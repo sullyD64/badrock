@@ -102,6 +102,7 @@ function scene:create( event )
 	-- We need physics started to add bodies, but we don't want the simulaton
 	-- running until the scene is on the screen.
 	physics.start()
+	physics.setGravity( 0, 15 )
 	physics.pause()
 
 	backgroundMusic= audio.loadStream(nil)
@@ -125,22 +126,17 @@ function scene:create( event )
 
 	-- make a rock (off-screen), position it, and rotate slightly
 	rock = display.newImageRect( "rock.png", 90, 90 )
-	rock.x, rock.y = 160, -100
+	rock.x, rock.y = 160, -30
 	rock.rotation = 15
 	
 	-- add physics to the rock
 	physics.addBody( rock, { density=1.0, friction=0.3, bounce=0 } )
 	setRockProperties()
 	
-
 	-- Movement Pad
 	controls = display.newRect(80,290, 100,50)
 	controls.name="controls"
 	controls:addEventListener("touch", controlsTouch)
-
-
-
-
 
 	local actionBtn = display.newCircle( 400,290,30)
 	actionBtn.name="actionBtn"
@@ -157,16 +153,13 @@ function scene:create( event )
 	local grassShape = { -halfW,-34, halfW,-34, halfW,34, -halfW,34 }
 	physics.addBody( grass, "static", { friction=0.3, shape=grassShape } )
 	
-
-	
--- second parameter is the Layer number, the 3rd is the focus on that object
+	-- second parameter is the Layer number, the 3rd is the focus on that object
 	camera:add(background, 3 , false)
 	camera:add(grass, 2 , false)
 	camera:add(rock, 1 , true)
 
 	--slow the track of a specific layer (perfect for backgrounds) 1 is equal to us, 0.5 is half track
 	camera:layer(3).parallaxRatio = 0.3
-
 
 	--camera Limits
 	camera:setBounds(0 , display.contentWidth, 0 , display.contentHeight)
@@ -178,7 +171,6 @@ function scene:create( event )
 	sceneGroup:insert( camera )
 	sceneGroup:insert(controls)
 	sceneGroup:insert(actionBtn)
-
 end
 
 
