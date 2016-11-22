@@ -104,7 +104,7 @@ function scene:create( event )
 	physics.start()
 	physics.pause()
 
-	backgroundMusic= audio.loadStream("Cthulhu Rising.wav")
+	backgroundMusic= audio.loadStream(nil)
 	-- create a grey rectangle as the backdrop
 	-- the physical screen will likely be a different shape than our defined content area
 	-- since we are going to position the background from it's top, left corner, draw the
@@ -112,7 +112,7 @@ function scene:create( event )
 	--camera = display.newGroup()
 
 
-	local background = display.newImageRect( "cthulhu_by_disse86-d9tq84i.jpg", 800, 500)
+	local background = display.newImageRect( "background.png", 1080, 720)
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
@@ -147,7 +147,7 @@ function scene:create( event )
 	actionBtn:addEventListener("touch", controlsTouch)
 
 	-- create a grass object and add physics (with custom shape)
-	local grass = display.newImageRect( "grass.png", screenW, 82 )
+	local grass = display.newImageRect( "platformdown.png", screenW, 50 )
 	grass.anchorX = 0
 	grass.anchorY = 1
 	--  draw the grass at the very bottom of the screen
