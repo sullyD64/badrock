@@ -7,17 +7,15 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
--- include Corona's "physics" library
 local physics = require ("physics")
-
-local tiledMap = require ("brt1")
+--local tiledMap = require ("brt1")
 
 --------------------------------------------
 
 -- forward declarations and other locals
 local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
 local backgroundMusic
-local rock={}
+local steve={}
 local controls={}
 
 local perspective=require("perspective")
@@ -28,62 +26,61 @@ local function moveCamera()
 	local leftOffset= 60
 	local screenLeft = -camera.x
 	local safeMoveArea = 380
-	if rock.x> leftOffset then
-		if rock.x > screenLeft + safeMoveArea then
-			camera.x = -rock.x + safeMoveArea
-			elseif rock.x < screenLeft + leftOffset then
-				camera.x = -rock.x + leftOffset
-
+	if steve.x> leftOffset then
+		if steve.x > screenLeft + safeMoveArea then
+			camera.x = -steve.x + safeMoveArea
+			elseif steve.x < screenLeft + leftOffset then
+				camera.x = -steve.x + leftOffset
 		end
 	else
 		camera.x=0
 	end
 end
 
-
-local function setRockProperties()
-	rock.speed = 80
+local function setSteveProperties()
+	steve.speed = 200
 end
 
-local function setRockVelocity()
-	local rockHorizontalVelocity, rockVerticalVelocity = rock:getLinearVelocity()
-	rock:setLinearVelocity(rock.velocity, rockVerticalVelocity)
+--Allows Steve to move on the x-axis while mid-air
+local function setSteveVelocity()
+
+	local steveHorizontalVelocity, steveVerticalVelocity = steve:getLinearVelocity()
+	steve:setLinearVelocity(steve.velocity, steveVerticalVelocity) 
 
 end
 local function controlsTouch(event)
 	local target = event.target
 
-	if event.phase=="began" then
+	if (event.phase=="began") then
 
 		display.currentStage:setFocus( target )
 
-		--IF WE TOUCH MOVEMENT CONTROLS
-		if(target.name == "controls") then
+		-- if we touch the d-pad
+		if (target.name == "dpad") then
+			Runtime:addEventListener("enterFrame", setSteveVelocity)
 
-
-			Runtime:addEventListener("enterFrame", setRockVelocity)
-
-			local middleOfControlPad= controls.x
-
-			if (event.x < middleOfControlPad )then
-			--move left
-
-				rock.velocity = -rock.speed
+			local middle = dpad.x
+			if (event.x < middle ) then
+				steve.velocity = -steve.speed -- move left 
 			else
-				--move right
-				rock.velocity = rock.speed
+				steve.velocity = steve.speed -- move right
 			end
-		--IF WE TOUCH ACTION BUTTON
-		elseif(target.name=="actionBtn") then
 
-			rock:applyLinearImpulse(0,-50, rock.x, rock.y)
+		-- if we touch the jump button
+		elseif (target.name=="jumpBtn") then
+			steve:applyLinearImpulse(0,-150, steve.x, steve.y)
 		end
 
-	elseif (event.phase=="ended"or "cancelled" == event.phase) then
+		-- if we touch the fire button
+		--elseif(target.name=="fireBtn") then
+			--[[INSERIRE CODICE BOTTONE AZIONE]]--
+		--end
 
-		if(target.name == "controls") then
-			rock.velocity=0
-			Runtime:removeEventListener("enterFrame", setRockVelocity)
+	elseif (event.phase=="ended" or "cancelled" == event.phase) then
+
+		if (target.name == "dpad") then
+			steve.velocity=0
+			Runtime:removeEventListener("enterFrame", setSteveVelocity)
 		end
 
 		display.currentStage:setFocus( nil )
@@ -94,7 +91,7 @@ function scene:create( event )
 
 	-- Called when the scene's view does not exist.
 	-- 
-	-- INSERT code here to initialize the scen
+	-- INSERT code here to initialize the scene
 	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
 
 	local sceneGroup = self.view
@@ -102,10 +99,11 @@ function scene:create( event )
 	-- We need physics started to add bodies, but we don't want the simulaton
 	-- running until the scene is on the screen.
 	physics.start()
-	physics.setGravity( 0, 15 )
+	physics.setGravity( 0, 30 )
 	physics.pause()
 
-	backgroundMusic= audio.loadStream(nil)
+	backgroundMusic = audio.loadStream(nil)
+
 	-- create a grey rectangle as the backdrop
 	-- the physical screen will likely be a different shape than our defined content area
 	-- since we are going to position the background from it's top, left corner, draw the
@@ -113,7 +111,7 @@ function scene:create( event )
 	--camera = display.newGroup()
 
 
-	local background = display.newImageRect( "background.png", 1080, 720)
+	local background = display.newImageRect( "background.png", 1080, 640)
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
@@ -124,39 +122,48 @@ function scene:create( event )
 	map.y = display.contentCenterY
 	]]--
 
-	-- make a rock (off-screen), position it, and rotate slightly
-	rock = display.newImageRect( "rock.png", 90, 90 )
-	rock.x, rock.y = 160, -30
-	rock.rotation = 15
+	-- make steve (off-screen), position it, and rotate slightly DA MODIFICARE
+	steve = display.newImageRect( "rock.png", 90, 90 )
+	steve.x, steve.y = 160, -30
+	steve.rotation = 15
 	
-	-- add physics to the rock
-	physics.addBody( rock, { density=1.0, friction=0.3, bounce=0 } )
-	setRockProperties()
+	-- add physics to the steve
+	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
+	setSteveProperties()
 	
-	-- Movement Pad
-	controls = display.newRect(80,290, 100,50)
-	controls.name="controls"
-	controls:addEventListener("touch", controlsTouch)
+	-- make the dpad
+	dpad = display.newRect(80,290, 100,50)
+	dpad.name="dpad"
+	dpad:addEventListener("touch", controlsTouch)
 
-	local actionBtn = display.newCircle( 400,290,30)
-	actionBtn.name="actionBtn"
-	actionBtn:addEventListener("touch", controlsTouch)
+	-- make the jump button
+	local jumpBtn = display.newCircle( 400,290,30)
+	jumpBtn.name="jumpBtn"
+	jumpBtn:addEventListener("touch", controlsTouch)
 
-	-- create a grass object and add physics (with custom shape)
-	local grass = display.newImageRect( "platformdown.png", screenW, 50 )
-	grass.anchorX = 0
-	grass.anchorY = 1
-	--  draw the grass at the very bottom of the screen
-	grass.x, grass.y = display.screenOriginX, display.actualContentHeight + display.screenOriginY
-	
+	-- create one platform (for testing)
+  	local platform = display.newImageRect( "platformdown.png", screenW, 50 )
+  	platform.anchorX = 0
+  	platform.anchorY = 1
+	platform.x = display.screenOriginX
+	platform.y = display.actualContentHeight + display.screenOriginY
+	physics.addBody( platform, "static", { friction = 1 } )
 	-- define a shape that's slightly shorter than image bounds (set draw mode to "hybrid" or "debug" to see)
-	local grassShape = { -halfW,-34, halfW,-34, halfW,34, -halfW,34 }
-	physics.addBody( grass, "static", { friction=0.3, shape=grassShape } )
-	
-	-- second parameter is the Layer number, the 3rd is the focus on that object
-	camera:add(background, 3 , false)
-	camera:add(grass, 2 , false)
-	camera:add(rock, 1 , true)
+	--local platformShape = { -halfW,-34, halfW,-34, halfW,34, -halfW,34 }
+	-- physics.addBody( platform, "static", { friction=0.3, shape=platformShape } )
+
+	-- create one square (for testing friction)
+	local sqr = display.newImageRect( "platformdown.png", 50, 50 )
+	sqr.anchorY = 1
+	sqr.x = display.contentCenterX
+	sqr.y = display.actualContentHeight + display.screenOriginY -50 
+	physics.addBody( sqr, "static", { friction = 1 } )
+	  
+  	-- second parameter is the Layer number, the 3rd is the focus on that object
+  	camera:add(background, 3 , false)
+  	camera:add(platform, 2 , false)
+  	camera:add(sqr, 2, false)
+  	camera:add(steve, 1 , true)
 
 	--slow the track of a specific layer (perfect for backgrounds) 1 is equal to us, 0.5 is half track
 	camera:layer(3).parallaxRatio = 0.3
@@ -168,9 +175,9 @@ function scene:create( event )
 	camera.dumping = 10
 
 	-- all display objects must be inserted into group
-	sceneGroup:insert( camera )
-	sceneGroup:insert(controls)
-	sceneGroup:insert(actionBtn)
+	sceneGroup:insert(camera)
+	sceneGroup:insert(dpad)
+	sceneGroup:insert(jumpBtn)
 end
 
 
