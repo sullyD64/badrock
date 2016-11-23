@@ -17,4 +17,4 @@ audio.setVolume( 0.5, { channel=1 } )
 
 
 -- load menu screen
-composer.gotoScene( "menu" )
+composer.gotoScene( "level1" ) --PROVVISORIA

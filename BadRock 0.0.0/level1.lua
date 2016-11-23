@@ -22,7 +22,7 @@ physics.setGravity( 0, 30 )
 local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
 local backgroundMusic
 
-local steve={}
+local steve
 local controls={}	-- MAI USATA
 
 local perspective=require("perspective")
