@@ -135,27 +135,26 @@ function scene:create( event )
 	steve.x, steve.y = 160, -30
 	steve.rotation = 15
 	steve.myName = "steve"
-	setEntitySpeed (steve, 120)
+	setEntitySpeed (steve, 300)
 	setEntityJumpHeight (steve, -45)
 	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
 
 	-- create one platform (for testing)
   	local platform = display.newImageRect( mainGroup, "platformdown.png", screenW *3, 50 )
-  	platform.anchorX = 0
+  	--platform.anchorX = 0
   	platform.anchorY = 1
 	platform.x = display.screenOriginX
 	platform.y =  display.actualContentHeight + display.screenOriginY
 	physics.addBody( platform, "static", { friction = 1 } )
-	-- define a shape that's slightly shorter than image bounds (set draw mode to "hybrid" or "debug" to see)
-	-- local platformShape = { -halfW,-34, halfW,-34, halfW,34, -halfW,34 }
-	-- physics.addBody( platform, "static", { friction=0.3, shape=platformShape } )
-
+	
+	--[[
 	-- create one square (for testing)
 	local sqr = display.newImageRect( mainGroup, "platformdown.png", 50, 50 )
 	sqr.anchorY = 1
 	sqr.x = display.contentCenterX + 200
 	sqr.y = display.actualContentHeight + display.screenOriginY -50 
 	physics.addBody( sqr, "static", { friction = 1 } )
+	
 
 	-- create left wall for avoiding falling down (for testing)
 	local lwall = display.newImageRect( mainGroup, "platformdown.png", 50, screenH )
@@ -164,6 +163,7 @@ function scene:create( event )
 	lwall.x = 0
 	lwall.y = display.actualContentHeight + display.screenOriginY -50 
 	physics.addBody( lwall, "static", { friction = 0 } )
+	]]
 
 	-- UI OPTIONS -----------------------------------
 	-- Load the controls UI
@@ -186,8 +186,8 @@ function scene:create( event )
   	-- third parameter is the focus on that object
   	camera:add(background, 3 , false)
   	camera:add(platform, 2 , false)
-  	camera:add(sqr, 2, false)
-  	camera:add(lwall, 2, false)
+  	--camera:add(sqr, 2, false)
+  	--camera:add(lwall, 2, false)
   	camera:add(steve, 1 , true)
 
 	-- slow the track of a specific layer (for backgrounds)
@@ -195,8 +195,7 @@ function scene:create( event )
 	camera:layer(3).parallaxRatio = 0.3
 
 	-- set the screen limits for the camera
-	camera:setBounds(display.contentWidth, display.contentWidth,
-	 display.contentHeight , display.contentHeight)
+	camera:setBounds(0,0,0,0)	-- TEST IN CORSO
 
 	-- set the follow speed of the focused layer 
 	camera.dumping = 10
