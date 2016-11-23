@@ -8,15 +8,22 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 local physics = require ("physics")
+physics.start()
+physics.setGravity( 0, 30 )
+
 --local tiledMap = require ("brt1")
 
---------------------------------------------
+-- -----------------------------------------------------------------------------------
+-- Code outside of the scene event functions below will only be executed ONCE unless
+-- the scene is removed entirely (not recycled) via "composer.removeScene()"
+-- -----------------------------------------------------------------------------------
 
 -- forward declarations and other locals
 local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
 local backgroundMusic
+
 local steve={}
-local controls={}
+local controls={}	-- MAI USATA
 
 local perspective=require("perspective")
 local camera = perspective.createView()
@@ -37,17 +44,20 @@ local function moveCamera()
 	end
 end
 
-local function setSteveProperties()
-	steve.speed = 200
+local function setEntitySpeed(entity, value)
+	entity.speed = value
+end
+
+local function setEntityJumpHeight(entity, value)
+	entity.jumpHeight = value
 end
 
 --Allows Steve to move on the x-axis while mid-air
 local function setSteveVelocity()
-
 	local steveHorizontalVelocity, steveVerticalVelocity = steve:getLinearVelocity()
 	steve:setLinearVelocity(steve.velocity, steveVerticalVelocity) 
-
 end
+
 local function controlsTouch(event)
 	local target = event.target
 
@@ -56,29 +66,27 @@ local function controlsTouch(event)
 		display.currentStage:setFocus( target )
 
 		-- if we touch the d-pad
-		if (target.name == "dpad") then
+		if (target.myName == "dpad") then
 			Runtime:addEventListener("enterFrame", setSteveVelocity)
-
-			local middle = dpad.x
-			if (event.x < middle ) then
+			if (event.x < dpad.x ) then
 				steve.velocity = -steve.speed -- move left 
 			else
 				steve.velocity = steve.speed -- move right
 			end
 
 		-- if we touch the jump button
-		elseif (target.name=="jumpBtn") then
-			steve:applyLinearImpulse(0,-150, steve.x, steve.y)
+		elseif (target.myName=="jumpBtn") then
+			steve:applyLinearImpulse(0,steve.jumpHeight, steve.x, steve.y)
 		end
 
 		-- if we touch the fire button
-		--elseif(target.name=="fireBtn") then
+		--elseif(target.myName=="fireBtn") then
 			--[[INSERIRE CODICE BOTTONE AZIONE]]--
 		--end
 
 	elseif (event.phase=="ended" or "cancelled" == event.phase) then
 
-		if (target.name == "dpad") then
+		if (target.myName == "dpad") then
 			steve.velocity=0
 			Runtime:removeEventListener("enterFrame", setSteveVelocity)
 		end
@@ -87,31 +95,31 @@ local function controlsTouch(event)
 	end
 end
 
+-- -----------------------------------------------------------------------------------
+-- Scene event functions
+-- -----------------------------------------------------------------------------------
+
 function scene:create( event )
 
-	-- Called when the scene's view does not exist.
-	-- 
-	-- INSERT code here to initialize the scene
-	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
-
 	local sceneGroup = self.view
-
-	-- We need physics started to add bodies, but we don't want the simulaton
-	-- running until the scene is on the screen.
-	physics.start()
-	physics.setGravity( 0, 30 )
-	physics.pause()
+	-- Code here runs when the scene is first created but has not yet appeared on screen
+	physics.pause() -- Temporarily pause the physics engine
 
 	backgroundMusic = audio.loadStream(nil)
 
-	-- create a grey rectangle as the backdrop
-	-- the physical screen will likely be a different shape than our defined content area
-	-- since we are going to position the background from it's top, left corner, draw the
-	-- background at the real top, left corner.
-	--camera = display.newGroup()
+	-- camera = display.newGroup()
+	backGroup = display.newGroup()
+	sceneGroup:insert( backGroup )
+
+	mainGroup = display.newGroup()
+	sceneGroup:insert( mainGroup )
+
+	uiGroup = display.newGroup()
+	sceneGroup:insert( uiGroup )
 
 
-	local background = display.newImageRect( "background.png", 1080, 640)
+	-- Load the background
+	local background = display.newImageRect( backGroup, "background.png", 480, 282)
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
@@ -122,129 +130,136 @@ function scene:create( event )
 	map.y = display.contentCenterY
 	]]--
 
-	-- make steve (off-screen), position it, and rotate slightly DA MODIFICARE
-	steve = display.newImageRect( "rock.png", 90, 90 )
+	-- Load Steve, the player avatar
+	steve = display.newImageRect( mainGroup, "rock.png", 50, 50 )
 	steve.x, steve.y = 160, -30
 	steve.rotation = 15
-	
-	-- add physics to the steve
+	steve.myName = "steve"
+	setEntitySpeed (steve, 120)
+	setEntityJumpHeight (steve, -45)
 	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
-	setSteveProperties()
-	
-	-- make the dpad
-	dpad = display.newRect(80,290, 100,50)
-	dpad.name="dpad"
-	dpad:addEventListener("touch", controlsTouch)
-
-	-- make the jump button
-	local jumpBtn = display.newCircle( 400,290,30)
-	jumpBtn.name="jumpBtn"
-	jumpBtn:addEventListener("touch", controlsTouch)
 
 	-- create one platform (for testing)
-  	local platform = display.newImageRect( "platformdown.png", screenW, 50 )
+  	local platform = display.newImageRect( mainGroup, "platformdown.png", screenW *3, 50 )
   	platform.anchorX = 0
   	platform.anchorY = 1
 	platform.x = display.screenOriginX
-	platform.y = display.actualContentHeight + display.screenOriginY
+	platform.y =  display.actualContentHeight + display.screenOriginY
 	physics.addBody( platform, "static", { friction = 1 } )
 	-- define a shape that's slightly shorter than image bounds (set draw mode to "hybrid" or "debug" to see)
-	--local platformShape = { -halfW,-34, halfW,-34, halfW,34, -halfW,34 }
+	-- local platformShape = { -halfW,-34, halfW,-34, halfW,34, -halfW,34 }
 	-- physics.addBody( platform, "static", { friction=0.3, shape=platformShape } )
 
-	-- create one square (for testing friction)
-	local sqr = display.newImageRect( "platformdown.png", 50, 50 )
+	-- create one square (for testing)
+	local sqr = display.newImageRect( mainGroup, "platformdown.png", 50, 50 )
 	sqr.anchorY = 1
-	sqr.x = display.contentCenterX
+	sqr.x = display.contentCenterX + 200
 	sqr.y = display.actualContentHeight + display.screenOriginY -50 
 	physics.addBody( sqr, "static", { friction = 1 } )
-	  
-  	-- second parameter is the Layer number, the 3rd is the focus on that object
+
+	-- create left wall for avoiding falling down (for testing)
+	local lwall = display.newImageRect( mainGroup, "platformdown.png", 50, screenH )
+	lwall.anchorX = 0
+	lwall.anchorY = 1
+	lwall.x = 0
+	lwall.y = display.actualContentHeight + display.screenOriginY -50 
+	physics.addBody( lwall, "static", { friction = 0 } )
+
+	-- UI OPTIONS -----------------------------------
+	-- Load the controls UI
+	dpad = display.newImageRect( uiGroup, "dpad.png", 100,51 )
+	dpad.x = 60
+	dpad.y = display.contentHeight-60
+	dpad.myName = "dpad"
+	dpad:addEventListener("touch", controlsTouch)
+
+	jumpBtn = display.newCircle( uiGroup, 
+		display.contentWidth-10, 
+		display.contentHeight-60,20 )
+	jumpBtn.anchorX = 1
+	jumpBtn.myName = "jumpBtn"
+	jumpBtn:addEventListener("touch", controlsTouch)
+	-------------------------------------------------
+
+	-- CAMERA OPTIONS -------------------------------
+  	-- second parameter is the Layer number
+  	-- third parameter is the focus on that object
   	camera:add(background, 3 , false)
   	camera:add(platform, 2 , false)
   	camera:add(sqr, 2, false)
+  	camera:add(lwall, 2, false)
   	camera:add(steve, 1 , true)
 
-	--slow the track of a specific layer (perfect for backgrounds) 1 is equal to us, 0.5 is half track
+	-- slow the track of a specific layer (for backgrounds)
+	-- 1 is equal to us, 0.5 is half track
 	camera:layer(3).parallaxRatio = 0.3
 
-	--camera Limits
-	camera:setBounds(0 , display.contentWidth, 0 , display.contentHeight)
+	-- set the screen limits for the camera
+	camera:setBounds(display.contentWidth, display.contentWidth,
+	 display.contentHeight , display.contentHeight)
 
-	--camera follow speed
+	-- set the follow speed of the focused layer 
 	camera.dumping = 10
 
 	-- all display objects must be inserted into group
 	sceneGroup:insert(camera)
 	sceneGroup:insert(dpad)
 	sceneGroup:insert(jumpBtn)
+	-------------------------------------------------
 end
 
-
+-- show()
 function scene:show( event )
+
 	local sceneGroup = self.view
 	local phase = event.phase
 	
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
 	elseif phase == "did" then
-		-- Called when the scene is now on screen
-		-- 
-		-- INSERT code here to make the scene come alive
-		-- e.g. start timers, begin animation, play audio, etc.
-
-		--Runtime:addEventListener("enterFrame", moveCamera)
+		-- Code here runs when the scene is entirely on screen
+		Runtime:addEventListener("enterFrame", moveCamera)
 
 		--Start the camera tracking
 		camera:track()
 		physics.start()
-		audio.play(backgroundMusic, {channel = 1 , loops= -1})
+		audio.play(backgroundMusic, {channel = 1 , loops=-1})
 	end
 end
 
+-- hide()
 function scene:hide( event )
+
 	local sceneGroup = self.view
-	
 	local phase = event.phase
 	
 	if event.phase == "will" then
-		-- Called when the scene is on screen and is about to move off screen
-		--
-		-- INSERT code here to pause the scene
-		-- e.g. stop timers, stop animation, unload sounds, etc.)
-		physics.stop()
+		-- Code here runs when the scene is on screen (but is about to go off screen)
 	elseif phase == "did" then
-		-- Called when the scene is now off screen
+		-- Code here runs immediately after the scene goes entirely off screen
+		physics.stop()
 		audio.stop(1)
-
 	end	
 	
 end
 
+-- destroy()
 function scene:destroy( event )
 
-	-- Called prior to the removal of scene's "view" (sceneGroup)
-	-- 
-	-- INSERT code here to cleanup the scene
-	-- e.g. remove display objects, remove touch listeners, save state, etc.
 	local sceneGroup = self.view
-
-
-
+	-- Code here runs prior to the removal of scene's view
 	audio.dispose( backgroundMusic )
-	
 	package.loaded[physics] = nil
 	physics = nil
 end
 
----------------------------------------------------------------------------------
-
--- Listener setup
+-- -----------------------------------------------------------------------------------
+-- Scene event function listeners
+-- -----------------------------------------------------------------------------------
 scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
-
------------------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------------
 
 return scene
