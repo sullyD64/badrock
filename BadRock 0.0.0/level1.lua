@@ -52,6 +52,21 @@ local function setEntityJumpHeight(entity, value)
 	entity.jumpHeight = value
 end
 
+local function onCollision ( event )
+
+    if ( event.phase == "began" ) then
+
+        local obj1 = event.object1
+        local obj2 = event.object2
+    
+        if ( (obj1.myName == "steve" and obj2.myName == "env" ) or
+             (obj1.myName == "env" and obj2.myName == "steve" ) )
+        then
+       	steve.isGrounded = true
+        end
+    end
+end
+
 --Allows Steve to move on the x-axis while mid-air
 local function setSteveVelocity()
 	local steveHorizontalVelocity, steveVerticalVelocity = steve:getLinearVelocity()
@@ -68,15 +83,16 @@ local function controlsTouch(event)
 		-- if we touch the d-pad
 		if (target.myName == "dpad") then
 			Runtime:addEventListener("enterFrame", setSteveVelocity)
-			if (event.x < dpad.x ) then
+			if (event.x < dpad.contentWidth/2 ) then
 				steve.velocity = -steve.speed -- move left 
 			else
 				steve.velocity = steve.speed -- move right
 			end
 
 		-- if we touch the jump button
-		elseif (target.myName=="jumpBtn") then
+		elseif (target.myName=="jumpBtn") and (steve.isGrounded) then
 			steve:applyLinearImpulse(0,steve.jumpHeight, steve.x, steve.y)
+			steve.isGrounded = false
 		end
 
 		-- if we touch the fire button
@@ -135,7 +151,7 @@ function scene:create( event )
 	steve.x, steve.y = 160, -30
 	steve.rotation = 15
 	steve.myName = "steve"
-	setEntitySpeed (steve, 300)
+	setEntitySpeed (steve, 120)
 	setEntityJumpHeight (steve, -45)
 	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
 
@@ -147,7 +163,6 @@ function scene:create( event )
 	platform.y =  display.actualContentHeight + display.screenOriginY
 	physics.addBody( platform, "static", { friction = 1 } )
 	
-	--[[
 	-- create one square (for testing)
 	local sqr = display.newImageRect( mainGroup, "platformdown.png", 50, 50 )
 	sqr.anchorY = 1
@@ -155,7 +170,6 @@ function scene:create( event )
 	sqr.y = display.actualContentHeight + display.screenOriginY -50 
 	physics.addBody( sqr, "static", { friction = 1 } )
 	
-
 	-- create left wall for avoiding falling down (for testing)
 	local lwall = display.newImageRect( mainGroup, "platformdown.png", 50, screenH )
 	lwall.anchorX = 0
@@ -163,12 +177,17 @@ function scene:create( event )
 	lwall.x = 0
 	lwall.y = display.actualContentHeight + display.screenOriginY -50 
 	physics.addBody( lwall, "static", { friction = 0 } )
-	]]
+
+	platform.myName = "env"
+	sqr.myName = "env"
+	lwall.myName = "env"
+
 
 	-- UI OPTIONS -----------------------------------
 	-- Load the controls UI
 	dpad = display.newImageRect( uiGroup, "dpad.png", 100,51 )
-	dpad.x = 60
+	dpad.anchorX = 0
+	dpad.x = 10
 	dpad.y = display.contentHeight-60
 	dpad.myName = "dpad"
 	dpad:addEventListener("touch", controlsTouch)
@@ -186,8 +205,8 @@ function scene:create( event )
   	-- third parameter is the focus on that object
   	camera:add(background, 3 , false)
   	camera:add(platform, 2 , false)
-  	--camera:add(sqr, 2, false)
-  	--camera:add(lwall, 2, false)
+  	camera:add(sqr, 2, false)
+  	camera:add(lwall, 2, false)
   	camera:add(steve, 1 , true)
 
 	-- slow the track of a specific layer (for backgrounds)
@@ -218,6 +237,7 @@ function scene:show( event )
 	elseif phase == "did" then
 		-- Code here runs when the scene is entirely on screen
 		Runtime:addEventListener("enterFrame", moveCamera)
+		Runtime:addEventListener( "collision", onCollision)
 
 		--Start the camera tracking
 		camera:track()
@@ -236,6 +256,7 @@ function scene:hide( event )
 		-- Code here runs when the scene is on screen (but is about to go off screen)
 	elseif phase == "did" then
 		-- Code here runs immediately after the scene goes entirely off screen
+		Runtime:removeEventListener( "collision", onCollision)
 		physics.stop()
 		audio.stop(1)
 	end	

@@ -219,7 +219,10 @@ function Perspective.createView(numLayers)
 		if type(x)=="boolean" then
 			view._PERSPECTIVE_PRIVATE_VALUES.x1, view._PERSPECTIVE_PRIVATE_VALUES.x2, view._PERSPECTIVE_PRIVATE_VALUES.y1, view._PERSPECTIVE_PRIVATE_VALUES.y2=-inf, inf, -inf, inf
 		else
-			view._PERSPECTIVE_PRIVATE_VALUES.x1, view._PERSPECTIVE_PRIVATE_VALUES.x2, view._PERSPECTIVE_PRIVATE_VALUES.y1, view._PERSPECTIVE_PRIVATE_VALUES.y2=x1, x2, y1, y2
+			view._PERSPECTIVE_PRIVATE_VALUES.x1, 
+			view._PERSPECTIVE_PRIVATE_VALUES.x2, 
+			view._PERSPECTIVE_PRIVATE_VALUES.y1, 
+			view._PERSPECTIVE_PRIVATE_VALUES.y2=x1, x2, y1, y2
 		end
 
 		return "bounds set"
