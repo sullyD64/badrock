@@ -7,24 +7,25 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
+lime = require("lime.lime")
+
 local physics = require ("physics")
 physics.start()
 physics.setGravity( 0, 30 )
 
---local tiledMap = require ("brt1")
-
 -- -----------------------------------------------------------------------------------
--- Code outside of the scene event functions below will only be executed ONCE unless
--- the scene is removed entirely (not recycled) via "composer.removeScene()"
+-- SCENE-ACCESSIBLE CODE
 -- -----------------------------------------------------------------------------------
 
 -- forward declarations and other locals
 local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
 local backgroundMusic
 
+local map, visual, physical
 local steve
-local controls={}	-- MAI USATA
 
+--[[
+-- CAMERA IMPLEMENTATION ----------------- 
 local perspective=require("perspective")
 local camera = perspective.createView()
 
@@ -43,6 +44,8 @@ local function moveCamera()
 		camera.x=0
 	end
 end
+------------------------------------------
+]]
 
 local function setEntitySpeed(entity, value)
 	entity.speed = value
@@ -70,7 +73,7 @@ end
 --Allows Steve to move on the x-axis while mid-air
 local function setSteveVelocity()
 	local steveHorizontalVelocity, steveVerticalVelocity = steve:getLinearVelocity()
-	steve:setLinearVelocity(steve.velocity, steveVerticalVelocity) 
+	steve:setLinearVelocity(steve.actualSpeed, steveVerticalVelocity) 
 end
 
 local function controlsTouch(event)
@@ -84,9 +87,9 @@ local function controlsTouch(event)
 		if (target.myName == "dpad") then
 			Runtime:addEventListener("enterFrame", setSteveVelocity)
 			if (event.x < dpad.contentWidth/2 ) then
-				steve.velocity = -steve.speed -- move left 
+				steve.actualSpeed = -steve.speed -- move left 
 			else
-				steve.velocity = steve.speed -- move right
+				steve.actualSpeed =  steve.speed -- move right
 			end
 
 		-- if we touch the jump button
@@ -95,8 +98,8 @@ local function controlsTouch(event)
 			steve.isGrounded = false
 		end
 
-		-- if we touch the fire button
-		--elseif(target.myName=="fireBtn") then
+		-- if we touch the action button button
+		--elseif(target.myName=="actionBtn") then
 			--[[INSERIRE CODICE BOTTONE AZIONE]]--
 		--end
 
@@ -112,48 +115,58 @@ local function controlsTouch(event)
 end
 
 -- -----------------------------------------------------------------------------------
--- Scene event functions
+-- SCENE EVENT FUNCTIONS
 -- -----------------------------------------------------------------------------------
 
+-- create()
 function scene:create( event )
 
 	local sceneGroup = self.view
-	-- Code here runs when the scene is first created but has not yet appeared on screen
-	physics.pause() -- Temporarily pause the physics engine
+	physics.pause()
 
 	backgroundMusic = audio.loadStream(nil)
 
-	-- camera = display.newGroup()
-	backGroup = display.newGroup()
+	-- SCENE GROUPS ---------------------------------
+	map = lime.loadMap("mappa1.tmx")
+	visual = lime.createVisual(map)
+	sceneGroup:insert( visual )
+
+	--[[
+	backGroup = display.newGroup() 
 	sceneGroup:insert( backGroup )
+	]]
 
 	mainGroup = display.newGroup()
 	sceneGroup:insert( mainGroup )
 
 	uiGroup = display.newGroup()
 	sceneGroup:insert( uiGroup )
+	-------------------------------------------------
+
+	-- Apply physics to the map
+	physical = lime.buildPhysical(map)	
 
 
+	-- CHARACTER OPTIONS ----------------------------
+	-- Load Steve, the player avatarS
+	local layer = map:getObjectLayer("obj")
+	local spawn = layer:getObject("spawn")
+	steve = display.newImageRect( mainGroup, "rock.png", 32, 32 )
+	steve.x, steve.y = spawn.x, spawn.y
+	steve.rotation = 15
+	steve.myName = "steve"
+	setEntitySpeed (steve, 150)
+	setEntityJumpHeight (steve, -18)
+	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
+	-------------------------------------------------
+
+
+	--[[
+	-- TESTING ENVIRONMENT --------------------------
 	-- Load the background
 	local background = display.newImageRect( backGroup, "background.png", 480, 282)
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
-
-	--[[
-	map = tiledMap:load("brt1.json")
-	map:setReferencePoint(display.contentReferencePoint)
-	map.x = display.contentCenterX
-	map.y = display.contentCenterY
-	]]--
-
-	-- Load Steve, the player avatar
-	steve = display.newImageRect( mainGroup, "rock.png", 50, 50 )
-	steve.x, steve.y = 160, -30
-	steve.rotation = 15
-	steve.myName = "steve"
-	setEntitySpeed (steve, 120)
-	setEntityJumpHeight (steve, -45)
-	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
 
 	-- create one platform (for testing)
   	local platform = display.newImageRect( mainGroup, "platformdown.png", screenW *3, 50 )
@@ -177,29 +190,32 @@ function scene:create( event )
 	lwall.x = 0
 	lwall.y = display.actualContentHeight + display.screenOriginY -50 
 	physics.addBody( lwall, "static", { friction = 0 } )
-
+	
 	platform.myName = "env"
 	sqr.myName = "env"
 	lwall.myName = "env"
-
+	-------------------------------------------------
+	]]--
 
 	-- UI OPTIONS -----------------------------------
 	-- Load the controls UI
 	dpad = display.newImageRect( uiGroup, "dpad.png", 100,51 )
 	dpad.anchorX = 0
 	dpad.x = 10
-	dpad.y = display.contentHeight-60
+	dpad.y = display.contentHeight -60
 	dpad.myName = "dpad"
 	dpad:addEventListener("touch", controlsTouch)
 
-	jumpBtn = display.newCircle( uiGroup, 
-		display.contentWidth-10, 
-		display.contentHeight-60,20 )
+	jumpBtn = display.newImageRect( uiGroup, "actionbtn.png",51,51 )
+	jumpBtn.x = display.contentWidth -10
+	jumpBtn.y = display.contentHeight -60
 	jumpBtn.anchorX = 1
 	jumpBtn.myName = "jumpBtn"
 	jumpBtn:addEventListener("touch", controlsTouch)
 	-------------------------------------------------
 
+
+	--[[
 	-- CAMERA OPTIONS -------------------------------
   	-- second parameter is the Layer number
   	-- third parameter is the focus on that object
@@ -224,6 +240,7 @@ function scene:create( event )
 	sceneGroup:insert(dpad)
 	sceneGroup:insert(jumpBtn)
 	-------------------------------------------------
+	]]
 end
 
 -- show()
@@ -233,14 +250,12 @@ function scene:show( event )
 	local phase = event.phase
 	
 	if phase == "will" then
-		-- Called when the scene is still off screen and is about to move on screen
+		
 	elseif phase == "did" then
-		-- Code here runs when the scene is entirely on screen
-		Runtime:addEventListener("enterFrame", moveCamera)
+		--Runtime:addEventListener("enterFrame", moveCamera)
 		Runtime:addEventListener( "collision", onCollision)
 
-		--Start the camera tracking
-		camera:track()
+		-- camera:track() -- start the camera tracking
 		physics.start()
 		audio.play(backgroundMusic, {channel = 1 , loops=-1})
 	end
@@ -253,9 +268,8 @@ function scene:hide( event )
 	local phase = event.phase
 	
 	if event.phase == "will" then
-		-- Code here runs when the scene is on screen (but is about to go off screen)
+	
 	elseif phase == "did" then
-		-- Code here runs immediately after the scene goes entirely off screen
 		Runtime:removeEventListener( "collision", onCollision)
 		physics.stop()
 		audio.stop(1)
@@ -267,14 +281,14 @@ end
 function scene:destroy( event )
 
 	local sceneGroup = self.view
-	-- Code here runs prior to the removal of scene's view
+	
 	audio.dispose( backgroundMusic )
 	package.loaded[physics] = nil
 	physics = nil
 end
 
 -- -----------------------------------------------------------------------------------
--- Scene event function listeners
+-- SCENE EVENT FUNCTION LISTENERS
 -- -----------------------------------------------------------------------------------
 scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
