@@ -24,7 +24,7 @@ local backgroundMusic
 local map, visual, physical
 local steve
 
---[[
+--
 -- CAMERA IMPLEMENTATION ----------------- 
 local perspective=require("perspective")
 local camera = perspective.createView()
@@ -45,7 +45,7 @@ local function moveCamera()
 	end
 end
 ------------------------------------------
-]]
+
 
 local function setEntitySpeed(entity, value)
 	entity.speed = value
@@ -87,21 +87,20 @@ local function controlsTouch(event)
 		if (target.myName == "dpad") then
 			Runtime:addEventListener("enterFrame", setSteveVelocity)
 			if (event.x < dpad.contentWidth/2 ) then
-				steve.actualSpeed = -steve.speed -- move left 
+				steve.actualSpeed = -steve.speed -- move left
+
+				steve.xScale= -1 --flip the image to the left
 			else
 				steve.actualSpeed =  steve.speed -- move right
+				steve.xScale=1 --flip the image to the right
 			end
 
 		-- if we touch the jump button
-		elseif (target.myName=="jumpBtn") and (steve.isGrounded) then
+		elseif (target.myName=="jumpScreen") and (steve.isGrounded) then
 			steve:applyLinearImpulse(0,steve.jumpHeight, steve.x, steve.y)
 			steve.isGrounded = false
 		end
 
-		-- if we touch the action button button
-		--elseif(target.myName=="actionBtn") then
-			--[[INSERIRE CODICE BOTTONE AZIONE]]--
-		--end
 
 	elseif (event.phase=="ended" or "cancelled" == event.phase) then
 
@@ -112,8 +111,26 @@ local function controlsTouch(event)
 
 		display.currentStage:setFocus( nil )
 	end
+
+	return true --Prevents touch propagation to underlying objects
 end
 
+
+local function actionTouch( event )
+
+	if (event.phase=="began") then
+		display.currentStage:setFocus( event.target )
+
+	-- CODE HERE
+
+	elseif (event.phase=="ended" or "cancelled" == event.phase) then
+
+	--CODE HERE
+
+		display.currentStage:setFocus( nil )
+	end
+	return true --Prevents touch propagation to underlying objects
+end
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
 -- -----------------------------------------------------------------------------------
@@ -131,10 +148,6 @@ function scene:create( event )
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 
-	--[[
-	backGroup = display.newGroup() 
-	sceneGroup:insert( backGroup )
-	]]
 
 	mainGroup = display.newGroup()
 	sceneGroup:insert( mainGroup )
@@ -161,29 +174,8 @@ function scene:create( event )
 	-------------------------------------------------
 
 
-	--[[
-	-- TESTING ENVIRONMENT --------------------------
-	-- Load the background
-	local background = display.newImageRect( backGroup, "background.png", 480, 282)
-	background.x = display.contentCenterX
-	background.y = display.contentCenterY
-
-	-- create one platform (for testing)
-  	local platform = display.newImageRect( mainGroup, "platformdown.png", screenW *3, 50 )
-  	--platform.anchorX = 0
-  	platform.anchorY = 1
-	platform.x = display.screenOriginX
-	platform.y =  display.actualContentHeight + display.screenOriginY
-	physics.addBody( platform, "static", { friction = 1 } )
 	
-	-- create one square (for testing)
-	local sqr = display.newImageRect( mainGroup, "platformdown.png", 50, 50 )
-	sqr.anchorY = 1
-	sqr.x = display.contentCenterX + 200
-	sqr.y = display.actualContentHeight + display.screenOriginY -50 
-	physics.addBody( sqr, "static", { friction = 1 } )
-	
-	-- create left wall for avoiding falling down (for testing)
+	--[[ create left wall for avoiding falling down (for testing)
 	local lwall = display.newImageRect( mainGroup, "platformdown.png", 50, screenH )
 	lwall.anchorX = 0
 	lwall.anchorY = 1
@@ -199,6 +191,14 @@ function scene:create( event )
 
 	-- UI OPTIONS -----------------------------------
 	-- Load the controls UI
+
+	--Trasparent Giant Button on the screen with the screen size that allow us to jump
+	jScreen = display.newImageRect(uiGroup,"emptyScreen.png", display.contentWidth, display.contentHeight)
+	jScreen.x, jScreen.y = display.contentCenterX , display.contentCenterY
+	jScreen.myName = "jumpScreen"
+	jScreen:toBack()
+	jScreen:addEventListener("touch", controlsTouch)
+
 	dpad = display.newImageRect( uiGroup, "dpad.png", 100,51 )
 	dpad.anchorX = 0
 	dpad.x = 10
@@ -206,41 +206,39 @@ function scene:create( event )
 	dpad.myName = "dpad"
 	dpad:addEventListener("touch", controlsTouch)
 
-	jumpBtn = display.newImageRect( uiGroup, "actionbtn.png",51,51 )
-	jumpBtn.x = display.contentWidth -10
-	jumpBtn.y = display.contentHeight -60
-	jumpBtn.anchorX = 1
-	jumpBtn.myName = "jumpBtn"
-	jumpBtn:addEventListener("touch", controlsTouch)
+	actionBtn = display.newImageRect( uiGroup, "actionbtn.png",51,51 )
+	actionBtn.x = display.contentWidth -10
+	actionBtn.y = display.contentHeight -60
+	actionBtn.anchorX = 1
+	actionBtn.myName = "actionBtn"
+	actionBtn:addEventListener("touch", actionTouch)
+-- DA IMPLEMENTARE FUNZIONALITA DI actionTouch
+	
 	-------------------------------------------------
 
 
-	--[[
+	--
 	-- CAMERA OPTIONS -------------------------------
   	-- second parameter is the Layer number
   	-- third parameter is the focus on that object
-  	camera:add(background, 3 , false)
-  	camera:add(platform, 2 , false)
-  	camera:add(sqr, 2, false)
-  	camera:add(lwall, 2, false)
+ 
+  	camera:add(visual,2,false)
   	camera:add(steve, 1 , true)
 
 	-- slow the track of a specific layer (for backgrounds)
 	-- 1 is equal to us, 0.5 is half track
-	camera:layer(3).parallaxRatio = 0.3
+	--camera:layer(3).parallaxRatio = 0.3
 
 	-- set the screen limits for the camera
-	camera:setBounds(0,0,0,0)	-- TEST IN CORSO
-
+	camera:setBounds(0, steve.x ,-100, steve.y)	-- TEST IN CORSO
 	-- set the follow speed of the focused layer 
-	camera.dumping = 10
+	camera.dumping = 50
 
 	-- all display objects must be inserted into group
 	sceneGroup:insert(camera)
-	sceneGroup:insert(dpad)
-	sceneGroup:insert(jumpBtn)
+	sceneGroup:insert(uiGroup)
 	-------------------------------------------------
-	]]
+	
 end
 
 -- show()
@@ -252,10 +250,10 @@ function scene:show( event )
 	if phase == "will" then
 		
 	elseif phase == "did" then
-		--Runtime:addEventListener("enterFrame", moveCamera)
+		Runtime:addEventListener("enterFrame", moveCamera)
 		Runtime:addEventListener( "collision", onCollision)
 
-		-- camera:track() -- start the camera tracking
+		 camera:track() -- start the camera tracking
 		physics.start()
 		audio.play(backgroundMusic, {channel = 1 , loops=-1})
 	end
