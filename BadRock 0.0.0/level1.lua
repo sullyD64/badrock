@@ -157,7 +157,7 @@ end
 
 
 
-
+--[[ OLD COLLISION HANDLER---------------------------------------------------------
 local function onCollision ( event )
 
 
@@ -214,10 +214,106 @@ local function onCollision ( event )
         end
 
             
-           
     end    
     end
 end
+
+]]--------------------------------------------------------------------------
+
+--NEW COLLISIONS METHODS
+
+
+--Collision Types:
+--Collision with Environments (Generic)
+function environmentCollision( event )
+	local env
+	local other
+
+	if(event.object1.myName =="env") then 
+		env= event.object1
+		other = event.object2
+	else 
+		env = event.object2
+		other = event.object1
+	end
+
+	if ( event.phase == "began" ) then
+		--set the objet (that is on the env) to be onGrounded
+		other.isGrounded = true
+	end
+end
+
+--Collision with Coins (Only for Steve)
+function coinCollision( event )
+	local steveObj
+	local coin
+
+	if(event.object1.myName =="steve") then 
+		steveObj= event.object1
+		coin = event.object2
+	else 
+		steveObj = event.object2
+		coin = event.object1
+	end
+
+	if ( event.phase == "began" ) then
+		display.remove( coin )
+		--La moneta "Permette di fare un doppio salto"
+    	steveObj.isGrounded = true
+    elseif(event.phase == "cancelled" or event.phase == "ended" )then
+       -- Increase score
+    	score = score + 100
+    	scoreText.text = "Score: " .. score
+    end
+
+end
+
+--Collision with enemy and dangerous things (Only for Steve)
+function dangerCollision( event )
+
+	if ( died == false ) then
+        died = true
+        -- Update lives
+        lives = lives - 1
+        livesText.text = "Lives: " .. lives
+
+        -- If we have no lives left
+        if ( lives == 0 ) then
+            steve.alpha = 0
+			camera:cancel() --Stop camera Tracking
+            timer.performWithDelay( 2000, endGame )
+        else
+            steve.alpha = 0
+            timer.performWithDelay( 50, restoreSteve )
+        end
+    end
+
+
+end
+
+
+--Steve Collisions Handler
+function steveCollisions( event )
+	local steveObj = event.object1
+	local other = event.object2
+
+	if(other.myName =="steve") then 
+		steveObj = event.object2
+		other = event.object1
+	end
+
+	-- Collision Type
+	if(other.myName == "env") then
+		environmentCollision(event)
+	elseif (other.myName == "coin") then
+		coinCollision(event)
+	elseif (other.myName == "nemico")then
+		dangerCollision(event)
+	end
+
+end
+
+
 
 --Allows Steve to move on the x-axis while mid-air
 local function setSteveVelocity()
@@ -334,7 +430,7 @@ function scene:create( event )
 	setEntitySpeed (steve, 150)
 	setEntityJumpHeight (steve, -18)
 	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
-
+	---steve:addEventListener ("collision", steveCollisions)
 
 	livesText = display.newText( uiGroup, "Lives: " .. lives, 100, 20, native.systemFont, 24 )
 	livesText:setFillColor( 255,0,0 )
@@ -420,12 +516,12 @@ function scene:show( event )
 		
 	elseif phase == "did" then
 		Runtime:addEventListener("enterFrame", moveCamera)
-		Runtime:addEventListener( "collision", onCollision)
-	--	Runtime:addEventListener( "morte", eliminasteve)
+		Runtime:addEventListener( "collision", steveCollisions)
+
 
 		 camera:track() -- start the camera tracking
 		physics.start()
-		--Runtime:addEventListener( "pre", prendi )
+
 		audio.play(backgroundMusic, {channel = 1 , loops=-1})
 	end
 end
