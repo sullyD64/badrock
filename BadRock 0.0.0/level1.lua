@@ -13,6 +13,146 @@ local physics = require ("physics")
 physics.start()
 physics.setGravity( 0, 30 )
 
+
+local lives = 3
+local score = 0
+local died = false
+local scoreText
+
+local function updateText()
+    livesText.text = "Lives: " .. lives
+    scoreText.text = "Score: " .. score
+end
+
+--[[
+local function createcoin()
+
+	local layer = map:getObjectLayer("obj")
+	local spawn = layer:getObject("spawn")
+
+	--local spawn = layer:getObject("spawn")
+	local coinspawn= layer:getObject("coinspawn")
+
+	
+	coin = display.newImageRect ( mainGroup, "coin.png", 32,32)
+	coin.x, coin.y = coinspawn.x,coinspawn.y
+	coin.myName = "coin"
+	physics.addBody( coin, {isSensor = true} )
+	--coin.HasBody= true
+	coin.bodyType= "static"
+
+
+	
+    local newcoin = display.newImageRect( mainGroup, objectSheet, 1, 102, 85 )
+    table.insert( coinsTable, newcoin )
+    physics.addBody( newcoin, "dynamic", { radius=40, bounce=0.8 } )
+    newcoin.myName = "coin"
+
+    local whereFrom = math.random( 3 )
+
+    if ( whereFrom == 1 ) then
+        -- From the left
+        newcoin.x = -60
+        newcoin.y = math.random( 500 )
+        newcoin:setLinearVelocity( math.random( 40,120 ), math.random( 20,60 ) )
+    elseif ( whereFrom == 2 ) then
+        -- From the top
+        newcoin.x = math.random( display.contentWidth )
+        newcoin.y = -60
+        newcoin:setLinearVelocity( math.random( -40,40 ), math.random( 40,120 ) )
+    elseif ( whereFrom == 3 ) then
+        -- From the right
+        newcoin.x = display.contentWidth + 60
+        newcoin.y = math.random( 500 )
+        newcoin:setLinearVelocity( math.random( -120,-40 ), math.random( 20,60 ) )
+    end
+
+    newcoin:applyTorque( math.random( -6,6 ) )
+end
+
+--steve è invisibile
+]]
+--[[local function restoresteve()
+	local steve
+	--local layer = map:getObjectLayer("obj")
+	--local spawn = layer:getObject("spawn")
+	steve = display.newImageRect( mainGroup, "rock.png", 32, 32 )
+	steve.x, steve.y = 226,1059
+	steve.rotation = 15
+	steve.myName = "steve"
+	--setEntitySpeed (steve, 150)
+	--setEntityJumpHeight (steve, -18)
+	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
+	
+
+    steve.isBodyActive = false
+    steve:setLinearVelocity( 0, 0 )
+    -- steve.x = 226
+    --steve.y = 1059
+
+    -- Fade in the steve
+    transition.to( steve, { alpha=1, time=4000,
+        onComplete = function()
+            steve.isBodyActive = true
+            died = false
+        end
+    } )
+end
+]]
+
+local function endGame()
+    composer.setVariable( "finalScore", score )
+    composer.removeScene( "highscores" )
+    composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
+end
+local function prendi( event )
+
+    if ( event.phase == "began" ) then
+
+        local obj1 = event.object1
+        local obj2 = event.object2
+
+        if ( ( obj1.myName == "steve" and obj2.myName == "coin" ) or
+             ( obj1.myName == "coin" and obj2.myName == "steve" ) )
+        then
+            -- Remove both the steve and coin
+            display.remove( obj1 )
+            display.remove( obj2 )
+
+            for i = #coinsTable, 1, -1 do
+                if ( coinsTable[i] == obj1 or coinsTable[i] == obj2 ) then
+                    table.remove( coinsTable, i )
+                    break
+                end
+            end
+
+            -- Increase score
+            score = score + 100
+            scoreText.text = "Score: " .. score
+
+        elseif ( ( obj1.myName == "steve" and obj2.myName == "coin" ) or
+                 ( obj1.myName == "coin" and obj2.myName == "steve" ) )
+        then
+            if ( died == false ) then
+                died = true
+
+                -- Update lives
+                lives = lives - 1
+                livesText.text = "Lives: " .. lives
+
+                if ( lives == 0 ) then
+                    display.remove( steve )
+                    timer.performWithDelay( 2000, endGame )
+                else
+                    steve.alpha = 0
+                    timer.performWithDelay( 1000, restoresteve )
+                end
+            end
+        end
+    end
+end
+
+
 -- -----------------------------------------------------------------------------------
 -- SCENE-ACCESSIBLE CODE
 -- -----------------------------------------------------------------------------------
@@ -55,6 +195,47 @@ local function setEntityJumpHeight(entity, value)
 	entity.jumpHeight = value
 end
 
+--[[local function morte ( event )
+
+    if ( event.phase == "began" ) then
+
+        local obj1 = event.object1
+        local obj2 = event.object2
+    
+        if ( ( obj1.myName == "steve" and obj2.myName == "nemico" ) or
+                 ( obj1.myName == "nemico" and obj2.myName == "steve" ) )
+        then
+            if ( died == false ) then
+                died = true
+
+                -- Update lives
+                lives = lives - 1
+                livesText.text = "Lives: " .. lives
+
+                if ( lives == 0 ) then
+                    display.remove( steve )
+                    timer.performWithDelay( 2000, endGame )
+                else
+                    steve.alpha = 0
+                    timer.performWithDelay( 1000, restoresteve )
+                end
+            end
+        end
+
+	end
+ 
+end
+
+local function eliminasteve()
+	if (steve.isDead== true)
+		then display.remove( steve ) 
+		steve.isDead= false
+
+	end
+end
+]]
+
+
 local function onCollision ( event )
 
     if ( event.phase == "began" ) then
@@ -67,6 +248,47 @@ local function onCollision ( event )
         then
        	steve.isGrounded = true
         end
+
+        else if (  (event.object1).myName == "steve" and (event.object2).myName == "coin" )
+        	then
+        	display.remove( event.object2 )
+        	steve.isGrounded = true
+        	            -- Increase score
+            score = score + 100
+            scoreText.text = "Score: " .. score
+        --end
+
+        else if ( (event.object1).myName == "coin" and (event.object2).myName == "steve" ) 
+             then
+             display.remove( event.object1 ) 
+             steve.isGrounded = true
+                         -- Increase score
+            score = score + 100
+            scoreText.text = "Score: " .. score
+       --end
+       elseif ( ( (event.object1).myName == "steve" and (event.object2).myName == "nemico" ) or
+                 ( (event.object1).myName == "nemico" and (event.object2).myName == "steve" ) )
+        then
+            if ( died == false ) then
+                died = true
+
+                -- Update lives
+                lives = lives - 1
+                livesText.text = "Lives: " .. lives
+
+                if ( lives == 0 ) then
+                    display.remove( steve )
+                    timer.performWithDelay( 2000, endGame )
+                else
+                    steve.alpha = 0
+                    timer.performWithDelay( 1000, restoresteve )
+                end
+            end
+        end
+
+            
+           
+    end    
     end
 end
 
@@ -164,6 +386,20 @@ function scene:create( event )
 	-- Load Steve, the player avatarS
 	local layer = map:getObjectLayer("obj")
 	local spawn = layer:getObject("spawn")
+
+	--local spawn = layer:getObject("spawn")
+	local coinspawn= layer:getObject("coinspawn")
+
+	
+	coin = display.newImageRect ( mainGroup, "coin.png", 32,32)
+	coin.x, coin.y = coinspawn.x,coinspawn.y
+	coin.myName = "coin"
+	physics.addBody( coin, {isSensor = true} )
+	--coin.HasBody= true
+	coin.bodyType= "static"
+
+
+
 	steve = display.newImageRect( mainGroup, "rock.png", 32, 32 )
 	steve.x, steve.y = spawn.x, spawn.y
 	steve.rotation = 15
@@ -171,6 +407,10 @@ function scene:create( event )
 	setEntitySpeed (steve, 150)
 	setEntityJumpHeight (steve, -18)
 	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
+
+
+	livesText = display.newText( uiGroup, "Lives: " .. lives, 100, 20, native.systemFont, 24 )
+    scoreText = display.newText( uiGroup, "Score: " .. score, 400, 20, native.systemFont, 24 )
 	-------------------------------------------------
 
 
@@ -223,8 +463,8 @@ function scene:create( event )
   	-- third parameter is the focus on that object
  
   	camera:add(visual,2,false)
+  	camera:add(coin,1,true)
   	camera:add(steve, 1 , true)
-
 	-- slow the track of a specific layer (for backgrounds)
 	-- 1 is equal to us, 0.5 is half track
 	--camera:layer(3).parallaxRatio = 0.3
@@ -252,9 +492,11 @@ function scene:show( event )
 	elseif phase == "did" then
 		Runtime:addEventListener("enterFrame", moveCamera)
 		Runtime:addEventListener( "collision", onCollision)
+	--	Runtime:addEventListener( "morte", eliminasteve)
 
 		 camera:track() -- start the camera tracking
 		physics.start()
+		--Runtime:addEventListener( "pre", prendi )
 		audio.play(backgroundMusic, {channel = 1 , loops=-1})
 	end
 end
@@ -269,6 +511,8 @@ function scene:hide( event )
 	
 	elseif phase == "did" then
 		Runtime:removeEventListener( "collision", onCollision)
+	--	Runtime:addEventListener( "morte", eliminasteve)
+       
 		physics.stop()
 		audio.stop(1)
 	end	
