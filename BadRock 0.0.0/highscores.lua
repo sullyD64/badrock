@@ -77,21 +77,21 @@ function scene:create( event )
     -- Save the scores
     saveScores()
 
-    local background = display.newImageRect( sceneGroup, "background.png", 800, 1400 )
+    local background = display.newImageRect( sceneGroup, "background.png", 640,960 )
     background.x = display.contentCenterX
     background.y = display.contentCenterY
 
-    local highScoresHeader = display.newText( sceneGroup, "High Scores", display.contentCenterX, 100, native.systemFont, 44 )
-
+    local highScoresHeader = display.newText( sceneGroup, "High Scores", display.contentCenterX-20, 30, native.systemFont, 22 )
+    highScoresHeader:setFillColor(0,0,255)
     for i = 1, 10 do
         if ( scoresTable[i] ) then
-            local yPos = 150 + ( i * 56 )
+            local yPos = 40 + ( i * 26 )
 
-            local rankNum = display.newText( sceneGroup, i .. ")", display.contentCenterX-50, yPos, native.systemFont, 36 )
+            local rankNum = display.newText( sceneGroup, i .. ")", display.contentCenterX-50, yPos, native.systemFont, 16 )
             rankNum:setFillColor( 0.8 )
             rankNum.anchorX = 1
 
-            local thisScore = display.newText( sceneGroup, scoresTable[i], display.contentCenterX-30, yPos, native.systemFont, 36 )
+            local thisScore = display.newText( sceneGroup, scoresTable[i], display.contentCenterX-30, yPos, native.systemFont, 16 )
             thisScore.anchorX = 0
         end
     end

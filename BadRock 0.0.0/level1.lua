@@ -94,9 +94,10 @@ local function restoreSteve()
     steve.rotation=0
   
     -- Fade in the steve
-    transition.to( steve, { alpha=1, time=4000,
+    transition.to( steve, { alpha=1, time=2500,
         onComplete = function()
             steve.isBodyActive = true
+            steve.isGrounded= false
             died = false
         end
     } )
@@ -153,45 +154,7 @@ local function setEntityJumpHeight(entity, value)
 	entity.jumpHeight = value
 end
 
---[[local function morte ( event )
 
-    if ( event.phase == "began" ) then
-
-        local obj1 = event.object1
-        local obj2 = event.object2
-    
-        if ( ( obj1.myName == "steve" and obj2.myName == "nemico" ) or
-                 ( obj1.myName == "nemico" and obj2.myName == "steve" ) )
-        then
-            if ( died == false ) then
-                died = true
-
-                -- Update lives
-                lives = lives - 1
-                livesText.text = "Lives: " .. lives
-
-                if ( lives == 0 ) then
-                    display.remove( steve )
-                    timer.performWithDelay( 2000, endGame )
-                else
-                    steve.alpha = 0
-                    timer.performWithDelay( 1000, restoreSteve )
-                end
-            end
-        end
-
-	end
- 
-end
-
-local function eliminasteve()
-	if (steve.isDead== true)
-		then display.remove( steve ) 
-		steve.isDead= false
-
-	end
-end
-]]
 
 
 local function onCollision ( event )
@@ -373,7 +336,9 @@ function scene:create( event )
 
 
 	livesText = display.newText( uiGroup, "Lives: " .. lives, 100, 20, native.systemFont, 24 )
+	livesText:setFillColor( 255,0,0 )
     scoreText = display.newText( uiGroup, "Score: " .. score, 400, 20, native.systemFont, 24 )
+    scoreText:setFillColor( 0,0,255 )
 	-------------------------------------------------
 
 
