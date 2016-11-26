@@ -13,16 +13,109 @@ local physics = require ("physics")
 physics.start()
 physics.setGravity( 0, 30 )
 
--- -----------------------------------------------------------------------------------
--- SCENE-ACCESSIBLE CODE
--- -----------------------------------------------------------------------------------
-
 -- forward declarations and other locals
 local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
 local backgroundMusic
 
 local map, visual, physical
 local steve
+
+local lives = 3
+local score = 0
+local died = false
+local scoreText
+
+--
+
+
+
+local function updateText()
+    livesText.text = "Lives: " .. lives
+    scoreText.text = "Score: " .. score
+end
+
+--[[
+local function createcoin()
+
+	local layer = map:getObjectLayer("obj")
+	local spawn = layer:getObject("spawn")
+
+	--local spawn = layer:getObject("spawn")
+	local coinspawn= layer:getObject("coinspawn")
+
+	
+	coin = display.newImageRect ( mainGroup, "coin.png", 32,32)
+	coin.x, coin.y = coinspawn.x,coinspawn.y
+	coin.myName = "coin"
+	physics.addBody( coin, {isSensor = true} )
+	--coin.HasBody= true
+	coin.bodyType= "static"
+
+
+	
+    local newcoin = display.newImageRect( mainGroup, objectSheet, 1, 102, 85 )
+    table.insert( coinsTable, newcoin )
+    physics.addBody( newcoin, "dynamic", { radius=40, bounce=0.8 } )
+    newcoin.myName = "coin"
+
+    local whereFrom = math.random( 3 )
+
+    if ( whereFrom == 1 ) then
+        -- From the left
+        newcoin.x = -60
+        newcoin.y = math.random( 500 )
+        newcoin:setLinearVelocity( math.random( 40,120 ), math.random( 20,60 ) )
+    elseif ( whereFrom == 2 ) then
+        -- From the top
+        newcoin.x = math.random( display.contentWidth )
+        newcoin.y = -60
+        newcoin:setLinearVelocity( math.random( -40,40 ), math.random( 40,120 ) )
+    elseif ( whereFrom == 3 ) then
+        -- From the right
+        newcoin.x = display.contentWidth + 60
+        newcoin.y = math.random( 500 )
+        newcoin:setLinearVelocity( math.random( -120,-40 ), math.random( 20,60 ) )
+    end
+
+    newcoin:applyTorque( math.random( -6,6 ) )
+end
+
+--steve è invisibile
+]]
+
+local function restoreSteve()
+	--local steve
+	local layer = map:getObjectLayer("obj")
+	local spawn = layer:getObject("spawn")
+	steve.x, steve.y = spawn.x , spawn.y
+
+    steve.isBodyActive = false
+    steve:setLinearVelocity( 0, 0 )
+    steve.rotation=0
+    steve.isGrounded= false
+    -- Fade in the steve
+    transition.to( steve, { alpha=1, time=2500,
+        onComplete = function()
+
+            steve.isBodyActive = true
+            
+            died = false
+        end
+    } )
+end
+
+
+local function endGame()
+
+    composer.setVariable( "finalScore", score )
+    composer.removeScene( "highscores" )
+    composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
+end
+
+
+-- -----------------------------------------------------------------------------------
+-- SCENE-ACCESSIBLE CODE
+-- -----------------------------------------------------------------------------------
 
 
 -- CAMERA IMPLEMENTATION ----------------- 
@@ -31,6 +124,9 @@ local camera = perspective.createView()
 
 local function moveCamera()
 	-- body
+	if(steve)then
+
+
 	local leftOffset= 60
 	local screenLeft = -camera.x
 	local safeMoveArea = 380
@@ -43,8 +139,13 @@ local function moveCamera()
 	else
 		camera.x=0
 	end
+
+
+	end
+
 end
 ------------------------------------------
+
 
 local function setEntitySpeed(entity, value)
 	entity.speed = value
@@ -54,39 +155,81 @@ local function setEntityJumpHeight(entity, value)
 	entity.jumpHeight = value
 end
 
+
+
+
 local function onCollision ( event )
 
-    if ( event.phase == "began" ) then
 
         local obj1 = event.object1
         local obj2 = event.object2
 
-        local obj1X, obj1Y = obj1:localToContent(0,0)
-        local obj2X, obj2Y = obj2:localToContent(0,0)
+    if ( event.phase == "began" ) then
+
     
-        if (obj1.myName == "steve" and obj2.myName == "env" ) then
-        	if (obj1Y > obj2Y) then
-        		steve.isGrounded = true
-        	end
-        elseif (obj1.myName == "env" and obj2.myName == "steve" ) then
-        	if (obj2Y > obj1Y) then
-        		steve.isGrounded = true
-        	end
+    -- "env" attribute of the environment
+        if ( (obj1.myName == "steve" and obj2.myName == "env" ) or
+             (obj1.myName == "env" and obj2.myName == "steve" ) )
+        then
+       	steve.isGrounded = true
         end
+
+        else if (  obj1.myName == "steve" and obj2.myName == "coin" )
+        	then
+        	display.remove( event.object2 )
+        	steve.isGrounded = true
+        	            -- Increase score
+            score = score + 100
+            scoreText.text = "Score: " .. score
+        --end
+
+        else if ( obj1.myName == "coin" and obj2.myName == "steve" ) 
+             then
+             display.remove( event.object1 ) 
+             steve.isGrounded = true
+                         -- Increase score
+            score = score + 100
+            scoreText.text = "Score: " .. score
+       --end
+
+       elseif ( ( obj1.myName == "steve" and obj2.myName == "nemico" ) or
+                 ( obj1.myName == "nemico" and obj2.myName == "steve" ) )
+        then
+            if ( died == false ) then
+                died = true
+
+                -- Update lives
+                lives = lives - 1
+                livesText.text = "Lives: " .. lives
+
+                if ( lives == 0 ) then
+                	steve.alpha = 0
+					camera:cancel()
+                    timer.performWithDelay( 2000, endGame )
+                else
+                    steve.alpha = 0
+                    timer.performWithDelay( 50, restoreSteve )
+                end
+            end
+        end
+
+            
+           
+    end    
     end
 end
 
--- Allows Steve to move on the x-axis while mid-air
+--Allows Steve to move on the x-axis while mid-air
 local function setSteveVelocity()
 	local steveHorizontalVelocity, steveVerticalVelocity = steve:getLinearVelocity()
 	steve:setLinearVelocity(steve.actualSpeed, steveVerticalVelocity) 
 end
 
--- Event handler for the player inputs
 local function controlsTouch(event)
 	local target = event.target
 
 	if (event.phase=="began") then
+
 		display.currentStage:setFocus( target )
 
 		-- if we touch the d-pad
@@ -94,10 +237,11 @@ local function controlsTouch(event)
 			Runtime:addEventListener("enterFrame", setSteveVelocity)
 			if (event.x < dpad.contentWidth/2 ) then
 				steve.actualSpeed = -steve.speed -- move left
-				steve.xScale = -1 --flip the image to the left
+
+				steve.xScale= -1 --flip the image to the left
 			else
 				steve.actualSpeed =  steve.speed -- move right
-				steve.xScale =  1 --flip the image to the right
+				steve.xScale=1 --flip the image to the right
 			end
 
 		-- if we touch the jump button
@@ -105,6 +249,7 @@ local function controlsTouch(event)
 			steve:applyLinearImpulse(0,steve.jumpHeight, steve.x, steve.y)
 			steve.isGrounded = false
 		end
+
 
 	elseif (event.phase=="ended" or "cancelled" == event.phase) then
 
@@ -119,8 +264,8 @@ local function controlsTouch(event)
 	return true --Prevents touch propagation to underlying objects
 end
 
+
 local function actionTouch( event )
-	local target = event.target
 
 	if (event.phase=="began") then
 		display.currentStage:setFocus( event.target )
@@ -135,7 +280,6 @@ local function actionTouch( event )
 	end
 	return true --Prevents touch propagation to underlying objects
 end
-
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
 -- -----------------------------------------------------------------------------------
@@ -153,6 +297,7 @@ function scene:create( event )
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 
+
 	mainGroup = display.newGroup()
 	sceneGroup:insert( mainGroup )
 
@@ -168,18 +313,38 @@ function scene:create( event )
 	-- Load Steve, the player avatarS
 	local layer = map:getObjectLayer("obj")
 	local spawn = layer:getObject("spawn")
-	steve = display.newImageRect( mainGroup, "rock.png", 30, 30 )
+
+	--local spawn = layer:getObject("spawn")
+	local coinspawn= layer:getObject("coinspawn")
+
+	
+	coin = display.newImageRect ( mainGroup, "coin.png", 32,32)
+	coin.x, coin.y = coinspawn.x,coinspawn.y
+	coin.myName = "coin"
+	physics.addBody( coin, {isSensor = true} )
+	--coin.HasBody= true
+	coin.bodyType= "static"
+
+
+
+	steve = display.newImageRect( mainGroup, "rock.png", 32, 32 )
 	steve.x, steve.y = spawn.x, spawn.y
 	steve.rotation = 15
 	steve.myName = "steve"
 	setEntitySpeed (steve, 150)
 	setEntityJumpHeight (steve, -18)
 	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
+
+
+	livesText = display.newText( uiGroup, "Lives: " .. lives, 100, 20, native.systemFont, 24 )
+	livesText:setFillColor( 255,0,0 )
+    scoreText = display.newText( uiGroup, "Score: " .. score, 400, 20, native.systemFont, 24 )
+    scoreText:setFillColor( 0,0,255 )
 	-------------------------------------------------
 
-	--[[
-	-- TESTING ENVIRONMENT --------------------------
-	-- create left wall for avoiding falling down (for testing)
+
+	
+	--[[ create left wall for avoiding falling down (for testing)
 	local lwall = display.newImageRect( mainGroup, "platformdown.png", 50, screenH )
 	lwall.anchorX = 0
 	lwall.anchorY = 1
@@ -196,7 +361,7 @@ function scene:create( event )
 	-- UI OPTIONS -----------------------------------
 	-- Load the controls UI
 
-	--Makes the whole screen tappable and triggers the jump function
+	--Trasparent Giant Button on the screen with the screen size that allow us to jump
 	jScreen = display.newImageRect(uiGroup,"emptyScreen.png", display.contentWidth, display.contentHeight)
 	jScreen.x, jScreen.y = display.contentCenterX , display.contentCenterY
 	jScreen.myName = "jumpScreen"
@@ -205,26 +370,30 @@ function scene:create( event )
 
 	dpad = display.newImageRect( uiGroup, "dpad.png", 100,51 )
 	dpad.anchorX = 0
-	dpad.x, dpad.y = 10, display.contentHeight -60 
+	dpad.x = 10
+	dpad.y = display.contentHeight -60
 	dpad.myName = "dpad"
 	dpad:addEventListener("touch", controlsTouch)
 
-	actionBtn = display.newImageRect( uiGroup, "actionbtn.png", 51,51 )
-	actionBtn.x, actionBtn.y = display.contentWidth -10, display.contentHeight -60
+	actionBtn = display.newImageRect( uiGroup, "actionbtn.png",51,51 )
+	actionBtn.x = display.contentWidth -10
+	actionBtn.y = display.contentHeight -60
 	actionBtn.anchorX = 1
 	actionBtn.myName = "actionBtn"
 	actionBtn:addEventListener("touch", actionTouch)
-	-- DA IMPLEMENTARE FUNZIONALITA DI actionTouch
+-- DA IMPLEMENTARE FUNZIONALITA DI actionTouch
 	
 	-------------------------------------------------
 
 
+	--
 	-- CAMERA OPTIONS -------------------------------
   	-- second parameter is the Layer number
   	-- third parameter is the focus on that object
-  	camera:add(visual, 2, false)
-  	camera:add(steve,  1, true)
-
+ 
+  	camera:add(visual,2,false)
+  	camera:add(coin,1, false)
+  	camera:add(steve, 1 , true)
 	-- slow the track of a specific layer (for backgrounds)
 	-- 1 is equal to us, 0.5 is half track
 	--camera:layer(3).parallaxRatio = 0.3
@@ -252,9 +421,11 @@ function scene:show( event )
 	elseif phase == "did" then
 		Runtime:addEventListener("enterFrame", moveCamera)
 		Runtime:addEventListener( "collision", onCollision)
+	--	Runtime:addEventListener( "morte", eliminasteve)
 
-		camera:track() -- start the camera tracking
+		 camera:track() -- start the camera tracking
 		physics.start()
+		--Runtime:addEventListener( "pre", prendi )
 		audio.play(backgroundMusic, {channel = 1 , loops=-1})
 	end
 end
@@ -269,6 +440,8 @@ function scene:hide( event )
 	
 	elseif phase == "did" then
 		Runtime:removeEventListener( "collision", onCollision)
+	--	Runtime:addEventListener( "morte", eliminasteve)
+       
 		physics.stop()
 		audio.stop(1)
 	end	
