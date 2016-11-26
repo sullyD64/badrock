@@ -13,11 +13,21 @@ local physics = require ("physics")
 physics.start()
 physics.setGravity( 0, 30 )
 
+-- forward declarations and other locals
+local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
+local backgroundMusic
+
+local map, visual, physical
+local steve
 
 local lives = 3
 local score = 0
 local died = false
 local scoreText
+
+--
+
+
 
 local function updateText()
     livesText.text = "Lives: " .. lives
@@ -72,24 +82,17 @@ end
 
 --steve è invisibile
 ]]
---[[local function restoresteve()
-	local steve
-	--local layer = map:getObjectLayer("obj")
-	--local spawn = layer:getObject("spawn")
-	steve = display.newImageRect( mainGroup, "rock.png", 32, 32 )
-	steve.x, steve.y = 226,1059
-	steve.rotation = 15
-	steve.myName = "steve"
-	--setEntitySpeed (steve, 150)
-	--setEntityJumpHeight (steve, -18)
-	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
-	
+
+local function restoreSteve()
+	--local steve
+	local layer = map:getObjectLayer("obj")
+	local spawn = layer:getObject("spawn")
+	steve.x, steve.y = spawn.x , spawn.y
 
     steve.isBodyActive = false
     steve:setLinearVelocity( 0, 0 )
-    -- steve.x = 226
-    --steve.y = 1059
-
+    steve.rotation=0
+  
     -- Fade in the steve
     transition.to( steve, { alpha=1, time=4000,
         onComplete = function()
@@ -98,58 +101,13 @@ end
         end
     } )
 end
-]]
+
 
 local function endGame()
+
     composer.setVariable( "finalScore", score )
     composer.removeScene( "highscores" )
     composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
-end
-local function prendi( event )
-
-    if ( event.phase == "began" ) then
-
-        local obj1 = event.object1
-        local obj2 = event.object2
-
-        if ( ( obj1.myName == "steve" and obj2.myName == "coin" ) or
-             ( obj1.myName == "coin" and obj2.myName == "steve" ) )
-        then
-            -- Remove both the steve and coin
-            display.remove( obj1 )
-            display.remove( obj2 )
-
-            for i = #coinsTable, 1, -1 do
-                if ( coinsTable[i] == obj1 or coinsTable[i] == obj2 ) then
-                    table.remove( coinsTable, i )
-                    break
-                end
-            end
-
-            -- Increase score
-            score = score + 100
-            scoreText.text = "Score: " .. score
-
-        elseif ( ( obj1.myName == "steve" and obj2.myName == "coin" ) or
-                 ( obj1.myName == "coin" and obj2.myName == "steve" ) )
-        then
-            if ( died == false ) then
-                died = true
-
-                -- Update lives
-                lives = lives - 1
-                livesText.text = "Lives: " .. lives
-
-                if ( lives == 0 ) then
-                    display.remove( steve )
-                    timer.performWithDelay( 2000, endGame )
-                else
-                    steve.alpha = 0
-                    timer.performWithDelay( 1000, restoresteve )
-                end
-            end
-        end
-    end
 end
 
 
@@ -157,20 +115,16 @@ end
 -- SCENE-ACCESSIBLE CODE
 -- -----------------------------------------------------------------------------------
 
--- forward declarations and other locals
-local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
-local backgroundMusic
 
-local map, visual, physical
-local steve
-
---
 -- CAMERA IMPLEMENTATION ----------------- 
 local perspective=require("perspective")
 local camera = perspective.createView()
 
 local function moveCamera()
 	-- body
+	if(steve)then
+
+
 	local leftOffset= 60
 	local screenLeft = -camera.x
 	local safeMoveArea = 380
@@ -183,6 +137,10 @@ local function moveCamera()
 	else
 		camera.x=0
 	end
+
+
+	end
+
 end
 ------------------------------------------
 
@@ -217,7 +175,7 @@ end
                     timer.performWithDelay( 2000, endGame )
                 else
                     steve.alpha = 0
-                    timer.performWithDelay( 1000, restoresteve )
+                    timer.performWithDelay( 1000, restoreSteve )
                 end
             end
         end
@@ -238,18 +196,21 @@ end
 
 local function onCollision ( event )
 
-    if ( event.phase == "began" ) then
 
         local obj1 = event.object1
         local obj2 = event.object2
+
+    if ( event.phase == "began" ) then
+
     
+    -- "env" attribute of the environment
         if ( (obj1.myName == "steve" and obj2.myName == "env" ) or
              (obj1.myName == "env" and obj2.myName == "steve" ) )
         then
        	steve.isGrounded = true
         end
 
-        else if (  (event.object1).myName == "steve" and (event.object2).myName == "coin" )
+        else if (  obj1.myName == "steve" and obj2.myName == "coin" )
         	then
         	display.remove( event.object2 )
         	steve.isGrounded = true
@@ -258,7 +219,7 @@ local function onCollision ( event )
             scoreText.text = "Score: " .. score
         --end
 
-        else if ( (event.object1).myName == "coin" and (event.object2).myName == "steve" ) 
+        else if ( obj1.myName == "coin" and obj2.myName == "steve" ) 
              then
              display.remove( event.object1 ) 
              steve.isGrounded = true
@@ -266,8 +227,9 @@ local function onCollision ( event )
             score = score + 100
             scoreText.text = "Score: " .. score
        --end
-       elseif ( ( (event.object1).myName == "steve" and (event.object2).myName == "nemico" ) or
-                 ( (event.object1).myName == "nemico" and (event.object2).myName == "steve" ) )
+
+       elseif ( ( obj1.myName == "steve" and obj2.myName == "nemico" ) or
+                 ( obj1.myName == "nemico" and obj2.myName == "steve" ) )
         then
             if ( died == false ) then
                 died = true
@@ -277,11 +239,12 @@ local function onCollision ( event )
                 livesText.text = "Lives: " .. lives
 
                 if ( lives == 0 ) then
-                    display.remove( steve )
+                	steve.alpha = 0
+					camera:cancel()
                     timer.performWithDelay( 2000, endGame )
                 else
                     steve.alpha = 0
-                    timer.performWithDelay( 1000, restoresteve )
+                    timer.performWithDelay( 50, restoreSteve )
                 end
             end
         end
@@ -463,7 +426,7 @@ function scene:create( event )
   	-- third parameter is the focus on that object
  
   	camera:add(visual,2,false)
-  	camera:add(coin,1,true)
+  	camera:add(coin,1, false)
   	camera:add(steve, 1 , true)
 	-- slow the track of a specific layer (for backgrounds)
 	-- 1 is equal to us, 0.5 is half track
