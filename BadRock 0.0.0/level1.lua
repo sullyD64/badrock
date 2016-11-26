@@ -24,7 +24,7 @@ local backgroundMusic
 local map, visual, physical
 local steve
 
---
+
 -- CAMERA IMPLEMENTATION ----------------- 
 local perspective=require("perspective")
 local camera = perspective.createView()
@@ -46,7 +46,6 @@ local function moveCamera()
 end
 ------------------------------------------
 
-
 local function setEntitySpeed(entity, value)
 	entity.speed = value
 end
@@ -61,26 +60,33 @@ local function onCollision ( event )
 
         local obj1 = event.object1
         local obj2 = event.object2
+
+        local obj1X, obj1Y = obj1:localToContent(0,0)
+        local obj2X, obj2Y = obj2:localToContent(0,0)
     
-        if ( (obj1.myName == "steve" and obj2.myName == "env" ) or
-             (obj1.myName == "env" and obj2.myName == "steve" ) )
-        then
-       	steve.isGrounded = true
+        if (obj1.myName == "steve" and obj2.myName == "env" ) then
+        	if (obj1Y > obj2Y) then
+        		steve.isGrounded = true
+        	end
+        elseif (obj1.myName == "env" and obj2.myName == "steve" ) then
+        	if (obj2Y > obj1Y) then
+        		steve.isGrounded = true
+        	end
         end
     end
 end
 
---Allows Steve to move on the x-axis while mid-air
+-- Allows Steve to move on the x-axis while mid-air
 local function setSteveVelocity()
 	local steveHorizontalVelocity, steveVerticalVelocity = steve:getLinearVelocity()
 	steve:setLinearVelocity(steve.actualSpeed, steveVerticalVelocity) 
 end
 
+-- Event handler for the player inputs
 local function controlsTouch(event)
 	local target = event.target
 
 	if (event.phase=="began") then
-
 		display.currentStage:setFocus( target )
 
 		-- if we touch the d-pad
@@ -88,11 +94,10 @@ local function controlsTouch(event)
 			Runtime:addEventListener("enterFrame", setSteveVelocity)
 			if (event.x < dpad.contentWidth/2 ) then
 				steve.actualSpeed = -steve.speed -- move left
-
-				steve.xScale= -1 --flip the image to the left
+				steve.xScale = -1 --flip the image to the left
 			else
 				steve.actualSpeed =  steve.speed -- move right
-				steve.xScale=1 --flip the image to the right
+				steve.xScale =  1 --flip the image to the right
 			end
 
 		-- if we touch the jump button
@@ -100,7 +105,6 @@ local function controlsTouch(event)
 			steve:applyLinearImpulse(0,steve.jumpHeight, steve.x, steve.y)
 			steve.isGrounded = false
 		end
-
 
 	elseif (event.phase=="ended" or "cancelled" == event.phase) then
 
@@ -115,8 +119,8 @@ local function controlsTouch(event)
 	return true --Prevents touch propagation to underlying objects
 end
 
-
 local function actionTouch( event )
+	local target = event.target
 
 	if (event.phase=="began") then
 		display.currentStage:setFocus( event.target )
@@ -131,6 +135,7 @@ local function actionTouch( event )
 	end
 	return true --Prevents touch propagation to underlying objects
 end
+
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
 -- -----------------------------------------------------------------------------------
@@ -148,7 +153,6 @@ function scene:create( event )
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 
-
 	mainGroup = display.newGroup()
 	sceneGroup:insert( mainGroup )
 
@@ -164,7 +168,7 @@ function scene:create( event )
 	-- Load Steve, the player avatarS
 	local layer = map:getObjectLayer("obj")
 	local spawn = layer:getObject("spawn")
-	steve = display.newImageRect( mainGroup, "rock.png", 32, 32 )
+	steve = display.newImageRect( mainGroup, "rock.png", 30, 30 )
 	steve.x, steve.y = spawn.x, spawn.y
 	steve.rotation = 15
 	steve.myName = "steve"
@@ -173,9 +177,9 @@ function scene:create( event )
 	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
 	-------------------------------------------------
 
-
-	
-	--[[ create left wall for avoiding falling down (for testing)
+	--[[
+	-- TESTING ENVIRONMENT --------------------------
+	-- create left wall for avoiding falling down (for testing)
 	local lwall = display.newImageRect( mainGroup, "platformdown.png", 50, screenH )
 	lwall.anchorX = 0
 	lwall.anchorY = 1
@@ -192,7 +196,7 @@ function scene:create( event )
 	-- UI OPTIONS -----------------------------------
 	-- Load the controls UI
 
-	--Trasparent Giant Button on the screen with the screen size that allow us to jump
+	--Makes the whole screen tappable and triggers the jump function
 	jScreen = display.newImageRect(uiGroup,"emptyScreen.png", display.contentWidth, display.contentHeight)
 	jScreen.x, jScreen.y = display.contentCenterX , display.contentCenterY
 	jScreen.myName = "jumpScreen"
@@ -201,29 +205,25 @@ function scene:create( event )
 
 	dpad = display.newImageRect( uiGroup, "dpad.png", 100,51 )
 	dpad.anchorX = 0
-	dpad.x = 10
-	dpad.y = display.contentHeight -60
+	dpad.x, dpad.y = 10, display.contentHeight -60 
 	dpad.myName = "dpad"
 	dpad:addEventListener("touch", controlsTouch)
 
-	actionBtn = display.newImageRect( uiGroup, "actionbtn.png",51,51 )
-	actionBtn.x = display.contentWidth -10
-	actionBtn.y = display.contentHeight -60
+	actionBtn = display.newImageRect( uiGroup, "actionbtn.png", 51,51 )
+	actionBtn.x, actionBtn.y = display.contentWidth -10, display.contentHeight -60
 	actionBtn.anchorX = 1
 	actionBtn.myName = "actionBtn"
 	actionBtn:addEventListener("touch", actionTouch)
--- DA IMPLEMENTARE FUNZIONALITA DI actionTouch
+	-- DA IMPLEMENTARE FUNZIONALITA DI actionTouch
 	
 	-------------------------------------------------
 
 
-	--
 	-- CAMERA OPTIONS -------------------------------
   	-- second parameter is the Layer number
   	-- third parameter is the focus on that object
- 
-  	camera:add(visual,2,false)
-  	camera:add(steve, 1 , true)
+  	camera:add(visual, 2, false)
+  	camera:add(steve,  1, true)
 
 	-- slow the track of a specific layer (for backgrounds)
 	-- 1 is equal to us, 0.5 is half track
@@ -253,7 +253,7 @@ function scene:show( event )
 		Runtime:addEventListener("enterFrame", moveCamera)
 		Runtime:addEventListener( "collision", onCollision)
 
-		 camera:track() -- start the camera tracking
+		camera:track() -- start the camera tracking
 		physics.start()
 		audio.play(backgroundMusic, {channel = 1 , loops=-1})
 	end
