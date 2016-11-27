@@ -325,6 +325,10 @@ local function controlsTouch(event)
 		elseif (target.myName=="jumpScreen") and (steve.isGrounded) then
 			steve:applyLinearImpulse(0,steve.jumpHeight, steve.x, steve.y)
 			steve.isGrounded = false
+		elseif (target.myName=="pauseBtn") then
+			    pauseBtn:addEventListener( "touch", pauseGame ) 
+		elseif(target.myName=="resumeBtn")then
+				resumeBtn:addEventListener( "touch", resumeGame )
 		end
 
 
@@ -356,6 +360,37 @@ local function actionTouch( event )
 		display.currentStage:setFocus( nil )
 	end
 	return true --Prevents touch propagation to underlying objects
+end
+
+
+--pause game
+function pauseGame(event)
+    --if end of touch event
+    if(event.phase == "ended") then
+        --pause the physics
+        physics.pause()
+        --make pause button invisible
+        pauseBtn.isVisible = false
+        --make resume button visible
+        resumeBtn.isVisible = true
+        -- indicates successful touch
+        return true
+    end
+end
+ 
+--resume game
+function resumeGame(event)
+    --if end of touch event
+    if(event.phase == "ended") then
+        --resume physics
+        physics.start()
+        --make pause button visible
+        pauseBtn.isVisible = true
+        --make resume button invisible
+        resumeBtn.isVisible = false
+        -- indicates successful touch
+        return true
+    end
 end
 
 -- -----------------------------------------------------------------------------------
@@ -452,6 +487,41 @@ function scene:create( event )
 	actionBtn.x, actionBtn.y = display.contentWidth -10, display.contentHeight -30
 	actionBtn.myName = "actionBtn"
 	actionBtn:addEventListener("touch", actionTouch)
+
+
+
+	local btnW, btnH = 100, 560
+     
+    --create pause button
+    pauseBtn = display.newImageRect( uiGroup,"pause.png", 35,35 )
+     
+    --place button in center
+    pauseBtn.anchorX, pauseBtn.anchorY = 0, 1
+    pauseBtn.x, pauseBtn.y = display.contentWidth-(btnW/2), display.contentHeight-(btnH/2)
+    pauseBtn.myName="pauseBtn"
+    pauseBtn:addEventListener("touch", controlsTouch)
+    --add event
+    pauseBtn:addEventListener( "touch", pauseGame ) 
+    --group:insert( pauseBtn )
+     
+    --create resume button
+    resumeBtn = display.newImageRect( uiGroup,"resume.png",35,35 )
+     
+    --put it on pause button
+    resumeBtn.anchorX, resumeBtn.anchorY = 0, 1
+    resumeBtn.x, resumeBtn.y = display.contentWidth-(btnW/2), display.contentHeight-(btnH/2)
+    resumeBtn.myName="resumeBtn"
+    resumeBtn:addEventListener("touch", controlsTouch)
+
+     
+    --and hide it
+    resumeBtn.isVisible = false
+     
+    --add event
+    resumeBtn:addEventListener( "touch", resumeGame ) 
+    --group:insert( resumeBtn )
+
+
 	-------------------------------------------------
 
 	-- CHARACTER OPTIONS ----------------------------
