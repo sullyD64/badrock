@@ -27,11 +27,12 @@ local steve
 local lives = 3
 local score = 0
 local died = false
-local scoreText
+--local scoreText
 
 local function updateText()
     livesText.text = "Lives: " .. lives
     scoreText.text = "Score: " .. score
+    pointsText.text = "+100"
 end
 
 --[[
@@ -137,6 +138,8 @@ local function setEntityJumpHeight(entity, value)
 	entity.jumpHeight = value
 end
 
+
+
 --NEW COLLISIONS METHODS
 
 
@@ -208,7 +211,7 @@ function dangerCollision( event )
 
 end
 
-
+--local points
 --Steve Collisions Handler
 function steveCollisions( event )
     local steveObj = event.object1
@@ -224,6 +227,26 @@ function steveCollisions( event )
         environmentCollision(event)
     elseif (other.myName == "coin") then
         coinCollision(event)
+        score = score + 100
+        scoreText.text = "Score: " .. score
+
+        --BUG se prendo più di 1 coin entro il tempo time
+        pointsText= display.newText( uiGroup,"+100", 200,200, native.systemFont, 14 )
+
+        pointsText:setFillColor(0,0,255)
+
+		transition.to( pointsText, { alpha=1, time=250,effect="crossFade",
+        onComplete = function()
+
+		display.remove(pointsText)
+        end
+    } )
+
+		
+        
+
+       -- pointsText:setFillColor(255,0,0)
+       -- pointText:setFillColor(255,0,0)
     elseif (other.myName == "nemico")then
         dangerCollision(event)
     end
@@ -232,8 +255,8 @@ end
 
 
 
-
 --[[
+
 local function onCollision ( event )
 
         local obj1 = event.object1
@@ -302,12 +325,13 @@ local function controlsTouch(event)
 			if (event.x < dpad.contentWidth/2 ) then
 				steve.actualSpeed = -steve.speed -- move left
 				steve.isFixedRotation=true
+
 				steve.xScale= -1 --flip the image to the left
 			else
 				steve.actualSpeed =  steve.speed -- move right
 				steve.xScale=  1 --flip the image to the right
 				steve.isFixedRotation=true
-				
+
 			end
 
 		-- if we touch the jump button
@@ -461,8 +485,9 @@ function scene:show( event )
 		
 	elseif phase == "did" then
 		Runtime:addEventListener("enterFrame", moveCamera)
-		--Runtime:addEventListener( "collision", onCollision)
-		Runtime:addEventListener( "collision", steveCollisions)
+        --Runtime:addEventListener( "collision", onCollision)
+        Runtime:addEventListener( "collision", steveCollisions)
+
 
 
 		camera:track() -- start the camera tracking
