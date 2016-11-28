@@ -34,6 +34,8 @@ local steve
 local lives = 3
 local score = 0
 local died = false
+local livesText, scoreText, pointsText
+pointsText = "+100"
 
 local function updateText()
     livesText.text = "Lives: " .. lives
@@ -43,8 +45,8 @@ end
 
 local function restoreSteve()
 	--local steve
-	local layer = map:getObjectLayer("obj")
-	local spawn = layer:getObject("spawn")
+	local layer = map:getObjectLayer("playerSpawn")
+	local spawn = layer:getObject("playerSpawn")
 	steve.x, steve.y = spawn.x , spawn.y
 
     steve.isBodyActive = false
@@ -89,16 +91,6 @@ local function moveCamera()
 end
 ------------------------------------------------------------------------------------
 
-
-local function setEntitySpeed(entity, value)
-	entity.speed = value
-end
-
-local function setEntityJumpHeight(entity, value)
-	entity.jumpHeight = value
-end
-
-
 -- COLLISION HANDLERS --------------------------------------------------------------
 
 -- Collision with Environments (Generic)
@@ -111,7 +103,7 @@ function environmentCollision( event )
 		other = event.object1
 	end
 
-	if ( event.phase == "began" ) then
+	if (event.phase == "began") then
 		other.canJump = true
 	end
 end
@@ -128,15 +120,28 @@ function coinCollision( event )
 
 	if ( event.phase == "began" ) then
 		display.remove( coin )
-	elseif(event.phase == "cancelled" or event.phase == "ended" )then
 		score = score + 100
 		scoreText.text = "Score: " .. score
+		pointsText = display.newText( uiGroup, "+100", 
+			display.contentWidth - 80, 60, native.systemFont, 14 )
+		pointsText:setFillColor( 0,0,255 )
+		transition.to( pointsText.text, { 
+			alpha=1, 
+			time=250, 
+			effect="crossfade",
+			onComplete = function() 
+				display.remove(pointsText) 
+			end
+		} )
+	elseif(event.phase == "cancelled" or event.phase == "ended" )then
+		
+		
+	
 	end
 end
 
 -- Collision with enemies and dangerous things (Only for Steve)
 function dangerCollision( event )
-
 	if ( died == false ) then
 		died = true
 		-- Update lives
@@ -273,6 +278,20 @@ end
 ------------------------------------------------------------------------------------
 
 
+
+-- TESTING ANIMATION
+--[[local onPlayerProperty = function(property, type, object)
+  steve = object.sprite
+
+  steve.state = STATE_IDLE
+  steve:setSequence("anim" .. steve.state)
+  steve:play()
+  --steve.collision = onCollision
+  --steve:addEventListener( "collision", player )
+end]]
+
+
+
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
 -- -----------------------------------------------------------------------------------
@@ -286,7 +305,7 @@ function scene:create( event )
 	backgroundMusic = audio.loadStream(nil)
 
 	-- SCENE GROUPS ---------------------------------
-	map = lime.loadMap("mappa1.tmx")
+	map = lime.loadMap("testmap_new.tmx")
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 
@@ -301,25 +320,14 @@ function scene:create( event )
 	physical = lime.buildPhysical(map)	
 
 	-- UI OPTIONS -----------------------------------
-	-- lives and score texts
-	livesText = display.newText( uiGroup, "Lives: " .. lives, 0, 0, native.systemFont, 24 )
-	livesText.anchorX, livesText. anchorY = 0, 0
-	livesText.x, livesText.y = 10, 30
-
-	livesText:setFillColor( 255,0,0 )
-	scoreText = display.newText( uiGroup, "Score: " .. score, 0, 0, native.systemFont, 24 )
-	scoreText.anchorX, scoreText. anchorY = 1, 0
-	scoreText.x, scoreText.y = display.contentWidth -10, 30
-	scoreText:setFillColor( 0,0,255 )
-
-	--Trasparent Giant Button on the screen with the screen size that allow us to jump
+	-- The jump "button" is screen-wide
 	jScreen = display.newImageRect(uiGroup,"emptyScreen.png", display.contentWidth, display.contentHeight)
 	jScreen.x, jScreen.y = display.contentCenterX , display.contentCenterY
 	jScreen.myName = "jumpScreen"
 	jScreen:toBack()
 	jScreen:addEventListener("touch", jumpTouch)
 
-	-- Load the controls UI
+	-- Load the d-pad
 	dpadLeft = display.newImageRect( uiGroup, "dpadLeft.png", 50, 52 )
 	dpadLeft.anchorX, dpadLeft.anchorY = 0, 1
 	dpadLeft.x, dpadLeft.y = dpadLeft.width / 2 + 10, display.contentHeight - dpadLeft.height / 2 - 10
@@ -332,40 +340,52 @@ function scene:create( event )
 	dpadRight.myName = "dpadRight"
 	dpadRight:addEventListener("touch", dpadTouch)
 
-	-- DA IMPLEMENTARE FUNZIONALITA DI actionTouch
+	-- Load the action button DA IMPLEMENTARE
 	actionBtn = display.newImageRect( uiGroup, "actionbtn.png",51,51 )
 	actionBtn.anchorX, actionBtn.anchorY = 1, 1
-	actionBtn.x, actionBtn.y = display.contentWidth -10, display.contentHeight -30
+	actionBtn.x, actionBtn.y = display.contentWidth - actionBtn.width / 2, display.contentHeight -10 - actionBtn.height / 2
 	actionBtn.myName = "actionBtn"
-	actionBtn:addEventListener("touch", actionTouch)
-	-------------------------------------------------
-
-
-
-	local btnW, btnH = 100, 560 -- DA MODIFICARE 
+	actionBtn:addEventListener("touch", actionTouch) 
      
-    --create pause button
-    pauseBtn = display.newImageRect( uiGroup,"pause.png", 35,35 )
-    pauseBtn.anchorX, pauseBtn.anchorY = 0, 1  -- DA MODIFICARE
-    pauseBtn.x, pauseBtn.y = display.contentWidth-(btnW/2), display.contentHeight-(btnH/2) -- DA MODIFICARE
+    -- Pause and resume buttons
+    pauseBtn = display.newImageRect( uiGroup,"pause.png",35,35 )
+    pauseBtn.anchorX, pauseBtn.anchorY = 1, 0
+    pauseBtn.x, pauseBtn.y = display.contentWidth -10, 30
     pauseBtn.myName="pauseBtn"
     pauseBtn:addEventListener( "touch", pauseGame )
      
     --create resume button
     resumeBtn = display.newImageRect( uiGroup,"resume.png",35,35 )
-    resumeBtn.anchorX, resumeBtn.anchorY = 0, 1
+    resumeBtn.anchorX, resumeBtn.anchorY = 1, 0
     resumeBtn.x, resumeBtn.y = pauseBtn.x, pauseBtn.y
     resumeBtn.myName="resumeBtn"
     resumeBtn.isVisible = false
     resumeBtn:addEventListener( "touch", resumeGame ) 
 
 
+	-- lives and score texts
+	livesText = display.newText( uiGroup, "Lives: " .. lives, 0, 0, native.systemFont, 24 )
+	livesText.anchorX, livesText. anchorY = 0, 0
+	livesText.x, livesText.y = 10, 30
+
+	livesText:setFillColor( 255,0,0 )
+	scoreText = display.newText( uiGroup, "Score: " .. score, 0, 0, native.systemFont, 24 )
+	scoreText.anchorX, scoreText. anchorY = 1, 0
+	scoreText.x, scoreText.y = display.contentWidth -20 - pauseBtn.contentWidth, 30
+	scoreText:setFillColor( 0,0,255 )
 	-------------------------------------------------
 
+
+
 	-- CHARACTER OPTIONS ----------------------------
+
+	--[[local layer = map:getTileLayer("player")
+	players = layer:getTIlesWithProperty("isPlayer")
+	steve = players:get]]
+
 	-- Load Steve, the player avatarS
-	local layer = map:getObjectLayer("obj")
-	local spawn = layer:getObject("spawn")
+	local layer = map:getObjectLayer("playerSpawn")
+	local spawn = layer:getObject("playerSpawn")
 	steve = display.newImageRect( mainGroup, "rock.png", 32, 32 )
 	steve.x, steve.y = spawn.x, spawn.y
 	steve.rotation = 0
@@ -374,9 +394,9 @@ function scene:create( event )
 	setEntityJumpHeight (steve, -18)
 	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
 	steve.isFixedRotation = true
-
-
 	-------------------------------------------------
+
+
 
 	-- CAMERA OPTIONS -------------------------------
   	-- second parameter is the Layer number
@@ -386,10 +406,11 @@ function scene:create( event )
 
 	-- slow the track of a specific layer (for backgrounds)
 	-- 1 is equal to us, 0.5 is half track
-	--camera:layer(3).parallaxRatio = 0.3
+	camera:layer(3).parallaxRatio = 0.3
 
 	-- set the screen limits for the camera
 	camera:setBounds(0, steve.x ,-100, steve.y)	-- TEST IN CORSO
+	
 	-- set the follow speed of the focused layer 
 	camera.dumping = 50
 

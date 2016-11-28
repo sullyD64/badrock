@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="40" height="40" tilewidth="32" tileheight="32" nextobjectid="30">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="40" height="40" tilewidth="32" tileheight="32" nextobjectid="34">
  <tileset firstgid="1" name="tileset-platformer" tilewidth="32" tileheight="32" tilecount="102" columns="6">
   <image source="tileset-platformer.png" width="192" height="544"/>
   <tile id="3">
@@ -267,18 +267,12 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup name="obj">
+ <objectgroup name="playerSpawn">
   <properties>
    <property name="playerImage" value="rock.png"/>
    <property name="type" value="PlayerSpawn"/>
   </properties>
-  <object id="1" name="spawn" x="226" y="1059" width="32" height="32"/>
-  <object id="12" name="coinspawn" x="288" y="1118" width="30" height="31">
-   <ellipse/>
-  </object>
-  <object id="13" name="coinspawn" x="100" y="964" width="31" height="35">
-   <ellipse/>
-  </object>
+  <object id="1" name="playerSpawn" x="226" y="1059" width="32" height="32"/>
  </objectgroup>
  <layer name="Livello tile 5" width="40" height="40">
   <data encoding="csv">
