@@ -4,11 +4,14 @@
 --
 -----------------------------------------------------------------------------------------
 
--- hide the status bar
+-- Hide the status bar
 display.setStatusBar( display.HiddenStatusBar )
 
--- include the Corona "composer" module
+-- Include the Corona "composer" module
 local composer = require "composer"
+
+-- Enable the multitouch 
+system.activate( "multitouch" )
 
 -- Reserve channel 1 for background music
 audio.reserveChannels( 1 )
