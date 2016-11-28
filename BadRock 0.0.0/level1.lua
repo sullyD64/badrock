@@ -78,9 +78,9 @@ local perspective=require("perspective")
 local camera = perspective.createView()
 
 local function moveCamera()
-	local leftOffset= 60
+	local leftOffset= 95
 	local screenLeft = -camera.x
-	local safeMoveArea = 380
+	local safeMoveArea = 290
 	if steve.x> leftOffset then
 		if steve.x > screenLeft + safeMoveArea then
 			camera.x = -steve.x + safeMoveArea
