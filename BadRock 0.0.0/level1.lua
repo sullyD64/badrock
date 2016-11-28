@@ -21,10 +21,12 @@ physics.setGravity( 0, 30 )
 local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
 local backgroundMusic
 local dpad, jumpScreen, actionBtn
+local steveAttack
 
 local STATE_IDLE = "Idle"
 local STATE_WALKING = "Walking"
 local STATE_JUMPING = "Jumping"
+local STATE_ATTACKING = "Attacking"
 local DIRECTION_LEFT = -1
 local DIRECTION_RIGHT = 1
 
@@ -242,16 +244,51 @@ local function jumpTouch( event )
 	end
 end
 
-local function actionTouch( event )
 
-	if (event.phase=="began") then
+	local function steveAttackFollowingSteve()
+		steveAttack.x, steveAttack.y = steve.x, steve.y
+	end
+
+	local function steveAttackStop()
+		-- Quando finisce il tempo di attacco di Steve
+		display.remove(steveAttack)
+		steve.state = STATE_IDLE
+		Runtime:removeEventListener("enterFrame" , steveAttackFollowingSteve)
+		--Rende il tasto nuovamente premibile
+		actionBtn.active=true
+		actionBtn.alpha=1
+
+	end
+
+
+local function actionTouch( event )
+	local attackDuration = 1000 -- MilliSeconds
+
+	if (event.phase=="began" and actionBtn.active == true) then
 		display.currentStage:setFocus( event.target )
 
-	-- CODE HERE
+		--Evita che il button di azione sia permaspammato
+		actionBtn.active=false
+		actionBtn.alpha = 0.5
 
-	elseif (event.phase=="ended" or "cancelled" == event.phase) then
+		-- CODE HERE
+		steve.state= STATE_ATTACKING
+		steveAttack = display.newCircle(mainGroup , steve.x, steve.y, 40)
+		physics.addBody(steveAttack, {isSensor = true})
 
-	--CODE HERE
+		--Statistiche momentanee per rendere visibile l'area d'attacco
+		steveAttack:setFillColor(0,0,255)
+		steveAttack.alpha=0.6
+
+	  	camera:add(steveAttack,1, false)
+
+	  	--Fa rotolare Steve nella direzione in cui sta guardando
+	  	steve:applyLinearImpulse(steve.direction * 10, 0,steve.x,steve.y)
+
+		Runtime:addEventListener("enterFrame" , steveAttackFollowingSteve)
+
+		attackTimer= timer.performWithDelay(attackDuration, steveAttackStop)
+
 
 		display.currentStage:setFocus( nil )
 	end
@@ -346,6 +383,7 @@ function scene:create( event )
 	actionBtn.x, actionBtn.y = display.contentWidth - actionBtn.width / 2, display.contentHeight -10 - actionBtn.height / 2
 	actionBtn.myName = "actionBtn"
 	actionBtn:addEventListener("touch", actionTouch) 
+	actionBtn.active = true --Attribute Needed to Avoid Action Spam
      
     -- Pause and resume buttons
     pauseBtn = display.newImageRect( uiGroup,"pause.png",35,35 )
@@ -394,6 +432,8 @@ function scene:create( event )
 	setEntityJumpHeight (steve, -18)
 	physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
 	steve.isFixedRotation = true
+	steve.direction = DIRECTION_RIGHT
+
 	-------------------------------------------------
 
 
