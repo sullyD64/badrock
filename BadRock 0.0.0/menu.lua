@@ -71,6 +71,7 @@ local widget = require ("widget")
 
     local function onScoreBtnRelease()
     	-- go to level1.lua scene
+        composer.removeScene( "level1" )
     	composer.gotoScene( "level1", "fade", 500 )
     	return true
     end

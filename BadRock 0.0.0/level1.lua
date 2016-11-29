@@ -24,12 +24,12 @@ physics.setGravity( 0, 30 )
 	local steveAttack
 	local backgroundMusic, jumpSound, coinSound, attackSound, dangerSound
 
-	local STATE_IDLE = "Idle"
-	local STATE_WALKING = "Walking"
-	local STATE_JUMPING = "Jumping"
+	local STATE_IDLE 	  = "Idle"
+	local STATE_WALKING   = "Walking"
+	local STATE_JUMPING   = "Jumping"
 	local STATE_ATTACKING = "Attacking"
-	local DIRECTION_LEFT = -1
-	local DIRECTION_RIGHT = 1
+	local DIRECTION_LEFT  = -1
+	local DIRECTION_RIGHT =  1
 
 	local map, visual, physical
 	local steve
@@ -37,7 +37,8 @@ physics.setGravity( 0, 30 )
 	local lives = 3
 	local score = 0
 	local died = false
-	local livesText, scoreText, pointsText
+	local levelCompleted = false
+	local livesText, scoreText, pointsText, exitText
 	pointsText = "+100"
 
 	local function updateText()
@@ -47,35 +48,58 @@ physics.setGravity( 0, 30 )
 	end
 
 
-local function endGame()
-    composer.setVariable( "finalScore", score )
-    composer.removeScene( "highscores" )
-    composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
-end
-
-
 -- CAMERA FUNCTIONS ----------------------------------------------------------------
-	local perspective=require("perspective")
+	local perspective = require("perspective")
 	local camera = perspective.createView()
 
 	local function moveCamera()
-		local leftOffset= 95
-		local screenLeft = -camera.x
-		local safeMoveArea = 290
-		if steve.x> leftOffset then
-			if steve.x > screenLeft + safeMoveArea then
-				camera.x = -steve.x + safeMoveArea
-				elseif steve.x < screenLeft + leftOffset then
-					camera.x = -steve.x + leftOffset
+		if ( camera ) then
+			local leftOffset = 95
+			local screenLeft = -camera.x
+			local safeMoveArea = 290
+			if steve.x > leftOffset then
+				if steve.x > screenLeft + safeMoveArea then
+					camera.x = -steve.x + safeMoveArea
+					elseif steve.x < screenLeft + leftOffset then
+						camera.x = -steve.x + leftOffset
+				end
+			else
+				camera.x  =0
 			end
-		else
-			camera.x=0
 		end
 	end
 ------------------------------------------------------------------------------------
 
 
 -- MISC FUNCTIONS ------------------------------------------------------------------
+
+	-- Endgame handler
+	local function endGame()
+	    composer.setVariable( "finalScore", score )
+	    composer.removeScene( "highscores" )
+	    composer.gotoScene( "highscores", { time=1500, effect="crossFade" } )
+	end
+
+	-- Endgame screen handler
+	local function endGameScreen()
+		steve.alpha = 0
+		camera:cancel() --Stop camera Tracking		
+
+		if (levelCompleted == true) then
+			exitText = display.newText( uiGroup, "Level Complete" , 250, 150, native.systemFontBold, 34 )
+			exitText:setFillColor( 0.75, 0.78, 1 )
+		else
+			exitText = display.newText( uiGroup, "Game Over" , 250, 150, native.systemFontBold, 34 )
+			exitText:setFillColor( 1, 0, 0 )
+		end
+
+		transition.to( exitText, { alpha=0, time=2000,
+	        onComplete = function()
+	            display.remove( exitText )
+	        end
+	    } )
+		timer.performWithDelay( 2000, endGame )
+	end
 
 	-- Replaces Steve on the spawn point
 	local function restoreSteve()
@@ -88,12 +112,10 @@ end
 	    steve:setLinearVelocity( 0, 0 )
 	    steve.rotation=0
 	    steve.isGrounded= false
-	    -- Fade in the steve
-	    transition.to( steve, { alpha=1, time=2500,
+	    -- Fade in Steve
+	    transition.to( steve, { alpha=1, time=2000,
 	        onComplete = function()
-
 	            steve.isBodyActive = true
-	            
 	            died = false
 	        end
 	    } )
@@ -101,7 +123,6 @@ end
 
 	-- Function to add points to the score
 	function addScore( points )
-		-- body
 		score = score + points
 		scoreText.text = "Score: " .. score
 		pointsText = display.newText( uiGroup, "+"..points , 
@@ -109,7 +130,7 @@ end
 		pointsText:setFillColor( 0,0,255 )
 		transition.to( pointsText.text, { 
 			alpha=1, 
-			time=50, 
+			time=100, 
 			effect="crossfade",
 			onComplete = function() 
 				display.remove(pointsText) 
@@ -148,25 +169,24 @@ end
 		steve.state = STATE_IDLE
 		Runtime:removeEventListener("enterFrame" , steveAttackFollowingSteve)
 		--Rende il tasto nuovamente premibile
-		actionBtn.active=true
-		actionBtn.alpha=1
+		actionBtn.active = true
+		actionBtn.alpha = 1
 	end
 
 	-- Action Button Method
 	local function actionTouch( event )
-		local attackDuration = 500 -- MilliSeconds
+		local attackDuration = 500
 
 		if (event.phase=="began" and actionBtn.active == true) then
 			display.currentStage:setFocus( event.target )
-
 			audio.play( attackSound )
 
 			--Evita che il button di azione sia permaspammato
 			actionBtn.active=false
 			actionBtn.alpha = 0.5
 
-			-- CODE HERE
-			steve.state= STATE_ATTACKING
+			steve.state = STATE_ATTACKING
+
 			steveAttack = display.newCircle(mainGroup , steve.x, steve.y, 40)
 			physics.addBody(steveAttack, {isSensor = true})
 			steveAttack.myName = "steveAttack"
@@ -174,49 +194,17 @@ end
 			--Statistiche momentanee per rendere visibile l'area d'attacco
 			steveAttack:setFillColor(0,0,255)
 			steveAttack.alpha=0.6
-
 		  	camera:add(steveAttack,1, false)
 
-		  	--Fa rotolare Steve nella direzione in cui sta guardando
+		  	-- Fa rotolare Steve nella direzione in cui sta guardando
 		  	steve:applyLinearImpulse(steve.direction * 10, 0,steve.x,steve.y)
 
-			Runtime:addEventListener("enterFrame" , steveAttackFollowingSteve)
-			attackTimer= timer.performWithDelay(attackDuration, steveAttackStop)
-
+			Runtime:addEventListener("enterFrame", steveAttackFollowingSteve)
+			timer.performWithDelay(attackDuration, steveAttackStop)
 			display.currentStage:setFocus( nil )
 		end
+
 		return true --Prevents touch propagation to underlying objects
-	end
-
-	local function attackedBySteve( event )
-		local attack = event.object1
-		local other = event.object2
-
-		if(other.myName == "steveAttack") then
-			attack = event.object2
-			other = event.object1
-		end
-
-		if((other.isEnemy) and(other.alpha == 1)) then --If the object in an enemy.. AND if it's not "invincible" (continue reading)
-			other.lives = other.lives - 1		
-			if ( other.lives == 0 ) then -- If the enemy has no lives left
-				display.remove(other)
-				addScore(200) -- Successivamente al posto di 200, useremo other.score, perchè ogni nemico ha un suo valore
-			else -- If the enemy is still alive
-
-				other.alpha=0.5-- Give the enemy a time for not being hit again in the same moment
-				local removeImmunity = function() other.alpha=1 end
-				timer.performWithDelay(500, removeImmunity)
-
-				--Little "knockBack" of the enemy when is hitted from Steve (pushed Away from Steve) 
-				if (other.x > steve.y) then other:applyLinearImpulse(1,1,other.x,other.y) --if the enemy is on the Steve's Right
-				elseif (other.x < steve.y) then other:applyLinearImpulse(-1,1,other.x,other.y) --if the enemy is on the Steve's Left
-				end
-			end
-
-		elseif(other.canBeBroken) then-- If the object is a item that chan be destroyed from steve attacks
-			display.remove(other)
-		end
 	end
 ------------------------------------------------------------------------------------
 
@@ -260,22 +248,24 @@ end
 	function dangerCollision( event )
 		local other = event.object2
 		if(event.object2.myName == "steve") then
-			other= event.object1
+			other = event.object1
 		end
 
-		if((steve.state ~= STATE_ATTACKING) and (other.isEnemy))then --Avoid steve to take damage from enemy while attacking
-			if ( died == false ) then
+		--Avoids Steve to take damage from enemy while attacking (but only if the enemy isn't invincible)
+		if ( (steve.state ~= STATE_ATTACKING and other.isEnemy) or
+			 (steve.state == STATE_ATTACKING and other.isInvincible) ) then 
+
+			if (died == false) then 
 				died = true
 				audio.play( dangerSound )
+
 				-- Update lives
 				lives = lives - 1
 				livesText.text = "Lives: " .. lives
 
-				-- If we have no lives left
+				-- Steve has no lives left
 				if ( lives == 0 ) then
-					steve.alpha = 0
-					camera:cancel() --Stop camera Tracking
-					timer.performWithDelay( 2000, endGame )
+					endGameScreen()
 				else
 					steve.alpha = 0
 					timer.performWithDelay( 50, restoreSteve )
@@ -284,18 +274,18 @@ end
 		end
 	end
 
+	-- Special handler for the "End Level" block (Only for Steve)
 	function endCollision( event )
-		local other
-		if(event.object1.myName == "steve") then
-			other= event.object2
-		else
-			other=event.object1
+		local other = event.object2
+
+		if(event.object2.myName == "steve") then
+			other= event.object1
 		end
-		exitText = display.newText( uiGroup, "Level Complete" , 250, 150, native.systemFontBold, 34 )
-		exitText:setFillColor( 0.75, 0.78, 1 )
-		steve.alpha = 0
-		camera:cancel() --Stop camera Tracking
-		timer.performWithDelay( 500, endGame )
+
+		if ( event.phase == "began" ) then
+			levelCompleted = true
+			endGameScreen()
+		end
 	end
 
 	-- Steve Collisions Handler
@@ -313,10 +303,49 @@ end
 			environmentCollision(event)
 		elseif (other.myName == "coin") then
 			coinCollision(event)
-		elseif ((other.myName == "nemico") or (other.isEnemy))then
+		elseif ((other.myName == "nemico") or (other.isEnemy)) then
 			dangerCollision(event)
 		elseif(other.myName == "end_level") then
 			endCollision(event)
+		end
+	end
+
+	-- Steve's "attack" Collisions Handler
+	local function steveAttackCollision( event )
+		local attack = event.object1
+		local other = event.object2
+
+		if(other.myName == "steveAttack") then
+			attack = event.object2
+			other = event.object1
+		end
+
+		-- Other is an enemy, targettable AND not "invincible"
+		if( (other.isEnemy == true ) and (other.isInvincible == false) and (other.alpha == 1) ) then 
+			other.lives = other.lives - 1
+
+			-- Enemy has no lives left
+			if ( other.lives == 0 ) then 
+				display.remove(other)
+				addScore(200) -- Successivamente al posto di 200, useremo other.score, perchè ogni nemico ha un suo valore
+			
+			-- Enemy is still alive
+			else 
+				other.alpha = 0.5 -- Make the enemy temporairly untargettable 
+				local removeImmunity = function() 
+					other.alpha=1 
+				end
+				timer.performWithDelay(500, removeImmunity)
+
+				-- Little "knockBack" of the enemy when is hit from Steve (pushed Away from Steve) 
+				if (other.x > steve.x) then other:applyLinearImpulse(1,1,other.x,other.y) --if the enemy is on the Steve's Right
+				elseif (other.x < steve.x) then other:applyLinearImpulse(-1,1,other.x,other.y) --if the enemy is on the Steve's Left
+				end
+			end
+
+		-- If the object is a item that can be destroyed from steve attacks
+		elseif(other.canBeBroken) then
+			display.remove(other)
 		end
 	end
 
@@ -326,10 +355,10 @@ end
 			 (event.object2.myName == "steve") ) then
 			steveCollisions( event )
 
+		-- SteveAttack collisions are handled by the attackedBySteve method
 		elseif( (event.object1.myName == "steveAttack") or 
-			    (event.object2.myName == "steveAttack") )
-			--If something is hit from the SteveAttack
-			then attackedBySteve(event)
+			    (event.object2.myName == "steveAttack") ) then
+			steveAttackCollision( event )
 		end
 	end
 ------------------------------------------------------------------------------------
@@ -347,17 +376,19 @@ end
 			Runtime:addEventListener("enterFrame", setSteveVelocity)
 			if (target.myName == "dpadLeft") then
 				steve.direction = DIRECTION_LEFT
+				dpadLeft.alpha = 0.5
 			elseif (target.myName == "dpadRight") then
 				steve.direction = DIRECTION_RIGHT
+				dpadRight.alpha = 0.5
 			end
 
 			steve.actualSpeed = steve.direction * steve.speed
 			steve.xScale = steve.direction
 
 		elseif (event.phase =="ended" or "cancelled" == event.phase) then
-			steve.actualSpeed=0
 			Runtime:removeEventListener("enterFrame", setSteveVelocity)
 			steve.state = STATE_IDLE
+			dpadLeft.alpha, dpadRight.alpha = 1, 1
 			display.currentStage:setFocus( nil )
 		end
 
@@ -430,7 +461,7 @@ function scene:create( event )
 		--backgroundMusic = audio.loadStream("audio/overside8bit.wav")
 		backgroundMusic = audio.loadStream( nil )
 		jumpSound = audio.loadSound("audio/jump.wav")
-		coinSound = audio.loadSound("audio/coin.11wav")
+		coinSound = audio.loadSound("audio/coin.wav")
 		attackSound = audio.loadSound( "audio/attack.wav")
 		dangerSound = audio.loadSound( "audio/danger3.wav")
 	-------------------------------------------------
@@ -594,6 +625,7 @@ function scene:destroy( event )
 	audio.dispose( dangerSound )
 	package.loaded[physics] = nil
 	physics = nil
+	camera = nil
 end
 
 -- -----------------------------------------------------------------------------------

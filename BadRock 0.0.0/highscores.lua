@@ -17,40 +17,38 @@ local scene = composer.newScene()
     local filePath = system.pathForFile( "scores.json", system.DocumentsDirectory )
 
 
-    local function loadScores()
+local function loadScores()
 
-        local file = io.open( filePath, "r" )
+    local file = io.open( filePath, "r" )
 
-        if file then
-            local contents = file:read( "*a" )
-            io.close( file )
-            scoresTable = json.decode( contents )
-        end
-
-        if ( scoresTable == nil or #scoresTable == 0 ) then
-            scoresTable = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-        end
+    if file then
+        local contents = file:read( "*a" )
+        io.close( file )
+        scoresTable = json.decode( contents )
     end
 
+    if ( scoresTable == nil or #scoresTable == 0 ) then
+        scoresTable = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    end
+end
 
-    local function saveScores()
+local function saveScores()
 
-        for i = #scoresTable, 11, -1 do
-            table.remove( scoresTable, i )
-        end
-
-        local file = io.open( filePath, "w" )
-
-        if file then
-            file:write( json.encode( scoresTable ) )
-            io.close( file )
-        end
+    for i = #scoresTable, 11, -1 do
+        table.remove( scoresTable, i )
     end
 
+    local file = io.open( filePath, "w" )
 
-    local function gotoMenu()
-        composer.gotoScene( "menu", { time=800, effect="crossFade" } )
+    if file then
+        file:write( json.encode( scoresTable ) )
+        io.close( file )
     end
+end
+
+local function gotoMenu()
+    composer.gotoScene( "menu", { time=800, effect="crossFade" } )
+end
 
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
@@ -75,7 +73,7 @@ function scene:create( event )
     -- Save the scores
     saveScores()
 
-    local background = display.newImageRect( sceneGroup, "background.png", 640,960 )
+    local background = display.newImageRect( sceneGroup, "background.png", display.contentWidth, display.contentHeight)
     background.x = display.contentCenterX
     background.y = display.contentCenterY
 
@@ -96,7 +94,7 @@ function scene:create( event )
 
     local menuButton = display.newText( sceneGroup, "Menu", display.contentCenterX+150, 250, native.systemFont, 44 )
     menuButton:setFillColor( 0.75, 0.78, 1 )
-    menuButton:addEventListener( "tap", gotoMenu )
+    menuButton:addEventListener( "touch", gotoMenu )
 end
 
 -- show()
