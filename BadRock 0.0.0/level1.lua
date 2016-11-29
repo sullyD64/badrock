@@ -18,33 +18,34 @@ physics.setGravity( 0, 30 )
 -- -----------------------------------------------------------------------------------
 
 -- forward declarations and other locals
-local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
-local backgroundMusic
-local dpad, jumpScreen, actionBtn
-local steveAttack
-local backgroundMusic, jumpSound, coinSound, attackSound, dangerSound
+	local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
+	local backgroundMusic
+	local dpad, jumpScreen, actionBtn
+	local steveAttack
+	local backgroundMusic, jumpSound, coinSound, attackSound, dangerSound
 
-local STATE_IDLE = "Idle"
-local STATE_WALKING = "Walking"
-local STATE_JUMPING = "Jumping"
-local STATE_ATTACKING = "Attacking"
-local DIRECTION_LEFT = -1
-local DIRECTION_RIGHT = 1
+	local STATE_IDLE = "Idle"
+	local STATE_WALKING = "Walking"
+	local STATE_JUMPING = "Jumping"
+	local STATE_ATTACKING = "Attacking"
+	local DIRECTION_LEFT = -1
+	local DIRECTION_RIGHT = 1
 
-local map, visual, physical
-local steve
+	local map, visual, physical
+	local steve
 
-local lives = 3
-local score = 0
-local died = false
-local livesText, scoreText, pointsText
-pointsText = "+100"
+	local lives = 3
+	local score = 0
+	local died = false
+	local livesText, scoreText, pointsText
+	pointsText = "+100"
 
-local function updateText()
-    livesText.text = "Lives: " .. lives
-    scoreText.text = "Score: " .. score
-    pointsText.text = "+100"
-end
+	local function updateText()
+	    livesText.text = "Lives: " .. lives
+	    scoreText.text = "Score: " .. score
+	    pointsText.text = "+100"
+	end
+
 
 local function endGame()
     composer.setVariable( "finalScore", score )
@@ -131,6 +132,7 @@ end
 		steve:setLinearVelocity(steve.actualSpeed, steveYV) 
 	end
 ------------------------------------------------------------------------------------
+
 
 -- ATTACK FUNCTIONS ----------------------------------------------------------------
 
