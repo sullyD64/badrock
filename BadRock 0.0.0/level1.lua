@@ -110,6 +110,25 @@ function environmentCollision( event )
 	end
 end
 
+--Function to add points to the score
+function addScore( points )
+	-- body
+	score = score + points
+	scoreText.text = "Score: " .. score
+	pointsText = display.newText( uiGroup, "+"..points , 
+	display.contentWidth - 80, 60, native.systemFont, 14 )
+	pointsText:setFillColor( 0,0,255 )
+	transition.to( pointsText.text, { 
+		alpha=1, 
+		time=250, 
+		effect="crossfade",
+		onComplete = function() 
+			display.remove(pointsText) 
+		end
+	})
+end
+
+
 -- Collision with Coins (Only for Steve)
 function coinCollision( event )
 	local steveObj = event.object1
@@ -122,19 +141,7 @@ function coinCollision( event )
 
 	if ( event.phase == "began" ) then
 		display.remove( coin )
-		score = score + 100
-		scoreText.text = "Score: " .. score
-		pointsText = display.newText( uiGroup, "+100", 
-			display.contentWidth - 80, 60, native.systemFont, 14 )
-		pointsText:setFillColor( 0,0,255 )
-		transition.to( pointsText.text, { 
-			alpha=1, 
-			time=250, 
-			effect="crossfade",
-			onComplete = function() 
-				display.remove(pointsText) 
-			end
-		} )
+		addScore(100)
 	elseif(event.phase == "cancelled" or event.phase == "ended" )then
 		
 		
@@ -144,30 +151,33 @@ end
 
 -- Collision with enemies and dangerous things (Only for Steve)
 function dangerCollision( event )
-	if ( died == false ) then
-		died = true
-		-- Update lives
-		lives = lives - 1
-		livesText.text = "Lives: " .. lives
+	local other
+	if(event.object1.myName == "steve") then
+		other= event.object2
+	else
+		other=event.object1
+	end
 
-		-- If we have no lives left
-		if ( lives == 0 ) then
-			steve.alpha = 0
-			camera:cancel() --Stop camera Tracking
-			timer.performWithDelay( 2000, endGame )
-		else
-			steve.alpha = 0
-			timer.performWithDelay( 50, restoreSteve )
+	if((steve.state ~= STATE_ATTACKING) and (other.isEnemy))then --Avoid steve to take damage from enemy while attacking
+		if ( died == false ) then
+			died = true
+			-- Update lives
+			lives = lives - 1
+			livesText.text = "Lives: " .. lives
+
+			-- If we have no lives left
+			if ( lives == 0 ) then
+				steve.alpha = 0
+				camera:cancel() --Stop camera Tracking
+				timer.performWithDelay( 2000, endGame )
+			else
+				steve.alpha = 0
+				timer.performWithDelay( 50, restoreSteve )
+			end
 		end
 	end
 end
 
-function onCollision( event )
-	if ( (event.object1.myName == "steve") or 
-		 (event.object2.myName == "steve") ) then
-	steveCollisions( event )
-	end
-end
 
 -- Steve Collisions Handler
 function steveCollisions( event )
@@ -184,7 +194,7 @@ function steveCollisions( event )
 		environmentCollision(event)
 	elseif (other.myName == "coin") then
 		coinCollision(event)
-	elseif (other.myName == "nemico")then
+	elseif ((other.myName == "nemico") or (other.isEnemy))then
 		dangerCollision(event)
 	end
 end
@@ -244,11 +254,14 @@ local function jumpTouch( event )
 	end
 end
 
-
+--- ATTACK METHODS -------------------------------------------------------------
+	
+-- Function that links the SteveAttack to Steve
 	local function steveAttackFollowingSteve()
 		steveAttack.x, steveAttack.y = steve.x, steve.y
 	end
 
+-- Function that handles the end of the SteveAttack phase
 	local function steveAttackStop()
 		-- Quando finisce il tempo di attacco di Steve
 		display.remove(steveAttack)
@@ -260,9 +273,9 @@ end
 
 	end
 
-
+-- Action Button Method
 local function actionTouch( event )
-	local attackDuration = 1000 -- MilliSeconds
+	local attackDuration = 500 -- MilliSeconds
 
 	if (event.phase=="began" and actionBtn.active == true) then
 		display.currentStage:setFocus( event.target )
@@ -275,6 +288,7 @@ local function actionTouch( event )
 		steve.state= STATE_ATTACKING
 		steveAttack = display.newCircle(mainGroup , steve.x, steve.y, 40)
 		physics.addBody(steveAttack, {isSensor = true})
+		steveAttack.myName = "steveAttack"
 
 		--Statistiche momentanee per rendere visibile l'area d'attacco
 		steveAttack:setFillColor(0,0,255)
@@ -286,14 +300,59 @@ local function actionTouch( event )
 	  	steve:applyLinearImpulse(steve.direction * 10, 0,steve.x,steve.y)
 
 		Runtime:addEventListener("enterFrame" , steveAttackFollowingSteve)
-
 		attackTimer= timer.performWithDelay(attackDuration, steveAttackStop)
-
 
 		display.currentStage:setFocus( nil )
 	end
 	return true --Prevents touch propagation to underlying objects
 end
+
+local function attackedBySteve( event )
+	local attack = event.object1
+	local other = event.object2
+
+	if(other.myName == "steveAttack") then
+		attack = event.object2
+		other = event.object1
+	end
+
+	if((other.isEnemy) and(other.alpha == 1)) then --If the object in an enemy.. AND if it's not "invincible" (continue reading)
+		other.lives = other.lives - 1		
+		if ( other.lives == 0 ) then -- If the enemy has no lives left
+			display.remove(other)
+			addScore(200) -- Successivamente al posto di 200, useremo other.score, perchè ogni nemico ha un suo valore
+		else -- If the enemy is still alive
+
+			other.alpha=0.5-- Give the enemy a time for not being hitted again in the same moment
+			local removeImmunity = function() other.alpha=1 end
+			timer.performWithDelay(500, removeImmunity)
+
+			--Little "knockBack" of the enemy when is hitted from Steve (pushed Away from Steve) 
+			if (other.x > steve.y) then other:applyLinearImpulse(1,1,other.x,other.y) --if the enemy is on the Steve's Right
+			elseif (other.x < steve.y) then other:applyLinearImpulse(-1,1,other.x,other.y) --if the enemy is on the Steve's Left
+			end
+		end
+
+	elseif(other.canBeBroken) then-- If the object is a item that chan be destroyed from steve attacks
+		display.remove(other)
+	end
+
+end
+---------------------------------------------------------------------------------------------------------------------------------
+
+function onCollision( event )
+	if ( (event.object1.myName == "steve") or 
+		 (event.object2.myName == "steve") ) then
+		steveCollisions( event )
+
+	elseif((event.object1.myName == "steveAttack") or (event.object2.myName == "steveAttack"))
+		--If something is hitted from the SteveAttack
+		then attackedBySteve(event)
+	end
+end
+
+
+--------------------------------------------------------------------------------------
 
 local function pauseGame(event)
     if(event.phase == "ended") then
