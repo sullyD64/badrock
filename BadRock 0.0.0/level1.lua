@@ -1,4 +1,3 @@
-
 -----------------------------------------------------------------------------------------
 --
 -- level1.lua
@@ -286,41 +285,40 @@ end
 	end
 
 	function endCollision( event )
-	local other
-	if(event.object1.myName == "steve") then
-		other= event.object2
-	else
-		other=event.object1
+		local other
+		if(event.object1.myName == "steve") then
+			other= event.object2
+		else
+			other=event.object1
+		end
+		exitText = display.newText( uiGroup, "Level Complete" , 250, 150, native.systemFontBold, 34 )
+		exitText:setFillColor( 0.75, 0.78, 1 )
+		steve.alpha = 0
+		camera:cancel() --Stop camera Tracking
+		timer.performWithDelay( 500, endGame )
 	end
-				exitText = display.newText( uiGroup, "Level Complete" , 250, 150, native.systemFontBold, 34 )
-				exitText:setFillColor( 0.75, 0.78, 1 )
-				steve.alpha = 0
-				camera:cancel() --Stop camera Tracking
-				timer.performWithDelay( 500, endGame )
-
-end
 
 	-- Steve Collisions Handler
-function steveCollisions( event )
-	local steveObj = event.object1
-	local other = event.object2
+	function steveCollisions( event )
+		local steveObj = event.object1
+		local other = event.object2
 
-	if(other.myName =="steve") then 
-		steveObj = event.object2
-		other = event.object1
-	end
+		if(other.myName =="steve") then 
+			steveObj = event.object2
+			other = event.object1
+		end
 
-	-- Collision Type
-	if(other.myName == "env") then
-		environmentCollision(event)
-	elseif (other.myName == "coin") then
-		coinCollision(event)
-	elseif ((other.myName == "nemico") or (other.isEnemy))then
-		dangerCollision(event)
-	elseif(other.myName == "end_level") then
-		endCollision(event)
+		-- Collision Type
+		if(other.myName == "env") then
+			environmentCollision(event)
+		elseif (other.myName == "coin") then
+			coinCollision(event)
+		elseif ((other.myName == "nemico") or (other.isEnemy))then
+			dangerCollision(event)
+		elseif(other.myName == "end_level") then
+			endCollision(event)
+		end
 	end
-end
 
 	-- Generic Collision Handler
 	function onCollision( event )
@@ -429,9 +427,10 @@ function scene:create( event )
 	physics.pause()
 
 	-- MUSIC AND SOUNDS -----------------------------
-		backgroundMusic = audio.loadStream("audio/overside8bit.wav")
+		--backgroundMusic = audio.loadStream("audio/overside8bit.wav")
+		backgroundMusic = audio.loadStream( nil )
 		jumpSound = audio.loadSound("audio/jump.wav")
-		coinSound = audio.loadSound("audio/coin.wav")
+		coinSound = audio.loadSound("audio/coin.11wav")
 		attackSound = audio.loadSound( "audio/attack.wav")
 		dangerSound = audio.loadSound( "audio/danger3.wav")
 	-------------------------------------------------
@@ -546,7 +545,6 @@ function scene:create( event )
 		sceneGroup:insert(camera)
 		sceneGroup:insert(uiGroup)
 	-------------------------------------------------
-	
 end
 
 -- show()
@@ -555,9 +553,9 @@ function scene:show( event )
 	local sceneGroup = self.view
 	local phase = event.phase
 	
-	if phase == "will" then
+	if ( phase == "will" ) then
 		
-	elseif phase == "did" then
+	elseif ( phase == "did" ) then
 		Runtime:addEventListener("enterFrame", moveCamera)
         Runtime:addEventListener( "collision", onCollision)
 
@@ -574,15 +572,14 @@ function scene:hide( event )
 	local sceneGroup = self.view
 	local phase = event.phase
 	
-	if event.phase == "will" then
+	if ( phase == "will" ) then
 	
-	elseif phase == "did" then
+	elseif ( phase == "did" ) then
 		Runtime:removeEventListener( "collision", onCollision)
        
 		physics.stop()
 		audio.stop(1)
-	end	
-	
+	end		
 end
 
 -- destroy()
@@ -606,6 +603,6 @@ scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
--- -----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 
 return scene
