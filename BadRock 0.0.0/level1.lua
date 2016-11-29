@@ -130,7 +130,7 @@ physics.setGravity( 0, 30 )
 		pointsText:setFillColor( 0,0,255 )
 		transition.to( pointsText.text, { 
 			alpha=1, 
-			time=100, 
+			time=30, 
 			effect="crossfade",
 			onComplete = function() 
 				display.remove(pointsText) 
@@ -551,7 +551,7 @@ function scene:create( event )
 		steve.myName = "steve"
 		setEntitySpeed (steve, 150)
 		setEntityJumpHeight (steve, -18)
-		physics.addBody( steve, { density=1.0, friction=0.7, bounce=0 } )
+		physics.addBody( steve, { density=1.0, friction=0.7, bounce=0.01 } )
 		steve.isFixedRotation = true
 		steve.direction = DIRECTION_RIGHT
 	-------------------------------------------------
