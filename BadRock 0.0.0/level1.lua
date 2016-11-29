@@ -458,8 +458,8 @@ function scene:create( event )
 	physics.pause()
 
 	-- MUSIC AND SOUNDS -----------------------------
-		--backgroundMusic = audio.loadStream("audio/overside8bit.wav")
-		backgroundMusic = audio.loadStream( nil )
+		backgroundMusic = audio.loadStream("audio/overside8bit.wav")
+		--backgroundMusic = audio.loadStream( nil )
 		jumpSound = audio.loadSound("audio/jump.wav")
 		coinSound = audio.loadSound("audio/coin.wav")
 		attackSound = audio.loadSound( "audio/attack.wav")
