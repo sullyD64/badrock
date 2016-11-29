@@ -1,3 +1,4 @@
+
 -----------------------------------------------------------------------------------------
 --
 -- level1.lua
@@ -109,7 +110,7 @@ end
 		pointsText:setFillColor( 0,0,255 )
 		transition.to( pointsText.text, { 
 			alpha=1, 
-			time=250, 
+			time=50, 
 			effect="crossfade",
 			onComplete = function() 
 				display.remove(pointsText) 
@@ -284,25 +285,42 @@ end
 		end
 	end
 
-	-- Steve Collisions Handler
-	function steveCollisions( event )
-		local steveObj = event.object1
-		local other = event.object2
-
-		if(other.myName =="steve") then 
-			steveObj = event.object2
-			other = event.object1
-		end
-
-		-- Collision Type
-		if(other.myName == "env") then
-			environmentCollision(event)
-		elseif (other.myName == "coin") then
-			coinCollision(event)
-		elseif ((other.myName == "nemico") or (other.isEnemy))then
-			dangerCollision(event)
-		end
+	function endCollision( event )
+	local other
+	if(event.object1.myName == "steve") then
+		other= event.object2
+	else
+		other=event.object1
 	end
+				exitText = display.newText( uiGroup, "Level Complete" , 250, 150, native.systemFontBold, 34 )
+				exitText:setFillColor( 0.75, 0.78, 1 )
+				steve.alpha = 0
+				camera:cancel() --Stop camera Tracking
+				timer.performWithDelay( 500, endGame )
+
+end
+
+	-- Steve Collisions Handler
+function steveCollisions( event )
+	local steveObj = event.object1
+	local other = event.object2
+
+	if(other.myName =="steve") then 
+		steveObj = event.object2
+		other = event.object1
+	end
+
+	-- Collision Type
+	if(other.myName == "env") then
+		environmentCollision(event)
+	elseif (other.myName == "coin") then
+		coinCollision(event)
+	elseif ((other.myName == "nemico") or (other.isEnemy))then
+		dangerCollision(event)
+	elseif(other.myName == "end_level") then
+		endCollision(event)
+	end
+end
 
 	-- Generic Collision Handler
 	function onCollision( event )

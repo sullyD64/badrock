@@ -9,6 +9,7 @@ local scene = composer.newScene()
 
 -- include Corona's "widget" library
 local widget = require "widget"
+local background
 
 --------------------------------------------
 
@@ -28,7 +29,7 @@ function scene:create( event )
 	local sceneGroup = self.view
 
 	-- display a background image
-	local background = display.newImageRect( "background.jpg", display.actualContentWidth, display.actualContentHeight )
+	background = display.newImageRect( "background.jpg", display.actualContentWidth, display.actualContentHeight )
 	background.anchorX = 0
 	background.anchorY = 0
 	background.x = 0 + display.screenOriginX 

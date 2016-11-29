@@ -48,7 +48,7 @@ end
 
 
 local function gotoMenu()
-    composer.gotoScene( "menu", { time=800, effect="crossFade" } )
+    composer.gotoScene( "level1", { time=800, effect="crossFade" } )
 end
 
 -- -----------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ function scene:create( event )
         end
     end
 
-    local menuButton = display.newText( sceneGroup, "Menu", display.contentCenterX, 810, native.systemFont, 44 )
+    local menuButton = display.newText( sceneGroup, "Menu", display.contentCenterX+150, 250, native.systemFont, 44 )
     menuButton:setFillColor( 0.75, 0.78, 1 )
     menuButton:addEventListener( "tap", gotoMenu )
 end
@@ -105,40 +105,40 @@ end
 -- show()
 function scene:show( event )
 
-	local sceneGroup = self.view
-	local phase = event.phase
+    local sceneGroup = self.view
+    local phase = event.phase
 
-	if ( phase == "will" ) then
-		-- Code here runs when the scene is still off screen (but is about to come on screen)
+    if ( phase == "will" ) then
+        -- Code here runs when the scene is still off screen (but is about to come on screen)
 
-	elseif ( phase == "did" ) then
-		-- Code here runs when the scene is entirely on screen
+    elseif ( phase == "did" ) then
+        -- Code here runs when the scene is entirely on screen
 
-	end
+    end
 end
 
 
 -- hide()
 function scene:hide( event )
 
-	local sceneGroup = self.view
-	local phase = event.phase
+    local sceneGroup = self.view
+    local phase = event.phase
 
-	if ( phase == "will" ) then
-		-- Code here runs when the scene is on screen (but is about to go off screen)
+    if ( phase == "will" ) then
+        -- Code here runs when the scene is on screen (but is about to go off screen)
 
-	elseif ( phase == "did" ) then
-		-- Code here runs immediately after the scene goes entirely off screen
+    elseif ( phase == "did" ) then
+        -- Code here runs immediately after the scene goes entirely off screen
 
-	end
+    end
 end
 
 
 -- destroy()
 function scene:destroy( event )
 
-	local sceneGroup = self.view
-	-- Code here runs prior to the removal of scene's view
+    local sceneGroup = self.view
+    -- Code here runs prior to the removal of scene's view
 
 end
 
