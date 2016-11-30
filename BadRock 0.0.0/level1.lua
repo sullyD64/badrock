@@ -40,7 +40,7 @@ physics.setGravity( 0, 30 )
 	local score = 0
 	local died = false
 	local levelCompleted = false
-	local scoreText, pointsText, exitText
+	local livesText, scoreText, pointsText, exitText
 	pointsText = "+100"
 
 	--[[
