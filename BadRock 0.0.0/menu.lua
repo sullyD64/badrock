@@ -36,43 +36,62 @@ local widget = require ("widget")
             	x = 130, y = 16, width = 20, height = 10 },
         	{	-- frame 9 = Center
         		x = 20, y = 16, width = 110, height = 10 },
-        	{   -- frame 10 = UpperSX Corner Over
-                x = 150, y = 0, width = 16 , height = 16 },
+        	
+			{   -- frame 10 = UpperSX Corner Over
+                x = 150, y = 0, width = 20, height = 16 },
             {   -- frame 11 = Upper Side Over
-                x = 166, y = 0, width = 114, height = 16 },
+                x = 166, y = 0, width = 110, height = 16 },
             {	-- frame 12 = UpperDX Corner Over
             	x = 280, y = 0, width = 20, height = 16 },
         	{	-- frame 13 = SX Side Over
-            	x = 150, y = 16, width = 16, height = 10 },
+            	x = 150, y = 16, width = 20, height = 10 },
+            {   -- frame 18 = Center Over
+                x = 166, y = 16, width = 110, height = 10 },
+            {   -- frame 17 = DX Side Over
+                x = 280, y = 16, width = 20, height = 10 },
         	{	-- frame 14 = LowerSX Corner Over 
-            	x = 150, y = 30, width = 16 , height = 20 },
+            	x = 150, y = 30, width = 20 , height = 20 },
         	{	-- frame 15 = Lower Side Over
-            	x = 166, y = 30, width = 114, height = 20 },
+            	x = 166, y = 30, width = 110, height = 20 },
         	{	-- frame 16 = LowerDX Corner Over
-            	x = 280 , y = 30, width = 20, height = 20 },
-        	{	-- frame 17 = DX Side Over
-            	x = 280, y = 16, width = 20, height = 10 },
-        	{	-- frame 18 = Center Over
-        		x = 166, y = 16, width = 114, height = 10 }
+            	x = 280, y = 30, width = 20, height = 20 }
+
+        	-- {   -- frame 10 = UpperSX Corner Over
+         --        x = 150, y = 0, width = 16 , height = 16 },
+         --    {   -- frame 11 = Upper Side Over
+         --        x = 166, y = 0, width = 114, height = 16 },
+         --    {	-- frame 12 = UpperDX Corner Over
+         --    	x = 280, y = 0, width = 20, height = 16 },
+        	-- {	-- frame 13 = SX Side Over
+         --    	x = 150, y = 16, width = 16, height = 10 },
+        	-- {	-- frame 14 = LowerSX Corner Over 
+         --    	x = 150, y = 30, width = 16 , height = 20 },
+        	-- {	-- frame 15 = Lower Side Over
+         --    	x = 166, y = 30, width = 114, height = 20 },
+        	-- {	-- frame 16 = LowerDX Corner Over
+         --    	x = 280 , y = 30, width = 20, height = 20 },
+        	-- {	-- frame 17 = DX Side Over
+         --    	x = 280, y = 16, width = 20, height = 10 },
+        	-- {	-- frame 18 = Center Over
+        	-- 	x = 166, y = 16, width = 114, height = 10 }
         },
-        sheetContentWidth = 297,
+        sheetContentWidth = 300,
         sheetContentHeight = 46
     }
-    local buttonSheet = graphics.newImageSheet( "Button.png", options )
+    local buttonSheet = graphics.newImageSheet( "ButtonSpazi.png", options )
 
     local playBtn, optionBtn, scoreBtn, exitBtn
 
 
     local function onPlayBtnRelease()
     	-- go to levelSelect.lua scene
-    	composer.gotoScene( "levelSelect", "fade", 500 )
+    	composer.gotoScene( "levelSelect", "fade", 333 )
     	return true
     end
 
     local function onScoreBtnRelease()
     	-- go to level1.lua scene
-        composer.removeScene( "level1" )
-    	composer.gotoScene( "level1", "fade", 500 )
+    	composer.gotoScene( "level1", "fade", 333 )
     	return true
     end
 
@@ -99,12 +118,12 @@ function scene:create( event )
 	background.y = 0 + display.screenOriginY
 	
 	-- Load the logo
-	local titleLogo = display.newImageRect( "logo.png", 343, 123 )
+	local titleLogo = display.newImageRect( "logoShadow.png", 343, 123 )
 	titleLogo.x = display.contentCenterX
 	titleLogo.y = 100
 
 	-- Load steve
-	local steveImage = display.newImageRect( "rock_original.png", 115, 113 )
+	local steveImage = display.newImageRect( "MenuSteve.png", 115, 113 )
 	steveImage.x = display.contentCenterX
 	steveImage.y = display.contentCenterY + 25
 	
@@ -123,18 +142,20 @@ function scene:create( event )
             bottomRightFrame = 7,
             middleRightFrame = 8,
             middleFrame = 9,
-            topLeftOverFrame = 10,
-            topMiddleOverFrame = 11,
-            topRightOverFrame = 12,
-            middleLeftOverFrame = 13,
-            bottomLeftOverFrame = 14,
-            bottomMiddleOverFrame = 15,
-            bottomRightOverFrame = 16,
-            middleRightOverFrame = 17,
-            middleOverFrame = 18,
+			topLeftOverFrame = 10,
+	        topMiddleOverFrame = 11,
+	        topRightOverFrame = 12,
+	        middleLeftOverFrame = 13,
+	        middleOverFrame = 14,
+	        middleRightOverFrame = 15,
+	        bottomLeftOverFrame = 16,
+	        bottomMiddleOverFrame = 17,
+	        bottomRightOverFrame = 18,
+
             label = "Play",
-            labelColor = { default={0}, over={128} },
-            onRelease = onPlayBtnRelease    -- event listener function
+            font = native.systemFontBold,
+            labelColor = { default={1}, over={128} },
+            onRelease = onPlayBtnRelease    
         }
         playBtn.anchorX = 0
         playBtn.anchorY = 0
@@ -155,18 +176,19 @@ function scene:create( event )
             bottomRightFrame = 7,
             middleRightFrame = 8,
             middleFrame = 9,
-            topLeftOverFrame = 10,
-            topMiddleOverFrame = 11,
-            topRightOverFrame = 12,
-            middleLeftOverFrame = 13,
-            bottomLeftOverFrame = 14,
-            bottomMiddleOverFrame = 15,
-            bottomRightOverFrame = 16,
-            middleRightOverFrame = 17,
-            middleOverFrame = 18,
+			topLeftOverFrame = 10,
+	        topMiddleOverFrame = 11,
+	        topRightOverFrame = 12,
+	        middleLeftOverFrame = 13,
+	        middleOverFrame = 14,
+	        middleRightOverFrame = 15,
+	        bottomLeftOverFrame = 16,
+	        bottomMiddleOverFrame = 17,
+	        bottomRightOverFrame = 18,
             label = "Options",
-            labelColor = { default={0}, over={128} },
-            onRelease = onPlayBtnRelease    -- event listener function  !!!!TO DO!!!!
+            font = native.systemFontBold,
+            labelColor = { default={1}, over={128} },
+            onRelease = onPlayBtnRelease    					-- !!!!TO DO!!!!
         }
 
         optionBtn.anchorX = 0
@@ -188,18 +210,19 @@ function scene:create( event )
             bottomRightFrame = 7,
             middleRightFrame = 8,
             middleFrame = 9,
-            topLeftOverFrame = 10,
-            topMiddleOverFrame = 11,
-            topRightOverFrame = 12,
-            middleLeftOverFrame = 13,
-            bottomLeftOverFrame = 14,
-            bottomMiddleOverFrame = 15,
-            bottomRightOverFrame = 16,
-            middleRightOverFrame = 17,
-            middleOverFrame = 18,
+			topLeftOverFrame = 10,
+	        topMiddleOverFrame = 11,
+	        topRightOverFrame = 12,
+	        middleLeftOverFrame = 13,
+	        middleOverFrame = 14,
+	        middleRightOverFrame = 15,
+	        bottomLeftOverFrame = 16,
+	        bottomMiddleOverFrame = 17,
+	        bottomRightOverFrame = 18,
             label = "Test",
-            labelColor = { default={0}, over={128} },
-            onRelease = onScoreBtnRelease    -- event listener function  !!!!TO DO!!!!
+            font = native.systemFontBold,
+            labelColor = { default={1}, over={128} },
+            onRelease = onScoreBtnRelease   			 -- !!!!TO DO!!!!
         }
 
         scoreBtn.anchorX = 0
@@ -221,18 +244,19 @@ function scene:create( event )
             bottomRightFrame = 7,
             middleRightFrame = 8,
             middleFrame = 9,
-            topLeftOverFrame = 10,
-            topMiddleOverFrame = 11,
-            topRightOverFrame = 12,
-            middleLeftOverFrame = 13,
-            bottomLeftOverFrame = 14,
-            bottomMiddleOverFrame = 15,
-            bottomRightOverFrame = 16,
-            middleRightOverFrame = 17,
-            middleOverFrame = 18,
+			topLeftOverFrame = 10,
+	        topMiddleOverFrame = 11,
+	        topRightOverFrame = 12,
+	        middleLeftOverFrame = 13,
+	        middleOverFrame = 14,
+	        middleRightOverFrame = 15,
+	        bottomLeftOverFrame = 16,
+	        bottomMiddleOverFrame = 17,
+	        bottomRightOverFrame = 18,
             label = "Exit",
-            labelColor = { default={0}, over={128} },
-            onRelease = onExitBtnRelease    -- event listener function  !!!!TO DO!!!!
+            font = native.systemFontBold,
+            labelColor = { default={1}, over={128} },
+            onRelease = onExitBtnRelease   
         }
 
         exitBtn.anchorX = 0

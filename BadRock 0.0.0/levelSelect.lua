@@ -30,36 +30,35 @@ local options =
         {   -- frame 9 = Center
             x = 20, y = 16, width = 110, height = 10 },
         {   -- frame 10 = UpperSX Corner Over
-            x = 150, y = 0, width = 16 , height = 16 },
+            x = 150, y = 0, width = 20, height = 16 },
         {   -- frame 11 = Upper Side Over
-            x = 166, y = 0, width = 114, height = 16 },
+            x = 166, y = 0, width = 110, height = 16 },
         {   -- frame 12 = UpperDX Corner Over
             x = 280, y = 0, width = 20, height = 16 },
         {   -- frame 13 = SX Side Over
-            x = 150, y = 16, width = 16, height = 10 },
-        {   -- frame 14 = LowerSX Corner Over 
-            x = 150, y = 30, width = 16 , height = 20 },
-        {   -- frame 15 = Lower Side Over
-            x = 166, y = 30, width = 114, height = 20 },
-        {   -- frame 16 = LowerDX Corner Over
-            x = 280 , y = 30, width = 20, height = 20 },
+            x = 150, y = 16, width = 20, height = 10 },
+        {   -- frame 18 = Center Over
+            x = 166, y = 16, width = 110, height = 10 },
         {   -- frame 17 = DX Side Over
             x = 280, y = 16, width = 20, height = 10 },
-        {   -- frame 18 = Center Over
-            x = 166, y = 16, width = 114, height = 10 }
+        {   -- frame 14 = LowerSX Corner Over 
+            x = 150, y = 30, width = 20 , height = 20 },
+        {   -- frame 15 = Lower Side Over
+            x = 166, y = 30, width = 110, height = 20 },
+        {   -- frame 16 = LowerDX Corner Over
+            x = 280, y = 30, width = 20, height = 20 }
     },
-    sheetContentWidth = 297,
+    sheetContentWidth = 300,
     sheetContentHeight = 46
-
 }
-local buttonSheet = graphics.newImageSheet( "Button.png", options )
+local buttonSheet = graphics.newImageSheet( "ButtonSpazi.png", options )
 
 
 
 -- Button handler to cancel the level selection and return to the menu
 local function handleCancelButtonEvent( event )
     if ( "ended" == event.phase ) then
-        composer.gotoScene( "menu", { effect="crossFade", time=333 } )
+        composer.gotoScene( "menu", { effect="fade", time=333 } )
     end
 end
  
@@ -125,17 +124,19 @@ function scene:create( event )
             id = tostring( i ),
             onEvent = handleLevelSelect,
             emboss = false,
-            shape="roundedRect",
+            --shape="roundedRect",
             width = display.contentWidth - 350,
             height = display.contentHeight - 200,
+            defaultFile = "lvl1select.png",
+            overFile= "lvl1select.png",
             font = native.systemFontBold,
-            fontSize = 18,
+            fontSize = 30,
             labelColor = { default = { 1, 1, 1 }, over = { 0.5, 0.5, 0.5 } },
-            cornerRadius = 8,
-            labelYOffset = -6, 
-            fillColor = { default={ 0, 0, 1, 1 }, over={ 0.5, 0.75, 1, 1 } },
-            strokeColor = { default={255,253,48,0.5}, over={0} },
-            strokeWidth = 2
+            --cornerRadius = 8,
+            labelYOffset = 0, 
+            --fillColor = { default={ 0, 0, 1, 1 }, over={ 0.5, 0.75, 1, 1 } },
+            --strokeColor = { default={255,253,48,0.5}, over={0} },
+            --strokeWidth = 2
         })
         -- Position the button in the grid and add it to the scrollView
         buttons[i].anchorX = 0
@@ -197,13 +198,14 @@ function scene:create( event )
         topMiddleOverFrame = 11,
         topRightOverFrame = 12,
         middleLeftOverFrame = 13,
-        bottomLeftOverFrame = 14,
-        bottomMiddleOverFrame = 15,
-        bottomRightOverFrame = 16,
-        middleRightOverFrame = 17,
-        middleOverFrame = 18,
+        middleOverFrame = 14,
+        middleRightOverFrame = 15,
+        bottomLeftOverFrame = 16,
+        bottomMiddleOverFrame = 17,
+        bottomRightOverFrame = 18,
         id = "button1",
         label = "Back",
+        labelColor = { default={1}, over={128} },
         onEvent = handleCancelButtonEvent
     })
     backButton.x = display.contentCenterX
