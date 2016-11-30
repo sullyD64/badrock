@@ -83,7 +83,7 @@ physics.setGravity( 0, 30 )
 	-- Endgame screen handler
 	local function endGameScreen()
 		steve.alpha = 0
-		camera:cancel() --Stop camera Tracking		
+		camera:cancel() --Stop camera Tracking
 
 		if (levelCompleted == true) then
 			exitText = display.newText( uiGroup, "Level Complete" , 250, 150, native.systemFontBold, 34 )
@@ -98,7 +98,7 @@ physics.setGravity( 0, 30 )
 	            display.remove( exitText )
 	        end
 	    } )
-		timer.performWithDelay( 2000, endGame )
+		timer.performWithDelay( 1500, endGame )
 	end
 
 	-- Replaces Steve on the spawn point
@@ -110,10 +110,10 @@ physics.setGravity( 0, 30 )
 
 	    steve.isBodyActive = false
 	    steve:setLinearVelocity( 0, 0 )
-	    steve.rotation=0
-	    steve.isGrounded= false
+	    steve.rotation = 0
+	    steve.isGrounded = false
 	    -- Fade in Steve
-	    transition.to( steve, { alpha=1, time=2000,
+	    transition.to( steve, { alpha = 1, time = 2000,
 	        onComplete = function()
 	            steve.isBodyActive = true
 	            died = false
@@ -129,9 +129,9 @@ physics.setGravity( 0, 30 )
 		display.contentWidth - 80, 60, native.systemFont, 14 )
 		pointsText:setFillColor( 0,0,255 )
 		transition.to( pointsText.text, { 
-			alpha=1, 
-			time=30, 
-			effect="crossfade",
+			alpha = 1, 
+			time = 30, 
+			effect = "crossfade",
 			onComplete = function() 
 				display.remove(pointsText) 
 			end
@@ -221,7 +221,7 @@ physics.setGravity( 0, 30 )
 			other = event.object1
 		end
 
-		if (event.phase == "began") then
+		if (event.phase == "began" and env.isGround) then
 			other.canJump = true
 		end
 	end
@@ -247,6 +247,7 @@ physics.setGravity( 0, 30 )
 	-- Collision with enemies and dangerous things (Only for Steve)
 	function dangerCollision( event )
 		local other = event.object2
+
 		if(event.object2.myName == "steve") then
 			other = event.object1
 		end
@@ -276,12 +277,7 @@ physics.setGravity( 0, 30 )
 
 	-- Special handler for the "End Level" block (Only for Steve)
 	function endCollision( event )
-		local other = event.object2
-
-		if(event.object2.myName == "steve") then
-			other= event.object1
-		end
-
+		
 		if ( event.phase == "began" ) then
 			levelCompleted = true
 			endGameScreen()
@@ -425,7 +421,7 @@ physics.setGravity( 0, 30 )
 			        pauseBtn.isVisible = true
 			        resumeBtn.isVisible = false
 			    end
-			display.currentStage:setFocus( nil )
+				display.currentStage:setFocus( nil )
 			end
 
 		return true
@@ -458,8 +454,8 @@ function scene:create( event )
 	physics.pause()
 
 	-- MUSIC AND SOUNDS -----------------------------
-		backgroundMusic = audio.loadStream("audio/overside8bit.wav")
-		--backgroundMusic = audio.loadStream( nil )
+		--backgroundMusic = audio.loadStream("audio/overside8bit.wav")
+		backgroundMusic = audio.loadStream( nil )
 		jumpSound = audio.loadSound("audio/jump.wav")
 		coinSound = audio.loadSound("audio/coin.wav")
 		attackSound = audio.loadSound( "audio/attack.wav")

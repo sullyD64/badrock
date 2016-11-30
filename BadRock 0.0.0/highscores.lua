@@ -46,8 +46,10 @@ local function saveScores()
     end
 end
 
-local function gotoMenu()
-    composer.gotoScene( "menu", { time=800, effect="crossFade" } )
+local function gotoMenu(event)
+	if (event.phase == "ended") then 
+    	composer.gotoScene( "menu", { time=1500, effect="crossFade" } )
+    end
 end
 
 -- -----------------------------------------------------------------------------------
