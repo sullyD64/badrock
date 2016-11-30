@@ -40,7 +40,7 @@ physics.setGravity( 0, 30 )
 	local score = 0
 	local died = false
 	local levelCompleted = false
-	local scoreText, pointsText, exitText
+	local livesText,scoreText, pointsText, exitText
 	pointsText = "+100"
 
 	local function updateText()
@@ -85,6 +85,7 @@ physics.setGravity( 0, 30 )
 	-- Endgame screen handler
 	local function endGameScreen()
 		steve.alpha = 0
+
 		camera:cancel() --Stop camera Tracking
 
 		if (levelCompleted == true) then
@@ -262,13 +263,13 @@ function dangerCollision( event )
 				audio.play( dangerSound )
 
 				-- Update lives
-				--[[lives = lives - 1
-				livesText.text = "Lives: " .. lives]]
-				--if lives &gt; 0 then
+				lives = lives - 1
+				livesText.text = "Lives: " .. lives
+				--[[if lives &gt; 0 then
     			lifeIcons[lives].isVisible = false
     			lives = lives - 1
 				--end
-				--[[lives = lives + 1
+				--lives = lives + 1
 				if lives &gt; maxLives then
     			lives = maxLives
 				end
@@ -530,12 +531,16 @@ function scene:create( event )
 	    resumeBtn:addEventListener( "touch", pauseResume ) 
 
 		-- lives and score texts
-		local i
+		--[[local i
 		for i = 1, maxLives do
     	lifeIcons[i] = display.newImage("rock.png")
     	lifeIcons[i].x = 10 + (lifeIcons[i].contentWidth * (i - 1))
     	lifeIcons[i].y = 30 -- start at 10,10
-		end
+		end]]
+		livesText = display.newText( uiGroup, "Lives: " .. lives, 0, 0, native.systemFont, 24 )
+		livesText.anchorX, livesText. anchorY = 0, 0
+		livesText.x, livesText.y = 10, 30
+		livesText:setFillColor( 255,0,0 )
 		scoreText = display.newText( uiGroup, "Score: " .. score, 0, 0, native.systemFont, 24 )
 		scoreText.anchorX, scoreText. anchorY = 1, 0
 		scoreText.x, scoreText.y = display.contentWidth -20 - pauseBtn.contentWidth, 30
