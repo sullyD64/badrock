@@ -34,11 +34,13 @@ physics.setGravity( 0, 30 )
 	local map, visual, physical
 	local steve
 
-	local lives = 3
+	local lifeIcons = {}
+	local lives = 5
+	local maxLives = 5
 	local score = 0
 	local died = false
 	local levelCompleted = false
-	local livesText, scoreText, pointsText, exitText
+	local scoreText, pointsText, exitText
 	pointsText = "+100"
 
 	local function updateText()
@@ -245,9 +247,8 @@ physics.setGravity( 0, 30 )
 	end
 
 	-- Collision with enemies and dangerous things (Only for Steve)
-	function dangerCollision( event )
+function dangerCollision( event )
 		local other = event.object2
-
 		if(event.object2.myName == "steve") then
 			other = event.object1
 		end
@@ -261,9 +262,17 @@ physics.setGravity( 0, 30 )
 				audio.play( dangerSound )
 
 				-- Update lives
-				lives = lives - 1
-				livesText.text = "Lives: " .. lives
-
+				--[[lives = lives - 1
+				livesText.text = "Lives: " .. lives]]
+				--if lives &gt; 0 then
+    			lifeIcons[lives].isVisible = false
+    			lives = lives - 1
+				--end
+				--[[lives = lives + 1
+				if lives &gt; maxLives then
+    			lives = maxLives
+				end
+				lifeIcons[lives].isVisible = true]]
 				-- Steve has no lives left
 				if ( lives == 0 ) then
 					endGameScreen()
@@ -521,11 +530,12 @@ function scene:create( event )
 	    resumeBtn:addEventListener( "touch", pauseResume ) 
 
 		-- lives and score texts
-		livesText = display.newText( uiGroup, "Lives: " .. lives, 0, 0, native.systemFont, 24 )
-		livesText.anchorX, livesText. anchorY = 0, 0
-		livesText.x, livesText.y = 10, 30
-
-		livesText:setFillColor( 255,0,0 )
+		local i
+		for i = 1, maxLives do
+    	lifeIcons[i] = display.newImage("rock.png")
+    	lifeIcons[i].x = 10 + (lifeIcons[i].contentWidth * (i - 1))
+    	lifeIcons[i].y = 30 -- start at 10,10
+		end
 		scoreText = display.newText( uiGroup, "Score: " .. score, 0, 0, native.systemFont, 24 )
 		scoreText.anchorX, scoreText. anchorY = 1, 0
 		scoreText.x, scoreText.y = display.contentWidth -20 - pauseBtn.contentWidth, 30
