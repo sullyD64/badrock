@@ -19,7 +19,6 @@ physics.setGravity( 0, 30 )
 
 -- forward declarations and other locals
 	local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
-	local backgroundMusic
 	local dpad, jumpScreen, actionBtn
 	local steveAttack
 	local backgroundMusic, jumpSound, coinSound, attackSound, dangerSound
@@ -32,22 +31,24 @@ physics.setGravity( 0, 30 )
 	local DIRECTION_RIGHT =  1
 
 	local map, visual, physical
+	local mainGroup, uiGroup, pauseGroup
 	local steve
 
 	local lifeIcons = {}
-	local lives = 5
-	local maxLives = 5
+	local lives = 3
+	local MAX_LIVES = 5
 	local score = 0
 	local died = false
 	local levelCompleted = false
 	local scoreText, pointsText, exitText
 	pointsText = "+100"
 
+	--[[
 	local function updateText()
 	    livesText.text = "Lives: " .. lives
 	    scoreText.text = "Score: " .. score
-	    pointsText.text = "+100"
 	end
+	]]
 
 
 -- CAMERA FUNCTIONS ----------------------------------------------------------------
@@ -86,12 +87,14 @@ physics.setGravity( 0, 30 )
 	local function endGameScreen()
 		steve.alpha = 0
 		camera:cancel() --Stop camera Tracking
+		display.remove(mainGroup)
+		display.remove(uiGroup)
 
 		if (levelCompleted == true) then
-			exitText = display.newText( uiGroup, "Level Complete" , 250, 150, native.systemFontBold, 34 )
+			exitText = display.newText( pauseGroup, "Level Complete" , 250, 150, native.systemFontBold, 34 )
 			exitText:setFillColor( 0.75, 0.78, 1 )
 		else
-			exitText = display.newText( uiGroup, "Game Over" , 250, 150, native.systemFontBold, 34 )
+			exitText = display.newText( pauseGroup, "Game Over" , 250, 150, native.systemFontBold, 34 )
 			exitText:setFillColor( 1, 0, 0 )
 		end
 
@@ -101,6 +104,8 @@ physics.setGravity( 0, 30 )
 	        end
 	    } )
 		timer.performWithDelay( 1500, endGame )
+
+		return true
 	end
 
 	-- Replaces Steve on the spawn point
@@ -123,21 +128,45 @@ physics.setGravity( 0, 30 )
 	    } )
 	end
 
-	-- Function to add points to the score
-	function addScore( points )
+	-- Add points to the score
+	local function addScore( points )
 		score = score + points
 		scoreText.text = "Score: " .. score
-		pointsText = display.newText( uiGroup, "+"..points , 
-		display.contentWidth - 80, 60, native.systemFont, 14 )
-		pointsText:setFillColor( 0,0,255 )
-		transition.to( pointsText.text, { 
-			alpha = 1, 
-			time = 30, 
-			effect = "crossfade",
-			onComplete = function() 
-				display.remove(pointsText) 
-			end
-		})
+		local pointsTimer = 250
+
+		if (pointsText.isVisible == false) then
+			pointsText.text = ("+" .. points)
+			pointsText.isVisible = true 
+			pointsTimer = 250
+		end
+
+		local pointsFade = function () 
+			transition.to( pointsText, { alpha = 0, time = 250, effect = "crossfade", 
+				onComplete = function() 
+					pointsText.isVisible = false
+					pointsText.alpha = 1
+				end
+				} ) 
+		end
+		timer.performWithDelay(pointsTimer, pointsFade)
+	end
+
+	-- Remove one life             -- WORK IN PROGRESS -- 
+	function decrementLives()
+		
+		if (lives > 0) then
+			lives = lives - 1
+			livesText.text = "Lives: " .. lives
+			
+		end
+		--lifeIcons[lives].isVisible = false
+		--end
+		--[[lives = lives + 1
+		if lives &gt; MAX_LIVES then
+		lives = MAX_LIVES
+		end
+		lifeIcons[lives].isVisible = true]]
+		-- Steve has no lives left
 	end
 
 	--Getters and setters for Entity speed and jump height (generic)
@@ -242,12 +271,13 @@ physics.setGravity( 0, 30 )
 			audio.play( coinSound )
 			display.remove( coin )
 			addScore(100)
+
 		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
 		end
 	end
 
 	-- Collision with enemies and dangerous things (Only for Steve)
-function dangerCollision( event )
+	function dangerCollision( event )
 		local other = event.object2
 		if(event.object2.myName == "steve") then
 			other = event.object1
@@ -260,20 +290,7 @@ function dangerCollision( event )
 			if (died == false) then 
 				died = true
 				audio.play( dangerSound )
-
-				-- Update lives
-				--[[lives = lives - 1
-				livesText.text = "Lives: " .. lives]]
-				--if lives &gt; 0 then
-    			lifeIcons[lives].isVisible = false
-    			lives = lives - 1
-				--end
-				--[[lives = lives + 1
-				if lives &gt; maxLives then
-    			lives = maxLives
-				end
-				lifeIcons[lives].isVisible = true]]
-				-- Steve has no lives left
+				decrementLives()
 				if ( lives == 0 ) then
 					endGameScreen()
 				else
@@ -286,7 +303,6 @@ function dangerCollision( event )
 
 	-- Special handler for the "End Level" block (Only for Steve)
 	function endCollision( event )
-		
 		if ( event.phase == "began" ) then
 			levelCompleted = true
 			endGameScreen()
@@ -479,8 +495,13 @@ function scene:create( event )
 		mainGroup = display.newGroup()
 		sceneGroup:insert( mainGroup )
 
+		sceneGroup:insert(camera)
+
 		uiGroup = display.newGroup()
 		sceneGroup:insert( uiGroup )
+
+		pauseGroup = display.newGroup()
+		sceneGroup:insert( pauseGroup )
 	-------------------------------------------------
 
 	-- Apply physics to the map
@@ -488,7 +509,7 @@ function scene:create( event )
 
 	-- UI OPTIONS -----------------------------------
 		-- The jump "button" is screen-wide
-		jScreen = display.newImageRect(uiGroup,"emptyScreen.png", display.contentWidth, display.contentHeight)
+		jScreen = display.newImageRect(uiGroup, "emptyScreen.png", display.contentWidth, display.contentHeight )
 		jScreen.x, jScreen.y = display.contentCenterX , display.contentCenterY
 		jScreen.myName = "jumpScreen"
 		jScreen:toBack()
@@ -508,7 +529,7 @@ function scene:create( event )
 		dpadRight:addEventListener( "touch", dpadTouch )
 
 		-- Load the action button DA IMPLEMENTARE
-		actionBtn = display.newImageRect( uiGroup, "actionbtn.png",51,51 )
+		actionBtn = display.newImageRect( uiGroup, "actionbtn.png", 51, 51 )
 		actionBtn.anchorX, actionBtn.anchorY = 1, 1
 		actionBtn.x, actionBtn.y = display.contentWidth - actionBtn.width / 2, display.contentHeight -10 - actionBtn.height / 2
 		actionBtn.myName = "actionBtn"
@@ -516,30 +537,43 @@ function scene:create( event )
 		actionBtn.active = true -- to avoid Action spam
 	     
 	    -- Pause and resume buttons
-	    pauseBtn = display.newImageRect( uiGroup,"pause.png",35,35 )
+	    pauseBtn = display.newImageRect( uiGroup, "pause.png", 35, 35 )
 	    pauseBtn.anchorX, pauseBtn.anchorY = 1, 0
 	    pauseBtn.x, pauseBtn.y = display.contentWidth -10, 30
 	    pauseBtn.myName="pauseBtn"
 	    pauseBtn:addEventListener( "touch", pauseResume )
 
-	    resumeBtn = display.newImageRect( uiGroup,"resume.png",35,35 )
+	    resumeBtn = display.newImageRect( uiGroup, "resume.png", 35, 35 )
 	    resumeBtn.anchorX, resumeBtn.anchorY = 1, 0
 	    resumeBtn.x, resumeBtn.y = pauseBtn.x, pauseBtn.y
 	    resumeBtn.myName="resumeBtn"
 	    resumeBtn.isVisible = false
 	    resumeBtn:addEventListener( "touch", pauseResume ) 
 
-		-- lives and score texts
-		local i
-		for i = 1, maxLives do
-    	lifeIcons[i] = display.newImage("rock.png")
-    	lifeIcons[i].x = 10 + (lifeIcons[i].contentWidth * (i - 1))
-    	lifeIcons[i].y = 30 -- start at 10,10
+		-- Lives and score texts
+		local i, currIcon
+		for i = 1, lives do
+			currIcon = lifeIcons[i]
+	    	currIcon = display.newImageRect( uiGroup, "rock.png", 30, 30 )
+	    	currIcon.anchorX, currIcon.anchorY = 0, 0
+	    	currIcon.x = 10 + currIcon.contentWidth / 2 + (currIcon.contentWidth * (i - 1))
+	    	currIcon.y = 10 + currIcon.contentHeight / 2
+	    	currIcon.isVisible = true
 		end
+
+		livesText = display.newText( uiGroup, "Lives: " .. lives, 0, 0, native.systemFont, 24 )
+		livesText.anchorX, livesText. anchorY = 0, 0
+		livesText.x, livesText.y = 10, 50
+		livesText:setFillColor( 255,0,0 )
+
 		scoreText = display.newText( uiGroup, "Score: " .. score, 0, 0, native.systemFont, 24 )
 		scoreText.anchorX, scoreText. anchorY = 1, 0
 		scoreText.x, scoreText.y = display.contentWidth -20 - pauseBtn.contentWidth, 30
 		scoreText:setFillColor( 0,0,255 )
+
+		pointsText = display.newText( uiGroup, "", display.contentWidth - 80, 60, native.systemFont, 14 )
+		pointsText:setFillColor( 0,0,255 )
+		pointsText.isVisible = false
 	-------------------------------------------------
 
 	-- CHARACTER OPTIONS ----------------------------
@@ -577,10 +611,6 @@ function scene:create( event )
 		
 		-- set the follow speed of the focused layer 
 		camera.dumping = 50
-
-		-- all display objects must be inserted into group
-		sceneGroup:insert(camera)
-		sceneGroup:insert(uiGroup)
 	-------------------------------------------------
 end
 
