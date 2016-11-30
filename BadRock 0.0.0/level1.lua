@@ -34,7 +34,7 @@ physics.setGravity( 0, 30 )
 	local mainGroup, uiGroup, pauseGroup
 	local steve
 
-	local lifeIcons = {}
+	lifeIcons = {}
 	local lives = 3
 	local MAX_LIVES = 5
 	local score = 0
@@ -120,7 +120,7 @@ physics.setGravity( 0, 30 )
 	    steve.rotation = 0
 	    steve.isGrounded = false
 	    -- Fade in Steve
-	    transition.to( steve, { alpha = 1, time = 2000,
+	    transition.to( steve, { alpha = 1, time = 1000,
 	        onComplete = function()
 	            steve.isBodyActive = true
 	            died = false
@@ -479,8 +479,8 @@ function scene:create( event )
 	physics.pause()
 
 	-- MUSIC AND SOUNDS -----------------------------
-		--backgroundMusic = audio.loadStream("audio/overside8bit.wav")
-		backgroundMusic = audio.loadStream( nil )
+		backgroundMusic = audio.loadStream("audio/overside8bit.wav")
+		--backgroundMusic = audio.loadStream( nil )
 		jumpSound = audio.loadSound("audio/jump.wav")
 		coinSound = audio.loadSound("audio/coin.wav")
 		attackSound = audio.loadSound( "audio/attack.wav")
@@ -554,7 +554,7 @@ function scene:create( event )
 		local i, currIcon
 		for i = 1, lives do
 			currIcon = lifeIcons[i]
-	    	currIcon = display.newImageRect( uiGroup, "rock.png", 30, 30 )
+	    	currIcon = display.newImageRect( uiGroup, "life.png", 30, 30 )
 	    	currIcon.anchorX, currIcon.anchorY = 0, 0
 	    	currIcon.x = 10 + currIcon.contentWidth / 2 + (currIcon.contentWidth * (i - 1))
 	    	currIcon.y = 10 + currIcon.contentHeight / 2

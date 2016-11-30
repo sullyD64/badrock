@@ -81,7 +81,7 @@
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isSensor" value="true"/>
+    <property name="isSensor" value=""/>
     <property name="myName" value="end_level"/>
    </properties>
   </tile>
@@ -89,7 +89,7 @@
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isSensor" value="true"/>
+    <property name="isSensor" value=""/>
     <property name="myName" value="end_level"/>
    </properties>
   </tile>
@@ -97,27 +97,21 @@
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isEnemy" value="true"/>
-    <property name="isInvincible" value="true"/>
-    <property name="myName" value="nemico"/>
+    <property name="myName" value="env"/>
    </properties>
   </tile>
   <tile id="41">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isEnemy" value="true"/>
-    <property name="isInvincible" value="true"/>
-    <property name="myName" value="nemico"/>
+    <property name="myName" value="env"/>
    </properties>
   </tile>
   <tile id="42">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isEnemy" value="true"/>
-    <property name="isInvincible" value="true"/>
-    <property name="myName" value="nemico"/>
+    <property name="myName" value="env"/>
    </properties>
   </tile>
   <tile id="43">
@@ -132,7 +126,7 @@
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isSensor" value="true"/>
+    <property name="isSensor" value=""/>
     <property name="myName" value="end_level"/>
    </properties>
   </tile>
@@ -140,7 +134,7 @@
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isSensor" value="true"/>
+    <property name="isSensor" value=""/>
     <property name="myName" value="end_level"/>
    </properties>
   </tile>
@@ -148,34 +142,28 @@
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isEnemy" value="true"/>
-    <property name="isInvincible" value="true"/>
-    <property name="myName" value="nemico"/>
+    <property name="myName" value="env"/>
    </properties>
   </tile>
   <tile id="49">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isEnemy" value="true"/>
-    <property name="isInvincible" value="true"/>
-    <property name="myName" value="nemico"/>
+    <property name="myName" value="env"/>
    </properties>
   </tile>
   <tile id="50">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isEnemy" value="true"/>
-    <property name="isInvincible" value="true"/>
-    <property name="myName" value="nemico"/>
+    <property name="myName" value="env"/>
    </properties>
   </tile>
   <tile id="53">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isSensor" value="true"/>
+    <property name="isSensor" value=""/>
     <property name="myName" value="end_level"/>
    </properties>
   </tile>
@@ -183,7 +171,7 @@
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isSensor" value="true"/>
+    <property name="isSensor" value=""/>
     <property name="myName" value="end_level"/>
    </properties>
   </tile>
@@ -200,7 +188,7 @@
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isSensor" value="true"/>
+    <property name="isSensor" value=""/>
     <property name="myName" value="end_level"/>
    </properties>
   </tile>
@@ -208,7 +196,7 @@
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isSensor" value="true"/>
+    <property name="isSensor" value=""/>
     <property name="myName" value="end_level"/>
    </properties>
   </tile>
@@ -289,6 +277,44 @@
    </properties>
   </tile>
  </tileset>
+ <tileset firstgid="106" name="paper" tilewidth="51" tileheight="52" tilecount="1" columns="1">
+  <image source="paper.png" width="51" height="52"/>
+  <tile id="0">
+   <properties>
+    <property name="HasBody" value=""/>
+    <property name="bodyType" value="dynamic"/>
+    <property name="friction" type="float" value="1"/>
+    <property name="isEnemy" value="true"/>
+    <property name="isInvincible" value="false"/>
+    <property name="lives" type="int" value="3"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="107" name="tileset-platformer" tilewidth="32" tileheight="32" tilecount="102" columns="6">
+  <image source="tileset-platformer.png" width="192" height="544"/>
+  <tile id="12">
+   <properties>
+    <property name="HasBody" value=""/>
+    <property name="bodyType" value="static"/>
+    <property name="bounce" value="1"/>
+   </properties>
+  </tile>
+  <tile id="14">
+   <properties>
+    <property name="HasBody" value=""/>
+    <property name="bodyType" value="static"/>
+    <property name="bounce" value="1"/>
+   </properties>
+  </tile>
+  <tile id="62">
+   <properties>
+    <property name="HasBody" value=""/>
+    <property name="bodyType" value="static"/>
+    <property name="isSensor" value="true"/>
+    <property name="myName" value="coin"/>
+   </properties>
+  </tile>
+ </tileset>
  <layer name="background" width="30" height="20">
   <data encoding="csv">
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -353,10 +379,10 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,32,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,7,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,15,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,23,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,31,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,8,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,16,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,24,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,32,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
@@ -370,8 +396,8 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,169,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,83,9,9,9,9,9,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,86,25,9,9,25,9,87,0,0,0,0,0,0,0,0,0,33,34,34,35,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,42,42,43,0,0,0,0,0,0,0,
@@ -418,17 +444,17 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,169,0,169,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,44,36,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,44,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,36,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,36,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,169,0,0,0,0,0,0,0,0,0,0,0,0,0,169,0,0,169,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,36,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,36,37,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
@@ -452,8 +478,8 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,57,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,65,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,57,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,65,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
@@ -490,16 +516,16 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,105,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,106,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,105,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,105,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

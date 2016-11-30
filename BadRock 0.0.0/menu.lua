@@ -91,6 +91,7 @@ local widget = require ("widget")
 
     local function onScoreBtnRelease()
     	-- go to level1.lua scene
+        composer.removeScene( "level1" )
     	composer.gotoScene( "level1", "fade", 333 )
     	return true
     end
@@ -126,6 +127,18 @@ function scene:create( event )
 	local steveImage = display.newImageRect( "MenuSteve.png", 115, 113 )
 	steveImage.x = display.contentCenterX
 	steveImage.y = display.contentCenterY + 25
+    steveImage.direction = 1
+    
+    local function functionLoop()
+        if (steveImage.direction == 1) then
+            steveImage.xScale = -1
+            steveImage.direction = -1
+        else
+            steveImage.direction = 1
+            steveImage.xScale = 1
+        end
+    end
+    timer.performWithDelay( 1000, functionLoop, 0 )
 	
     -- Load the buttons
     playBtn = widget.newButton 
