@@ -1,0 +1,15 @@
+
+// -------------- Regolamento di Condominio ----------------------- \\
+
+-- Ognuno ha il suo branch (ramo) NOMINALE. 5 branch totali
+-- A partire da oggi ognuno creerà il suo branch
+-- Qualsiasi modifica o commit va fatto sul proprio branch e NON SUL MASTER
+-- (buona norma) Prima di committare operare tutte le modifiche al codice su una copia locale e poi sostituire i file da modificare
+-- In questo modo sourceTree non rompe le palle con le "modifiche non commissionate"
+-- Usare una formattazione uniforme per i commit
+-- Usare i [TAG] in cima ai commit per indicare il progetto attuale
+-- Ogni X giorni si fa merge collettivo su master (OBBLIGATO)
+-- Se 2 o più lavorano allo stesso progetto si fa pull a vicenda (ma NON nel master)
+-- In questo modo ognuno può pullare i commit che gli servono senza dover fare merge troppe volte
+	
+\\ ---------------------------------------------------------------- //
