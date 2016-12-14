@@ -9,6 +9,8 @@ local scene = composer.newScene()
 
 lime = require("lime.lime")
 
+local game = require ( "game" )
+
 local physics = require ("physics")
 physics.start()
 physics.setGravity( 0, 30 )
@@ -586,10 +588,6 @@ function scene:create( event )
 
 	-- CHARACTER OPTIONS ----------------------------
 
-		--[[local layer = map:getTileLayer("player")
-		players = layer:getTIlesWithProperty("isPlayer")
-		steve = players:get]]
-
 		-- Load Steve, the player avatarS
 		local layer = map:getObjectLayer("playerSpawn")
 		spawn = layer:getObject("playerSpawn")
@@ -678,7 +676,7 @@ function scene:destroy( event )
 	audio.dispose( dangerSound )
 	package.loaded[physics] = nil
 	physics = nil
-	camera = nil
+	--camera = nil
 end
 
 -- -----------------------------------------------------------------------------------

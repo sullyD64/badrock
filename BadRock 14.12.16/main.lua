@@ -20,4 +20,4 @@ audio.setVolume( 0.4, { channel=1 } )
 
 
 -- load menu screen
-composer.gotoScene( "menu" )
+composer.gotoScene( "level1" )
