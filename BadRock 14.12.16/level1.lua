@@ -7,7 +7,8 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
-lime = 		 require("lime.lime")
+lime = require("lime.lime")
+lime.disableScreenCulling() 
 local game = require ( "game" )
 
 
@@ -16,7 +17,6 @@ local game = require ( "game" )
 -- -----------------------------------------------------------------------------------
 
 local map, visual, physical
-
 
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
@@ -33,13 +33,14 @@ function scene:create( event )
 
 	physical = lime.buildPhysical(map)
 
-	-- ATTENZIONE --
-	-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
-	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
-	-- e due layer di TILE playerObject e playerEffects
+	--[[	-- ATTENZIONE -- 
+	La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
+	playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
+	e due layer di TILE playerObject e playerEffects
+	]]
 	local layer = map:getObjectLayer("playerSpawn")	
 	local spawn = layer:getObject("spawn0")
-	game.create( spawn, map )
+	game.loadGame( map, spawn )
 	--game.level = map
 	mainGroup = display.newGroup()
 	local steve = game.steve
@@ -74,7 +75,7 @@ function scene:hide( event )
 	if 	   ( phase == "will" ) then
 	
 	elseif ( phase == "did" )  then
-		game.stop()
+		game.pause()
 	end		
 end
 
@@ -82,6 +83,7 @@ end
 function scene:destroy( event )
 	local sceneGroup = self.view
 
+	--game.stop()
 	package.loaded[game] = nil
 end
 

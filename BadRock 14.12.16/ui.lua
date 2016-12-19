@@ -8,6 +8,7 @@ local ui={}
 
 ui.uiGroup = nil
 local jumpScreen, dpadLeft, dpadRight, actionBtn, pauseBtn, resumeBtn
+local lifeIcons = {}
 
 function ui.loadUi()
 	ui.uiGroup = display.newGroup()
@@ -30,9 +31,8 @@ function ui.getButtonByName( name )
 			return ui.uiGroup[i]
 		end 
 	end
-
-	return nil
 end
+
 
 function ui.createJumpScreen()
 	jumpScreen = display.newImageRect( "ui/emptyScreen.png", display.contentWidth, display.contentHeight )
@@ -45,7 +45,7 @@ end
 function ui.createDpadLeft()
 	dpadLeft = display.newImageRect( "ui/dpadLeft.png", 50, 52 )
 	dpadLeft.anchorX, dpadLeft.anchorY = 0, 1
-	dpadLeft.x, dpadLeft.y = dpadLeft.width / 2 + 10, display.contentHeight - dpadLeft.height / 2 - 10
+	dpadLeft.x, dpadLeft.y =  10, display.contentHeight - dpadLeft.height / 2 - 10
 	dpadLeft.myName = "dpadLeft"
 
 	return dpadLeft
@@ -63,7 +63,7 @@ end
 function ui.createActionBtn()
 	actionBtn = display.newImageRect( "ui/actionbtn.png", 51, 51 )
 	actionBtn.anchorX, actionBtn.anchorY = 1, 1
-	actionBtn.x, actionBtn.y = display.contentWidth - actionBtn.width / 2, display.contentHeight -10 - actionBtn.height / 2
+	actionBtn.x, actionBtn.y = display.contentWidth - 10, display.contentHeight -10 - actionBtn.height / 2
 	actionBtn.myName = "actionBtn"
 	actionBtn.active = true -- to avoid Action spam
 
@@ -118,13 +118,12 @@ function ui.createLivesText()
 	return livesText
 end
 
---Create all the images for the max lives, used for the beginning of the level
+-- Create all the images for the max lives
 function ui.createLifeIcons( maxLives )
-	local lifeIcons = {}
 	for i = 1, maxLives do
 		local	currIcon = display.newImageRect(ui.uiGroup, "ui/life.png", 30, 30 )
 	    currIcon.anchorX, currIcon.anchorY = 0, 0
-	    currIcon.x = 10 + currIcon.contentWidth / 2 + (currIcon.contentWidth * (i - 1))
+	    currIcon.x = 10 + (currIcon.contentWidth * (i - 1))
 	    currIcon.y = 10 + currIcon.contentHeight / 2
 	    currIcon.isVisible = true
 	    table.insert(lifeIcons,currIcon) 
