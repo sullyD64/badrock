@@ -579,7 +579,7 @@
 </data>
  </layer>
  <objectgroup name="playerSpawn">
-  <object id="1" name="spawn0" x="231" y="284" width="32" height="32"/>
+  <object id="1" name="spawn0" x="140" y="273" width="32" height="32"/>
  </objectgroup>
  <layer name="foreground" width="37" height="20">
   <properties>

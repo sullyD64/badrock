@@ -32,7 +32,7 @@ physics.setGravity( 0, 35 )
 	local levelCompleted
 	local posX, posY
 	local spawnX, spawnY
-	local controlsEnabled, SSVEnabled, SSVLaunched
+	local controlsEnabled, SSVEnabled, SSVLaunched, letMeJump
 
 --===========================================-- 
 
@@ -58,12 +58,14 @@ local function onUpdate ()
 
 	-- Deny jump if steve is falling
 	if (SSVEnabled) then
+		print("controllo salto")
 		local xv, yv = game.steve:getLinearVelocity()
-		if (yv > 0 and game.steve.letMeJump == false) then 
+		if (yv > 0 and letMeJump == false) then 
 			game.steve.canJump = false
-		elseif (yv == 0 and game.steve.letMeJump == true) then
+		elseif (yv == 0 and letMeJump == true) then
 			game.steve.canJump = true
 		end
+		print(game.steve.canJump)
 	end
 
 	local state = game.state
@@ -127,6 +129,7 @@ end
 		game.map:setFocus( nil )
 		display.remove(game.steve)
 
+
 		-- Display the exitText
 			local exitText = display.newText( ui.uiGroup, "" , 250, 150, native.systemFontBold, 34 )
 			if (levelCompleted == true) then
@@ -141,6 +144,8 @@ end
 		local endGame = function()
 			game.state = GAME_ENDED
 			game.ui:removeSelf( )
+
+			Runtime:removeEventListener( "enterFrame", onUpdate )
 
 			-- Remove the event listener if endGame was triggered while pressing Dpad
 			if (SSVLaunched) then
@@ -330,9 +335,11 @@ end
 				dangerCollision(event)
 			elseif(other.myName == "end_level") then
 				levelCompleted = true
+				controlsEnabled = false
+				SSVEnabled = false
 				endGameScreen()
 			else
-				steveObj.letMeJump = true -- force enable the jump
+				letMeJump = true -- force enable the jump
 			end
 
 		-- SteveAttack collisions are handled by the attackedBySteve method
@@ -396,12 +403,13 @@ end
 	local function jumpTouch(event)
 		if (game.state == GAME_RUNNING) then
 			display.currentStage:setFocus( event.target )
-			if (game.steve.canJump == true) then
+			if (controlsEnabled and game.steve.canJump == true) then
 				audio.play( jumpSound )
 
 				game.steve:applyLinearImpulse(0,game.steve.jumpHeight, game.steve.x, game.steve.y)
 				game.steve.state = STATE_JUMPING
 				game.steve.canJump = false
+				letMeJump = false
 			end
 			display.currentStage:setFocus( nil )
 		end
