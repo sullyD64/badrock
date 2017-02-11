@@ -50,23 +50,122 @@ local function debug(event)
 	--print(game.steve.canJump)
 	--local xv, yv = game.steve:getLinearVelocity()
 	--print(yv)
+	--print("AirState "..game.steve.airState)
+	--print("STATE "..game.steve.state)
+	print("Sequence: "..game.steveSprite.sequence)
+	print( "STEVEisPlaying: ", game.steveSprite.isPlaying)
+	--if (game.steveSprite.phase)then print("AnimState"..game.steveSprite.phase) end
+	--print("SteveY: "..game.steve.y)
+	--print("SpriteY: "..game.steveSprite.y)
+	print( "TESTisPlaying: ", game.testSprite.isPlaying)
+
+
 end
 
 local function onUpdate ()
 	posX = game.steve.x
 	posY = game.steve.y
 
+--	game.steveSprite.x , game.steveSprite.y = posX , posY
+	if((game.steve.x) and (game.steve.y)) then
+		game.steveSprite.x = game.steve.x 
+		game.steveSprite.y = game.steve.y -10
+	 	--(offset della sprite rispetto a game.steve)
+		game.steveSprite.xScale = game.steve.direction
+	end
+
 	-- Deny jump if steve is falling
 	if (SSVEnabled) then
-		print("controllo salto")
+		--print("controllo salto")
 		local xv, yv = game.steve:getLinearVelocity()
 		if (yv > 0 and letMeJump == false) then 
 			game.steve.canJump = false
 		elseif (yv == 0 and letMeJump == true) then
 			game.steve.canJump = true
 		end
-		print(game.steve.canJump)
+		--print(game.steve.canJump)
+
+			if(yv > 0) then
+			game.steve.airState= "Falling"
+		elseif(yv < 0) then
+			game.steve.airState= "Jumping"
+
+		elseif(yv == 0) then
+			game.steve.airState= "Idle"
+		end
+
 	end
+
+	-- Setting the AirState, needed for the Animation controls
+	
+		-- flag = game.steveSprite.sequence
+		-- --Animation settings based on the steve states
+		-- if((game.steve.state == STATE_WALKING) and game.steve.airState == "Idle") then
+
+		-- 	game.steveSprite:setSequence("walking")
+		-- 	game.testSprite:setSequence("walking")
+		-- 	--game.testSprite:play()
+		-- 	print("TEST Play()") 
+			
+		-- 	if(flag ~= "walking") then 
+		-- 		print("Flag PRIMA: "..flag)
+		-- 		for i=0, 10 do
+		-- 		game.testSprite:play() 
+		-- 		print("Play")
+		-- 		 end
+		-- 		game.steveSprite:play()
+		-- 		--print("---------------Ho fatto play allo sprite")
+		-- 		flag = game.steveSprite.sequence
+		-- 		--print("Flag DOPO "..flag)
+		-- 	end
+		-- 	--	print("Ho fatto play allo sprite") end
+
+		-- elseif((game.steve.state == STATE_IDLE) and game.steve.airState == "Idle") then
+		-- 	game.steveSprite:setSequence("idle")
+		-- 	--game.testSprite:setSequence
+			
+		-- 	if(flag ~= "idle") then 
+		-- 		--game.testSprite:play() 
+		-- 		--game.steveSprite:play()
+		-- 		flag = game.steveSprite.sequence
+		-- 	end
+			
+
+		-- elseif(game.steve.airState == "Falling") then
+		-- 	game.steveSprite:setSequence("falling")
+		-- 	if(flag ~= "falling") then 
+		-- 		--game.testSprite:play() 
+		-- 		--game.steveSprite:play()
+		-- 		flag = game.steveSprite.sequence
+		-- 	end
+		-- 	--game.testSprite:setSequence("falling")
+		-- 	--game.testSprite:play()
+
+		-- elseif(game.steve.airState == "Jumping") then
+		-- 	game.steveSprite:setSequence("jumping")
+		-- 	if(flag ~= "jumping") then 
+		-- 		--game.testSprite:play() 
+		-- 		--game.steveSprite:play()
+		-- 		flag = game.steveSprite.sequence
+		-- 	end
+		-- 	--game.steveSprite:play()
+		-- 	-- game.testSprite:setSequence("walking")
+		-- 	-- if(flag ~= "walking") then 
+		-- 	-- 	game.testSprite:play()
+		-- 	-- 	print("HO fatto Play") 
+		-- 	-- 	flag = game.testSprite.sequence
+		-- 	-- end
+		-- end
+
+		-- if(game.steve.state == STATE_ATTACKING) then
+		-- 	game.steveSprite.alpha = 0
+		-- else
+		-- 	if(game.steveSprite.alpha == 0) then game.steveSprite.alpha = 1 end
+		-- end
+
+
+
+
 
 	local state = game.state
 	if (state == GAME_RUNNING) then
@@ -128,6 +227,7 @@ end
 		SSVEnabled = false 		-- Prevents setSteveVelocity from accessing the physical Steve object
 		game.map:setFocus( nil )
 		display.remove(game.steve)
+		display.remove(game.steveSprite)
 
 
 		-- Display the exitText
@@ -173,11 +273,12 @@ end
 	    game.steve.state = STATE_IDLE
 
 	    -- Fade in Steve's sprite
-	    transition.to( game.steve, { alpha = 1, time = 1000,
+	    transition.to( game.steveSprite, { alpha = 1, time = 1000,
 	        onComplete = function()
 	            game.steve.isBodyActive = true
 	            game.steve.state = STATE_IDLE
 	            controlsEnabled = true
+	            game.steveSprite:play()
 	        end
 	    } )  
 	end
@@ -197,7 +298,7 @@ end
 
 		if (event.phase == "began" and env.isGround) then
 			other.canJump = true
-			game.steve.isTouchingGround = true
+			game.steve.isTouchingGround = true -- non usata
 		end
 		--[[
 		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
@@ -257,9 +358,10 @@ end
 				if ( game.lives == 0 ) then
 					endGameScreen()
 				else
-					transition.to(game.steve, { time=0, onComplete = function() 
+					transition.to(game.steveSprite, { alpha=0, time=0, onComplete = function() 
 						game.steve.isBodyActive = false
-						game.steve.alpha = 0
+						game.steveSprite:setSequence("idle")
+						game.steveSprite:pause()
 						restoreSteve()
 					end
 					} )
@@ -381,6 +483,13 @@ end
 				if (controlsEnabled) then
 					SSVEnabled = true
 					game.steve.state = STATE_WALKING
+
+					--avoid walking animation in mid air
+					if(game.steve.airState == "Idle" or game.steve.airState == nil) then
+						game.steveSprite:setSequence("walking")
+						game.steveSprite:play()
+					end
+
 					Runtime:addEventListener("enterFrame", setSteveVelocity)
 					
 					game.steve.actualSpeed = game.steve.direction * game.steve.speed
@@ -390,6 +499,10 @@ end
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
 
 				game.steve.state = STATE_IDLE
+
+				--if(controlsEnabled)then
+					game.steveSprite:setSequence("idle")
+				--end
 				Runtime:removeEventListener("enterFrame", setSteveVelocity)	
 
 				lbutton.alpha, rbutton.alpha = 0.1, 0.1
@@ -437,6 +550,7 @@ end
 					steveAttack:setFillColor(0,0,255)
 					steveAttack.alpha=0.6
 				  	game.map:getTileLayer("playerEffects"):addObject( steveAttack )
+				  	game.steveSprite.alpha=0
 
 				  	-- Make steve dash forward
 				  	game.steve:applyLinearImpulse( game.steve.direction * 8, 0, game.steve.x, game.steve.y )
@@ -453,6 +567,7 @@ end
 						Runtime:removeEventListener("enterFrame" , steveAttackFollowingSteve)
 						actionBtn.active = true
 						actionBtn.alpha = 1
+		 				game.steveSprite.alpha = 1
 					end
 
 					Runtime:addEventListener("enterFrame", steveAttackFollowingSteve)
@@ -495,7 +610,45 @@ end
 -- GAME INITIALIZATION -------------------------------------------------------------
 	
  	function game.loadPlayer()
-		game.steve = display.newImageRect( "sprites/rock.png", 30, 30 )
+	
+ 		local sheetData ={
+ 			height = 50,
+ 			width = 30,
+ 			numFrames = 4,
+ 			sheetContentWidth = 120,--120,
+        	sheetContentHeight = 50--40
+ 	 	}
+
+ 	 	local walkingSheet = graphics.newImageSheet("sprites/steveAnim.png", sheetData)
+
+ 	 	local sequenceData = {
+ 	 		{name = "walking", start= 1, count =4, time = 300, loopCount=0},
+ 	 		{name = "idle", start= 1, count =1, time = 300, loopCount=0},
+ 	 		{name = "falling", start= 1, count =1, time = 300, loopCount=0},
+ 	 		{name = "jumping", start= 1, count =1, time = 300, loopCount=0 }
+ 	 	}
+
+ 	 	-- game.testSprite =  display.newSprite( walkingSheet , sequenceData)
+ 	 	-- game.testSprite.x = spawnX
+ 	 	-- game.testSprite.y = spawnY
+ 	 	-- game.map:getTileLayer("playerEffects"):addObject( game.testSprite )
+ 	 	-- game.testSprite:setSequence("idle")
+ 	 	-- game.testSprite:play()
+
+		game.steveSprite = display.newSprite( walkingSheet , sequenceData)
+		game.map:getTileLayer("playerEffects"):addObject( game.steveSprite )
+		--game.map:getObjectLayer("playerEffects"):addObject( game.steveSprite )
+
+		game.steveSprite:setSequence("idle")
+		--game.steveSprite:setFrame(1)
+		game.steveSprite:play()
+		--game.steveSprite:pause()
+
+
+
+	
+		game.steve = display.newImageRect( "sprites/rock_original.png", 30, 30 )
+		game.steve.alpha=0
 		game.steve.myName = "steve"
 		game.steve.rotation = 0
 		game.steve.speed = 180
@@ -508,6 +661,7 @@ end
 
 		
 		game.steve.x, game.steve.y = spawnX, spawnY
+
 	end
 
 	function game.loadUi()
@@ -592,6 +746,7 @@ end
 
 function game.start()
 	game.state = GAME_RUNNING
+	game.steveSprite:play()
 	physics.start()
 	Runtime:addEventListener("enterFrame", moveCamera)
 	Runtime:addEventListener("collision", onCollision)
@@ -601,13 +756,15 @@ function game.start()
 end
 
 function game.pause()
-	game.steve.state = STATE_IDLE	
+	game.steve.state = STATE_IDLE
+	game.steveSprite:pause()	
 	physics.pause()
 	audio.pause(1)
 end
 
 function game.resume()
 	game.state = GAME_RUNNING
+	game.steveSprite:play()
 	physics.start()
 	audio.resume(1)
 end

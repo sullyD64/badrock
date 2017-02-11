@@ -119,7 +119,7 @@ function scene:create( event )
 	background.y = 0 + display.screenOriginY
 	
 	-- Load the logo
-	local titleLogo = display.newImageRect( "misc/logoShadow.png", 343, 123 )
+	local titleLogo = display.newImageRect( "misc/LogoShadow.png", 343, 123 )
 	titleLogo.x = display.contentCenterX
 	titleLogo.y = 100
 
