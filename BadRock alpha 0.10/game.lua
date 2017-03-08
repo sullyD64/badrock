@@ -7,6 +7,7 @@
 local composer = require( "composer" )
 local ui = 		 require ( "ui" )
 local physics =  require ( "physics" )
+local enemies =  require( "enemies" )
 
 local game = {}
 
@@ -52,12 +53,12 @@ local function debug(event)
 	--print(yv)
 	--print("AirState "..game.steve.airState)
 	--print("STATE "..game.steve.state)
-	print("Sequence: "..game.steveSprite.sequence)
-	print( "STEVEisPlaying: ", game.steveSprite.isPlaying)
+	--print("Sequence: "..game.steveSprite.sequence)
+	--print( "STEVEisPlaying: ", game.steveSprite.isPlaying)
 	--if (game.steveSprite.phase)then print("AnimState"..game.steveSprite.phase) end
 	--print("SteveY: "..game.steve.y)
 	--print("SpriteY: "..game.steveSprite.y)
-	print( "TESTisPlaying: ", game.testSprite.isPlaying)
+	--print( "TESTisPlaying: ", game.testSprite.isPlaying)
 
 
 end
@@ -719,6 +720,25 @@ end
 		end
 	  ]]
 
+--Crea visivamente e con i relativi attributi tutti i nemici sulla mappa (Richiede che sulla mappa ci siano degli OGGETTI con il tipo = tipoNemico)
+	function game.loadEnemies()
+		--Riazzeriamo la lista dei nemici di un livello appena il gioco si carica
+		game.enemyLevelList = {}
+		local enemy = nil
+		local enemyList = game.map:getObjectLayer("enemy").objects
+
+		for k, v in pairs(enemyList) do
+			enemy = enemyList[k]
+			--print ("primax= "..enemy.x.." primay= "..enemy.y)
+			local en = enemies.createEnemy(enemy, enemy.type)
+			--assegno qui la posizione perchè nella funzione precedente magicamente si perdono i valori della posizione
+				en.x = enemy.x
+				en.y = enemy.y
+			game.map:getTileLayer("nemico"):addObject( en )
+			table.insert (game.enemyLevelList , en)
+		end
+	
+	  end
 
 	function game.loadGame( map, spawn )
 		-- Locally stores the current level map and spawn coordinates
@@ -732,7 +752,7 @@ end
 		game.loadPlayer()
 		game.loadUi()
 		game.loadSounds()
-		
+		game.loadEnemies()
 		SSVEnabled = true
 		controlsEnabled = true
 		SSVLaunched = false

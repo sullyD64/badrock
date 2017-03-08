@@ -75,7 +75,7 @@ function scene:hide( event )
 	if 	   ( phase == "will" ) then
 	
 	elseif ( phase == "did" )  then
-		game.pause()
+		--game.pause()
 	end		
 end
 
