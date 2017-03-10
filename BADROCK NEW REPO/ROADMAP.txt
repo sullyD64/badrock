@@ -1,0 +1,33 @@
+
+	// ---------------- Roadmap BR --------------------------------- \\
+
+	-- (OK) Sistemare il bug delle vite 			(Giacomo)
+	-- (OK) REFACTOR (Creare la CLASSE game.lua e più)	(Lorenzo e Fabio)			
+	-- (OK) Textures in HD					(Elena)
+
+	{{{SUPERVISIONE E REFACTORING}}}			(Lorenzo e Fabio)
+
+	-- [level design] Mappa del livello 1			(Giacomo)
+	-- Movimento dei nemici 				(Giacomo)
+	-- "prisoner" e balloon
+		- GRAFICA: 					(Fabio)
+		- CODICE: 					(Elena e Lorenzo)
+	
+	-- Power up (concept / test)				(Lorenzo)	
+	-- ANIMAZIONI con SHEET (solo steve)	
+		- GRAFICA:					(Fabio e Lorenzo)
+		- CODICE:					////
+	-- ANIMAZIONI con SHEET (mob)
+		- GRAFICA:					(Fabio e Lorenzo)
+		- CODICE: 					////
+
+	-- Endgame screen (riepilogo) 				(Claudia + aiuto)				
+	-- Finire il menu.lua					(Claudia)
+	-- Opzioni (metti/togli musica, skin etc)		(Claudia)
+	-- Menù di pausa					(Claudia)
+
+		
+	-- Shop e implementazione skin / sistemare var		////
+	-- Test su telefono (creare l'apk) +++ ICONE +++
+	
+	\\ ------------------------------------------------------------- //

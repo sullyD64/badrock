@@ -1,0 +1,46 @@
+
+/// COSA FA ORA LEVEL1:
+
+- Carica Lime (FORZATO QUI) 
+- Carica physics (FORZATO QUI)
+- Carica perspective (FORZATO QUI)
+===================================
+
+- Dichiara gli STATE e DIRECTION
+- Dichiara variabili di stato gameplay
+
+- moveCamera()
+
+[meccanica di gioco]
+- endGame() + endGameScreen()
+- restoreSteve()
+- addScore(points)
+- decrementives
+- setEntitySpeed/JumpHeight(entity, value)
+- setSteveVelocity()
+
+- steveAttackFollowingSteve()
+- steveAttackStop()
+
+----------------------------------- MODIFICA		  RICHIAMA
+- environmentCollision( event )	    event.obj
+- coinCollision ( event )				  addScore, audio.play(coinsound)  
+- dangerCollision ( event )	    died, steve.alpha	  declives, endscreen, audio.play										(dangersound)	
+- endCollision ( event )	    levelCompleted	  endscreen
+- steveCollisions ( event )				  env, coin, danger e endcollision
+- steveAttackCollisions ( event )   event.obj	 	  addScore, steve.x
+- onCollision ( event ) 				  stevecollisions, steveattackcolls
+
+[controlli]
+- dpadTouch
+- jumpTouch
+- pauseResume
+- actionTouch
+
+- Carica i suoni 
+- Carica i bottoni su display
+- Inizializza player DALLO SPAWN
+
+===================================
+- Crea gruppi immagini
+- Li aggiunge alla camera
