@@ -1,8 +1,0 @@
-CASI IN CUI STEVE PERDE UNA VITA (metodo dangerCollision(event))
-
-steve sta attaccando?		nemico?		invincibile?	]	Risultato
-0				0		0		]	0
-0				1		0		]	1
-0				1		1		]	1
-1				1		0		]	0
-1				1		1		]	1
