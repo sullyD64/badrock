@@ -4,12 +4,12 @@
 --
 -----------------------------------------------------------------------------------------
 
-local composer = require ( "composer" )
-local physics  = require ( "physics" )
-local math     = require ( "math" )
-local widget   = require ( "widget" )
-local ui  	   = require ( "ui" )
-local enemies  = require ( "enemies" )
+local composer = require ( "composer"     )
+local physics  = require ( "physics"      )
+local math     = require ( "math"         )
+local panel    = require ( "panel"        )
+local ui       = require ( "ui"           )
+local enemies  = require ( "enemies"      )
 
 local game = {}
 
@@ -177,34 +177,59 @@ physics.setGravity( 0, 35 )
 		end
 	end
 
-	local function npcDetect( event )
-		if (game.state == GAME_RUNNING) then
-			playerPosX, playerPosY = game.steve.x, game.steve.y
+	--[[ npcDetect (ver 1.0)
+		local function npcDetect( event )
+			if (game.state == GAME_RUNNING) then
+				posX, posY = game.steve.x, game.steve.y
 
-			local rangeDetect = function(npc)
-				local range = 50
-				local isHere = false
-				if (math.sqrt( (playerPosX-npc.x)^2 + (playerPosY-npc.y)^2 ) < range) then
-					isHere = true
-					npc.balloon:show()
-					--npc.balloon.alpha = 1
-				else
-					isHere = false
-					npc.balloon:hide()
-					--npc.balloon.alpha = 0
-					return false
+				local rangeDetect = function(npc)
+					local range = 50
+					local isHere = false
+					if (math.sqrt( (posX-npc.x)^2 + (posY-npc.y)^2 ) < range) then
+						isHere = true
+						
+					else
+						isHere = false
+						
+					end
 				end
 
-				if (isHere) then
-					npc.balloon:show()
-				else
-					npc.balloon:hide()
+				for i = 1, #game.npcs, 1  do
+					if (game.npcs[i]) then
+						rangeDetect(game.npcs[i])
+					end
 				end
 			end
+		end
+	]]
 
-			for i = 1, #game.npcs, 1  do
-				if (game.npcs[i]) then
-					rangeDetect(game.npcs[i])
+	local function npcDetect( event )
+		if (game.state == GAME_RUNNING) then
+			posX, posY = game.steve.x, game.steve.y
+			local blocca = false
+			local range = 50
+			local dist
+
+			local multiRangeCheck = function(npc)
+				dist = math.sqrt( (posX-npc.x)^2 + (posY-npc.y)^2 )
+				print ("multiRangeCheck")
+
+				local singleExitCheck = function(event)
+					print("singleExitCheck")
+					if (math.sqrt( (posX-npc.x)^2 + (posY-npc.y)^2 ) > range) then
+						print ("singleExitStop")
+						--npc.balloon:hide()
+						npc.balloon.alpha = 0
+						blocca = false
+						Runtime:removeEventListener( "enterFrame", singleExitCheck )
+					end
+				end
+
+				if (dist < range) then
+					blocca = true
+					--npc.balloon:show()
+					npc.balloon.alpha = 1 
+					Runtime:addEventListener( "enterFrame", singleExitCheck )
 				end
 			end
 		end
@@ -213,150 +238,6 @@ physics.setGravity( 0, 35 )
 	local function moveCamera( event ) 
 		game.map:update(event)
 	end
-------------------------------------------------------------------------------------
-
--- PANEL WIDGET --------------------------------------------------------------------
-
-	function widget.newPanel( options )
-	    local customOptions = options or {}
-	    local opt = {}
-	 
-	    opt.location = customOptions.location or "top"
-	 
-	    local default_width, default_height
-	    if ( opt.location == "top" or opt.location == "bottom" ) then
-	        default_width = display.contentWidth
-	        default_height = display.contentHeight * 0.33
-	    else
-	        default_width = display.contentWidth * 0.33
-	        default_height = display.contentHeight
-	    end
-	 
-	    opt.width = customOptions.width or default_width
-	    opt.height = customOptions.height or default_height
-	 
-	    opt.speed = customOptions.speed or 500
-	    opt.inEasing = customOptions.inEasing or easing.linear
-	    opt.outEasing = customOptions.outEasing or easing.linear
-	 
-	    if ( customOptions.onComplete and type(customOptions.onComplete) == "function" ) then
-	        opt.listener = customOptions.onComplete
-	    else 
-	        opt.listener = nil
-	    end
-	 
-	    local container = display.newContainer( opt.width, opt.height )
-	 
-	    if ( opt.location == "left" ) then
-	        container.anchorX = 1.0
-	        container.x = display.screenOriginX
-	        container.anchorY = 0.5
-	        container.y = display.contentCenterY
-	    elseif ( opt.location == "right" ) then
-	        container.anchorX = 0.0
-	        container.x = display.actualContentWidth
-	        container.anchorY = 0.5
-	        container.y = display.contentCenterY
-	    elseif ( opt.location == "top" ) then
-	        container.anchorX = 0.5
-	        container.x = display.contentCenterX
-	        container.anchorY = 1.0
-	        container.y = display.screenOriginY
-	    elseif (opt.location == "npcPos") then
-	    	container.x = npc.x
-	    	container.y = npc.y-20
-	    else
-	        container.anchorX = 0.5
-	        container.x = display.contentCenterX
-	        container.anchorY = 0.0
-	        container.y = display.actualContentHeight
-	    end
-	 
-	    function container:show()
-	        local options = {
-	            time = opt.speed,
-	            transition = opt.inEasing
-	        }
-	        if ( opt.listener ) then
-	            options.onComplete = opt.listener
-	            self.completeState = "shown"
-	        end
-	        if ( opt.location == "top" ) then
-	            options.y = display.screenOriginY + opt.height
-	        elseif ( opt.location == "bottom" ) then
-	            options.y = display.actualContentHeight - opt.height
-	        elseif ( opt.location == "left" ) then
-	            options.x = display.screenOriginX + opt.width
-	        else
-	            options.x = display.actualContentWidth - opt.width
-	        end 
-	        transition.to( self, options )
-	    end
-	 
-	    function container:hide()
-	        local options = {
-	            time = opt.speed,
-	            transition = opt.outEasing
-	        }
-	        if ( opt.listener ) then
-	            options.onComplete = opt.listener
-	            self.completeState = "hidden"
-	        end
-	        if ( opt.location == "top" ) then
-	            options.y = display.screenOriginY
-	        elseif ( opt.location == "bottom" ) then
-	            options.y = display.actualContentHeight
-	        elseif ( opt.location == "left" ) then
-	            options.x = display.screenOriginX
-	        else
-	            options.x = display.actualContentWidth
-	        end 
-	        transition.to( self, options )
-	    end
-	 
-	    return container
-	end
-
-
-	local function panelTransDone( target )
-	    --native.showAlert( "Panel", "Complete", { "Okay" } )
-	    if ( target.completeState ) then
-	        print( "PANEL STATE IS: "..target.completeState )
-	    end
-	end
-
-	local panel = widget.newPanel{
-		location = "top",
-		onComplete = panelTransDone,
-		width = display.actualContentWidth,
-		height = display.actualContentHeight,
-		speed = 250
-
-	}
-	panel.background = display.newImageRect( "sprites/balloons.png", 134, 107 )
-	panel:insert( panel.background)
-
-	panel.title = display.newText( "aiuto", display.contentCenterX, display.contentCenterY, native.systemFontBold, 18)
-	panel.title:setFillColor( 1,1,1 )
-	panel:insert(panel.title)
-
-
-	local function handleButtonEvent(event)
-		if("ended"==event.phase) then
-			print("bottone premuto")
-			panel:hide()
-		end
-	end
-
-
-	--local button = widget.newButton( ){
-
-		--balloon.button = display.newImageRect( "sprites/bottonefanculo.png", 58, 40 )
-		--balloon.button.x = background.x
-		--balloon.button.y = background.y -50
-
-		--balloon:insert(balloon.button)
-	--}
 ------------------------------------------------------------------------------------
 
 -- MISCELLANEOUS FUNCTIONS ---------------------------------------------------------
@@ -479,7 +360,6 @@ physics.setGravity( 0, 35 )
 			print("collision ended")
 		end
 		]]
-
 	end
 
 	-- Collision with Coins (Only for Steve)
@@ -624,7 +504,6 @@ physics.setGravity( 0, 35 )
 		end
 	end
 ------------------------------------------------------------------------------------
-
 
 -- CONTROLS HANDLERS ---------------------------------------------------------------
 	
@@ -785,6 +664,8 @@ physics.setGravity( 0, 35 )
 			if (event.phase == "began") then
 				display.currentStage:setFocus( event.target )
 
+				print("BOOP")
+
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
 				display.currentStage:setFocus( nil )
 			end
@@ -793,7 +674,6 @@ physics.setGravity( 0, 35 )
 		return true --Prevents touch propagation to underlying objects
 	end
 ------------------------------------------------------------------------------------
-
 
 -- GAME INITIALIZATION -------------------------------------------------------------
 	
@@ -860,31 +740,67 @@ physics.setGravity( 0, 35 )
 		end
 	end
 
+	--AUXILIARY FUNCTION: enables/disables range detection for each NPC loaded
+	function game.toggleRangeDetect(bit)
+		for i = 1, #game.npcs, 1  do
+			if game.npcs[i] then
+				if (bit == true) then
+					game.npcs[i].staticImage:addEventListener( "enterFrame", npcDetect )
+				elseif (bit == false) then
+					game.npcs[i].staticImage:removeEventListener( "enterFrame", npcDetect )
+				end
+			end 
+		end
+	end
+
 	function game.loadNPCS() 
 		local layer = game.map:getObjectLayer("npcSpawn")
 		game.npcs = layer:getObjects("npc")
 
 		local loadNPC = function(npc)
-			npc.image = display.newImageRect( "sprites/pinkie.png", 70, 70 )
-			npc.image.x, npc.image.y = npc.x, npc.y 
-			--physics.addBody( npc.image, {friction = 1.0})
-			game.map:getTileLayer("entities"):addObject(npc.image)
+			npc.staticImage = display.newImageRect( "sprites/pinkie.png", 70, 70 )
+			npc.staticImage.x, npc.staticImage.y = npc.x, npc.y 
+			--physics.addBody( npc.staticImage, {friction = 1.0})
+			game.map:getTileLayer("entities"):addObject(npc.staticImage)
+		end
 
-		
-			--npc.balloon = ui.createBalloon()
+		local loadBalloon = function(npc)
 
-			npc.balloon = panel
+			-- local panelTransDone = function( target )
+			-- 	if ( target.completeState ) then
+			-- 		print( "PANEL STATE IS: "..target.completeState )
+			-- 	end
+			-- end
+			
+			
+			
+			-- npc.balloon = panel.newPanel{
+			-- 	location = "bottom",
+			-- 	onComplete = panelTransDone,
+			-- 	widht = 134,
+			-- 	height = 107
+			-- }
+
+			-- local background = display.newImageRect( "sprites/balloons.png", 134, 107 )
+			-- background.anchorY = 1
+			-- npc.balloon:insert(background)
+
+			-- local button = display.newImageRect( "sprites/bottonefanculo.png", 58, 40 )
+			-- button.x, button.y = background.x, background.y -50
+			-- npc.balloon:insert(button)
+
+			npc.balloon = ui.createBalloon()
+			npc.balloon.x, npc.balloon.y = npc.x, npc.y -20
+			npc.balloon.alpha = 0
+			-- npc.balloon:hide()
 
 			game.map:getTileLayer("entities"):addObject(npc.balloon)
-			--npc.balloon.x, npc.balloon.y = npc.x, npc.y -20
-			--npc.balloon.alpha = 1
-			npc.balloon:show()
-
 			--npc.balloon.button:addEventListener( "touch", balloonTouch )
 		end
 
 		for i = 1, #game.npcs, 1 do
 			loadNPC(game.npcs[i])
+			loadBalloon(game.npcs[i])
 		end
 	end
 
@@ -942,8 +858,6 @@ physics.setGravity( 0, 35 )
 		end
 	  ]]
 
-
-
 	function game.loadGame( map, spawn )
 		-- Locally stores the current level map and spawn coordinates
 		game.map = map
@@ -953,10 +867,10 @@ physics.setGravity( 0, 35 )
 		game.lives = MAX_LIVES
 		levelCompleted = false
 
+		game.loadUi()
 		game.loadPlayer()
 		game.loadEnemies()
 		game.loadNPCS()
-		game.loadUi()
 		game.loadSounds()
 
 		SSVEnabled = true
@@ -975,7 +889,8 @@ function game.start()
 	game.steveSprite:play()
 	physics.start()
 	Runtime:addEventListener("enterFrame", moveCamera)
-	Runtime:addEventListener("enterFrame", npcDetect)
+	--Runtime:addEventListener("enterFrame", npcDetect)
+	game.toggleRangeDetect(true)
 	Runtime:addEventListener("collision", onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 	timer.performWithDelay(200, debug, 0)
@@ -984,7 +899,8 @@ end
 
 function game.pause()
 	game.steve.state = STATE_IDLE
-	game.steveSprite:pause()	
+	game.steveSprite:pause()
+	game.toggleRangeDetect(false)	
 	physics.pause()
 	audio.pause(1)
 end
@@ -992,6 +908,7 @@ end
 function game.resume()
 	game.state = GAME_RUNNING
 	game.steveSprite:play()
+	game.toggleRangeDetect(true)
 	physics.start()
 	audio.resume(1)
 end
@@ -1000,7 +917,8 @@ function game.stop()
 	game.disposeSounds()
 	package.loaded[physics] = nil
 	Runtime:removeEventListener("enterFrame", moveCamera)
-	Runtime:removeEventListener("enterFrame", npcDetect)
+	--Runtime:removeEventListener("enterFrame", npcDetect)
+	game.toggleRangeDetect(false)
 	Runtime:removeEventListener("collision", onCollision)
 	Runtime:removeEventListener( "enterFrame", onUpdate )
 

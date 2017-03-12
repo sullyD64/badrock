@@ -132,21 +132,20 @@ function ui.createLifeIcons( maxLives )
 	return lifeIcons
 end
 
+function ui.createBalloon()
+	balloon = display.newGroup()
 
---function ui.createBalloon()
-	--balloon = display.newGroup()
+	local background = display.newImageRect( "sprites/balloons.png", 134, 107 )
+	background.anchorY = 1
 
-	--local background = display.newImageRect( "sprites/balloons.png", 134, 107 )
-	--background.anchorY = 1
+	balloon.button = display.newImageRect( "sprites/bottonefanculo.png", 58, 40 )
+	balloon.button.x = background.x
+	balloon.button.y = background.y -50
 
-	--balloon.button = display.newImageRect( "sprites/bottonefanculo.png", 58, 40 )
-	--balloon.button.x = background.x
-	--balloon.button.y = background.y -50
+	balloon:insert(background)
+	balloon:insert(balloon.button)
 
-	--balloon:insert(background)
-	--balloon:insert(balloon.button)
-
-	--return balloon
---end
+	return balloon
+end
 
 return ui

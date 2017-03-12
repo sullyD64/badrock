@@ -579,10 +579,11 @@
 </data>
  </layer>
  <objectgroup name="playerSpawn">
-  <object id="1" name="spawn0" x="182" y="532" width="32" height="32"/>
+  <object id="1" name="spawn0" x="140" y="273" width="32" height="32"/>
  </objectgroup>
  <objectgroup name="npcSpawn">
-  <object id="9" name="npc" x="352" y="549"/>
+  <object id="4" name="npc" x="417" y="227" width="21" height="21"/>
+  <object id="9" name="npc" x="170" y="549"/>
  </objectgroup>
  <objectgroup name="enemySpawn">
   <object id="2" name="paper01" type="paper" x="443" y="365"/>
