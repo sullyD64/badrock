@@ -203,37 +203,39 @@ physics.setGravity( 0, 35 )
 		end
 	]]
 
-	local function npcDetect( event )
-		if (game.state == GAME_RUNNING) then
-			posX, posY = game.steve.x, game.steve.y
-			local blocca = false
-			local range = 50
-			local dist
+	--[[ npcDetect (ver 2.0)
+		local function npcDetect( event )
+			if (game.state == GAME_RUNNING) then
+				posX, posY = game.steve.x, game.steve.y
+				local blocca = false
+				local range = 50
+				local dist
 
-			local multiRangeCheck = function(npc)
-				dist = math.sqrt( (posX-npc.x)^2 + (posY-npc.y)^2 )
-				print ("multiRangeCheck")
+				local multiRangeCheck = function(npc)
+					dist = math.sqrt( (posX-npc.x)^2 + (posY-npc.y)^2 )
+					print ("multiRangeCheck")
 
-				local singleExitCheck = function(event)
-					print("singleExitCheck")
-					if (math.sqrt( (posX-npc.x)^2 + (posY-npc.y)^2 ) > range) then
-						print ("singleExitStop")
-						--npc.balloon:hide()
-						npc.balloon.alpha = 0
-						blocca = false
-						Runtime:removeEventListener( "enterFrame", singleExitCheck )
+					local singleExitCheck = function(event)
+						print("singleExitCheck")
+						if (math.sqrt( (posX-npc.x)^2 + (posY-npc.y)^2 ) > range) then
+							print ("singleExitStop")
+							--npc.balloon:hide()
+							npc.balloon.alpha = 0
+							blocca = false
+							Runtime:removeEventListener( "enterFrame", singleExitCheck )
+						end
 					end
-				end
 
-				if (dist < range) then
-					blocca = true
-					--npc.balloon:show()
-					npc.balloon.alpha = 1 
-					Runtime:addEventListener( "enterFrame", singleExitCheck )
+					if (dist < range) then
+						blocca = true
+						--npc.balloon:show()
+						npc.balloon.alpha = 1 
+						Runtime:addEventListener( "enterFrame", singleExitCheck )
+					end
 				end
 			end
 		end
-	end
+	]]
 
 	local function moveCamera( event ) 
 		game.map:update(event)
@@ -469,7 +471,7 @@ physics.setGravity( 0, 35 )
 	end
 
 	-- Generic Collision Handler
-	function onCollision( event )
+	local function onCollision( event )
 		if ( (event.object1.myName == "steve") or 
 			 (event.object2.myName == "steve") ) then
 			
@@ -501,6 +503,13 @@ physics.setGravity( 0, 35 )
 		elseif( (event.object1.myName == "steveAttack") or 
 			    (event.object2.myName == "steveAttack") ) then
 			steveAttackCollision( event )
+		end
+	end
+
+	local function npcDetectByCollision ( event )
+		if ( (event.object1.sensorName == "sensorN") or 
+			 (event.object2.sensorName == "sensorN") ) then
+			print ("sensColl")
 		end
 	end
 ------------------------------------------------------------------------------------
@@ -740,17 +749,44 @@ physics.setGravity( 0, 35 )
 		end
 	end
 
+	--[[
 	--AUXILIARY FUNCTION: enables/disables range detection for each NPC loaded
 	function game.toggleRangeDetect(bit)
 		for i = 1, #game.npcs, 1  do
 			if game.npcs[i] then
 				if (bit == true) then
 					game.npcs[i].staticImage:addEventListener( "enterFrame", npcDetect )
-				elseif (bit == false) then
+				else
 					game.npcs[i].staticImage:removeEventListener( "enterFrame", npcDetect )
 				end
 			end 
 		end
+	end
+	]]
+
+	function game.loadPlayerSensors()
+		local followSteve = function (self,event)
+			sensorD.x = game.steve.x
+			sensorD.y = game.steve.y
+			sensorE.x = game.steve.x
+			sensorE.y = game.steve.y
+		end
+
+		sensorD = display.newCircle( game.steve.x, game.steve.y, 40)
+		physics.addBody(sensorD, {isSensor = true})
+		sensorD.sensorName = "D"
+		sensorD:setFillColor(0,200,255)
+		sensorD.alpha=0.6
+
+		sensorE = display.newCircle( game.steve.x, game.steve.y, 80)
+		physics.addBody(sensorE, {isSensor = true})
+		sensorE.sensorName = "E"
+		sensorE:setFillColor(100,50,0)
+		sensorE.alpha=0.4
+
+		Runtime:addEventListener( "enterFrame", followSteve )
+		game.map:getTileLayer("playerEffects"):addObject( sensorD )
+		game.map:getTileLayer("playerEffects"):addObject( sensorE )
 	end
 
 	function game.loadNPCS() 
@@ -765,14 +801,11 @@ physics.setGravity( 0, 35 )
 		end
 
 		local loadBalloon = function(npc)
-
 			-- local panelTransDone = function( target )
 			-- 	if ( target.completeState ) then
 			-- 		print( "PANEL STATE IS: "..target.completeState )
 			-- 	end
 			-- end
-			
-			
 			
 			-- npc.balloon = panel.newPanel{
 			-- 	location = "bottom",
@@ -798,9 +831,25 @@ physics.setGravity( 0, 35 )
 			--npc.balloon.button:addEventListener( "touch", balloonTouch )
 		end
 
+		local loadSensor = function(npc)
+			local followNpc = function ()
+				sensorN.x = npc.x
+				sensorN.y = npc.y
+			end
+			sensorN = display.newCircle( npc.x, npc.y, 60)
+			physics.addBody(sensorN, {isSensor = true})
+			sensorN.sensorName = "N"
+			sensorN:setFillColor(0,100,0)
+			sensorN.alpha=0.5
+
+			Runtime:addEventListener( "enterFrame", followNpc )
+			game.map:getTileLayer("entities"):addObject(sensorN)
+		end
+
 		for i = 1, #game.npcs, 1 do
 			loadNPC(game.npcs[i])
 			loadBalloon(game.npcs[i])
+			loadSensor(game.npcs[i])
 		end
 	end
 
@@ -873,6 +922,8 @@ physics.setGravity( 0, 35 )
 		game.loadNPCS()
 		game.loadSounds()
 
+		game.loadPlayerSensors()
+
 		SSVEnabled = true
 		controlsEnabled = true
 		SSVLaunched = false
@@ -890,7 +941,7 @@ function game.start()
 	physics.start()
 	Runtime:addEventListener("enterFrame", moveCamera)
 	--Runtime:addEventListener("enterFrame", npcDetect)
-	game.toggleRangeDetect(true)
+	--game.toggleRangeDetect(true)
 	Runtime:addEventListener("collision", onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 	timer.performWithDelay(200, debug, 0)
@@ -900,7 +951,7 @@ end
 function game.pause()
 	game.steve.state = STATE_IDLE
 	game.steveSprite:pause()
-	game.toggleRangeDetect(false)	
+	--game.toggleRangeDetect(false)	
 	physics.pause()
 	audio.pause(1)
 end
@@ -908,7 +959,7 @@ end
 function game.resume()
 	game.state = GAME_RUNNING
 	game.steveSprite:play()
-	game.toggleRangeDetect(true)
+	--game.toggleRangeDetect(true)
 	physics.start()
 	audio.resume(1)
 end
@@ -918,7 +969,7 @@ function game.stop()
 	package.loaded[physics] = nil
 	Runtime:removeEventListener("enterFrame", moveCamera)
 	--Runtime:removeEventListener("enterFrame", npcDetect)
-	game.toggleRangeDetect(false)
+	--game.toggleRangeDetect(false)
 	Runtime:removeEventListener("collision", onCollision)
 	Runtime:removeEventListener( "enterFrame", onUpdate )
 
