@@ -177,66 +177,6 @@ physics.setGravity( 0, 35 )
 		end
 	end
 
-	--[[ npcDetect (ver 1.0)
-		local function npcDetect( event )
-			if (game.state == GAME_RUNNING) then
-				posX, posY = game.steve.x, game.steve.y
-
-				local rangeDetect = function(npc)
-					local range = 50
-					local isHere = false
-					if (math.sqrt( (posX-npc.x)^2 + (posY-npc.y)^2 ) < range) then
-						isHere = true
-						
-					else
-						isHere = false
-						
-					end
-				end
-
-				for i = 1, #game.npcs, 1  do
-					if (game.npcs[i]) then
-						rangeDetect(game.npcs[i])
-					end
-				end
-			end
-		end
-	]]
-
-	--[[ npcDetect (ver 2.0)
-		local function npcDetect( event )
-			if (game.state == GAME_RUNNING) then
-				posX, posY = game.steve.x, game.steve.y
-				local blocca = false
-				local range = 50
-				local dist
-
-				local multiRangeCheck = function(npc)
-					dist = math.sqrt( (posX-npc.x)^2 + (posY-npc.y)^2 )
-					print ("multiRangeCheck")
-
-					local singleExitCheck = function(event)
-						print("singleExitCheck")
-						if (math.sqrt( (posX-npc.x)^2 + (posY-npc.y)^2 ) > range) then
-							print ("singleExitStop")
-							--npc.balloon:hide()
-							npc.balloon.alpha = 0
-							blocca = false
-							Runtime:removeEventListener( "enterFrame", singleExitCheck )
-						end
-					end
-
-					if (dist < range) then
-						blocca = true
-						--npc.balloon:show()
-						npc.balloon.alpha = 1 
-						Runtime:addEventListener( "enterFrame", singleExitCheck )
-					end
-				end
-			end
-		end
-	]]
-
 	local function moveCamera( event ) 
 		game.map:update(event)
 	end
@@ -505,13 +445,6 @@ physics.setGravity( 0, 35 )
 			steveAttackCollision( event )
 		end
 	end
-
-	local function npcDetectByCollision ( event )
-		if ( (event.object1.sensorName == "sensorN") or 
-			 (event.object2.sensorName == "sensorN") ) then
-			print ("sensColl")
-		end
-	end
 ------------------------------------------------------------------------------------
 
 -- CONTROLS HANDLERS ---------------------------------------------------------------
@@ -684,6 +617,81 @@ physics.setGravity( 0, 35 )
 	end
 ------------------------------------------------------------------------------------
 
+-- NPCDETECT 3.0--------------------------------------------------------------------
+	local contactEnabled = true
+	local releaseEnabled = false
+
+		-- Parameters: one npc from the npcs list and one flag string.
+		-- The flag is calculated by the type of collision detected.
+		local function toggleNpcBalloon ( npc, flag )
+			if (flag == "show") then
+				npc.balloon.alpha = 1
+			elseif (flag == "hide") then
+				npc.balloon.alpha = 0
+			end
+		end
+
+		-- Handles the triggering of the event of showing/hiding one npc's balloon.
+		-- Steve and every npc have an invisible "sensor" physical object surrounding 
+		-- and following them at runtime. This function handles the collision between
+		-- the two (in future three) sensors, and acts differently depending if the
+		-- collision is a "contact" or a "release" between the two circles.
+		local function npcDetectByCollision ( event )
+			local sensorN, collName, flag 
+			if ( (event.object1.sensorName == "N")   or 
+				 (event.object2.sensorName == "N") ) and 
+			   ( (event.object2.sensorName == "D")   or 
+			     (event.object2.sensorName == "E") ) then
+				sensorN = event.object1
+
+				--[[
+					-- if (event.object2.sensorName == "D") then
+					-- 	sensorD = event.object2
+					-- elseif (event.object2.sensorName == "E") then
+					-- 	sensorE = event.object2
+					-- end
+					-- if (sensorN.sensorName ~= "N") then
+					-- 	sensorN = event.object2
+					-- end
+				]]--
+
+				if (contactEnabled) then 
+					collName = "contact"
+					flag = "show"
+				elseif (releaseEnabled) then
+					collName = "release"
+					flag = "hide"
+				end
+
+				-- Switches between the two if blocks (next collision will enter the other if)
+				if (collName == "contact") then
+					contactEnabled = false
+					releaseEnabled = true
+				elseif (collName == "release") then
+					releaseEnabled = false
+					contactEnabled = true
+				end
+
+				for i = 1, #game.npcs, 1 do
+					-- Selects the npc associated to the sensorN and calls the toggle function
+					if (game.npcs[i].sensorN == sensorN) then
+						toggleNpcBalloon(game.npcs[i], flag)
+					end
+				end
+			end
+		end
+
+		-- Non so ancora se mi servirà a qualcosa
+		local function sensorPreCollision ( self, event )
+			if ( "sensor" ~= event.other.collType ) then
+				if event.contact then
+					event.contact.isEnabled = false
+				end
+			end
+			return true
+		end
+------------------------------------------------------------------------------------
+
 -- GAME INITIALIZATION -------------------------------------------------------------
 	
  	function game.loadPlayer()
@@ -749,44 +757,32 @@ physics.setGravity( 0, 35 )
 		end
 	end
 
-	--[[
-	--AUXILIARY FUNCTION: enables/disables range detection for each NPC loaded
-	function game.toggleRangeDetect(bit)
-		for i = 1, #game.npcs, 1  do
-			if game.npcs[i] then
-				if (bit == true) then
-					game.npcs[i].staticImage:addEventListener( "enterFrame", npcDetect )
-				else
-					game.npcs[i].staticImage:removeEventListener( "enterFrame", npcDetect )
-				end
-			end 
-		end
-	end
-	]]
-
 	function game.loadPlayerSensors()
-		local followSteve = function (self,event)
+		local followSteve = function (event)
 			sensorD.x = game.steve.x
 			sensorD.y = game.steve.y
-			sensorE.x = game.steve.x
-			sensorE.y = game.steve.y
+			-- sensorE.x = game.steve.x
+			-- sensorE.y = game.steve.y
 		end
 
-		sensorD = display.newCircle( game.steve.x, game.steve.y, 40)
-		physics.addBody(sensorD, {isSensor = true})
+		sensorD = display.newCircle( game.steve.x, game.steve.y, 80)
+		physics.addBody(sensorD, {isSensor = true, radius = 80})
 		sensorD.sensorName = "D"
-		sensorD:setFillColor(0,200,255)
+		sensorD:setFillColor(100,50,0)
 		sensorD.alpha=0.6
+		--sensorD.collType = "sensor"
+		--sensorD.preCollision = sensorPreCollision
+		--sensorD:addEventListener( "preCollision", sensorD )
 
-		sensorE = display.newCircle( game.steve.x, game.steve.y, 80)
-		physics.addBody(sensorE, {isSensor = true})
-		sensorE.sensorName = "E"
-		sensorE:setFillColor(100,50,0)
-		sensorE.alpha=0.4
+		-- sensorE = display.newCircle( game.steve.x, game.steve.y, 40)
+		-- physics.addBody(sensorE, {isSensor = true, radius = 40})
+		-- sensorE.sensorName = "E"
+		-- sensorE:setFillColor(0,200,255)
+		-- sensorE.alpha=0.4
 
 		Runtime:addEventListener( "enterFrame", followSteve )
 		game.map:getTileLayer("playerEffects"):addObject( sensorD )
-		game.map:getTileLayer("playerEffects"):addObject( sensorE )
+		-- game.map:getTileLayer("playerEffects"):addObject( sensorE )
 	end
 
 	function game.loadNPCS() 
@@ -832,18 +828,27 @@ physics.setGravity( 0, 35 )
 		end
 
 		local loadSensor = function(npc)
+			local sensorN
+
 			local followNpc = function ()
 				sensorN.x = npc.x
 				sensorN.y = npc.y
 			end
+
 			sensorN = display.newCircle( npc.x, npc.y, 60)
-			physics.addBody(sensorN, {isSensor = true})
+			physics.addBody(sensorN, {isSensor = true, radius = 60})
 			sensorN.sensorName = "N"
 			sensorN:setFillColor(0,100,0)
 			sensorN.alpha=0.5
+			
+			-- sensorN.collType = "sensor"
+			-- sensorN.preCollision = sensorPreCollision
+			-- sensorN:addEventListener( "preCollision", sensorN )
 
 			Runtime:addEventListener( "enterFrame", followNpc )
 			game.map:getTileLayer("entities"):addObject(sensorN)
+
+			npc.sensorN = sensorN
 		end
 
 		for i = 1, #game.npcs, 1 do
@@ -940,9 +945,8 @@ function game.start()
 	game.steveSprite:play()
 	physics.start()
 	Runtime:addEventListener("enterFrame", moveCamera)
-	--Runtime:addEventListener("enterFrame", npcDetect)
-	--game.toggleRangeDetect(true)
 	Runtime:addEventListener("collision", onCollision)
+	Runtime:addEventListener("collision", npcDetectByCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 	timer.performWithDelay(200, debug, 0)
 	audio.play(backgroundMusic, {channel = 1 , loops=-1})
@@ -951,7 +955,6 @@ end
 function game.pause()
 	game.steve.state = STATE_IDLE
 	game.steveSprite:pause()
-	--game.toggleRangeDetect(false)	
 	physics.pause()
 	audio.pause(1)
 end
@@ -959,7 +962,6 @@ end
 function game.resume()
 	game.state = GAME_RUNNING
 	game.steveSprite:play()
-	--game.toggleRangeDetect(true)
 	physics.start()
 	audio.resume(1)
 end
@@ -968,15 +970,12 @@ function game.stop()
 	game.disposeSounds()
 	package.loaded[physics] = nil
 	Runtime:removeEventListener("enterFrame", moveCamera)
-	--Runtime:removeEventListener("enterFrame", npcDetect)
-	--game.toggleRangeDetect(false)
+	Runtime:removeEventListener("collision", npcDetectByCollision)
 	Runtime:removeEventListener("collision", onCollision)
 	Runtime:removeEventListener( "enterFrame", onUpdate )
 
 	--audio.stop(1)
 end
-
-
 
 return game
 
