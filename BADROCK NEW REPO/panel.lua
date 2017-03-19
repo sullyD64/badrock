@@ -4,6 +4,11 @@
 --
 -----------------------------------------------------------------------------------------
 
+-- Sligthly modified version of the "SlidingPanel" class.
+-- This allows to specify the widget coordinates as well as the anchor points,
+-- plus, a "static" position can be declared which will override the show() and hide()
+-- methods to perform a simple alpha channel fade in-out of the display objects contained
+-- in the panel.
 local widget = require ( "widget" )
 
 local panel={}
@@ -18,8 +23,11 @@ function panel.newPanel( options )
     if ( opt.location == "top" or opt.location == "bottom" ) then
         default_width = display.contentWidth
         default_height = display.contentHeight * 0.33
-    else
+    elseif ( opt.location == "left" or opt.location == "right" ) then
         default_width = display.contentWidth * 0.33
+        default_height = display.contentHeight
+    else
+        default_width = display.contentWidth
         default_height = display.contentHeight
     end
  
@@ -29,6 +37,13 @@ function panel.newPanel( options )
     opt.speed = customOptions.speed or 500
     opt.inEasing = customOptions.inEasing or easing.linear
     opt.outEasing = customOptions.outEasing or easing.linear
+
+    -------------------------------------------------
+    opt.anchorX = customOptions.anchorX or 0.5
+    opt.anchorY = customOptions.anchorY or 0.5
+    opt.x = customOptions.x or display.contentCenterX
+    opt.y = customOptions.y or display.contentCenterY
+    -------------------------------------------------
  
     if ( customOptions.onComplete and type(customOptions.onComplete) == "function" ) then
         opt.listener = customOptions.onComplete
@@ -58,6 +73,11 @@ function panel.newPanel( options )
         container.x = display.contentCenterX
         container.anchorY = 0
         container.y = display.actualContentHeight
+    elseif ( opt.location == "static") then
+        container.anchorX = opt.anchorX
+        container.anchorY = opt.anchorY
+        container.x = opt.x
+        container.y = opt.y
     else
         container.x = display.contentCenterX
         container.y = display.contentCenterY
@@ -78,9 +98,11 @@ function panel.newPanel( options )
             options.y = display.actualContentHeight - opt.height
         elseif ( opt.location == "left" ) then
             options.x = display.screenOriginX + opt.width
-        else
+        elseif ( opt.location == "right" ) then
             options.x = display.actualContentWidth - opt.width
-        end 
+        elseif ( opt.location == "static" ) then
+            options.alpha = 1
+        end
         transition.to( self, options )
     end
  
@@ -99,12 +121,14 @@ function panel.newPanel( options )
             options.y = display.actualContentHeight
         elseif ( opt.location == "left" ) then
             options.x = display.screenOriginX
-        else
+        elseif ( opt.location == "right" ) then
             options.x = display.actualContentWidth
-        end 
+        elseif ( opt.location == "static" ) then
+            options.alpha = 0
+        end
         transition.to( self, options )
     end
- 
+
     return container
 end
 

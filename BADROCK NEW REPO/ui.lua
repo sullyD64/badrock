@@ -12,7 +12,7 @@ local lifeIcons = {}
 
 function ui.loadUi()
 	ui.uiGroup = display.newGroup()
-	ui.uiGroup:insert( ui.createJumpScreen() )
+	--ui.uiGroup:insert( ui.createJumpScreen() )
 	ui.uiGroup:insert( ui.createDpadLeft() )
 	ui.uiGroup:insert( ui.createDpadRight() )
 	ui.uiGroup:insert( ui.createActionBtn() )
@@ -35,9 +35,17 @@ end
 
 
 function ui.createJumpScreen()
-	jumpScreen = display.newImageRect( "ui/emptyScreen.png", display.contentWidth, display.contentHeight )
-	jumpScreen.x, jumpScreen.y = display.contentCenterX , display.contentCenterY
+		-- Se va nello uiGroup
+	-- jumpScreen = display.newImageRect( "ui/emptyScreen.png", display.contentWidth, display.contentHeight )
+	-- jumpScreen.x, jumpScreen.y = display.contentCenterX , display.contentCenterY
+		-- Come sopra ma migliore (non usa immagini)
+	-- jumpScreen = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight )
+		-- Se create viene chiamata esternamente
+	jumpScreen = display.newRect( display.contentCenterX, display.contentCenterY, 10000,10000)
 	jumpScreen.myName = "jumpScreen"
+	jumpScreen.isVisible = false
+	jumpScreen.isHitTestable = true
+	jumpScreen:setFillColor( 0, 255, 0 )
 
 	return jumpScreen
 end
@@ -132,20 +140,22 @@ function ui.createLifeIcons( maxLives )
 	return lifeIcons
 end
 
-function ui.createBalloon()
-	balloon = display.newGroup()
+--[[
+	function ui.createBalloon()
+		balloon = display.newGroup()
 
-	local background = display.newImageRect( "sprites/balloons.png", 134, 107 )
-	background.anchorY = 1
+		local background = display.newImageRect( "sprites/balloons.png", 134, 107 )
+		background.anchorY = 1
 
-	balloon.button = display.newImageRect( "sprites/bottonefanculo.png", 58, 40 )
-	balloon.button.x = background.x
-	balloon.button.y = background.y -50
+		balloon.button = display.newImageRect( "sprites/bottonefanculo.png", 58, 40 )
+		balloon.button.x = background.x
+		balloon.button.y = background.y -50
 
-	balloon:insert(background)
-	balloon:insert(balloon.button)
+		balloon:insert(background)
+		balloon:insert(balloon.button)
 
-	return balloon
-end
+		return balloon
+	end
+]]
 
 return ui

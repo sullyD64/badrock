@@ -625,9 +625,11 @@ physics.setGravity( 0, 35 )
 		-- The flag is calculated by the type of collision detected.
 		local function toggleNpcBalloon ( npc, flag )
 			if (flag == "show") then
-				npc.balloon.alpha = 1
+				-- npc.balloon.alpha = 1
+				npc.balloon:show()
 			elseif (flag == "hide") then
-				npc.balloon.alpha = 0
+				-- npc.balloon.alpha = 0
+				npc.balloon:hide()
 			end
 		end
 
@@ -758,6 +760,8 @@ physics.setGravity( 0, 35 )
 	end
 
 	function game.loadPlayerSensors()
+		local sensorD
+		-- local sensorE
 		local followSteve = function (event)
 			sensorD.x = game.steve.x
 			sensorD.y = game.steve.y
@@ -765,11 +769,11 @@ physics.setGravity( 0, 35 )
 			-- sensorE.y = game.steve.y
 		end
 
-		sensorD = display.newCircle( game.steve.x, game.steve.y, 80)
-		physics.addBody(sensorD, {isSensor = true, radius = 80})
+		sensorD = display.newCircle( game.steve.x, game.steve.y, 80 )
+		physics.addBody( sensorD, {isSensor = true, radius = 80} )
 		sensorD.sensorName = "D"
-		sensorD:setFillColor(100,50,0)
-		sensorD.alpha=0.6
+		sensorD:setFillColor( 100, 50, 0 )
+		sensorD.alpha = 0.6
 		--sensorD.collType = "sensor"
 		--sensorD.preCollision = sensorPreCollision
 		--sensorD:addEventListener( "preCollision", sensorD )
@@ -781,7 +785,7 @@ physics.setGravity( 0, 35 )
 		-- sensorE.alpha=0.4
 
 		Runtime:addEventListener( "enterFrame", followSteve )
-		game.map:getTileLayer("playerEffects"):addObject( sensorD )
+		game.map:getTileLayer( "playerEffects"):addObject( sensorD )
 		-- game.map:getTileLayer("playerEffects"):addObject( sensorE )
 	end
 
@@ -797,58 +801,54 @@ physics.setGravity( 0, 35 )
 		end
 
 		local loadBalloon = function(npc)
-			-- local panelTransDone = function( target )
-			-- 	if ( target.completeState ) then
-			-- 		print( "PANEL STATE IS: "..target.completeState )
-			-- 	end
-			-- end
+			local panelTransDone = function( target )
+				if ( target.completeState ) then
+					print( "PANEL STATE IS: "..target.completeState )
+				end
+			end
 			
-			-- npc.balloon = panel.newPanel{
-			-- 	location = "bottom",
-			-- 	onComplete = panelTransDone,
-			-- 	widht = 134,
-			-- 	height = 107
-			-- }
+			npc.balloon = panel.newPanel{
+				location = "static",
+				onComplete = panelTransDone,
+				speed = 200,
+				x, y = npc.x, npc.y,
+				anchorX, anchorY = 0.5, 0.5
+			}
 
-			-- local background = display.newImageRect( "sprites/balloons.png", 134, 107 )
-			-- background.anchorY = 1
-			-- npc.balloon:insert(background)
+			local background = display.newImageRect( "sprites/balloons.png", 134, 107 )
+			background.anchorY = 1
+			npc.balloon:insert(background)
 
-			-- local button = display.newImageRect( "sprites/bottonefanculo.png", 58, 40 )
-			-- button.x, button.y = background.x, background.y -50
-			-- npc.balloon:insert(button)
+			local button = display.newImageRect( "sprites/bottonefanculo.png", 58, 40 )
+			button.x, button.y = background.x, background.y -50
+			npc.balloon:insert(button)
 
-			npc.balloon = ui.createBalloon()
+			-- npc.balloon = ui.createBalloon()
 			npc.balloon.x, npc.balloon.y = npc.x, npc.y -20
-			npc.balloon.alpha = 0
-			-- npc.balloon:hide()
+			npc.balloon:hide()
 
-			game.map:getTileLayer("entities"):addObject(npc.balloon)
-			--npc.balloon.button:addEventListener( "touch", balloonTouch )
+			game.map:getTileLayer("balloons"):addObject(npc.balloon)
+			button:addEventListener( "touch", balloonTouch )
 		end
 
 		local loadSensor = function(npc)
-			local sensorN
-
 			local followNpc = function ()
-				sensorN.x = npc.x
-				sensorN.y = npc.y
+				npc.sensorN.x = npc.x
+				npc.sensorN.y = npc.y
 			end
 
-			sensorN = display.newCircle( npc.x, npc.y, 60)
-			physics.addBody(sensorN, {isSensor = true, radius = 60})
-			sensorN.sensorName = "N"
-			sensorN:setFillColor(0,100,0)
-			sensorN.alpha=0.5
+			npc.sensorN = display.newCircle( npc.x, npc.y, 60)
+			physics.addBody(npc.sensorN, {isSensor = true, radius = 60})
+			npc.sensorN.sensorName = "N"
+			npc.sensorN:setFillColor(0,100,0)
+			npc.sensorN.alpha=0.5
 			
-			-- sensorN.collType = "sensor"
-			-- sensorN.preCollision = sensorPreCollision
-			-- sensorN:addEventListener( "preCollision", sensorN )
+			-- npc.sensorN.collType = "sensor"
+			-- npc.sensorN.preCollision = sensorPreCollision
+			-- npc.sensorN:addEventListener( "preCollision", npc.sensorN )
 
 			Runtime:addEventListener( "enterFrame", followNpc )
-			game.map:getTileLayer("entities"):addObject(sensorN)
-
-			npc.sensorN = sensorN
+			game.map:getTileLayer("entities"):addObject(npc.sensorN)
 		end
 
 		for i = 1, #game.npcs, 1 do
@@ -861,8 +861,12 @@ physics.setGravity( 0, 35 )
 	function game.loadUi()
 		game.ui = ui.loadUi()
 
+		local jumpScreen = ui.createJumpScreen()
+		game.map:getTileLayer("JUMPSCREEN"):addObject(jumpScreen)
+		jumpScreen:addEventListener( "touch", jumpTouch )
+
 		-- Add the UI event listeners
-		ui.getButtonByName("jumpScreen"):addEventListener("touch", jumpTouch)
+		--ui.getButtonByName("jumpScreen"):addEventListener("touch", jumpTouch)
 		ui.getButtonByName("dpadLeft"):addEventListener("touch", dpadTouch)
 		ui.getButtonByName("dpadRight"):addEventListener("touch", dpadTouch)
 		ui.getButtonByName("actionBtn"):addEventListener("touch", actionTouch)
@@ -870,7 +874,7 @@ physics.setGravity( 0, 35 )
 		ui.getButtonByName("resumeBtn"):addEventListener("touch",pauseResume)
 		
 		-- Display the number of starting lives (specified by MAX_LIVES)
-		--ui.getButtonByName("livesText").text = "Lives: ".. game.lives
+		-- ui.getButtonByName("livesText").text = "Lives: ".. game.lives
 		-- Display the life icon structure
 		game.lifeIcons = ui.createLifeIcons(game.lives)
 
