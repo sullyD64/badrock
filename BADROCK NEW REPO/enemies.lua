@@ -4,6 +4,7 @@
 --
 -----------------------------------------------------------------------------------------
 local physics =  require ( "physics" )
+local items = require ( "items" )
 
 local enemies = {}
 
@@ -34,7 +35,6 @@ local enemies = {}
 }
 
 -- Create a new Enemy with his attributes and image if we pass (as a parameter) an object from Tiled
-
 function enemies.createEnemy( enemy , type )
 		local en = nil
 		for k, v in pairs(enemies.list) do
@@ -43,7 +43,6 @@ function enemies.createEnemy( enemy , type )
 				break
 			end
 		end
-
 		enemy = display.newImageRect (en.image , en.width, en.height)
 		enemy.type = type
 		enemy.lives = en.lives
@@ -52,5 +51,7 @@ function enemies.createEnemy( enemy , type )
 		physics.addBody( enemy, { density = en.density, friction = en.friction, bounce = en.bounce} )
 		return enemy
 end
+
+
 
 return enemies

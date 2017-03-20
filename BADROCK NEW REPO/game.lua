@@ -10,6 +10,7 @@ local math     = require ( "math"         )
 local panel    = require ( "panel"        )
 local ui       = require ( "ui"           )
 local enemies  = require ( "enemies"      )
+local items    = require ( "items"        )
 
 local game = {}
 
@@ -278,6 +279,30 @@ physics.setGravity( 0, 35 )
 	        end
 	    } )  
 	end
+
+		--Return True if an object has that attribute or not
+	local function hasAttribute( obj , attributeName )		--MERGED
+		--attributeName must be a String
+
+		local ris = false
+		for k, v in pairs(obj) do
+			if k == attributeName then
+				ris =true
+				break
+			end
+		end
+		return ris
+	end 
+
+	
+	local function dropItemFrom( enemy )					--MERGED
+		--Crea l'item contenuto nell'attributo Drop di Enemy
+	
+		local item = items.createItem(enemy.drop)
+		game.map:getTileLayer("items"):addObject(item)
+		item.x = enemy.x
+		item.y = enemy.y
+	end
 ------------------------------------------------------------------------------------
 
 -- COLLISION HANDLERS --------------------------------------------------------------
@@ -375,6 +400,14 @@ physics.setGravity( 0, 35 )
 			other = event.object1
 		end
 
+		--salvo localmente alcuni attributi del nemico prima che, venendo colpito e ucciso, li perda
+		local enemy = {}				--<MERGED
+		enemy.drop = other.drop
+		enemy.name = other.name 
+		enemy.x = other.x
+		enemy.y = other.y 				-->MERGED
+
+
 		-- Other is an enemy, targettable AND not invincible
 		if( other.isEnemy and other.isTargettable == true ) then 
 			other.lives = other.lives - 1
@@ -387,6 +420,10 @@ physics.setGravity( 0, 35 )
 				other.isEnemy = false
 				timer.performWithDelay(1000, other:applyLinearImpulse( 0.05, -0.30, other.x, other.y ))
 				other.yScale = -1
+
+				--Force the enemy to drop his item 			--MERGED
+				if ( hasAttribute(enemy,"drop") ) then dropItemFrom(enemy) end 
+					
 				timer.performWithDelay(5000, function() other:removeSelf() end)
 				addScore(200) -- We will modify this
 			
@@ -754,9 +791,50 @@ physics.setGravity( 0, 35 )
 			--assegno qui la posizione perchè nella funzione precedente magicamente si perdono i valori della posizione
 				en.x = enemy.x
 				en.y = enemy.y
+				en.name = enemy.name 		--MERGED (fabio)
+				muovi(en)					--MERGED (giacomo)
+
+			--assign the drop property only if there is a drop
+			if(enemy.drop ~=nil) then 		--MERGED (fabio)
+				en.drop = enemy.drop 
+			end
+
 			game.map:getTileLayer("entities"):addObject( en )
 			table.insert (game.enemyLevelList , en)
 		end
+	end
+
+	-- i nemici si muovono a destra e sinistra, lista
+	function muovi(object)		-- MERGED
+		function goLeft ()
+		transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
+		end
+
+		function goRight ()
+		transition.to( object, { time=1500, x=(object.x + 120), onComplete=goLeft } )
+		end
+
+		goLeft()
+	end	
+
+	-- i nemici dovrebbero seguire steve, per alcuni, liste
+	function segui(steve)		-- MERGED
+
+    	for i = 1, #enemiesList do
+    	    local distanceX = steve.x - enemiesList[i].x
+    	    local distanceY = steve.y - enemiesList[i].y
+     
+    	    local angleRadians = math.atan2(distanceY, distanceX)
+    	    local angleDegrees = math.deg(angleRadians)
+     
+    	    local enemySpeed = 5
+     
+    	    local enemyMoveDistanceX = enemySpeed*math.cos(angleDegrees)
+    	    local enemyMoveDistanceY = enemySpeed*math.sin(angleDegrees)
+     
+    	    enemy.x = enemy.x + enemyMoveDistanceX
+    	    enemy.y = enemy.y + enemyMoveDistanceY
+    		end
 	end
 
 	function game.loadPlayerSensors()
@@ -773,7 +851,7 @@ physics.setGravity( 0, 35 )
 		physics.addBody( sensorD, {isSensor = true, radius = 80} )
 		sensorD.sensorName = "D"
 		sensorD:setFillColor( 100, 50, 0 )
-		sensorD.alpha = 0.6
+		sensorD.alpha = 0.3
 		--sensorD.collType = "sensor"
 		--sensorD.preCollision = sensorPreCollision
 		--sensorD:addEventListener( "preCollision", sensorD )
@@ -841,7 +919,7 @@ physics.setGravity( 0, 35 )
 			physics.addBody(npc.sensorN, {isSensor = true, radius = 60})
 			npc.sensorN.sensorName = "N"
 			npc.sensorN:setFillColor(0,100,0)
-			npc.sensorN.alpha=0.5
+			npc.sensorN.alpha=0.3
 			
 			-- npc.sensorN.collType = "sensor"
 			-- npc.sensorN.preCollision = sensorPreCollision
