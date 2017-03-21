@@ -6,7 +6,7 @@ local utility = {}
 -- ImageSheet per i bottoni (viola)
 -- -----------------------------------------------------------------------------------
 
-    local options =
+    local buttonOptions =
         {
             frames =
             {
@@ -52,8 +52,22 @@ local utility = {}
             sheetContentHeight = 46
         }
         
-    utility.buttonSheet = graphics.newImageSheet( "misc/ButtonSpazi.png", options )
+    utility.buttonSheet = graphics.newImageSheet( "misc/ButtonSpazi.png", buttonOptions )
     
+
+
+    local sliderOptions = {
+    frames = {
+            { x=0, y=0, width=36, height=64 },
+            { x=40, y=0, width=36, height=64 },
+            { x=80, y=0, width=36, height=64 },
+            { x=124, y=0, width=36, height=64 },
+            { x=168, y=0, width=64, height=64 }
+        },
+    sheetContentWidth = 232,
+    sheetContentHeight = 64
+    }
+    utility.sliderSheet = graphics.newImageSheet( "misc/widget-slider.png", sliderOptions )
 -- -----------------------------------------------------------------------------------
 -- Creazione dei pannelli a scorrimento
 -- -----------------------------------------------------------------------------------

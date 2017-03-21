@@ -9,25 +9,152 @@ local scene = composer.newScene()
 
 local widget = require ("widget")
 local utility = require ("utilityMenu")
-local panel = require ("optionsMenu")
+--local panel = require ("optionsMenu")
+
+
+-- forward declarations and other locals
+
+local playBtn, optionBtn, shopBtn, exitBtn, optPanel, slider, muteBtn
+
+-- Option menu
+-- -----------------------------------------------------------------------------------
+
+    local function onOptReturnBtnRelease()  
+        optPanel:hide()
+        return true
+    end
+
+        local function onAboutBtnRelease()  
+        optPanel:hide()
+        return true
+    end
+
+    -- Slider listener !!! TO DO !!!
+    local function sliderListener( event )
+        print( "Slider at " .. event.value .. "%" )
+    end
+
+
+    -- options panel (shown when the clockwork is pressed/released)
+    optPanel = utility.newPanel{
+        location = "top",
+        onComplete = panelTransDone,
+        width = display.contentWidth * 0.52,
+        height = display.contentHeight * 0.7,
+        speed = 250,
+        inEasing = easing.outBack,
+        outEasing = easing.outCubic
+    }
+    optPanel.background = display.newRoundedRect( 0, 0, optPanel.width-100, optPanel.height-100, 10 )
+    optPanel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
+    optPanel:insert( optPanel.background )
+     
+    optPanel.title = display.newText( "menu", 0, 0, native.systemFontBold, 18 )
+    optPanel.title:setFillColor( 1, 1, 1 )
+    optPanel:insert( optPanel.title )
+
+        -- Create the volume slider
+    optPanel.slider = widget.newSlider
+        {
+            sheet = utility.sliderSheet,
+            leftFrame = 1,
+            middleFrame = 2,
+            rightFrame = 3,
+            fillFrame = 4,
+            frameWidth = 18,
+            frameHeight = 16,
+            handleFrame = 5,
+            handleWidth = 18,
+            handleHeight = 18,
+            top = 100,
+            left= 50,
+            orientation = "horizontal",
+            width = 140,
+            listener = sliderListener
+            -- top = 100,
+            -- left = 50,
+            -- width = 100,
+            -- value = 10,  -- Start slider at 10% (optional)
+            -- listener = sliderListener
+        }
+    optPanel.slider.x= -15
+    optPanel.slider.y = -30
+    optPanel:insert(optPanel.slider)
+
+    
+    -- Handle press events for the checkbox !!! TO DO !!! 
+    local function onSwitchPress( event )
+        local switch = event.target
+        print( "Switch with ID '"..switch.id.."' is on: "..tostring(switch.isOn) )
+    end
+     
+    -- Create the mute checkbox
+    optPanel.muteBtn = widget.newSwitch(
+        {
+            left = 250,
+            top = 200,
+            style = "checkbox",
+            id = "Checkbox",
+            onPress = onSwitchPress,
+            height = 15,
+            width = 15
+        }
+    )
+    optPanel.muteBtn.x= 0
+    optPanel.muteBtn.y = 0
+    optPanel:insert(optPanel.muteBtn)
+
+
+    
+    -- Create the button to exit the options menu
+    optPanel.returnBtn = widget.newButton {
+        --label = "Return",
+        onEvent = onOptReturnBtnRelease,
+        -- emboss = false,
+        -- shape = "roundedRect",
+        width = 10,
+        height = 10,
+        -- cornerRadius = 2,
+        -- fillColor = { default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+        -- strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+        -- strokeWidth = 1,
+        defaultFile = "misc/exitOptionMenu.png",
+        --overFile = "buttonOver.png",
+        }
+    optPanel.returnBtn.x= 70
+    optPanel.returnBtn.y = -58
+    optPanel:insert(optPanel.returnBtn)
+
+    optPanel.aboutBtn = widget.newButton {
+        --label = "About",
+        onEvent = onAboutBtnRelease,
+        emboss = false,
+        shape = "roundedRect",
+        width = 15,
+        height = 15,
+        cornerRadius = 2,
+        fillColor = { default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+        strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+        strokeWidth = 1,
+        }
+    optPanel.aboutBtn.x= 0
+    optPanel.aboutBtn.y = 0
+    --optPanel:insert(optPanel.aboutBtn)
 
 -- -----------------------------------------------------------------------------------
--- SCENE-ACCESSIBLE CODE
+
+
+
+
+-- Button functions
 -- -----------------------------------------------------------------------------------
-
-    -- forward declarations and other locals
-
-    local playBtn, optionBtn, scoreBtn, exitBtn, optionBtn2  
-
-
-
     local function onPlayBtnRelease()
     	-- go to levelSelect.lua scene
     	composer.gotoScene( "levelSelect", "fade", 333 )
     	return true
     end
 
-    local function onScoreBtnRelease()
+    local function onShopBtnRelease()
     	-- go to level1.lua scene
         composer.removeScene( "level1" )
     	composer.gotoScene( "level1", "fade", 333 )
@@ -36,15 +163,11 @@ local panel = require ("optionsMenu")
 
     local function onOptionBtnRelease()
         -- open options panel
-        panel:show()
+        optPanel:show()
         return true
     end
+-- -----------------------------------------------------------------------------------
 
-    local function onExitBtnRelease()
-    	-- exit the game
-    	native.requestExit()  -- ONLY WORKS FOR ANDROID
-    	return true
-    end
 
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
@@ -71,20 +194,26 @@ function scene:create( event )
 	steveImage.x = display.contentCenterX
 	steveImage.y = display.contentCenterY + 25
     steveImage.direction = 1
-    
-    -- local function functionLoop()
-    --     if (steveImage.direction == 1) then
-    --         steveImage.xScale = -1
-    --         steveImage.direction = -1
-    --     else
-    --         steveImage.direction = 1
-    --         steveImage.xScale = 1
-    --     end
-    -- end
-    -- timer.performWithDelay( 1000, functionLoop, 0 )
+
+    -- Loop Steve image    
+    local function functionLoop()
+        if (steveImage.direction == 1) then
+            steveImage.xScale = -1
+            steveImage.direction = -1
+        else
+            steveImage.direction = 1
+            steveImage.xScale = 1
+        end
+    end
+    timer.performWithDelay( 2000, functionLoop, 0 )
 	
     -- Load the widgets
 
+
+
+    
+-- -----------------------------------------------------------------------------------
+    -- Option button (clockwork in the upper-right corner)
     optionBtn = widget.newButton
         {
             id = "optionBtn",
@@ -97,8 +226,9 @@ function scene:create( event )
         optionBtn.anchorX = 0
         optionBtn.anchorY = 0
         optionBtn.x =  display.screenOriginX + 3 
-        optionBtn.y = display.screenOriginY + 3 -- ingranaggio in alto a destra
+        optionBtn.y = display.screenOriginY + 3 
 
+    -- Play button (go to level select)
     playBtn = widget.newButton 
         {
             width = 150,
@@ -131,9 +261,10 @@ function scene:create( event )
         playBtn.anchorX = 0
         playBtn.anchorY = 0
         playBtn.x =  display.screenOriginX -20 
-        playBtn.y = display.contentHeight - 130
+        playBtn.y = display.contentHeight - 90
 
-    optionBtn2 = widget.newButton -- bottone opzioni grande
+    -- Shop button, go to the shop scene, for now it goes to the test level
+    shopBtn = widget.newButton 
         {
             width = 150,
             height = 38,
@@ -147,104 +278,33 @@ function scene:create( event )
             bottomRightFrame = 7,
             middleRightFrame = 8,
             middleFrame = 9,
-			topLeftOverFrame = 10,
-	        topMiddleOverFrame = 11,
-	        topRightOverFrame = 12,
-	        middleLeftOverFrame = 13,
-	        middleOverFrame = 14,
-	        middleRightOverFrame = 15,
-	        bottomLeftOverFrame = 16,
-	        bottomMiddleOverFrame = 17,
-	        bottomRightOverFrame = 18,
-            label = "Options",
-            font = native.systemFontBold,
-            labelColor = { default={1}, over={128} },
-            onRelease = onOptionBtnRelease    					-- !!!!TO DO!!!!
-        }
-
-        optionBtn2.anchorX = 0
-        optionBtn2.anchorY = 0
-        optionBtn2.x =  display.screenOriginX -20 
-        optionBtn2.y = display.contentHeight - 80
-
-    scoreBtn = widget.newButton 
-        {
-            width = 150,
-            height = 38,
-            sheet = utility.buttonSheet,
-            topLeftFrame = 1,
-            topMiddleFrame = 2,
-            topRightFrame = 3,
-            middleLeftFrame = 4,
-            bottomLeftFrame = 5,
-            bottomMiddleFrame = 6,
-            bottomRightFrame = 7,
-            middleRightFrame = 8,
-            middleFrame = 9,
-			topLeftOverFrame = 10,
-	        topMiddleOverFrame = 11,
-	        topRightOverFrame = 12,
-	        middleLeftOverFrame = 13,
-	        middleOverFrame = 14,
-	        middleRightOverFrame = 15,
-	        bottomLeftOverFrame = 16,
-	        bottomMiddleOverFrame = 17,
-	        bottomRightOverFrame = 18,
+            topLeftOverFrame = 10,
+            topMiddleOverFrame = 11,
+            topRightOverFrame = 12,
+            middleLeftOverFrame = 13,
+            middleOverFrame = 14,
+            middleRightOverFrame = 15,
+            bottomLeftOverFrame = 16,
+            bottomMiddleOverFrame = 17,
+            bottomRightOverFrame = 18,
             label = "Test",
             font = native.systemFontBold,
             labelColor = { default={1}, over={128} },
-            onRelease = onScoreBtnRelease   			 -- !!!!TO DO!!!!
+            onRelease = onShopBtnRelease                -- !!!!TO DO!!!!
         }
 
-        scoreBtn.anchorX = 0
-        scoreBtn.anchorY = 0
-        scoreBtn.x =  display.contentWidth -130
-        scoreBtn.y = display.contentHeight - 130
-
-    exitBtn = widget.newButton 
-        {
-            width = 150,
-            height = 38,
-            sheet = utility.buttonSheet,
-            topLeftFrame = 1,
-            topMiddleFrame = 2,
-            topRightFrame = 3,
-            middleLeftFrame = 4,
-            bottomLeftFrame = 5,
-            bottomMiddleFrame = 6,
-            bottomRightFrame = 7,
-            middleRightFrame = 8,
-            middleFrame = 9,
-			topLeftOverFrame = 10,
-	        topMiddleOverFrame = 11,
-	        topRightOverFrame = 12,
-	        middleLeftOverFrame = 13,
-	        middleOverFrame = 14,
-	        middleRightOverFrame = 15,
-	        bottomLeftOverFrame = 16,
-	        bottomMiddleOverFrame = 17,
-	        bottomRightOverFrame = 18,
-            label = "Exit",
-            font = native.systemFontBold,
-            labelColor = { default={1}, over={128} },
-            onRelease = onExitBtnRelease   
-        }
-
-        exitBtn.anchorX = 0
-        exitBtn.anchorY = 0
-        exitBtn.x =  display.contentWidth - 130
-        exitBtn.y = display.contentHeight - 80
-
-
+        shopBtn.anchorX = 0
+        shopBtn.anchorY = 0
+        shopBtn.x =  display.contentWidth -130
+        shopBtn.y = display.contentHeight - 90
+-- -----------------------------------------------------------------------------------
 
     	-- all display objects must be inserted into group
     	sceneGroup:insert( background )
     	sceneGroup:insert( titleLogo )
     	sceneGroup:insert( playBtn )
     	sceneGroup:insert( optionBtn )
-        sceneGroup:insert( optionBtn2 )
-    	sceneGroup:insert( scoreBtn )
-    	sceneGroup:insert( exitBtn )
+    	sceneGroup:insert( shopBtn )
     	sceneGroup:insert( steveImage )
 
 end
@@ -277,13 +337,11 @@ end
 function scene:destroy( event )
 	local sceneGroup = self.view
 	
-	if playBtn or scoreBtn then
+	if playBtn or shopBtn then
 		playBtn:removeSelf()	-- widgets must be manually removed
 		playBtn = nil
 		optionBtn:removeSelf()
-        optionBtn2:removeSelf()
-		scoreBtn:removeSelf()
-		exitBtn:removeSelf()
+		shopBtn:removeSelf()
 		steveImage:removeSelf()
 	end	
 end
