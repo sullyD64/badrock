@@ -3,7 +3,6 @@ local scene = composer.newScene()
  
 local widget = require( "widget" )
 local utility = require("utilityMenu")
-local skinPanel = require ("skinMenu")
 -- Require "global" data table (http://coronalabs.com/blog/2013/05/28/tutorial-goodbye-globals/)
 -- This will contain relevant data like the current level, max levels etc.
 local myData = require( "mydata" )
@@ -14,7 +13,7 @@ local myData = require( "mydata" )
 -- Button handler to cancel the level selection and return to the menu
 local function handleCancelButtonEvent( event )
     if ( "ended" == event.phase ) then
-        composer.gotoScene( "menu", { effect="fade", time=333 } )
+        composer.gotoScene( "menu", { effect="fade", time=280 } )
     end
 end
 
@@ -36,6 +35,7 @@ local function handleLevelSelect( event )
         -- Purge the game scene so we have a fresh start
         composer.removeScene( "game", false )
  
+        audio.stop()
         -- Go to the game scene
         composer.gotoScene( "level" .. tostring(event.target.id), { effect="crossFade", time=333 } )
     end
