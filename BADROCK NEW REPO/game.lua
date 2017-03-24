@@ -280,7 +280,33 @@ physics.setGravity( 0, 35 )
 	    } )  
 	end
 
-		--Return True if an object has that attribute or not
+--Steve "animation" that fires stones fragment when he dies
+local function steveDeathAnimation(sx, sy)
+	-- body
+	local frammenti = {}
+	local numRocce = 10
+	
+	for i = 1, numRocce, 1 do
+		local dim = math.random (2, 10)
+		local dx = math.random(-1, 1)
+		local dy = math.random(-1, 1)
+		local frammento = display.newImageRect("ui/life.png", dim, dim)
+		frammento.x , frammento.y = sx, sy
+		game.map:getTileLayer("playerEffects"):addObject(frammento)
+		
+		transition.to(frammento, {onComplete= function()
+			physics.addBody(frammento, {density = 1, friction = 1, bounce = 0.5})
+			frammento:applyLinearImpulse(dx, dy, frammento.x , frammento.y)
+		end})
+		
+		table.insert(frammenti , frammento)
+
+	end
+end
+
+
+
+	--Return True if an object has that attribute or not
 	local function hasAttribute( obj , attributeName )		--MERGED
 		--attributeName must be a String
 
@@ -365,6 +391,7 @@ physics.setGravity( 0, 35 )
 				game.steve.state = STATE_DIED
 
 				audio.play( dangerSound )
+				steveDeathAnimation(game.steve.x , game.steve.y)
 
 				-- \\ CRITICAL CODE // --
 				controlsEnabled = false
@@ -382,6 +409,10 @@ physics.setGravity( 0, 35 )
 						game.steve.isBodyActive = false
 						game.steveSprite:setSequence("idle")
 						game.steveSprite:pause()
+					end
+					} )
+
+					transition.to(game.steveSprite, { time=2000, onComplete = function() 
 						restoreSteve()
 					end
 					} )
@@ -851,7 +882,7 @@ physics.setGravity( 0, 35 )
 		physics.addBody( sensorD, {isSensor = true, radius = 80} )
 		sensorD.sensorName = "D"
 		sensorD:setFillColor( 100, 50, 0 )
-		sensorD.alpha = 0.3
+		sensorD.alpha = 0 --MODIFICAT DA FABIO
 		--sensorD.collType = "sensor"
 		--sensorD.preCollision = sensorPreCollision
 		--sensorD:addEventListener( "preCollision", sensorD )
@@ -919,7 +950,7 @@ physics.setGravity( 0, 35 )
 			physics.addBody(npc.sensorN, {isSensor = true, radius = 60})
 			npc.sensorN.sensorName = "N"
 			npc.sensorN:setFillColor(0,100,0)
-			npc.sensorN.alpha=0.3
+			npc.sensorN.alpha=0 --MODIFICTO DA FABIO
 			
 			-- npc.sensorN.collType = "sensor"
 			-- npc.sensorN.preCollision = sensorPreCollision
