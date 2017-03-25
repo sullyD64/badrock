@@ -53,21 +53,32 @@ local utility = {}
         }
         
     utility.buttonSheet = graphics.newImageSheet( "misc/ButtonSpazi.png", buttonOptions )
-    
 
     -- volume slider sheet
     local sliderOptions = {
         frames = {
-            { x=0, y=0, width=36, height=64 },
-            { x=40, y=0, width=36, height=64 },
-            { x=80, y=0, width=36, height=64 },
-            { x=124, y=0, width=36, height=64 },
-            { x=168, y=0, width=64, height=64 }
+            { x=0, y=0, width=36, height=60 },
+            { x=40, y=0, width=36, height=60 },
+            { x=80, y=0, width=36, height=60 },
+            { x=124, y=0, width=36, height=60 },
+            { x=168, y=0, width=60, height=60 }
             },
         sheetContentWidth = 232,
-        sheetContentHeight = 64
+        sheetContentHeight = 60
         }
     utility.sliderSheet = graphics.newImageSheet( "misc/widget-slider.png", sliderOptions )
+
+    -- checkbox sheet
+    local checkboxOptions = {
+            width = 62,
+            height = 64,
+            numFrames = 2,
+            sheetContentWidth = 128,
+            sheetContentHeight = 64
+        }
+    utility.checkboxSheet = graphics.newImageSheet( "misc/checkbox.png", checkboxOptions )
+
+
 -- -----------------------------------------------------------------------------------
 -- Creazione dei pannelli a scorrimento
 -- -----------------------------------------------------------------------------------
@@ -230,6 +241,11 @@ local utility = {}
         container.x = display.contentCenterX
         container.anchorY = 0
         container.y = display.actualContentHeight
+    elseif ( opt.location == "custom" ) then
+        container.anchorX = opt.anchorX
+        container.anchorY = opt.anchorY
+        container.x = opt.x
+        container.y = opt.y
     elseif ( opt.location == "static") then
         container.anchorX = opt.anchorX
         container.anchorY = opt.anchorY
@@ -244,9 +260,9 @@ local utility = {}
         local tab = tab or {}
         local options = {
             time = tab.speed or opt.speed,
-            transition = tab.transition or opt.outEasing,
-            alpha = tab.alpha
-
+            transition = tab.transition or opt.inEasing,
+            x = tab.x or opt.x,
+            y= tab.y or opt.y
         }
         if ( opt.listener ) then
             options.onComplete = opt.listener
@@ -260,6 +276,8 @@ local utility = {}
             options.x = display.screenOriginX + opt.width
         elseif ( opt.location == "right" ) then
             options.x = display.actualContentWidth - opt.width
+        -- elseif (opt.location == "custom") then
+        --     options.y = display.screenOriginY + opt.height
         elseif ( opt.location == "static" ) then
             options.alpha = 1
         end
@@ -271,8 +289,9 @@ local utility = {}
         local options = {
             time = tab.speed or opt.speed,
             transition = tab.transition or opt.outEasing,
-            alpha = tab.alpha
-
+            alpha = tab.alpha,
+            x = tab.x or opt.x,
+            y= tab.y or opt.y
         }
         if ( opt.listener ) then
             options.onComplete = opt.listener
@@ -286,6 +305,10 @@ local utility = {}
             options.x = display.screenOriginX
         elseif ( opt.location == "right" ) then
             options.x = display.actualContentWidth
+        elseif (opt.location == "custom") then
+            options.y = opt.x
+            options.y = opt.y
+            
         elseif ( opt.location == "static" ) then
             options.alpha = 0
         end

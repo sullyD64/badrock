@@ -3,8 +3,8 @@
 -- menu.lua
 --
 --Cose da fare:
---se premo da qualche parte che non è il panel menu, non funziona oppure esce dal menu (scegliere)
---non so perché, se metto come volume di partenza
+--se premo da qualche parte che non è il panel menu, non funziona oppure esce dal menu (scegliere tra le due)
+--quando si torna dalla partita al menu, la musica di fondo rimane quella della partita, rimediare in qualche modo
 -----------------------------------------------------------------------------------------
 
 local composer = require( "composer" )
@@ -13,18 +13,28 @@ local widget = require ("widget")
 local utility = require ("utilityMenu")
 
 -- forward declarations and other locals
-local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVolume, fxMuteBtn, volumeText
+local playBtn, optionBtn, shopBtn  
+local optPanel, returnMenuBtn, abtPanel, aboutReturnBtn
+local bgVolume, bgMuteBtn, fxVolume, fxMuteBtn
 
--- Option menu
--- -----------------------------------------------------------------------------------
+-- Option menu -----------------------------------------------------------------------
 
-    local function onOptReturnBtnRelease()  
+    local function onOptReturnMenuBtnRelease()  
         optPanel:hide()
         return true
     end
 
     local function onAboutBtnRelease()  
-        optPanel:hide()
+        transition.fadeOut( optPanel, { time=100 } )
+        abtPanel:show({
+            y = display.screenOriginY+225,
+            time =250})
+        return true
+    end
+
+    local function onAboutReturnBtnRelease()  
+        transition.fadeIn( optPanel, { time=100 } )
+        abtPanel:hide()
         return true
     end
 
@@ -57,31 +67,34 @@ local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVol
         local switch = event.target
         print( "Switch with ID '"..switch.id.."' is on: "..tostring(switch.isOn) )
         if (switch.isOn) then 
-            --audio.setVolume( 0, { channel=1 } )
-            --else audio.setVolume (optPanel.bgVolume.value)
             audio.pause({channel =2})
             else audio.resume({channel =2})
          end
-    end
+    end  
   
-  
+
     -- Create the options panel (shown when the clockwork is pressed/released)
     optPanel = utility.newPanel{
-        location = "top",
+        location = "custom",
         onComplete = panelTransDone,
-        width = display.contentWidth * 0.52,
-        height = display.contentHeight * 0.7,
+        width = display.contentWidth * 0.35,
+        height = display.contentHeight * 0.65,
         speed = 250,
+        anchorX = 0.5,
+        anchorY = 1.0,
+        x = display.contentCenterX,
+        y = display.screenOriginY,
         inEasing = easing.outBack,
         outEasing = easing.outCubic
         }
-        optPanel.background = display.newRoundedRect( 0, 0, optPanel.width-100, optPanel.height-100, 10 )
-        optPanel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
+        optPanel.background = display.newImageRect("misc/panel.png",optPanel.width, optPanel.height-20)
+        --optPanel.background = display.newRoundedRect( 0, 0, optPanel.width-10, optPanel.height-50, 10 )
+        --optPanel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
         optPanel:insert( optPanel.background )
          
-        optPanel.title = display.newText( "~Settings~", 0, -70, native.systemFontBold, 15 )
-        optPanel.title:setFillColor( 1, 1, 1 )
-        optPanel:insert( optPanel.title )
+    optPanel.title = display.newText( "Settings", 0, -70, "Micolas.ttf", 15 )
+    optPanel.title:setFillColor( 1, 1, 1 )
+    optPanel:insert( optPanel.title )
 
     -- Create the background music volume slider
     optPanel.bgVolume = widget.newSlider
@@ -102,7 +115,7 @@ local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVol
             value = 40,  -- Start slider at 40%
             listener = bgVolumeListener
         }
-        optPanel.bgVolume.x= -15
+        optPanel.bgVolume.x= -10
         optPanel.bgVolume.y = -30
         optPanel:insert(optPanel.bgVolume)
 
@@ -125,21 +138,23 @@ local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVol
             value = 40,  -- Start slider at 40%
             listener = fxVolumeListener
         }
-        optPanel.fxVolume.x= -15
+        optPanel.fxVolume.x= -10
         optPanel.fxVolume.y = 5
         optPanel:insert(optPanel.fxVolume)
 
-    optPanel.volumeText = display.newText( "Music", -20, -45, native.systemFont, 15 )
-    optPanel.volumeText:setFillColor( 1, 0, 0 )
-    optPanel:insert(optPanel.volumeText)
+    optPanel.bgVolumeText = display.newText( "Music", -20, -48,  "Micolas.ttf", 15 )
+    optPanel.bgVolumeText:setFillColor( 0, 0, 0 )
+    optPanel:insert(optPanel.bgVolumeText)
 
-    optPanel.volumeText = display.newText( "Sound Effects", -20, -12, native.systemFont, 15 )
-    optPanel.volumeText:setFillColor( 1, 0, 0 )
-    optPanel:insert(optPanel.volumeText)
+    optPanel.fxVolumeText = display.newText( "Sound Effects", -20, -12, "Micolas.ttf", 15 )
+    optPanel.fxVolumeText:setFillColor( 0, 0, 0 )
+    optPanel:insert(optPanel.fxVolumeText)
 
     -- Create the background mute checkbox
     optPanel.bgMuteBtn = widget.newSwitch
-        {
+        {   sheet = utility.checkboxSheet,
+            frameOff = 1,
+            frameOn = 2,
             left = 0,
             top = 100,
             style = "checkbox",
@@ -148,13 +163,15 @@ local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVol
             height = 15,
             width = 15
         }
-        optPanel.bgMuteBtn.x= 55
+        optPanel.bgMuteBtn.x= 64
         optPanel.bgMuteBtn.y = -30
         optPanel:insert(optPanel.bgMuteBtn)
 
     -- Create the effects mute checkbox
     optPanel.fxMuteBtn = widget.newSwitch
-        {
+        {   sheet = utility.checkboxSheet,
+            frameOff = 1,
+            frameOn = 2,
             left = 0,
             top = 100,
             style = "checkbox",
@@ -163,56 +180,88 @@ local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVol
             height = 15,
             width = 15
         }
-        optPanel.fxMuteBtn.x= 55
+        optPanel.fxMuteBtn.x= 64
         optPanel.fxMuteBtn.y = 5
         optPanel:insert(optPanel.fxMuteBtn)
     
     -- Create the button to exit the options menu
-    optPanel.returnBtn = widget.newButton {
+    optPanel.returnMenuBtn = widget.newButton {
         --label = "Return",
-        onEvent = onOptReturnBtnRelease,
-        -- emboss = false,
-        -- shape = "roundedRect",
-        width = 10,
-        height = 10,
-        -- cornerRadius = 2,
-        -- fillColor = { default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
-        -- strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
-        -- strokeWidth = 1,
+        onRelease = onOptReturnMenuBtnRelease,
+        width = 15,
+        height = 15,
         defaultFile = "misc/exitOptionMenu.png",
         --overFile = "buttonOver.png",
         }
-        optPanel.returnBtn.x= 70
-        optPanel.returnBtn.y = -58
-        optPanel:insert(optPanel.returnBtn)
+        optPanel.returnMenuBtn.x= 75
+        optPanel.returnMenuBtn.y = -83
+        optPanel:insert(optPanel.returnMenuBtn)
 
     -- Create the about button
     optPanel.aboutBtn = widget.newButton {
-        --label = "About",
-        onEvent = onAboutBtnRelease,
+        label = "About",
+        fontSize = 10,
+        labelColor = { default={0}, over={1} },
+        onRelease = onAboutBtnRelease,
+        emboss = false,
+        shape = "roundedRect",
+        width = 30,
+        height = 15,
+        cornerRadius = 2,
+        fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+        strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+        strokeWidth = 1,
+        }
+        optPanel.aboutBtn.x= -60
+        optPanel.aboutBtn.y = 39
+        optPanel:insert(optPanel.aboutBtn)
+
+        -- Create the about panel
+    abtPanel = utility.newPanel{
+        location = "custom",
+        onComplete = panelTransDone,
+        width = display.contentWidth * 0.35,
+        height = display.contentHeight * 0.65,
+        speed = 250,
+        anchorX = 0.5,
+        anchorY = 1.0,
+        x = display.contentCenterX,
+        y = display.screenOriginY,
+        inEasing = easing.outBack,
+        outEasing = easing.outCubic
+        }
+        abtPanel.background = display.newImageRect("misc/panel.png",abtPanel.width, abtPanel.height-20)
+        abtPanel:insert( abtPanel.background )
+         
+    abtPanel.title = display.newText( "About", 0, -70, "Micolas.ttf", 15 )
+    abtPanel.title:setFillColor( 1, 1, 1 )
+    abtPanel:insert( abtPanel.title )
+
+    -- Create the button to exit the about menu
+    abtPanel.aboutReturnBtn = widget.newButton {
+        --label = "Return",
+        onRelease = onAboutReturnBtnRelease,
         emboss = false,
         shape = "roundedRect",
         width = 15,
         height = 15,
         cornerRadius = 2,
-        fillColor = { default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
-        strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+        fillColor = { default={0.78,0.79,0.78,1}, over={1,0.1,0.7,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+        strokeColor = { default={0,0,0,1}, over={0.8,0.8,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
         strokeWidth = 1,
         }
-        optPanel.aboutBtn.x= 0
-        optPanel.aboutBtn.y = 0
-        --optPanel:insert(optPanel.aboutBtn)
+        abtPanel.aboutReturnBtn.x= -60
+        abtPanel.aboutReturnBtn.y = 39
+        abtPanel:insert(abtPanel.aboutReturnBtn)
 -- -----------------------------------------------------------------------------------
 
--- Button functions
--- -----------------------------------------------------------------------------------
+-- Button functions ------------------------------------------------------------------
 
     local function onPlayBtnRelease()
     	--go to levelSelect.lua scene
         optPanel:hide({
             speed = 250,
             transition = easing.outElastic
-            --alpha = 0
         })
     	composer.gotoScene( "levelSelect", "fade", 280 )
 
@@ -229,7 +278,8 @@ local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVol
 
     local function onOptionBtnRelease()
         -- open options panel
-        optPanel:show()
+        optPanel:show({
+            y = display.screenOriginY+225,})
         return true
     end
 -- -----------------------------------------------------------------------------------
@@ -237,18 +287,11 @@ local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVol
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
 -- -----------------------------------------------------------------------------------
-
     -- create()
     function scene:create( event )
     	local sceneGroup = self.view
+        backgroundMusic = audio.loadStream( "audio/Undertale - Bonetrousle.mp3" )     -- AUDIO (ovviamente cambiare il brano)     
         
-
-        backgroundMusic = audio.loadStream( "audio/heartbeat.mp3" )     -- AUDIO (probabilmente da cambiare)
-        
-        
-        
-
-
     	-- Load the background
     	local background = display.newImageRect( "misc/MenuBackground.jpg", display.actualContentWidth, display.actualContentHeight )
     	background.anchorX = 0
@@ -279,13 +322,13 @@ local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVol
         end
         timer.performWithDelay( 2000, functionLoop, 0 )
     	
-        -- Load the widgets    
-        -- -----------------------------------------------------------------------------------
+        -- Load the buttons ------------------------------------------------------------------   
+
             -- Option button (clockwork in the upper-right corner)
             optionBtn = widget.newButton
                 {
                     id = "optionBtn",
-                    onEvent = onOptionBtnRelease,
+                    onRelease = onOptionBtnRelease,
                     width = 25,
                     height = 25,
                     defaultFile = "misc/ingranaggio.png",
@@ -322,7 +365,8 @@ local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVol
         	        bottomRightOverFrame = 18,
 
                     label = "Play",
-                    font = native.systemFontBold,
+                    font = "Micolas.ttf",
+                    fontSize = 20,
                     labelColor = { default={1}, over={128} },
                     onRelease = onPlayBtnRelease    
                 }
@@ -356,7 +400,8 @@ local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVol
                     bottomMiddleOverFrame = 17,
                     bottomRightOverFrame = 18,
                     label = "Test",
-                    font = native.systemFontBold,
+                    font = "Micolas.ttf",
+                    fontSize = 20,
                     labelColor = { default={1}, over={128} },
                     onRelease = onShopBtnRelease                -- !!!!TO DO!!!!
                 }
@@ -420,6 +465,6 @@ local playBtn, optionBtn, shopBtn, exitBtn, optPanel, bgVolume, bgMuteBtn, fxVol
     scene:addEventListener( "show", scene )
     scene:addEventListener( "hide", scene )
     scene:addEventListener( "destroy", scene )
------------------------------------------------------------------------------------------
+
 
 return scene
