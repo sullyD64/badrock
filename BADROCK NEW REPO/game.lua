@@ -912,7 +912,7 @@ end
 		local loadBalloon = function(npc)
 			local panelTransDone = function( target )
 				if ( target.completeState ) then
-					print( "PANEL STATE IS: "..target.completeState )
+					--print( "PANEL STATE IS: "..target.completeState ) MODIFICATO DA FABIO
 				end
 			end
 			
