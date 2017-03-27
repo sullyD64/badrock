@@ -32,8 +32,8 @@ physics.setGravity( 0, 35 )
 	local DIRECTION_RIGHT =  1
 	local MAX_LIVES 	  =  3
 
-	local buttonPressed
-	local levelCompleted
+	local buttonPressed -- Never used
+	--local game.levelCompleted		-- non si può dichiarare qui
 	local posX, posY
 	local spawnX, spawnY
 	local controlsEnabled, SSVEnabled, SSVLaunched, letMeJump
@@ -50,7 +50,7 @@ physics.setGravity( 0, 35 )
 		--print(game.steve.canJump)
 		--print("Game " .. game.state)
 		--print("Level ended: ")
-		--print(levelCompleted)
+		--print(game.levelCompleted)
 		--print(spawnX .. "   " .. spawnY)
 
 		--print(game.steve.canJump)
@@ -78,26 +78,25 @@ physics.setGravity( 0, 35 )
 			game.steveSprite.xScale = game.steve.direction
 		end
 
-		-- Deny jump if steve is falling
+		-- Jumping is allowed only in two circumstances:
+		-- 1) The player is touching the ground (see jumpTouch())
+		-- 2) The player isn't falling (his vertical speed is greater than 0)
+		-- This block checks the second condition.
 		if (SSVEnabled) then
-			--print("controllo salto")
 			local xv, yv = game.steve:getLinearVelocity()
 			if (yv > 0 and letMeJump == false) then 
 				game.steve.canJump = false
 			elseif (yv == 0 and letMeJump == true) then
 				game.steve.canJump = true
 			end
-			--print(game.steve.canJump)
 
-				if(yv > 0) then
+			if(yv > 0) then
 				game.steve.airState= "Falling"
 			elseif(yv < 0) then
 				game.steve.airState= "Jumping"
-
 			elseif(yv == 0) then
 				game.steve.airState= "Idle"
 			end
-
 		end
 
 		-- Setting the AirState, needed for the Animation controls
@@ -210,7 +209,7 @@ physics.setGravity( 0, 35 )
 		timer.performWithDelay(pointsTimer, pointsFade)
 	end
 
-	--Update Life Icons: Works if we Lose or if we Get Lives
+	-- Update Life Icons: Works if we Lose or if we Get Lives
 	local function updateLifeIcons()
 		for i=1, #game.lifeIcons do
 			if( i <= game.lives) then
@@ -231,7 +230,7 @@ physics.setGravity( 0, 35 )
 
 		-- Display the exitText
 			local exitText = display.newText( ui.uiGroup, "" , 250, 150, native.systemFontBold, 34 )
-			if (levelCompleted == true) then
+			if (game.levelCompleted == true) then
 				exitText.text = "Level Complete"
 				exitText:setFillColor( 0.75, 0.78, 1 )
 			else
@@ -268,6 +267,7 @@ physics.setGravity( 0, 35 )
 		
 		game.steve:setLinearVelocity( 0, 0 )
 	    game.steve.state = STATE_IDLE
+	    game.steve.canJump = false
 
 	    -- Fade in Steve's sprite
 	    transition.to( game.steveSprite, { alpha = 1, time = 1000,
@@ -280,8 +280,8 @@ physics.setGravity( 0, 35 )
 	    } )  
 	end
 
-		--Return True if an object has that attribute or not
-	local function hasAttribute( obj , attributeName )		--MERGED
+	-- Return True if an object has that attribute or not
+	local function hasAttribute( obj , attributeName )
 		--attributeName must be a String
 
 		local ris = false
@@ -294,8 +294,7 @@ physics.setGravity( 0, 35 )
 		return ris
 	end 
 
-	
-	local function dropItemFrom( enemy )					--MERGED
+	local function dropItemFrom( enemy )
 		--Crea l'item contenuto nell'attributo Drop di Enemy
 	
 		local item = items.createItem(enemy.drop)
@@ -331,11 +330,11 @@ physics.setGravity( 0, 35 )
 
 	-- Collision with Coins (Only for Steve)
 	local function coinCollision( event )
-		local steveObj = event.object1
+		local steve = event.object1
 		local coin = event.object2
 
 		if(event.object2.myName =="steve") then 
-			steveObj = event.object2
+			steve = event.object2
 			coin = event.object1
 		end
 
@@ -407,7 +406,6 @@ physics.setGravity( 0, 35 )
 		enemy.x = other.x
 		enemy.y = other.y 				-->MERGED
 
-
 		-- Other is an enemy, targettable AND not invincible
 		if( other.isEnemy and other.isTargettable == true ) then 
 			other.lives = other.lives - 1
@@ -447,28 +445,29 @@ physics.setGravity( 0, 35 )
 		end
 	end
 
-	-- Generic Collision Handler
+	-- General index for every Collision handler in Game
 	local function onCollision( event )
+		-- Index for collisions involving the player
 		if ( (event.object1.myName == "steve") or 
 			 (event.object2.myName == "steve") ) then
 			
-			local steveObj = event.object1
+			local steve = event.object1
 			local other = event.object2
 
 			if(other.myName =="steve") then 
-				steveObj = event.object2
+				steve = event.object2
 				other = event.object1
 			end
 
-			-- Collision Type
-			if(other.myName == "env") then
+			if(other.myName == "env" or other.myName == "platform") then
 				environmentCollision(event)
 			elseif (other.myName == "coin") then
 				coinCollision(event)
 			elseif (other.isEnemy or other.isDanger) then
 				dangerCollision(event)
+			-- Special case for the level's ending block. Triggers the "Endgame" handler
 			elseif(other.myName == "end_level") then
-				levelCompleted = true
+				game.levelCompleted = true
 				controlsEnabled = false
 				SSVEnabled = false
 				endGameScreen()
@@ -476,12 +475,30 @@ physics.setGravity( 0, 35 )
 				letMeJump = true -- force enable the jump
 			end
 
-		-- SteveAttack collisions are handled by the attackedBySteve method
+		-- Index for collisions involving the player attacking effects
 		elseif( (event.object1.myName == "steveAttack") or 
 			    (event.object2.myName == "steveAttack") ) then
 			steveAttackCollision( event )
 		end
 	end
+
+	-- Allows steve to pass through certain platforms when jumping from below the tile's base
+	local function stevePreCollision( self, event )
+		if ( event.other.myName == "platform" ) then
+
+			-- Compare Y position of character "base" to platform top
+			-- A slight increase (0.2) is added to account for collision location inconsistency
+			-- If collision position is greater than platform top, void/disable the specific collision
+			if ( self.y+(self.height*0.5) > event.other.y-(event.other.height*0.5)+0.2 ) then
+				if event.contact then
+					event.contact.isEnabled = false
+					-- The jump policy is disabled temporairly while the player is passing through
+					self.canJump = false
+				end
+			end
+		end
+	return true
+end
 ------------------------------------------------------------------------------------
 
 -- CONTROLS HANDLERS ---------------------------------------------------------------
@@ -617,7 +634,7 @@ physics.setGravity( 0, 35 )
 		local target = event.target
 		local psbutton = ui.getButtonByName("pauseBtn")
 		local rsbutton = ui.getButtonByName("resumeBtn")
-
+		
 		if (event.phase == "began") then
 			display.currentStage:setFocus( target )
 
@@ -638,7 +655,8 @@ physics.setGravity( 0, 35 )
 	end
 
 	--// DA COMPLETARE //
-	local function balloonTouch(event)
+	local function balloonTouch(event) 
+		local target = event.target
 		if (game.state == GAME_RUNNING) then
 			if (event.phase == "began") then
 				display.currentStage:setFocus( event.target )
@@ -759,7 +777,6 @@ physics.setGravity( 0, 35 )
 		--game.steveSprite:setFrame(1)
 		game.steveSprite:play()
 		--game.steveSprite:pause()
-
 	
 		game.steve = display.newImageRect( "sprites/rock_original.png", 30, 30 )
 		game.steve.alpha = 0 
@@ -774,6 +791,9 @@ physics.setGravity( 0, 35 )
 		game.steve.canJump = false
 
 		game.steve.x, game.steve.y = spawnX, spawnY
+
+		game.steve.preCollision = stevePreCollision
+		game.steve:addEventListener( "preCollision", game.steve )
 	end
 
 	function game.loadEnemies()
@@ -791,11 +811,11 @@ physics.setGravity( 0, 35 )
 			--assegno qui la posizione perchè nella funzione precedente magicamente si perdono i valori della posizione
 				en.x = enemy.x
 				en.y = enemy.y
-				en.name = enemy.name 		--MERGED (fabio)
-				muovi(en)					--MERGED (giacomo)
+				en.name = enemy.name
+				muovi(en)
 
 			--assign the drop property only if there is a drop
-			if(enemy.drop ~=nil) then 		--MERGED (fabio)
+			if(enemy.drop ~=nil) then
 				en.drop = enemy.drop 
 			end
 
@@ -805,7 +825,7 @@ physics.setGravity( 0, 35 )
 	end
 
 	-- i nemici si muovono a destra e sinistra, lista
-	function muovi(object)		-- MERGED
+	function muovi(object)
 		function goLeft ()
 		transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
 		end
@@ -818,7 +838,7 @@ physics.setGravity( 0, 35 )
 	end	
 
 	-- i nemici dovrebbero seguire steve, per alcuni, liste
-	function segui(steve)		-- MERGED
+	function segui(steve)
 
     	for i = 1, #enemiesList do
     	    local distanceX = steve.x - enemiesList[i].x
@@ -847,8 +867,8 @@ physics.setGravity( 0, 35 )
 			-- sensorE.y = game.steve.y
 		end
 
-		sensorD = display.newCircle( game.steve.x, game.steve.y, 80 )
-		physics.addBody( sensorD, {isSensor = true, radius = 80} )
+		sensorD = display.newCircle( game.steve.x, game.steve.y, 50 )
+		physics.addBody( sensorD, {isSensor = true, radius = 50} )
 		sensorD.sensorName = "D"
 		sensorD:setFillColor( 100, 50, 0 )
 		sensorD.alpha = 0.3
@@ -873,8 +893,7 @@ physics.setGravity( 0, 35 )
 
 		local loadNPC = function(npc)
 			npc.staticImage = display.newImageRect( "sprites/pinkie.png", 70, 70 )
-			npc.staticImage.x, npc.staticImage.y = npc.x, npc.y 
-			--physics.addBody( npc.staticImage, {friction = 1.0})
+			npc.staticImage.x, npc.staticImage.y = npc.x, npc.y
 			game.map:getTileLayer("entities"):addObject(npc.staticImage)
 		end
 
@@ -901,8 +920,9 @@ physics.setGravity( 0, 35 )
 			button.x, button.y = background.x, background.y -50
 			npc.balloon:insert(button)
 
-			-- npc.balloon = ui.createBalloon()
 			npc.balloon.x, npc.balloon.y = npc.x, npc.y -20
+
+			npc.balloon.alpha = 0
 			npc.balloon:hide()
 
 			game.map:getTileLayer("balloons"):addObject(npc.balloon)
@@ -1001,7 +1021,7 @@ physics.setGravity( 0, 35 )
 
 		game.score = 0
 		game.lives = MAX_LIVES
-		levelCompleted = false
+		game.levelCompleted = false
 
 		game.loadUi()
 		game.loadPlayer()

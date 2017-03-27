@@ -27,7 +27,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
   <tile id="24">
@@ -36,7 +36,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
   <tile id="32">
@@ -232,7 +232,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
   <tile id="83">
@@ -241,7 +241,12 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
+   </properties>
+  </tile>
+  <tile id="84">
+   <properties>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
   <tile id="85">
@@ -250,7 +255,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
   <tile id="86">
@@ -259,7 +264,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
  </tileset>
@@ -651,11 +656,10 @@
 </data>
  </layer>
  <objectgroup name="playerSpawn">
-  <object id="1" name="spawn0" x="257.333" y="528" width="32" height="32"/>
+  <object id="1" name="spawn0" x="108.333" y="472" width="32" height="32"/>
  </objectgroup>
  <objectgroup name="npcSpawn">
   <object id="9" name="npc" x="446" y="530.333" width="25.3333" height="20.6667"/>
-  <object id="10" name="npc" x="88" y="552"/>
  </objectgroup>
  <objectgroup name="enemySpawn">
   <object id="2" name="paper01" type="paper" x="519" y="357">
