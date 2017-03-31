@@ -36,7 +36,7 @@ physics.setGravity( 0, 35 )
 	--local game.levelCompleted		-- non si può dichiarare qui
 	local posX, posY
 	local spawnX, spawnY
-	local controlsEnabled, SSVEnabled, SSVLaunched, letMeJump
+	local controlsEnabled, SSVEnabled, SSVLaunched, SSVType, letMeJump
 
 --===========================================-- 
 
@@ -507,7 +507,13 @@ end
 		if (SSVEnabled) then
 			SSVLaunched = true
 			local steveXV, steveYV = game.steve:getLinearVelocity()
-			game.steve:setLinearVelocity(game.steve.actualSpeed, steveYV)
+			if (SSVType == "walk") then
+				game.steve:setLinearVelocity(game.steve.actualSpeed, steveYV)
+			elseif (SSVType == "jump") then
+				
+				game.steve:setLinearVelocity(steveXV, game.steve.actualSpeed )
+				game.steve:applyLinearImpulse(0, game.steve.jumpHeight, game.steve.x, game.steve.y)
+			end
 		end
 	end
 
@@ -538,6 +544,7 @@ end
 						game.steveSprite:play()
 					end
 
+					SSVType = "walk"
 					Runtime:addEventListener("enterFrame", setSteveVelocity)
 					game.steve.actualSpeed = game.steve.direction * game.steve.speed
 					game.steve.xScale = game.steve.direction
@@ -545,9 +552,8 @@ end
 
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
 				game.steve.state = STATE_IDLE
-
 				game.steveSprite:setSequence("idle")
-			
+
 				Runtime:removeEventListener("enterFrame", setSteveVelocity)	
 
 				lbutton.alpha, rbutton.alpha = 0.1, 0.1
@@ -558,6 +564,52 @@ end
 		return true --Prevents touch propagation to underlying objects
 	end
 
+	local function jumpTouch(event)
+		if (game.state == GAME_RUNNING) then
+			if (event.phase == "began") then
+				display.currentStage:setFocus( event.target )
+				if (controlsEnabled and game.steve.canJump == true) then
+					audio.play( jumpSound )
+					game.steve.state = STATE_JUMPING
+
+					--[[
+						local checkloop = function()
+							actualPosition = game.steve.y - startingPosition
+							if (actualPosition > maxPosition) then
+								print("yes")
+								Runtime:removeEventListener("enterFrame", setSteveVelocity)
+								maxReached = true
+							end
+						end
+
+						startingPosition = game.steve.y
+						maxPosition = startingPosition - game.steve.maxJumpHeight
+						actualPosition = 0
+						print("stPos: "..startingPosition)
+						print("mxPos: " ..maxPosition)
+						Runtime:addEventListener( "enterFrame", checkloop )
+					]]
+
+					SSVType = "jump"
+					Runtime:addEventListener("enterFrame", setSteveVelocity)
+					game.steve.actualSpeed = game.steve.jumpHeight
+
+					game.steve.canJump = false
+					letMeJump = false
+				end
+
+			elseif (event.phase == "ended" or "cancelled" == event.phase) then
+				display.currentStage:setFocus( nil )
+				game.steve.state = STATE_IDLE
+				game.steveSprite:setSequence("idle")
+				Runtime:removeEventListener("enterFrame", setSteveVelocity)	
+			end
+		end
+		
+		return true --Prevents touch propagation to underlying objects
+	end
+
+	--[[
 	local function jumpTouch(event)
 		if (game.state == GAME_RUNNING) then
 			if (event.phase == "began") then
@@ -578,6 +630,7 @@ end
 		
 		return true --Prevents touch propagation to underlying objects
 	end
+	]]
 
 	local function actionTouch( event )
 		local attackDuration = 500
@@ -782,8 +835,8 @@ end
 		game.steve.alpha = 0 
 		game.steve.myName = "steve"
 		game.steve.rotation = 0
-		game.steve.speed = 180
-		game.steve.jumpHeight = -18
+		game.steve.speed = 150
+		game.steve.jumpHeight = -15
 		physics.addBody( game.steve, { density=1.0, friction=0.7, bounce=0.01} )
 		game.steve.isFixedRotation = true
 		game.steve.state = STATE_IDLE
@@ -892,7 +945,7 @@ end
 		game.npcs = layer:getObjects("npc")
 
 		local loadNPC = function(npc)
-			npc.staticImage = display.newImageRect( "sprites/pinkie.png", 70, 70 )
+			npc.staticImage = display.newImageRect( "sprites/carota.png", 51, 128 )
 			npc.staticImage.x, npc.staticImage.y = npc.x, npc.y
 			game.map:getTileLayer("entities"):addObject(npc.staticImage)
 		end
