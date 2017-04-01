@@ -54,6 +54,7 @@ physics.setGravity( 0, 35 )
 		--print(spawnX .. "   " .. spawnY)
 
 		--print(game.steve.canJump)
+		print(game.steve.jumpForce)
 		--local xv, yv = game.steve:getLinearVelocity()
 		--print(yv)
 		--print("AirState "..game.steve.airState)
@@ -400,11 +401,11 @@ physics.setGravity( 0, 35 )
 		end
 
 		--salvo localmente alcuni attributi del nemico prima che, venendo colpito e ucciso, li perda
-		local enemy = {}				--<MERGED
+		local enemy = {}
 		enemy.drop = other.drop
 		enemy.name = other.name 
 		enemy.x = other.x
-		enemy.y = other.y 				-->MERGED
+		enemy.y = other.y
 
 		-- Other is an enemy, targettable AND not invincible
 		if( other.isEnemy and other.isTargettable == true ) then 
@@ -497,8 +498,8 @@ physics.setGravity( 0, 35 )
 				end
 			end
 		end
-	return true
-end
+		return true
+	end
 ------------------------------------------------------------------------------------
 
 -- CONTROLS HANDLERS ---------------------------------------------------------------
@@ -506,13 +507,19 @@ end
 	local function setSteveVelocity()
 		if (SSVEnabled) then
 			SSVLaunched = true
+
+			-- ActualSpeed is needed for allowing combinations of two-dimensional movements.
+			-- In both cases (x-movement or y-movement), we set the character's linear velocity at each
+			-- frame, overriding one of the two linear velocities when a movement is input by the player.
 			local steveXV, steveYV = game.steve:getLinearVelocity()
 			if (SSVType == "walk") then
+				-- When walking, ActualSpeed will be 'direction * walkForce'
 				game.steve:setLinearVelocity(game.steve.actualSpeed, steveYV)
-			elseif (SSVType == "jump") then
-				
+			elseif (SSVType == "jump" and game.steve.jumpForce < 0) then
+				-- When jumping, ActualSpeed will be 'jumpForce'
 				game.steve:setLinearVelocity(steveXV, game.steve.actualSpeed )
-				game.steve:applyLinearImpulse(0, game.steve.jumpHeight, game.steve.x, game.steve.y)
+				game.steve:applyLinearImpulse(0, game.steve.jumpForce, game.steve.x, game.steve.y)
+				--transition.to(game.steve, {game.steve.jumpForce = 0, transition=easing.outExpo})
 			end
 		end
 	end
@@ -546,8 +553,9 @@ end
 
 					SSVType = "walk"
 					Runtime:addEventListener("enterFrame", setSteveVelocity)
-					game.steve.actualSpeed = game.steve.direction * game.steve.speed
+					game.steve.actualSpeed = game.steve.direction * game.steve.walkForce
 					game.steve.xScale = game.steve.direction
+					print("actualSpeed: ".. game.steve.actualSpeed)
 				end
 
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
@@ -565,6 +573,7 @@ end
 	end
 
 	local function jumpTouch(event)
+		local timerDisabled = false
 		if (game.state == GAME_RUNNING) then
 			if (event.phase == "began") then
 				display.currentStage:setFocus( event.target )
@@ -572,33 +581,40 @@ end
 					audio.play( jumpSound )
 					game.steve.state = STATE_JUMPING
 
-					--[[
-						local checkloop = function()
-							actualPosition = game.steve.y - startingPosition
-							if (actualPosition > maxPosition) then
-								print("yes")
-								Runtime:removeEventListener("enterFrame", setSteveVelocity)
-								maxReached = true
-							end
-						end
-
-						startingPosition = game.steve.y
-						maxPosition = startingPosition - game.steve.maxJumpHeight
-						actualPosition = 0
-						print("stPos: "..startingPosition)
-						print("mxPos: " ..maxPosition)
-						Runtime:addEventListener( "enterFrame", checkloop )
-					]]
-
 					SSVType = "jump"
 					Runtime:addEventListener("enterFrame", setSteveVelocity)
-					game.steve.actualSpeed = game.steve.jumpHeight
+					game.steve.jumpForce = 0
+					game.steve.actualSpeed = game.steve.jumpForce
 
+					local i = 0
+					local j = 100
+					local listener = {}
+					function listener:timer( event )
+						if timerDisabled == false then 
+							i = i +1
+							j = j -1
+							game.steve.jumpForce = game.steve.maxJumpForce + math.exp( i )
+							
+						end
+					end
+					  
+					timer.performWithDelay( 1, listener, j )
+
+
+
+					
+
+
+					print("jumpForce: ".. game.steve.jumpForce)
+					print("actualSpeed: ".. game.steve.actualSpeed)
 					game.steve.canJump = false
 					letMeJump = false
 				end
 
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
+
+				timerDisabled = true
+				game.steve.jumpForce = 0
 				display.currentStage:setFocus( nil )
 				game.steve.state = STATE_IDLE
 				game.steveSprite:setSequence("idle")
@@ -608,29 +624,6 @@ end
 		
 		return true --Prevents touch propagation to underlying objects
 	end
-
-	--[[
-	local function jumpTouch(event)
-		if (game.state == GAME_RUNNING) then
-			if (event.phase == "began") then
-				display.currentStage:setFocus( event.target )
-				if (controlsEnabled and game.steve.canJump == true) then
-					audio.play( jumpSound )
-					game.steve.state = STATE_JUMPING
-
-					game.steve:applyLinearImpulse(0,game.steve.jumpHeight, game.steve.x, game.steve.y)
-					game.steve.canJump = false
-					letMeJump = false
-				end
-
-			elseif (event.phase == "ended" or "cancelled" == event.phase) then
-				display.currentStage:setFocus( nil )
-			end
-		end
-		
-		return true --Prevents touch propagation to underlying objects
-	end
-	]]
 
 	local function actionTouch( event )
 		local attackDuration = 500
@@ -835,8 +828,8 @@ end
 		game.steve.alpha = 0 
 		game.steve.myName = "steve"
 		game.steve.rotation = 0
-		game.steve.speed = 150
-		game.steve.jumpHeight = -15
+		game.steve.walkForce = 150
+		game.steve.maxJumpForce = -20
 		physics.addBody( game.steve, { density=1.0, friction=0.7, bounce=0.01} )
 		game.steve.isFixedRotation = true
 		game.steve.state = STATE_IDLE

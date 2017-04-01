@@ -656,7 +656,7 @@
 </data>
  </layer>
  <objectgroup name="playerSpawn">
-  <object id="1" name="spawn0" x="108.333" y="472" width="32" height="32"/>
+  <object id="1" name="spawn0" x="145" y="496"/>
  </objectgroup>
  <objectgroup name="npcSpawn">
   <object id="9" name="npc" x="446" y="530.333" width="25.3333" height="20.6667"/>
