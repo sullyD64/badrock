@@ -185,7 +185,7 @@ physics.setGravity( 0, 35 )
 
 -- MISCELLANEOUS FUNCTIONS ---------------------------------------------------------
 
-	local function addScore(points)
+	 function game.addScore(points)
 		local pointsText = ui.getButtonByName("pointsText")
 		local scoreText = ui.getButtonByName("scoreText")
 		
@@ -210,8 +210,17 @@ physics.setGravity( 0, 35 )
 		timer.performWithDelay(pointsTimer, pointsFade)
 	end
 
+	--Add a life to our lives
+	function game.addLife()
+		if(game.lives < MAX_LIVES ) then
+			game.lives = game.lives + 1
+			updateLifeIcons()
+		end
+
+	end
+
 	--Update Life Icons: Works if we Lose or if we Get Lives
-	local function updateLifeIcons()
+	function updateLifeIcons()
 		for i=1, #game.lifeIcons do
 			if( i <= game.lives) then
 				game.lifeIcons[i].isVisible = true
@@ -294,14 +303,21 @@ local function steveDeathAnimation(sx, sy)
 		frammento.x , frammento.y = sx, sy
 		game.map:getTileLayer("playerEffects"):addObject(frammento)
 		
-		transition.to(frammento, {onComplete= function()
+		transition.to(frammento, {time =0, onComplete= function()
 			physics.addBody(frammento, {density = 1, friction = 1, bounce = 0.5})
 			frammento:applyLinearImpulse(dx, dy, frammento.x , frammento.y)
 		end})
 		
 		table.insert(frammenti , frammento)
-
 	end
+
+	--Toglie la fisica ai frammenti dopo un tot tempo, rendendoli solo immagini
+	transition.to(frammenti, {time = 4000, onComplete = function()
+		for i=1, #frammenti, 1 do
+			frammenti[i].isBodyActive = false
+		end
+	end})
+
 end
 
 
@@ -355,28 +371,10 @@ end
 		]]
 	end
 
-	-- Collision with Coins (Only for Steve)
-	local function coinCollision( event )
-		local steveObj = event.object1
-		local coin = event.object2
-
-		if(event.object2.myName =="steve") then 
-			steveObj = event.object2
-			coin = event.object1
-		end
-
-		if ( event.phase == "began" ) then
-			audio.play( coinSound )
-			coin.BodyType = "dynamic"
-			display.remove( coin )
-			addScore(100)
-
-		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-		end
-	end
 
 	-- Collision with enemies and dangerous things (Only for Steve)
 	local function dangerCollision( event )
+		--steveDeathAnimation(game.steve.x , game.steve.y)
 		local other = event.object2
 		if(event.object2.myName == "steve") then
 			other = event.object1
@@ -456,7 +454,7 @@ end
 				if ( hasAttribute(enemy,"drop") ) then dropItemFrom(enemy) end 
 					
 				timer.performWithDelay(5000, function() other:removeSelf() end)
-				addScore(200) -- We will modify this
+				game.addScore(200) -- We will modify this
 			
 			else -- Enemy is still alive
 				
@@ -494,8 +492,8 @@ end
 			-- Collision Type
 			if(other.myName == "env") then
 				environmentCollision(event)
-			elseif (other.myName == "coin") then
-				coinCollision(event)
+			elseif (other.myName == "item") then
+				items.itemCollision(game , event, other)
 			elseif (other.isEnemy or other.isDanger) then
 				dangerCollision(event)
 			elseif(other.myName == "end_level") then

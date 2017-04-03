@@ -3,11 +3,20 @@
 -- items.lua
 --
 -----------------------------------------------------------------------------------------
+local physics  = require ( "physics"      )
 
 local items = {}
 
 items.list = {
+	{
+		name = "coin",
+		type = "bonus",
+		image = "ui/coin.png",
+		width = 25,
+		heigth = 25
 
+
+	},
 	-- 1 LIFE
 	{
 		name = "life",
@@ -52,11 +61,68 @@ function items.createItem( name )
 	local item = display.newImageRect(i.image , i.width, i.heigth)
 	item.name = i.name
 	item.type = i.type
+	item.myName = "item"
+	transition.to(item, {time = 0, onComplete= function()
+	physics.addBody(item )
+	
+	end})
+	item.isSensor = true
+	
+
 	return item
 end
 
 
+-- ITEMS COLLISION HANDLERS ------------------------------------------------------------
 
+	function items.itemCollision(game , event, item)
+		--item.alpha = 0
+		--inserire qui eventuali suoni di collisione con gli item
+		--display.remove( item )
+		--game.map:getTileLayer("items"):removeObject( item )
+		
+		--List of all items with relative collision handler
+		if(item.name == "coin") then
+			coinCollision(game, event, item)
+
+		elseif(item.name == "life") then
+			lifeCollision(game, event, item)
+
+		end
+	
+		item = nil --"Distruzione" dell'item
+	end
+
+
+
+
+	function coinCollision( game , event, coin)
+
+		if ( event.phase == "began" ) then
+			--audio.play( coinSound )
+			coin.BodyType = "dynamic"
+			display.remove( coin )
+			game.addScore(100)
+
+		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
+		end
+	end
+
+	function lifeCollision( game, event, life )
+
+		if ( event.phase == "began" ) then
+			display.remove(life)
+			--audio.play( coinSound )
+			--life.BodyType = "dynamic"
+			game.addLife()
+			
+
+		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
+		end
+	end
+
+
+----------------------------------------------------------------------------------------
 
 function addDropTo( enemy , itemName )
 	--Add an item drop to an enemy (MAX 1 Drop per Enemy, for "now" )

@@ -310,7 +310,8 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
     <property name="isSensor" value="true"/>
-    <property name="myName" value="coin"/>
+    <property name="myName" value="item"/>
+    <property name="name" value="coin"/>
    </properties>
   </tile>
  </tileset>
@@ -692,7 +693,7 @@
    </properties>
   </object>
   <object id="3" name="sedia01" type="sedia" x="832" y="226"/>
-  <object id="11" name="paper02" type="paper" x="544" y="160">
+  <object id="11" name="paper02" type="paper" x="560" y="550">
    <properties>
     <property name="drop" value="life"/>
    </properties>
