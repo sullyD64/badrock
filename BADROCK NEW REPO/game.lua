@@ -15,7 +15,7 @@ local items    = require ( "items"        )
 local game = {}
 
 physics.start()
-physics.setGravity( 0, 35 )
+physics.setGravity( 0, 50 )
 
 --===========================================-- 
 
@@ -54,7 +54,9 @@ physics.setGravity( 0, 35 )
 		--print(spawnX .. "   " .. spawnY)
 
 		--print(game.steve.canJump)
-		print(game.steve.jumpForce)
+		-- if (game.steve.jumpForce) then
+		-- 	print("jumpForce: " ..game.steve.jumpForce)
+		-- end
 		--local xv, yv = game.steve:getLinearVelocity()
 		--print(yv)
 		--print("AirState "..game.steve.airState)
@@ -518,8 +520,22 @@ physics.setGravity( 0, 35 )
 			elseif (SSVType == "jump" and game.steve.jumpForce < 0) then
 				-- When jumping, ActualSpeed will be 'jumpForce'
 				game.steve:setLinearVelocity(steveXV, game.steve.actualSpeed )
-				game.steve:applyLinearImpulse(0, game.steve.jumpForce, game.steve.x, game.steve.y)
-				--transition.to(game.steve, {game.steve.jumpForce = 0, transition=easing.outExpo})
+				game.steve:applyForce(0, game.steve.jumpForce, game.steve.x, game.steve.y)
+
+				if (game.steve.state == STATE_JUMPING and game.steve.jumpForce > - 400 and j ~= 0) then
+					j = j - 1
+					i = i + 1
+
+					maths = - i
+					-- maths = - math.exp( i/2 ) + 1
+					-- maths - game.steve.jumpForce*math.exp(-i/100000000)
+					game.steve.jumpForce = game.steve.jumpForce + maths
+				else
+					game.steve.jumpForce = 0
+				end
+
+				print("i:" ..i.. "| j:" ..j.. "	| jumpForce:" .. game.steve.jumpForce .. " | maths: " .. maths)
+
 			end
 		end
 	end
@@ -531,7 +547,7 @@ physics.setGravity( 0, 35 )
 
 		if (game.state == GAME_RUNNING) then
 			if (event.phase == "began") then
-				display.currentStage:setFocus( target )
+				display.currentStage:setFocus( target, event.id )
 
 				if (target.myName == "dpadLeft") then
 					game.steve.direction = DIRECTION_LEFT
@@ -555,7 +571,6 @@ physics.setGravity( 0, 35 )
 					Runtime:addEventListener("enterFrame", setSteveVelocity)
 					game.steve.actualSpeed = game.steve.direction * game.steve.walkForce
 					game.steve.xScale = game.steve.direction
-					print("actualSpeed: ".. game.steve.actualSpeed)
 				end
 
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
@@ -565,7 +580,7 @@ physics.setGravity( 0, 35 )
 				Runtime:removeEventListener("enterFrame", setSteveVelocity)	
 
 				lbutton.alpha, rbutton.alpha = 0.1, 0.1
-				display.currentStage:setFocus( nil )
+				display.currentStage:setFocus( target, nil )
 			end
 		end
 
@@ -573,50 +588,30 @@ physics.setGravity( 0, 35 )
 	end
 
 	local function jumpTouch(event)
-		local timerDisabled = false
 		if (game.state == GAME_RUNNING) then
 			if (event.phase == "began") then
-				display.currentStage:setFocus( event.target )
+				display.currentStage:setFocus( event.target, event.id )
 				if (controlsEnabled and game.steve.canJump == true) then
 					audio.play( jumpSound )
 					game.steve.state = STATE_JUMPING
 
 					SSVType = "jump"
 					Runtime:addEventListener("enterFrame", setSteveVelocity)
-					game.steve.jumpForce = 0
+					game.steve.jumpForce = -200
 					game.steve.actualSpeed = game.steve.jumpForce
 
-					local i = 0
-					local j = 100
-					local listener = {}
-					function listener:timer( event )
-						if timerDisabled == false then 
-							i = i +1
-							j = j -1
-							game.steve.jumpForce = game.steve.maxJumpForce + math.exp( i )
-							
-						end
-					end
-					  
-					timer.performWithDelay( 1, listener, j )
+					i = 0
+					j = 18
+					print(" ")
 
-
-
-					
-
-
-					print("jumpForce: ".. game.steve.jumpForce)
-					print("actualSpeed: ".. game.steve.actualSpeed)
 					game.steve.canJump = false
 					letMeJump = false
 				end
 
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
-
-				timerDisabled = true
-				game.steve.jumpForce = 0
-				display.currentStage:setFocus( nil )
+				display.currentStage:setFocus( event.target, nil )
 				game.steve.state = STATE_IDLE
+				game.steve.jumpForce = 0
 				game.steveSprite:setSequence("idle")
 				Runtime:removeEventListener("enterFrame", setSteveVelocity)	
 			end
