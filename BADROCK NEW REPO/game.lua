@@ -54,9 +54,7 @@ physics.setGravity( 0, 35 )
 		--print(spawnX .. "   " .. spawnY)
 
 		--print(game.steve.canJump)
-		if (game.steve.jumpForce ~= nil) then
-			print("jumpForce: "..game.steve.jumpForce)
-		end
+		print(game.steve.jumpForce)
 		--local xv, yv = game.steve:getLinearVelocity()
 		--print(yv)
 		--print("AirState "..game.steve.airState)
@@ -509,6 +507,7 @@ physics.setGravity( 0, 35 )
 	local function setSteveVelocity()
 		if (SSVEnabled) then
 			SSVLaunched = true
+
 			-- ActualSpeed is needed for allowing combinations of two-dimensional movements.
 			-- In both cases (x-movement or y-movement), we set the character's linear velocity at each
 			-- frame, overriding one of the two linear velocities when a movement is input by the player.
@@ -516,9 +515,11 @@ physics.setGravity( 0, 35 )
 			if (SSVType == "walk") then
 				-- When walking, ActualSpeed will be 'direction * walkForce'
 				game.steve:setLinearVelocity(game.steve.actualSpeed, steveYV)
-			-- elseif (SSVType == "jump") then
-			-- 	-- When jumping, ActualSpeed will be 'jumpForce'
-			-- 	game.steve:setLinearVelocity(steveXV, game.steve.actualSpeed )
+			elseif (SSVType == "jump" and game.steve.jumpForce < 0) then
+				-- When jumping, ActualSpeed will be 'jumpForce'
+				game.steve:setLinearVelocity(steveXV, game.steve.actualSpeed )
+				game.steve:applyLinearImpulse(0, game.steve.jumpForce, game.steve.x, game.steve.y)
+				--transition.to(game.steve, {game.steve.jumpForce = 0, transition=easing.outExpo})
 			end
 		end
 	end
@@ -554,6 +555,7 @@ physics.setGravity( 0, 35 )
 					Runtime:addEventListener("enterFrame", setSteveVelocity)
 					game.steve.actualSpeed = game.steve.direction * game.steve.walkForce
 					game.steve.xScale = game.steve.direction
+					print("actualSpeed: ".. game.steve.actualSpeed)
 				end
 
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
@@ -571,31 +573,52 @@ physics.setGravity( 0, 35 )
 	end
 
 	local function jumpTouch(event)
+		local timerDisabled = false
 		if (game.state == GAME_RUNNING) then
 			if (event.phase == "began") then
 				display.currentStage:setFocus( event.target )
 				if (controlsEnabled and game.steve.canJump == true) then
 					audio.play( jumpSound )
-					game.steve.state = STATE_JUMPING	
+					game.steve.state = STATE_JUMPING
 
-					game.steve.jumpForce = -18
-					game.steve.minJumpForce = -8
+					SSVType = "jump"
+					Runtime:addEventListener("enterFrame", setSteveVelocity)
+					game.steve.jumpForce = 0
+					game.steve.actualSpeed = game.steve.jumpForce
 
-					game.steve:applyLinearImpulse(0, game.steve.jumpForce, game.steve.x, game.steve.y)
+					local i = 0
+					local j = 100
+					local listener = {}
+					function listener:timer( event )
+						if timerDisabled == false then 
+							i = i +1
+							j = j -1
+							game.steve.jumpForce = game.steve.maxJumpForce + math.exp( i )
+							
+						end
+					end
+					  
+					timer.performWithDelay( 1, listener, j )
+
+
+
 					
-					-- SSVType = "jump"
-					-- Runtime:addEventListener("enterFrame", setSteveVelocity)	
-					-- game.steve.actualSpeed = game.steve.jumpForce
 
+
+					print("jumpForce: ".. game.steve.jumpForce)
+					print("actualSpeed: ".. game.steve.actualSpeed)
 					game.steve.canJump = false
 					letMeJump = false
 				end
 
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
+
+				timerDisabled = true
+				game.steve.jumpForce = 0
 				display.currentStage:setFocus( nil )
 				game.steve.state = STATE_IDLE
 				game.steveSprite:setSequence("idle")
-				-- Runtime:removeEventListener("enterFrame", setSteveVelocity)	
+				Runtime:removeEventListener("enterFrame", setSteveVelocity)	
 			end
 		end
 		
@@ -806,7 +829,7 @@ physics.setGravity( 0, 35 )
 		game.steve.myName = "steve"
 		game.steve.rotation = 0
 		game.steve.walkForce = 150
-		game.steve.maxJumpForce = -15
+		game.steve.maxJumpForce = -20
 		physics.addBody( game.steve, { density=1.0, friction=0.7, bounce=0.01} )
 		game.steve.isFixedRotation = true
 		game.steve.state = STATE_IDLE
