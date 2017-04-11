@@ -1035,7 +1035,7 @@ physics.setGravity( 0, 50 )
 				en.x = enemy.x
 				en.y = enemy.y
 				en.name = enemy.name
-				muovi(en)
+				--muovi4(en)
 
 			--assign the drop property only if there is a drop
 			if(enemy.drop ~=nil) then
@@ -1044,19 +1044,155 @@ physics.setGravity( 0, 50 )
 
 			game.map:getTileLayer("entities"):addObject( en )
 			table.insert (game.enemyLevelList , en)
+
+		--muovi(en)
+	
 		end
+		--2 sedia, 3 paper sopra, 1 paper sotto
+		-- for i=1,2 do
+		-- 	local obj= game.enemyLevelList[i]
+		-- 	transition.to( obj, { time=1500, onComplete=muovi(obj)} )
+		-- 	print(obj)
+		-- 	--table.remove (enemyList[0])
+		-- end
+		--transition.to( game.enemyLevelList[2], { time=1500, x=(game.enemyLevelList[2].x - 120), onComplete=muovi(game.enemyLevelList[1]) } )
+		--transition.to( game.enemyLevelList[2], { time=1500, x=(game.enemyLevelList[1].x - 120), onComplete=muovi(game.enemyLevelList[3]) } )
+		-- 	for i=2,3 do
+		-- 	local obj= game.enemyLevelList[i]
+		-- 	muovi(obj)
+		-- 	print(obj)
+		-- 	--table.remove (enemyList[0])
+		-- end
+		-- if(math.random(3)==1) then muovi(game.enemyLevelList[1])
+		-- elseif(math.random(3)==2) then muovi(game.enemyLevelList[2])
+		-- elseif(math.random(3)==3) then muovi(game.enemyLevelList[3])
+		-- end
+		-- esaurimento di memoria
+		--muovi(game.enemyLevelList[3],game.enemyLevelList[2],game.enemyLevelList[1])	--si muove comunque l'ultimo e solo lui
+		--muovi2(game.enemyLevelList[1])
+		--muovi(game.enemyLevelList[3])
+		-- local i=0
+		-- for i=0,1 do
+		-- 	for k, v in pairs(game.enemyLevelList) do
+		-- 		muovi(game.enemyLevelList[k])
+		-- 		i=i+1
+		-- 	end
+		-- end
+		--local txt = display.newText( "Hello", 0, 0 )
+		-- 	local g1 = display.newGroup()
+		-- 	local g2 = display.newGroup()
+	               
+		-- for k, v in pairs(game.enemyLevelList) do
+		-- 	g1:insert(game.enemyLevelList[k])  
+		-- end
+		-- --g1:toBack()
+		-- --muovi(g1)
+		--prova()
+		-- muovi(game.enemyLevelList[1])
+		-- muovi(game.enemyLevelList[3])
+		-- muovi(game.enemyLevelList[2])
+		
+		--muovi3(game.enemyLevelList)
+		-- for i=1,3 do
+		-- 		timer.performWithDelay(1000,muovi(game.enemyLevelList[1]))
+		-- 		timer.performWithDelay(2000,muovi(game.enemyLevelList[2]))
+		-- 		timer.performWithDelay(1000,muovi(game.enemyLevelList[3]))
+		-- end
+
+		-- for k, v in pairs(game.enemyLevelList) do
+		-- 	game.enemyLevelList[k].speed=5	
+		-- end
+
+		for k, v in pairs(game.enemyLevelList) do
+			muovi(game.enemyLevelList[k])
+		end
+	end
+
+	-- function prova()
+	-- for k,v in ipairs(game.enemyLevelList) do
+	-- transition.to( game.enemyLevelList[k], { time=1500, x=(game.enemyLevelList[k].x - 120), onComplete=prova()})
+	-- end
+	-- end
+	
+	function f(object)
+		local angle= math.atan2(game.steve.y - object.y, game.steve.x - object.x) -- work out angle between target and missile
+		object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
+		object.y = object.y + (math.sin(angle) * object.speed) -- update y pos in relation to angle
+	end
+
+	function muovi2(object,a,b)
+		function goLeft ()
+		transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
+		transition.to( a, { time=1500, x=(a.x - 120), onComplete=goRight } )
+		transition.to( b, { time=1500, x=(b.x - 120), onComplete=goRight } )
+		end
+
+		function goRight ()
+		
+		transition.to( object, { time=1500, x=(object.x - 120), onComplete=goLeft } )
+		transition.to( a, { time=1500, x=(a.x - 120), onComplete=goLeft } )
+		transition.to( b, { time=1500, x=(b.x - 120), onComplete=goLeft } )
+		end
+
+		goLeft()
 	end
 
 	-- i nemici si muovono a destra e sinistra, lista
 	function muovi(object)
+		object.isFixedRotation=true
 		function goLeft ()
 		transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
+		object.xScale=1
 		end
 
 		function goRight ()
 		transition.to( object, { time=1500, x=(object.x + 120), onComplete=goLeft } )
+		object.xScale=-1
 		end
 
+		goLeft()
+	end
+
+	function muovi4(table)
+		function goLeft ()
+			-- mi scandiscono tutta la table, ma crash
+			
+			print(table)
+			transition.to( table, { time=2500, x=(table.x - 120), onComplete=function()
+				timer.performWithDelay(1000,goRight)
+				end } )
+			
+		end
+
+		function goRight ()
+			-- mi scandiscono tutta la table, ma crash
+			
+			print(table)
+			transition.to( table, { time=2500, x=(table.x + 120), onComplete=function()
+				timer.performWithDelay(1000,goLeft)
+				end } )
+			
+		end
+		goLeft()
+	end	
+
+	-- questa muove tutti ma dopo un po' crasha, troppi controlli
+	function muovi3(table)		
+		function goLeft ()
+			-- mi scandiscono tutta la table, ma crash
+			for k,v in ipairs(table) do
+			print(table[k])
+			transition.to( table[k], { time=2500, x=(table[k].x - 120), onComplete=goRight } )
+			end
+		end
+
+		function goRight ()
+			-- mi scandiscono tutta la table, ma crash
+			for k,v in ipairs(table) do
+			print(table[k])
+			transition.to( table[k], { time=2500, x=(table[k].x + 120), onComplete=goLeft } )
+			end
+		end
 		goLeft()
 	end	
 

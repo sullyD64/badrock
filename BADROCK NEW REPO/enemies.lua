@@ -18,7 +18,8 @@ local enemies = {}
 		density = 1.0,
 		image = "sprites/paper.png",
 		height = 40,
-		width = 40
+		width = 40,
+		speed=0
 		},
 	--2
 		{
@@ -29,7 +30,8 @@ local enemies = {}
 		density = 1.0,
 		image = "sprites/sedia.png",
 		height = 113,
-		width = 70
+		width = 70,
+		speed=0
 		}
 
 }
