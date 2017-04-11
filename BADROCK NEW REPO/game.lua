@@ -234,131 +234,131 @@ physics.setGravity( 0, 50 )
          end
     end  
   
-    -- Create the options panel (shown when the clockwork is pressed/released)
-    pausePanel = utility.newPanel{
-        location = "custom",
-        onComplete = panelTransDone,
-        width = display.contentWidth * 0.35,
-        height = display.contentHeight * 0.65,
-        speed = 250,
-        anchorX = 0.5,
-        anchorY = 1.0,
-        x = display.contentCenterX,
-        y = display.screenOriginY,
-        inEasing = easing.outBack,
-        outEasing = easing.outCubic
-        }
-        pausePanel.background = display.newImageRect("misc/panel.png",pausePanel.width, pausePanel.height-20)
-        pausePanel:insert( pausePanel.background )
-         
-        pausePanel.title = display.newText( "Pause", 0, -70, "Micolas.ttf", 15 )
-        pausePanel.title:setFillColor( 1, 1, 1 )
-        pausePanel:insert( pausePanel.title )
+	    -- Create the options panel (shown when the clockwork is pressed/released)
+	    pausePanel = utility.newPanel{
+	        location = "custom",
+	        onComplete = panelTransDone,
+	        width = display.contentWidth * 0.35,
+	        height = display.contentHeight * 0.65,
+	        speed = 250,
+	        anchorX = 0.5,
+	        anchorY = 1.0,
+	        x = display.contentCenterX,
+	        y = display.screenOriginY,
+	        inEasing = easing.outBack,
+	        outEasing = easing.outCubic
+	        }
+	        pausePanel.background = display.newImageRect("misc/panel.png",pausePanel.width, pausePanel.height-20)
+	        pausePanel:insert( pausePanel.background )
+	         
+	        pausePanel.title = display.newText( "Pause", 0, -70, "Micolas.ttf", 15 )
+	        pausePanel.title:setFillColor( 1, 1, 1 )
+	        pausePanel:insert( pausePanel.title )
 
-    -- Create the background music volume slider
-    pausePanel.bgVolume = widget.newSlider
-        {   sheet = utility.sliderSheet,
-            leftFrame = 1,
-            middleFrame = 2,
-            rightFrame = 3,
-            fillFrame = 4,
-            frameWidth = 18,
-            frameHeight = 16,
-            handleFrame = 5,
-            handleWidth = 18,
-            handleHeight = 18,
-            top = 100,
-            left= 50,
-            orientation = "horizontal",
-            width = 140,
-            value = 40,  -- Start slider at 40%
-            listener = bgVolumeListener
-        }
-        pausePanel.bgVolume.x= -10
-        pausePanel.bgVolume.y = -30
-        pausePanel:insert(pausePanel.bgVolume)
+	    -- Create the background music volume slider
+	    pausePanel.bgVolume = widget.newSlider
+	        {   sheet = utility.sliderSheet,
+	            leftFrame = 1,
+	            middleFrame = 2,
+	            rightFrame = 3,
+	            fillFrame = 4,
+	            frameWidth = 18,
+	            frameHeight = 16,
+	            handleFrame = 5,
+	            handleWidth = 18,
+	            handleHeight = 18,
+	            top = 100,
+	            left= 50,
+	            orientation = "horizontal",
+	            width = 140,
+	            value = 40,  -- Start slider at 40%
+	            listener = bgVolumeListener
+	        }
+	        pausePanel.bgVolume.x= -10
+	        pausePanel.bgVolume.y = -30
+	        pausePanel:insert(pausePanel.bgVolume)
 
-    -- Create the effects volume slider
-    pausePanel.fxVolume = widget.newSlider
-        {   sheet = utility.sliderSheet,
-            leftFrame = 1,
-            middleFrame = 2,
-            rightFrame = 3,
-            fillFrame = 4,
-            frameWidth = 18,
-            frameHeight = 16,
-            handleFrame = 5,
-            handleWidth = 18,
-            handleHeight = 18,
-            top = 100,
-            left= 50,
-            orientation = "horizontal",
-            width = 140,
-            value = 40,  -- Start slider at 40%
-            listener = fxVolumeListener
-        }
-        pausePanel.fxVolume.x= -10
-        pausePanel.fxVolume.y = 5
-        pausePanel:insert(pausePanel.fxVolume)
+	    -- Create the effects volume slider
+	    pausePanel.fxVolume = widget.newSlider
+	        {   sheet = utility.sliderSheet,
+	            leftFrame = 1,
+	            middleFrame = 2,
+	            rightFrame = 3,
+	            fillFrame = 4,
+	            frameWidth = 18,
+	            frameHeight = 16,
+	            handleFrame = 5,
+	            handleWidth = 18,
+	            handleHeight = 18,
+	            top = 100,
+	            left= 50,
+	            orientation = "horizontal",
+	            width = 140,
+	            value = 40,  -- Start slider at 40%
+	            listener = fxVolumeListener
+	        }
+	        pausePanel.fxVolume.x= -10
+	        pausePanel.fxVolume.y = 5
+	        pausePanel:insert(pausePanel.fxVolume)
 
-    pausePanel.bgVolumeText = display.newText( "Music", -20, -48,  "Micolas.ttf", 15 )
-    pausePanel.bgVolumeText:setFillColor( 0, 0, 0 )
-    pausePanel:insert(pausePanel.bgVolumeText)
+	    pausePanel.bgVolumeText = display.newText( "Music", -20, -48,  "Micolas.ttf", 15 )
+	    pausePanel.bgVolumeText:setFillColor( 0, 0, 0 )
+	    pausePanel:insert(pausePanel.bgVolumeText)
 
-    pausePanel.fxVolumeText = display.newText( "Sound Effects", -20, -12, "Micolas.ttf", 15 )
-    pausePanel.fxVolumeText:setFillColor( 0, 0, 0 )
-    pausePanel:insert(pausePanel.fxVolumeText)
+	    pausePanel.fxVolumeText = display.newText( "Sound Effects", -20, -12, "Micolas.ttf", 15 )
+	    pausePanel.fxVolumeText:setFillColor( 0, 0, 0 )
+	    pausePanel:insert(pausePanel.fxVolumeText)
 
-    -- Create the background mute checkbox
-    pausePanel.bgMuteBtn = widget.newSwitch
-        {   sheet = utility.checkboxSheet,
-            frameOff = 1,
-            frameOn = 2,
-            left = 0,
-            top = 100,
-            style = "checkbox",
-            id = "Checkbox",
-            onPress = onBgMuteSwitchPress,
-            height = 15,
-            width = 15
-        }
-        pausePanel.bgMuteBtn.x= 64
-        pausePanel.bgMuteBtn.y = -30
-        pausePanel:insert(pausePanel.bgMuteBtn)
+	    -- Create the background mute checkbox
+	    pausePanel.bgMuteBtn = widget.newSwitch
+	        {   sheet = utility.checkboxSheet,
+	            frameOff = 1,
+	            frameOn = 2,
+	            left = 0,
+	            top = 100,
+	            style = "checkbox",
+	            id = "Checkbox",
+	            onPress = onBgMuteSwitchPress,
+	            height = 15,
+	            width = 15
+	        }
+	        pausePanel.bgMuteBtn.x= 64
+	        pausePanel.bgMuteBtn.y = -30
+	        pausePanel:insert(pausePanel.bgMuteBtn)
 
-    -- Create the effects mute checkbox
-    pausePanel.fxMuteBtn = widget.newSwitch
-        {   sheet = utility.checkboxSheet,
-            frameOff = 1,
-            frameOn = 2,
-            left = 0,
-            top = 100,
-            style = "checkbox",
-            id = "Checkbox",
-            onPress = onFxMuteSwitchPress,
-            height = 15,
-            width = 15
-        }
-        pausePanel.fxMuteBtn.x= 64
-        pausePanel.fxMuteBtn.y = 5
-        pausePanel:insert(pausePanel.fxMuteBtn)
-    
-    -- Create the about button
-    pausePanel.menuBtn = widget.newButton {
-        label = "Menu",
-        onRelease = onMenuBtnRelease,
-        emboss = false,
-        shape = "roundedRect",
-        width = 40,
-        height = 15,
-        cornerRadius = 2,
-        fillColor = { default={0.78,0.79,0.78,1}, over={1,0.1,0.7,0.4} },
-        strokeColor = { default={0,0,0,1}, over={0.8,0.8,1,1} },
-        strokeWidth = 1,
-        }
-        pausePanel.menuBtn.x= -60
-        pausePanel.menuBtn.y = 39
-        pausePanel:insert(pausePanel.menuBtn)
+	    -- Create the effects mute checkbox
+	    pausePanel.fxMuteBtn = widget.newSwitch
+	        {   sheet = utility.checkboxSheet,
+	            frameOff = 1,
+	            frameOn = 2,
+	            left = 0,
+	            top = 100,
+	            style = "checkbox",
+	            id = "Checkbox",
+	            onPress = onFxMuteSwitchPress,
+	            height = 15,
+	            width = 15
+	        }
+	        pausePanel.fxMuteBtn.x= 64
+	        pausePanel.fxMuteBtn.y = 5
+	        pausePanel:insert(pausePanel.fxMuteBtn)
+	    
+	    -- Create the about button
+	    pausePanel.menuBtn = widget.newButton {
+	        label = "Menu",
+	        onRelease = onMenuBtnRelease,
+	        emboss = false,
+	        shape = "roundedRect",
+	        width = 40,
+	        height = 15,
+	        cornerRadius = 2,
+	        fillColor = { default={0.78,0.79,0.78,1}, over={1,0.1,0.7,0.4} },
+	        strokeColor = { default={0,0,0,1}, over={0.8,0.8,1,1} },
+	        strokeWidth = 1,
+	        }
+	        pausePanel.menuBtn.x= -60
+	        pausePanel.menuBtn.y = 39
+	        pausePanel:insert(pausePanel.menuBtn)
 
 
 -- ---------------------------------------------------------------------------------
@@ -388,19 +388,16 @@ physics.setGravity( 0, 50 )
 					pointsText.alpha = 1
 				end
 				} ) 
-		end
+			end
 		timer.performWithDelay(pointsTimer, pointsFade)
-	end
+		end
 
-	-- Update Life Icons: Works if we Lose or if we Get Lives
-	local function updateLifeIcons()
 	--Add a life to our lives
 	function game.addLife()
 		if(game.lives < MAX_LIVES ) then
 			game.lives = game.lives + 1
 			updateLifeIcons()
 		end
-
 	end
 
 	--Update Life Icons: Works if we Lose or if we Get Lives
@@ -474,38 +471,35 @@ physics.setGravity( 0, 50 )
 	    } )  
 	end
 
-	-- Return True if an object has that attribute or not
-	local function hasAttribute( obj , attributeName )
---Steve "animation" that fires stones fragment when he dies
-local function steveDeathAnimation(sx, sy)
-	-- body
-	local frammenti = {}
-	local numRocce = 10
-	
-	for i = 1, numRocce, 1 do
-		local dim = math.random (2, 10)
-		local dx = math.random(-1, 1)
-		local dy = math.random(-1, 1)
-		local frammento = display.newImageRect("ui/life.png", dim, dim)
-		frammento.x , frammento.y = sx, sy
-		game.map:getTileLayer("playerEffects"):addObject(frammento)
+	--Steve "animation" that fires stones fragment when he dies
+	local function steveDeathAnimation(sx, sy)
+		-- body
+		local frammenti = {}
+		local numRocce = 10
 		
-		transition.to(frammento, {time =0, onComplete= function()
-			physics.addBody(frammento, {density = 1, friction = 1, bounce = 0.5})
-			frammento:applyLinearImpulse(dx, dy, frammento.x , frammento.y)
-		end})
-		
-		table.insert(frammenti , frammento)
-	end
-
-	--Toglie la fisica ai frammenti dopo un tot tempo, rendendoli solo immagini
-	transition.to(frammenti, {time = 4000, onComplete = function()
-		for i=1, #frammenti, 1 do
-			frammenti[i].isBodyActive = false
+		for i = 1, numRocce, 1 do
+			local dim = math.random (2, 10)
+			local dx = math.random(-1, 1)
+			local dy = math.random(-1, 1)
+			local frammento = display.newImageRect("ui/life.png", dim, dim)
+			frammento.x , frammento.y = sx, sy
+			game.map:getTileLayer("playerEffects"):addObject(frammento)
+			
+			transition.to(frammento, {time =0, onComplete= function()
+				physics.addBody(frammento, {density = 1, friction = 1, bounce = 0.5})
+				frammento:applyLinearImpulse(dx, dy, frammento.x , frammento.y)
+			end})
+			
+			table.insert(frammenti , frammento)
 		end
-	end})
 
-end
+		--Toglie la fisica ai frammenti dopo un tot tempo, rendendoli solo immagini
+		transition.to(frammenti, {time = 4000, onComplete = function()
+			for i=1, #frammenti, 1 do
+				frammenti[i].isBodyActive = false
+			end
+		end})
+	end
 
 
 
@@ -1282,7 +1276,6 @@ end
 		physics.addBody( sensorD, {isSensor = true, radius = 50} )
 		sensorD.sensorName = "D"
 		sensorD:setFillColor( 100, 50, 0 )
-		sensorD.alpha = 0.3
 		sensorD.alpha = 0 --MODIFICAT DA FABIO
 		--sensorD.collType = "sensor"
 		--sensorD.preCollision = sensorPreCollision
@@ -1312,7 +1305,6 @@ end
 		local loadBalloon = function(npc)
 			local panelTransDone = function( target )
 				if ( target.completeState ) then
-					print( "PANEL STATE IS: "..target.completeState )
 					--print( "PANEL STATE IS: "..target.completeState ) MODIFICATO DA FABIO
 				end
 			end

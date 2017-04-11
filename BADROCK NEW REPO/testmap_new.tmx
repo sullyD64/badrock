@@ -27,7 +27,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
   <tile id="24">
@@ -36,7 +36,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
   <tile id="32">
@@ -232,7 +232,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
   <tile id="83">
@@ -241,7 +241,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
   <tile id="85">
@@ -250,7 +250,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
   <tile id="86">
@@ -259,7 +259,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="myName" value="platform"/>
    </properties>
   </tile>
  </tileset>
