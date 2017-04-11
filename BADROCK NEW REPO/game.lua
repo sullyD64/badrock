@@ -367,7 +367,7 @@ physics.setGravity( 0, 50 )
 
 -- MISCELLANEOUS FUNCTIONS ---------------------------------------------------------
 
-	local function addScore(points)
+	 function game.addScore(points)
 		local pointsText = ui.getButtonByName("pointsText")
 		local scoreText = ui.getButtonByName("scoreText")
 		
@@ -394,6 +394,17 @@ physics.setGravity( 0, 50 )
 
 	-- Update Life Icons: Works if we Lose or if we Get Lives
 	local function updateLifeIcons()
+	--Add a life to our lives
+	function game.addLife()
+		if(game.lives < MAX_LIVES ) then
+			game.lives = game.lives + 1
+			updateLifeIcons()
+		end
+
+	end
+
+	--Update Life Icons: Works if we Lose or if we Get Lives
+	function updateLifeIcons()
 		for i=1, #game.lifeIcons do
 			if( i <= game.lives) then
 				game.lifeIcons[i].isVisible = true
@@ -465,6 +476,41 @@ physics.setGravity( 0, 50 )
 
 	-- Return True if an object has that attribute or not
 	local function hasAttribute( obj , attributeName )
+--Steve "animation" that fires stones fragment when he dies
+local function steveDeathAnimation(sx, sy)
+	-- body
+	local frammenti = {}
+	local numRocce = 10
+	
+	for i = 1, numRocce, 1 do
+		local dim = math.random (2, 10)
+		local dx = math.random(-1, 1)
+		local dy = math.random(-1, 1)
+		local frammento = display.newImageRect("ui/life.png", dim, dim)
+		frammento.x , frammento.y = sx, sy
+		game.map:getTileLayer("playerEffects"):addObject(frammento)
+		
+		transition.to(frammento, {time =0, onComplete= function()
+			physics.addBody(frammento, {density = 1, friction = 1, bounce = 0.5})
+			frammento:applyLinearImpulse(dx, dy, frammento.x , frammento.y)
+		end})
+		
+		table.insert(frammenti , frammento)
+	end
+
+	--Toglie la fisica ai frammenti dopo un tot tempo, rendendoli solo immagini
+	transition.to(frammenti, {time = 4000, onComplete = function()
+		for i=1, #frammenti, 1 do
+			frammenti[i].isBodyActive = false
+		end
+	end})
+
+end
+
+
+
+	--Return True if an object has that attribute or not
+	local function hasAttribute( obj , attributeName )		--MERGED
 		--attributeName must be a String
 
 		local ris = false
@@ -533,6 +579,7 @@ physics.setGravity( 0, 50 )
 
 	-- Collision with enemies and dangerous things (Only for Steve)
 	local function dangerCollision( event )
+		--steveDeathAnimation(game.steve.x , game.steve.y)
 		local other = event.object2
 		if(event.object2.myName == "steve") then
 			other = event.object1
@@ -547,6 +594,7 @@ physics.setGravity( 0, 50 )
 				game.steve.state = STATE_DIED
 
 				audio.play( dangerSound )
+				steveDeathAnimation(game.steve.x , game.steve.y)
 
 				-- \\ CRITICAL CODE // --
 				controlsEnabled = false
@@ -564,6 +612,10 @@ physics.setGravity( 0, 50 )
 						game.steve.isBodyActive = false
 						game.steveSprite:setSequence("idle")
 						game.steveSprite:pause()
+					end
+					} )
+
+					transition.to(game.steveSprite, { time=2000, onComplete = function() 
 						restoreSteve()
 					end
 					} )
@@ -606,7 +658,7 @@ physics.setGravity( 0, 50 )
 				if ( hasAttribute(enemy,"drop") ) then dropItemFrom(enemy) end 
 					
 				timer.performWithDelay(5000, function() other:removeSelf() end)
-				addScore(200) -- We will modify this
+				game.addScore(200) -- We will modify this
 			
 			else -- Enemy is still alive
 				
@@ -644,8 +696,8 @@ physics.setGravity( 0, 50 )
 
 			if(other.myName == "env" or other.myName == "platform") then
 				environmentCollision(event)
-			elseif (other.myName == "coin") then
-				coinCollision(event)
+			elseif (other.myName == "item") then
+				items.itemCollision(game , event, other)
 			elseif (other.isEnemy or other.isDanger) then
 				dangerCollision(event)
 			-- Special case for the level's ending block. Triggers the "Endgame" handler
@@ -1231,6 +1283,7 @@ physics.setGravity( 0, 50 )
 		sensorD.sensorName = "D"
 		sensorD:setFillColor( 100, 50, 0 )
 		sensorD.alpha = 0.3
+		sensorD.alpha = 0 --MODIFICAT DA FABIO
 		--sensorD.collType = "sensor"
 		--sensorD.preCollision = sensorPreCollision
 		--sensorD:addEventListener( "preCollision", sensorD )
@@ -1260,6 +1313,7 @@ physics.setGravity( 0, 50 )
 			local panelTransDone = function( target )
 				if ( target.completeState ) then
 					print( "PANEL STATE IS: "..target.completeState )
+					--print( "PANEL STATE IS: "..target.completeState ) MODIFICATO DA FABIO
 				end
 			end
 			
@@ -1298,7 +1352,7 @@ physics.setGravity( 0, 50 )
 			physics.addBody(npc.sensorN, {isSensor = true, radius = 60})
 			npc.sensorN.sensorName = "N"
 			npc.sensorN:setFillColor(0,100,0)
-			npc.sensorN.alpha=0.3
+			npc.sensorN.alpha=0 --MODIFICTO DA FABIO
 			
 			-- npc.sensorN.collType = "sensor"
 			-- npc.sensorN.preCollision = sensorPreCollision
