@@ -862,7 +862,7 @@ physics.setGravity( 0, 35 )
 	end
 		for k, v in pairs(game.enemyLevelList) do
 		--game.enemyLevelList[k].speed=5
-		f(game.enemyLevelList[k])
+		muovi(game.enemyLevelList[k])
 	end
 	end
 
@@ -896,12 +896,15 @@ physics.setGravity( 0, 35 )
 	end
 	-- i nemici si muovono a destra e sinistra, lista
 	function muovi(object)		-- MERGED
+		object.isFixedRotation=true
 		function goLeft ()
 		transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
+		object.xScale=1
 		end
 
 		function goRight ()
 		transition.to( object, { time=1500, x=(object.x + 120), onComplete=goLeft } )
+		object.xScale=-1
 		end
 
 		goLeft()
