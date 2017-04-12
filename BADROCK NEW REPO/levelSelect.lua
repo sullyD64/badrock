@@ -5,7 +5,7 @@ local widget = require( "widget" )
 local utility = require("utilityMenu")
 -- Require "global" data table (http://coronalabs.com/blog/2013/05/28/tutorial-goodbye-globals/)
 -- This will contain relevant data like the current level, max levels etc.
-local myData = require( "mydata" )
+local myData = require( "myData" )
 
 
 -- -----------------------------------------------------------------------------------

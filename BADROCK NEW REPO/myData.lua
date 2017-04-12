@@ -19,6 +19,7 @@ M.settings.levels[3].score = 0
 M.settings.levels[4] = {}
 M.settings.levels[4].stars = 0
 M.settings.levels[4].score = 0
+M.settings.levels[5] = {}
 M.settings.levels[5].stars = 0
 M.settings.levels[5].score = 0
 return M
