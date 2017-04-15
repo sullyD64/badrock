@@ -492,11 +492,12 @@ physics.setGravity( 0, 50 )
 			
 			table.insert(frammenti , frammento)
 		end
-
+		--display.remove(game.steveSprite)
 		--Toglie la fisica ai frammenti dopo un tot tempo, rendendoli solo immagini
-		transition.to(frammenti, {time = 4000, onComplete = function()
+		transition.to(frammenti, {time = 2000, onComplete = function()
 			for i=1, #frammenti, 1 do
 				frammenti[i].isBodyActive = false
+				frammenti[i].alpha= 0
 			end
 		end})
 	end
@@ -589,7 +590,6 @@ physics.setGravity( 0, 50 )
 
 				audio.play( dangerSound )
 				steveDeathAnimation(game.steve.x , game.steve.y)
-
 				-- \\ CRITICAL CODE // --
 				controlsEnabled = false
 				SSVEnabled = false
@@ -602,6 +602,7 @@ physics.setGravity( 0, 50 )
 				if ( game.lives == 0 ) then
 					endGameScreen()
 				else
+					--if(game.steveSprite~=nil) then
 					transition.to(game.steveSprite, { alpha=0, time=0, onComplete = function() 
 						game.steve.isBodyActive = false
 						game.steveSprite:setSequence("idle")
@@ -609,10 +610,14 @@ physics.setGravity( 0, 50 )
 					end
 					} )
 
-					transition.to(game.steveSprite, { time=2000, onComplete = function() 
+					--gigi: durante tutta la transizione della morte e al momento della morte settiamo alpha a 0, dentro e fuori della transizione, poi oncomplete alpha a 1
+					game.steveSprite.alpha=0
+					transition.to(game.steveSprite, { alpha=0,time=2000, onComplete = function() 
 						restoreSteve()
+						game.steveSprite.alpha=1
 					end
 					} )
+					
 				end
 			end
 		end
@@ -847,6 +852,7 @@ physics.setGravity( 0, 50 )
 	end
 
 	local function actionTouch( event )
+
 		local attackDuration = 500
 		local actionBtn = event.target
 
@@ -1090,7 +1096,7 @@ physics.setGravity( 0, 50 )
 
 			game.map:getTileLayer("entities"):addObject( en )
 			table.insert (game.enemyLevelList , en)
-
+			--game.enemyLevelList.name="nemici"
 		--muovi(en)
 	
 		end
@@ -1148,10 +1154,35 @@ physics.setGravity( 0, 50 )
 		-- for k, v in pairs(game.enemyLevelList) do
 		-- 	game.enemyLevelList[k].speed=5	
 		-- end
-
+-- local nemici = game.enemyLevelList
+  
+-- -- Setup listener
+-- local myListener = function( event )
+--         muovi4(nemici)
+-- end
+  
+-- nemici:addEventListener( "nemici", myListener )
+  
+-- -- Sometime later, create an event and dispatch it
+-- local event = { name= "nemici", target=nemici }
+-- nemici:dispatchEvent( event )
 		for k, v in pairs(game.enemyLevelList) do
 			muovi(game.enemyLevelList[k])
 		end
+		
+		-- local movimento = function( event )
+  --   	muovi(game.enemyLevelList[1])
+		-- end
+		-- local timer3 = timer.performWithDelay( 0, movimento2 )
+		-- --Runtime:addEventListener( "timer", movimento )
+		
+
+		-- local movimento2 = function( event )
+  --   	muovi(game.enemyLevelList[3])
+		-- end
+		-- local timer2 = timer.performWithDelay( 1000, movimento2 )
+		-- Runtime:addEventListener( "timer2", movimento2 )
+
 	end
 
 	-- function prova()
@@ -1160,6 +1191,9 @@ physics.setGravity( 0, 50 )
 	-- end
 	-- end
 	
+
+
+
 	function f(object)
 		local angle= math.atan2(game.steve.y - object.y, game.steve.x - object.x) -- work out angle between target and missile
 		object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
