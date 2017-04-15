@@ -1087,6 +1087,7 @@ physics.setGravity( 0, 50 )
 				en.x = enemy.x
 				en.y = enemy.y
 				en.name = enemy.name
+				en.speed=1
 				--muovi4(en)
 
 			--assign the drop property only if there is a drop
@@ -1166,9 +1167,9 @@ physics.setGravity( 0, 50 )
 -- -- Sometime later, create an event and dispatch it
 -- local event = { name= "nemici", target=nemici }
 -- nemici:dispatchEvent( event )
-		for k, v in pairs(game.enemyLevelList) do
-			muovi(game.enemyLevelList[k])
-		end
+		-- for k, v in pairs(game.enemyLevelList) do
+		-- 	muovi(game.enemyLevelList[k])
+		-- end
 		
 		-- local movimento = function( event )
   --   	muovi(game.enemyLevelList[1])
@@ -1183,6 +1184,7 @@ physics.setGravity( 0, 50 )
 		-- local timer2 = timer.performWithDelay( 1000, movimento2 )
 		-- Runtime:addEventListener( "timer2", movimento2 )
 
+
 	end
 
 	-- function prova()
@@ -1194,10 +1196,20 @@ physics.setGravity( 0, 50 )
 
 
 
-	function f(object)
+	function follow(object)
+		if((object.x~=nil and object.y~=nil) and(game.steve.x~=nil and game.steve.y~=nil)) then
+		object.isFixedRotation=true
 		local angle= math.atan2(game.steve.y - object.y, game.steve.x - object.x) -- work out angle between target and missile
 		object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
 		object.y = object.y + (math.sin(angle) * object.speed) -- update y pos in relation to angle
+		
+		if(game.steve.x>object.x) then
+			object.xScale=-1
+		else object.xScale=1
+		end
+		end
+		print(object.name)
+		print(timer)
 	end
 
 	function muovi2(object,a,b)
@@ -1465,6 +1477,39 @@ physics.setGravity( 0, 50 )
 		game.loadUi()
 		game.loadPlayer()
 		game.loadEnemies()
+
+		local obj1=game.enemyLevelList[3]
+		if(obj1~=nil) then
+		local function move1()
+    	follow(game.enemyLevelList[3])
+		end
+		
+		Runtime:addEventListener( "enterFrame", move1 )
+		-- else
+		-- Runtime:removeEventListener("enterFrame", move1)
+		end
+		local obj2=game.enemyLevelList[2]
+		if(obj2~=nil) then
+		local function move2()
+    	follow(game.enemyLevelList[2])
+		end
+		
+		Runtime:addEventListener( "enterFrame", move2 )
+		-- else
+		-- Runtime:removeEventListener("enterFrame", move1)
+		end
+
+		local obj3=game.enemyLevelList[1]
+		if(obj3~=nil) then
+		local function move3()
+    	follow(game.enemyLevelList[1])
+		end
+		
+		Runtime:addEventListener( "enterFrame", move3 )
+		-- else
+		-- Runtime:removeEventListener("enterFrame", move1)
+		end
+
 		game.loadNPCS()
 		game.loadSounds()
 
