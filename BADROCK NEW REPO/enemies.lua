@@ -13,7 +13,7 @@ local enemies = {}
 		{
 		type = "paper",
 		lives = 1,
-		bounce = 0.1,
+		bounce = 0,
 		friction = 1.0,
 		density = 1.0,
 		image = "sprites/paper.png",
@@ -25,7 +25,7 @@ local enemies = {}
 		{
 		type = "sedia",
 		lives = 5,
-		bounce = 0.1,
+		bounce = 0,
 		friction = 1.0,
 		density = 1.0,
 		image = "sprites/sedia.png",

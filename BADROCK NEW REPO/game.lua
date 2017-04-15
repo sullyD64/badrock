@@ -1199,17 +1199,62 @@ physics.setGravity( 0, 50 )
 	function follow(object)
 		if((object.x~=nil and object.y~=nil) and(game.steve.x~=nil and game.steve.y~=nil)) then
 		object.isFixedRotation=true
+		--if(math.sqrt((object.x-game.steve.x)^2+(object.x-game.steve.y)^2)<=400) then
 		local angle= math.atan2(game.steve.y - object.y, game.steve.x - object.x) -- work out angle between target and missile
 		object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
-		object.y = object.y + (math.sin(angle) * object.speed) -- update y pos in relation to angle
+		--object.y = object.y + (math.sin(angle) * object.speed) -- update y pos in relation to angle
 		
+
 		if(game.steve.x>object.x) then
 			object.xScale=-1
 		else object.xScale=1
 		end
+		print(game.steve.y)
+		print(object.y)
+		--se steve è sopra una piattaforma non lontana dal nemico allora il nemico salta, non funziona
+		if(((object.y-game.steve.y)>0 and (object.y-game.steve.y)<1000) and (math.abs(game.steve.x-object.x)<40) ) then
+			local impulso= (game.steve.y-object.y)
+			object:applyLinearImpulse( 0, -impulso*4, object.x, object.y )
 		end
-		print(object.name)
-		print(timer)
+	
+		local vuoto = nil
+		local vuotoList = game.map:getObjectLayer("cadutaVuoto").objects
+
+		for k, v in pairs(vuotoList) do
+		vuoto = vuotoList[k]
+		--print(vuoto.name)
+		end
+		local direzione=math.abs(object.x-vuoto.x)
+		local distanzab= math.abs(direzione)
+		local distanzaverticalebordo= math.abs(object.y-vuoto.y)
+		--print(vuoto.x)
+
+		--i nemici disaggrano steve alla morte, bisogna sistemare il momento in cui lo considerano morto? sgommata se si rimane fermi...
+		if(game.steve.state == STATE_DIED) then
+
+			object.xScale=-1
+			transition.to(object,{time=3500,xScale=-1,x=(object.x+280)})
+		end
+		if(distanzab<=100 and distanzaverticalebordo<=100 and object.lives~=0 ) then
+			print("ciao")
+			
+			object:applyLinearImpulse( 0, -15, object.x, object.y )
+
+			--if(object.lives==0) then transition.to(object,{time=1000,alpha=0}) end
+			-- if(object.x-vuoto.x<=0) then	--
+			-- 	object.x=object.x+100
+			-- 	print(object.x)
+			-- 	print(object.y)
+			-- else
+			-- 	object.x=object.x-10
+			-- 	print(object.x)
+			-- 	print(object.y)
+			-- end
+		end
+		
+		
+		--end
+		end
 	end
 
 	function muovi2(object,a,b)
@@ -1464,6 +1509,17 @@ physics.setGravity( 0, 50 )
 			ui.getButtonByName("resumeBtn"):removeEventListener("touch",pauseResume)
 		end
 	  ]]
+		local function move1()
+    	follow(game.enemyLevelList[3])
+		end
+		
+		local function move2()
+    	follow(game.enemyLevelList[2])
+		end
+		
+		local function move3()
+    	follow(game.enemyLevelList[1])
+		end
 
 	function game.loadGame( map, spawn )
 		-- Locally stores the current level map and spawn coordinates
@@ -1480,9 +1536,7 @@ physics.setGravity( 0, 50 )
 
 		local obj1=game.enemyLevelList[3]
 		if(obj1~=nil) then
-		local function move1()
-    	follow(game.enemyLevelList[3])
-		end
+		
 		
 		Runtime:addEventListener( "enterFrame", move1 )
 		-- else
@@ -1490,9 +1544,7 @@ physics.setGravity( 0, 50 )
 		end
 		local obj2=game.enemyLevelList[2]
 		if(obj2~=nil) then
-		local function move2()
-    	follow(game.enemyLevelList[2])
-		end
+
 		
 		Runtime:addEventListener( "enterFrame", move2 )
 		-- else
@@ -1501,9 +1553,7 @@ physics.setGravity( 0, 50 )
 
 		local obj3=game.enemyLevelList[1]
 		if(obj3~=nil) then
-		local function move3()
-    	follow(game.enemyLevelList[1])
-		end
+
 		
 		Runtime:addEventListener( "enterFrame", move3 )
 		-- else
@@ -1542,6 +1592,9 @@ function game.pause()
 	game.steve.state = STATE_IDLE
 	game.steveSprite:pause()
 	physics.pause()
+	Runtime:removeEventListener( "enterFrame", move1 )
+	Runtime:removeEventListener( "enterFrame", move1 )
+	Runtime:removeEventListener( "enterFrame", move1 )
 	audio.pause(1)
 end
 
@@ -1549,6 +1602,9 @@ function game.resume()
 	game.state = GAME_RUNNING
 	game.steveSprite:play()
 	physics.start()
+	Runtime:addEventListener( "enterFrame", move1 )
+	Runtime:addEventListener( "enterFrame", move2 )
+	Runtime:addEventListener( "enterFrame", move3 )
 	audio.resume(1)
 end
 
