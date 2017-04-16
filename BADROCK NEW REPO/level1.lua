@@ -44,6 +44,7 @@ function scene:create( event )
 	local layer = mappa:getObjectLayer("playerSpawn")	
 	local spawn = layer:getObject("spawn0")
 	game.loadGame( mappa, spawn )
+	
 	--game.level = map
 	mainGroup = display.newGroup()
 	local steve = game.steve
@@ -220,6 +221,7 @@ function scene:show( event )
 		game.start()
 		
 	end
+	
 end
 
 -- hide()

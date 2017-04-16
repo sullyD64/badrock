@@ -14,6 +14,7 @@ local items    = require ( "items"        )
 local utility  = require ( "utilityMenu"  )
 local widget   = require ( "widget"		  )
 
+
 local game = {}
 
 physics.start()
@@ -468,7 +469,10 @@ physics.setGravity( 0, 50 )
 	            controlsEnabled = true
 	            game.steveSprite:play()
 	        end
-	    } )  
+	    } )
+	    --bisogna ricaricare anche i nemici, distruggili tutti e ricreali tutti da capo
+	    
+	    game.refreshEnemies()
 	end
 
 	--Steve "animation" that fires stones fragment when he dies
@@ -1194,12 +1198,18 @@ physics.setGravity( 0, 50 )
 	-- end
 	
 
-
-
+function game.refreshEnemies()
+	--qui per ora i va da 1 a 3, in seguito potrebbe aumentare
+	for i=1,3 do
+		game.enemyLevelList[i]:removeSelf()
+		
+	end
+		game.loadEnemies()
+end
 	function follow(object)
 		if((object.x~=nil and object.y~=nil) and(game.steve.x~=nil and game.steve.y~=nil)) then
 		object.isFixedRotation=true
-		--if(math.sqrt((object.x-game.steve.x)^2+(object.x-game.steve.y)^2)<=400) then
+		if(math.abs(object.x-game.steve.x)<=400) then
 		local angle= math.atan2(game.steve.y - object.y, game.steve.x - object.x) -- work out angle between target and missile
 		object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
 		--object.y = object.y + (math.sin(angle) * object.speed) -- update y pos in relation to angle
@@ -1209,8 +1219,8 @@ physics.setGravity( 0, 50 )
 			object.xScale=-1
 		else object.xScale=1
 		end
-		print(game.steve.y)
-		print(object.y)
+		--print(game.steve.y)
+		--print(object.y)
 		--se steve è sopra una piattaforma non lontana dal nemico allora il nemico salta, non funziona
 		if(((object.y-game.steve.y)>0 and (object.y-game.steve.y)<1000) and (math.abs(game.steve.x-object.x)<40) ) then
 			local impulso= (game.steve.y-object.y)
@@ -1231,12 +1241,18 @@ physics.setGravity( 0, 50 )
 
 		--i nemici disaggrano steve alla morte, bisogna sistemare il momento in cui lo considerano morto? sgommata se si rimane fermi...
 		if(game.steve.state == STATE_DIED) then
-
+			--print(game.state)
 			object.xScale=-1
-			transition.to(object,{time=3500,xScale=-1,x=(object.x+280)})
+			
+			local transition1= transition.to(object,{time=3500,xScale=-1,x=(object.x+280), })--onPause= function() print ("transition paused")end})
+			--transition.pause(transition1)
+			-- if(game.state==Paused) then
+			-- 	print("pausa")
+			-- 	transition.pause(transition1)
+			-- end
 		end
 		if(distanzab<=100 and distanzaverticalebordo<=100 and object.lives~=0 ) then
-			print("ciao")
+			
 			
 			object:applyLinearImpulse( 0, -15, object.x, object.y )
 
@@ -1253,7 +1269,7 @@ physics.setGravity( 0, 50 )
 		end
 		
 		
-		--end
+		end
 		end
 	end
 
@@ -1535,7 +1551,7 @@ physics.setGravity( 0, 50 )
 		game.loadEnemies()
 
 		local obj1=game.enemyLevelList[3]
-		if(obj1~=nil) then
+		if(obj1~=nil) then	--and game.state==GAME_RUNNING
 		
 		
 		Runtime:addEventListener( "enterFrame", move1 )
@@ -1543,23 +1559,23 @@ physics.setGravity( 0, 50 )
 		-- Runtime:removeEventListener("enterFrame", move1)
 		end
 		local obj2=game.enemyLevelList[2]
-		if(obj2~=nil) then
+		if(obj1~=nil) then
 
 		
 		Runtime:addEventListener( "enterFrame", move2 )
-		-- else
-		-- Runtime:removeEventListener("enterFrame", move1)
 		end
 
 		local obj3=game.enemyLevelList[1]
-		if(obj3~=nil) then
-
+		if(obj1~=nil) then
+		--print("ok")
 		
 		Runtime:addEventListener( "enterFrame", move3 )
-		-- else
-		-- Runtime:removeEventListener("enterFrame", move1)
 		end
 
+
+
+
+--Runtime:addEventListener("enterFrame", move2)
 		game.loadNPCS()
 		game.loadSounds()
 
@@ -1572,14 +1588,42 @@ physics.setGravity( 0, 50 )
 		physics.start()
 		physics.pause()
 	end
+
+	local cerchio= display.newCircle(10,10,10)
+		local function listener( event )
+    muovi(cerchio)
+   
+	end
+	timer1 = timer.performWithDelay( 0, listener )
+	timer.pause(timer1)
+	timer1._expired=false
+	print(game.state)
 ------------------------------------------------------------------------------------
+--local cerchio= display.newCircle(10,10,10)
+--local function listener( event )
+--    muovi(cerchio)
+--end
+  --timer1 = timer.performWithDelay( 2000, listener )  -- wait 2 seconds
 
+ 
+-- local function stop()
+--    transition.pause()
+-- end
 
+-- transition.to(cerchio,{y=offScreen*2,time=objSpeed*speedFactor})
+-- if resume==2 then timer.performWithDelay(1,stop)  end
 
 function game.start()
 	game.state = GAME_RUNNING
 	game.steveSprite:play()
 	physics.start()
+	
+	
+	--sono esclusive anche quando le metto nel listener
+
+	--timer.start(1)
+	
+
 	Runtime:addEventListener("enterFrame", moveCamera)
 	Runtime:addEventListener("collision", onCollision)
 	Runtime:addEventListener("collision", npcDetectByCollision)
@@ -1592,6 +1636,20 @@ function game.pause()
 	game.steve.state = STATE_IDLE
 	game.steveSprite:pause()
 	physics.pause()
+
+-- sometime later...
+--local result = timer.pause( timer1 )
+--print( "Time remaining is " .. result )
+
+--if(timer1) then print("esiste") local result= timer.pause(timer1) print(result) timer.cancel(timer1) end--timer.pause(timer1) end
+--timers.pause()
+	if(timer1) then timer1._expired=false end --if not timer1._expired then
+    timer.pause( timer1 )
+	--else
+    -- the timer is done, so house clean if you're done with it.
+   -- timer1 = nil
+--end end
+	--ATTENZIONE: se un nemico sta cadendo si muove per inerzia, da sistemare
 	Runtime:removeEventListener( "enterFrame", move1 )
 	Runtime:removeEventListener( "enterFrame", move1 )
 	Runtime:removeEventListener( "enterFrame", move1 )
@@ -1602,10 +1660,22 @@ function game.resume()
 	game.state = GAME_RUNNING
 	game.steveSprite:play()
 	physics.start()
+	if(game.enemyLevelList[1]) then game.enemyLevelList[1].speed=1 end
+	if(game.enemyLevelList[2]) then game.enemyLevelList[1].speed=2 end
+	if(game.enemyLevelList[3]) then game.enemyLevelList[1].speed=3 end
 	Runtime:addEventListener( "enterFrame", move1 )
 	Runtime:addEventListener( "enterFrame", move2 )
 	Runtime:addEventListener( "enterFrame", move3 )
 	audio.resume(1)
+	resume=2
+	--timer1 = timer.performWithDelay( 5000, listener )
+	--if(timer1) then timer.resume(timer1) end
+	if(timer1) then if not timer1._expired then
+    timer.resume( timer1 )
+	else
+    -- the timer is done, so house clean if you're done with it.
+    timer1 = nil
+end end
 end
 
 function game.stop()
