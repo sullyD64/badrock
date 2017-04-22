@@ -32,7 +32,19 @@ local enemies = {}
 		height = 113,
 		width = 70,
 		speed=0
-		}
+		},
+	--3
+		{
+		type = "mage",
+		lives = 1,
+		bounce = 0,
+		friction = 1.0,
+		density = 1.0,
+		image = "sprites/paper.png",
+		height = 40,
+		width = 40,
+		speed=0
+		},
 
 }
 

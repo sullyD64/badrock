@@ -13,7 +13,7 @@ local enemies  = require ( "enemies"      )
 local items    = require ( "items"        )
 local utility  = require ( "utilityMenu"  )
 local widget   = require ( "widget"		  )
-
+local platforms  = require ( "platforms"      )
 
 local game = {}
 
@@ -90,6 +90,7 @@ physics.setGravity( 0, 50 )
 			local xv, yv = game.steve:getLinearVelocity()
 			if (yv > 0 and letMeJump == false) then 
 				game.steve.canJump = false
+
 			elseif (yv == 0 and letMeJump == true) then
 				game.steve.canJump = true
 			end
@@ -468,11 +469,14 @@ physics.setGravity( 0, 50 )
 	            game.steve.state = STATE_IDLE
 	            controlsEnabled = true
 	            game.steveSprite:play()
+	            SSVEnabled = true
+	            game.steve.canJump=true
+
 	        end
 	    } )
 	    --bisogna ricaricare anche i nemici, distruggili tutti e ricreali tutti da capo
 	    
-	    game.refreshEnemies()
+	    game.restoreEnemies()
 	end
 
 	--Steve "animation" that fires stones fragment when he dies
@@ -546,6 +550,7 @@ physics.setGravity( 0, 50 )
 
 		if (event.phase == "began" and env.isGround) then
 			other.canJump = true
+
 			game.steve.isTouchingGround = true -- non usata
 		end
 		--[[
@@ -660,7 +665,9 @@ physics.setGravity( 0, 50 )
 				--Force the enemy to drop his item 			--MERGED
 				if ( hasAttribute(enemy,"drop") ) then dropItemFrom(enemy) end 
 					
+				--if(other~= nil and other.removeSelf ~= nil ) then 
 				timer.performWithDelay(5000, function() other:removeSelf() end)
+				--end
 				game.addScore(200) -- We will modify this
 			
 			else -- Enemy is still alive
@@ -768,9 +775,9 @@ physics.setGravity( 0, 50 )
 				else
 					game.steve.jumpForce = 0
 				end
-
+				
 				print("i:" ..i.. "| j:" ..j.. "	| jumpForce:" .. game.steve.jumpForce .. " | maths: " .. maths)
-
+				
 			end
 		end
 	end
@@ -840,6 +847,7 @@ physics.setGravity( 0, 50 )
 					print(" ")
 
 					game.steve.canJump = false
+					
 					letMeJump = false
 				end
 
@@ -1196,14 +1204,33 @@ physics.setGravity( 0, 50 )
 	-- transition.to( game.enemyLevelList[k], { time=1500, x=(game.enemyLevelList[k].x - 120), onComplete=prova()})
 	-- end
 	-- end
-	
+			
+function game.createFire(object)
+			fireball = display.newImageRect("sprites/fireball.png", 32, 32)
+			fireball.x=object.x-100
+			fireball.y=object.y
+			fireball.xScale=-1
+			fireball.yScale=-1
+			fireball.rotation=90
+			fireball.bodyType="static"
+			physics.addBody(fireball, {density = 1, friction = 1, bounce = 0.5})
+			fireball.gravityScale=0
+			fireball.isSensor=true
+			fireball.isEnemy=true
+			--fireball.speed=1
+			game.map:getTileLayer("entities"):addObject( fireball )
+			return fireball
+end
 
-function game.refreshEnemies()
+function game.restoreEnemies()
 	--qui per ora i va da 1 a 3, in seguito potrebbe aumentare
 	for i=1,3 do
-		game.enemyLevelList[i]:removeSelf()
 		
+			print(game.enemyLevelList[i]) print(i)
+			--game.enemyLevelList[i]=nil
+			if(game.enemyLevelList[i] and game.enemyLevelList[i].removeSelf ~= nil ) then game.enemyLevelList[i]:removeSelf() end
 	end
+		--game.enemyLevelList=nil
 		game.loadEnemies()
 end
 	function follow(object)
@@ -1244,7 +1271,7 @@ end
 			--print(game.state)
 			object.xScale=-1
 			
-			local transition1= transition.to(object,{time=3500,xScale=-1,x=(object.x+280), })--onPause= function() print ("transition paused")end})
+			local transition1= transition.to(object,{time=3500,xScale=-1,x=(object.x+280)})--onPause= function() print ("transition paused")end})
 			--transition.pause(transition1)
 			-- if(game.state==Paused) then
 			-- 	print("pausa")
@@ -1294,17 +1321,71 @@ end
 	function muovi(object)
 		object.isFixedRotation=true
 		function goLeft ()
-		transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
+		transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight
+			--,onResume=goLeft
+			 } )
 		object.xScale=1
 		end
 
 		function goRight ()
-		transition.to( object, { time=1500, x=(object.x + 120), onComplete=goLeft } )
+		transition.to( object, { time=1500, x=(object.x + 120), onComplete=goLeft
+			--, onResume=goRight
+			 } )
 		object.xScale=-1
 		end
 
 		goLeft()
 	end
+
+
+	function updown(object)
+		--object.isFixedRotation=true
+		function goUp ()
+		transition.to( object, { time=1500, y=(object.y - 120), onComplete=goDown
+			--,onResume=goLeft
+			 } )
+		--object.yScale=1
+		end
+
+		function goDown ()
+		transition.to( object, { time=1500, y=(object.y + 120), onComplete=goUp
+			--, onResume=goRight
+			 } )
+		--object.yScale=-1
+		end
+
+		goUp()
+	end
+
+
+	
+		
+
+		
+		
+
+	
+	function game.loadPlatforms()
+		game.platformLevelList = {}
+		local platform = nil
+		local platformList = game.map:getObjectLayer("piattaforme").objects
+
+		for k, v in pairs(platformList) do
+			platform = platformList[k]
+			
+			local p = platforms.createPlatform(platform, platform.type)
+				p.x = platform.x
+				p.y = platform.y
+				p.name = platform.name
+				p.speed=1
+
+			game.map:getTileLayer("entities"):addObject( p )
+			table.insert (game.platformLevelList , p)
+		
+	
+		end
+	end
+
 
 	function muovi4(table)
 		function goLeft ()
@@ -1537,6 +1618,7 @@ end
     	follow(game.enemyLevelList[1])
 		end
 
+
 	function game.loadGame( map, spawn )
 		-- Locally stores the current level map and spawn coordinates
 		game.map = map
@@ -1549,6 +1631,33 @@ end
 		game.loadUi()
 		game.loadPlayer()
 		game.loadEnemies()
+		game.loadPlatforms()
+
+
+
+		
+		obj4=game.enemyLevelList[4]
+		if(obj4~=nil) then
+			--local fireball=game.createFire(obj4)
+			fireball = display.newImageRect("sprites/fireball.png", 32, 32)
+			fireball.x=obj4.x-100
+			fireball.y=obj4.y
+			fireball.xScale=-1
+			fireball.yScale=-1
+			fireball.rotation=90
+			fireball.bodyType="dynamic"
+			physics.addBody(fireball, {density = 1, friction = 1, bounce = 0.5})
+			fireball.gravityScale=0.05
+			fireball.isSensor=true
+			fireball.isEnemy=true
+			fireball.speed=1
+			game.map:getTileLayer("entities"):addObject( fireball )
+			--muovi(fireball)
+			local function move4()
+    		follow(fireball)
+			end
+			Runtime:addEventListener( "enterFrame", move4 )
+		end
 
 		local obj1=game.enemyLevelList[3]
 		if(obj1~=nil) then	--and game.state==GAME_RUNNING
@@ -1590,14 +1699,20 @@ end
 	end
 
 	local cerchio= display.newCircle(10,10,10)
-		local function listener( event )
+	local function listener( event )
     muovi(cerchio)
-   
 	end
 	timer1 = timer.performWithDelay( 0, listener )
-	timer.pause(timer1)
+	--timer.pause(timer1)
 	timer1._expired=false
 	print(game.state)
+
+	local function saliscendi(event)
+	updown(game.platformLevelList[1])
+	end
+
+	timer2=  timer.performWithDelay(0,saliscendi)
+	timer2._expired=false
 ------------------------------------------------------------------------------------
 --local cerchio= display.newCircle(10,10,10)
 --local function listener( event )
@@ -1644,7 +1759,7 @@ function game.pause()
 --if(timer1) then print("esiste") local result= timer.pause(timer1) print(result) timer.cancel(timer1) end--timer.pause(timer1) end
 --timers.pause()
 	if(timer1) then timer1._expired=false end --if not timer1._expired then
-    timer.pause( timer1 )
+    --timer.pause( timer1 )
 	--else
     -- the timer is done, so house clean if you're done with it.
    -- timer1 = nil
@@ -1654,6 +1769,7 @@ function game.pause()
 	Runtime:removeEventListener( "enterFrame", move1 )
 	Runtime:removeEventListener( "enterFrame", move1 )
 	audio.pause(1)
+	transition.pause()
 end
 
 function game.resume()
@@ -1670,12 +1786,13 @@ function game.resume()
 	resume=2
 	--timer1 = timer.performWithDelay( 5000, listener )
 	--if(timer1) then timer.resume(timer1) end
-	if(timer1) then if not timer1._expired then
-    timer.resume( timer1 )
-	else
-    -- the timer is done, so house clean if you're done with it.
-    timer1 = nil
-end end
+-- 	if(timer1) then if not timer1._expired then
+--     timer.resume( timer1 )
+-- 	else
+--     -- the timer is done, so house clean if you're done with it.
+--     timer1 = nil
+-- end end
+transition.resume()
 end
 
 function game.stop()
