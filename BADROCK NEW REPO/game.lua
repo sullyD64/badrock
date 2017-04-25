@@ -13,6 +13,7 @@ local enemies  = require ( "enemies"      )
 local items    = require ( "items"        )
 local utility  = require ( "utilityMenu"  )
 local widget   = require ( "widget"		  )
+local collisions=require ( "collisions"   )
 
 local game = {}
 
@@ -21,24 +22,25 @@ physics.setGravity( 0, 50 )
 
 --===========================================-- 
 
-	local GAME_RUNNING    = "Running"
-	local GAME_PAUSED     = "Paused"
-	local GAME_RESUMED	  = "Resumed"
-	local GAME_ENDED	  = "Ended"
-	local STATE_IDLE 	  = "Idle"
-	local STATE_WALKING   = "Walking"
-	local STATE_JUMPING   = "Jumping"
-	local STATE_ATTACKING = "Attacking"
-	local STATE_DIED	  = "Died"
-	local DIRECTION_LEFT  = -1
-	local DIRECTION_RIGHT =  1
-	local MAX_LIVES 	  =  3
+	game.GAME_RUNNING    = "Running"
+	game.GAME_PAUSED     = "Paused"
+	game.GAME_RESUMED	  = "Resumed"
+	game.GAME_ENDED	  = "Ended"
+	game.STATE_IDLE 	  = "Idle"
+	game.STATE_WALKING   = "Walking"
+	game.STATE_JUMPING   = "Jumping"
+	game.STATE_ATTACKING = "Attacking"
+	game.STATE_DIED	  = "Died"
+	game.DIRECTION_LEFT  = -1
+	game.DIRECTION_RIGHT =  1
+	game.MAX_LIVES 	  =  3
 
-	local buttonPressed -- Never used
+	game.letMeJump = false
+	game.SSVEnabled = true
+	game.controlsEnabled = true
 	--local game.levelCompleted		-- non si può dichiarare qui
-	local posX, posY
 	local spawnX, spawnY
-	local controlsEnabled, SSVEnabled, SSVLaunched, SSVType, letMeJump
+	local SSVLaunched, SSVType
 
 --===========================================-- 
 
@@ -70,8 +72,6 @@ physics.setGravity( 0, 50 )
 	end
 
 	local function onUpdate ()
-		posX = game.steve.x
-		posY = game.steve.y
 
 		--	game.steveSprite.x , game.steveSprite.y = posX , posY
 		if((game.steve.x) and (game.steve.y)) then
@@ -85,14 +85,15 @@ physics.setGravity( 0, 50 )
 		-- 1) The player is touching the ground (see jumpTouch())
 		-- 2) The player isn't falling (his vertical speed is greater than 0)
 		-- This block checks the second condition.
-		if (SSVEnabled) then
+		if (game.SSVEnabled) then
 			local xv, yv = game.steve:getLinearVelocity()
-			if (yv > 0 and letMeJump == false) then 
+			if (yv > 0 and game.letMeJump == false) then 
 				game.steve.canJump = false
-			elseif (yv == 0 and letMeJump == true) then
+			elseif (yv == 0 and game.letMeJump == true) then
 				game.steve.canJump = true
 			end
 
+			-- Setting the AirState, needed for the Animation controls
 			if(yv > 0) then
 				game.steve.airState= "Falling"
 			elseif(yv < 0) then
@@ -102,80 +103,14 @@ physics.setGravity( 0, 50 )
 			end
 		end
 
-		-- Setting the AirState, needed for the Animation controls
-		
-			-- flag = game.steveSprite.sequence
-			-- --Animation settings based on the steve states
-			-- if((game.steve.state == STATE_WALKING) and game.steve.airState == "Idle") then
-
-			-- 	game.steveSprite:setSequence("walking")
-			-- 	game.testSprite:setSequence("walking")
-			-- 	--game.testSprite:play()
-			-- 	print("TEST Play()") 
-				
-			-- 	if(flag ~= "walking") then 
-			-- 		print("Flag PRIMA: "..flag)
-			-- 		for i=0, 10 do
-			-- 		game.testSprite:play() 
-			-- 		print("Play")
-			-- 		 end
-			-- 		game.steveSprite:play()
-			-- 		--print("---------------Ho fatto play allo sprite")
-			-- 		flag = game.steveSprite.sequence
-			-- 		--print("Flag DOPO "..flag)
-			-- 	end
-			-- 	--	print("Ho fatto play allo sprite") end
-
-			-- elseif((game.steve.state == STATE_IDLE) and game.steve.airState == "Idle") then
-			-- 	game.steveSprite:setSequence("idle")
-			-- 	--game.testSprite:setSequence
-				
-			-- 	if(flag ~= "idle") then 
-			-- 		--game.testSprite:play() 
-			-- 		--game.steveSprite:play()
-			-- 		flag = game.steveSprite.sequence
-			-- 	end
-				
-
-			-- elseif(game.steve.airState == "Falling") then
-			-- 	game.steveSprite:setSequence("falling")
-			-- 	if(flag ~= "falling") then 
-			-- 		--game.testSprite:play() 
-			-- 		--game.steveSprite:play()
-			-- 		flag = game.steveSprite.sequence
-			-- 	end
-			-- 	--game.testSprite:setSequence("falling")
-			-- 	--game.testSprite:play()
-
-			-- elseif(game.steve.airState == "Jumping") then
-			-- 	game.steveSprite:setSequence("jumping")
-			-- 	if(flag ~= "jumping") then 
-			-- 		--game.testSprite:play() 
-			-- 		--game.steveSprite:play()
-			-- 		flag = game.steveSprite.sequence
-			-- 	end
-			-- 	--game.steveSprite:play()
-			-- 	-- game.testSprite:setSequence("walking")
-			-- 	-- if(flag ~= "walking") then 
-			-- 	-- 	game.testSprite:play()
-			-- 	-- 	print("HO fatto Play") 
-			-- 	-- 	flag = game.testSprite.sequence
-			-- 	-- end
-			-- end
-
-			-- if(game.steve.state == STATE_ATTACKING) then
-			-- 	game.steveSprite.alpha = 0
-			-- else
-			-- 	if(game.steveSprite.alpha == 0) then game.steveSprite.alpha = 1 end
-			-- end
 
 		local state = game.state
-		if (state == GAME_RUNNING) then
-		elseif (state == GAME_RESUMED) then
+		if (state == game.GAME_RUNNING) then
+		elseif (state == game.GAME_RESUMED) then
 			game.resume()
-		elseif (state == GAME_PAUSED) then
+		elseif (state == game.GAME_PAUSED) then
 			game.pause()
-		elseif (state == GAME_ENDED) then
+		elseif (state == game.GAME_ENDED) then
 			game.stop() 
 		end
 	end
@@ -189,15 +124,14 @@ physics.setGravity( 0, 50 )
     local pausePanel, bgVolume, bgMuteBtn, fxVolume, fxMuteBtn
 
     local function onMenuBtnRelease()  
-        local psbutton = ui.getButtonByName("pauseBtn")
-		local rsbutton = ui.getButtonByName("resumeBtn")
         pausePanel:hide({
             speed = 250,
             transition = easing.outElastic
         })
-        game.state = GAME_RESUMED
-		psbutton.isVisible = true
-		rsbutton.isVisible = false
+        game.state = game.GAME_RESUMED
+
+		ui.pauseButton.isVisible = true
+		ui.resumeButton.isVisible = false
         composer.gotoScene( "menu", { effect="fade", time=280 } )
         return true
     end
@@ -368,24 +302,22 @@ physics.setGravity( 0, 50 )
 -- MISCELLANEOUS FUNCTIONS ---------------------------------------------------------
 
 	 function game.addScore(points)
-		local pointsText = ui.getButtonByName("pointsText")
-		local scoreText = ui.getButtonByName("scoreText")
 		
 		game.score = game.score + points
-		scoreText.text = "Score: " .. game.score
+		ui.scoreText.text = "Score: " .. game.score
 		local pointsTimer = 250
 
-		if (pointsText.isVisible == false) then
-			pointsText.text = ("+" .. points)
-			pointsText.isVisible = true 
+		if (ui.pointsText.isVisible == false) then
+			ui.pointsText.text = ("+" .. points)
+			ui.pointsText.isVisible = true 
 			pointsTimer = 250
 		end
 
 		local pointsFade = function () 
-			transition.to( pointsText, { alpha = 0, time = 250, effect = "crossfade", 
+			transition.to( ui.pointsText, { alpha = 0, time = 250, effect = "crossfade", 
 				onComplete = function() 
-					pointsText.isVisible = false
-					pointsText.alpha = 1
+					ui.pointsText.isVisible = false
+					ui.pointsText.alpha = 1
 				end
 				} ) 
 			end
@@ -394,26 +326,16 @@ physics.setGravity( 0, 50 )
 
 	--Add a life to our lives
 	function game.addLife()
-		if(game.lives < MAX_LIVES ) then
+		if(game.lives < game.MAX_LIVES ) then
 			game.lives = game.lives + 1
-			updateLifeIcons()
-		end
-	end
-
-	--Update Life Icons: Works if we Lose or if we Get Lives
-	function updateLifeIcons()
-		for i=1, #game.lifeIcons do
-			if( i <= game.lives) then
-				game.lifeIcons[i].isVisible = true
-			else
-				game.lifeIcons[i].isVisible = false
-			end
+			ui.updateLifeIcons(game.lives)
 		end
 	end
 
 	-- Endgame handler
-	local function endGameScreen()
-		SSVEnabled = false 		-- Prevents setSteveVelocity from accessing the physical Steve object
+	 function game.endGameScreen()
+		game.SSVEnabled = false 		-- Prevents setSteveVelocity from accessing the physical Steve object
+		game.controlsEnabled = false
 		game.map:setFocus( nil )
 		display.remove(game.steve)
 		display.remove(game.steveSprite)
@@ -443,12 +365,12 @@ physics.setGravity( 0, 50 )
 		end
 		timer.performWithDelay( 1500, endGame )
 
-		game.state = GAME_ENDED
+		game.state = game.GAME_ENDED
 		return true
 	end
 
 	-- Restores Steve at the current spawn point
-	local function restoreSteve()
+	function game.restoreSteve()
 		transition.to(game.steve, { time=0, onComplete = function()
 			game.steve.isBodyActive = false
 			game.steve.x, game.steve.y = spawnX, spawnY
@@ -457,22 +379,22 @@ physics.setGravity( 0, 50 )
 		game.map:fadeToPosition (spawnX, spawnY, 250)
 		
 		game.steve:setLinearVelocity( 0, 0 )
-	    game.steve.state = STATE_IDLE
+	    game.steve.state = game.STATE_IDLE
 	    game.steve.canJump = false
 
 	    -- Fade in Steve's sprite
 	    transition.to( game.steveSprite, { alpha = 1, time = 1000,
 	        onComplete = function()
 	            game.steve.isBodyActive = true
-	            game.steve.state = STATE_IDLE
-	            controlsEnabled = true
+	            game.steve.state = game.STATE_IDLE
+	            game.controlsEnabled = true
 	            game.steveSprite:play()
 	        end
 	    } )  
 	end
 
 	--Steve "animation" that fires stones fragment when he dies
-	local function steveDeathAnimation(sx, sy)
+	function game.steveDeathAnimation(sx, sy)
 		-- body
 		local frammenti = {}
 		local numRocce = 10
@@ -504,7 +426,7 @@ physics.setGravity( 0, 50 )
 
 
 	--Return True if an object has that attribute or not
-	local function hasAttribute( obj , attributeName )		--MERGED
+	function game.hasAttribute( obj , attributeName )		--MERGED
 		--attributeName must be a String
 
 		local ris = false
@@ -517,7 +439,7 @@ physics.setGravity( 0, 50 )
 		return ris
 	end 
 
-	local function dropItemFrom( enemy )
+	function game.dropItemFrom( enemy )
 		--Crea l'item contenuto nell'attributo Drop di Enemy
 	
 		local item = items.createItem(enemy.drop)
@@ -528,212 +450,16 @@ physics.setGravity( 0, 50 )
 ------------------------------------------------------------------------------------
 
 -- COLLISION HANDLERS --------------------------------------------------------------
+local function onCollision( event )
+	collisions.onCollision( event , game )
+end
 
-	-- Collision with Environments (Generic)
-	local function environmentCollision( event )
-		local env = event.object1
-		local other = event.object2
-
-		if(event.object2.isGround) then 
-			env = event.object2
-			other = event.object1
-		end
-
-		if (event.phase == "began" and env.isGround) then
-			other.canJump = true
-			game.steve.isTouchingGround = true -- non usata
-		end
-		--[[
-		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-			timer.performWithDelay( 250, function() other.canJump = false end )
-			print("collision ended")
-		end
-		]]
-	end
-
-	-- Collision with Coins (Only for Steve)
-	local function coinCollision( event )
-		local steve = event.object1
-		local coin = event.object2
-
-		if(event.object2.myName =="steve") then 
-			steve = event.object2
-			coin = event.object1
-		end
-
-		if ( event.phase == "began" ) then
-			audio.play( coinSound )
-			coin.BodyType = "dynamic"
-			display.remove( coin )
-			addScore(100)
-
-		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-		end
-	end
-
-	-- Collision with enemies and dangerous things (Only for Steve)
-	local function dangerCollision( event )
-		--steveDeathAnimation(game.steve.x , game.steve.y)
-		local other = event.object2
-		if(event.object2.myName == "steve") then
-			other = event.object1
-		end
-
-		-- Avoid Steve to take damage from enemy while attacking 
-		-- (but only if the enemy isn't invincible)
-		if ( (game.steve.state ~= STATE_ATTACKING and (other.isEnemy or other.isDanger) ) or
-			 (game.steve.state == STATE_ATTACKING and other.isDanger) ) then 
-
-			if (game.steve.state ~= STATE_DIED) then 
-				game.steve.state = STATE_DIED
-
-				audio.play( dangerSound )
-				steveDeathAnimation(game.steve.x , game.steve.y)
-
-				-- \\ CRITICAL CODE // --
-				controlsEnabled = false
-				SSVEnabled = false
-				-- NON SPOSTARE CANI MALEDETTI --
-
-				game.lives = game.lives - 1
-				--ui.getButtonByName("livesText").text = "Lives: " .. game.lives
-				updateLifeIcons()	--Refresh the Life Icons
-				
-				if ( game.lives == 0 ) then
-					endGameScreen()
-				else
-					transition.to(game.steveSprite, { alpha=0, time=0, onComplete = function() 
-						game.steve.isBodyActive = false
-						game.steveSprite:setSequence("idle")
-						game.steveSprite:pause()
-					end
-					} )
-
-					transition.to(game.steveSprite, { time=2000, onComplete = function() 
-						restoreSteve()
-					end
-					} )
-				end
-			end
-		end
-	end
-
-	-- Collision with the Steve Attack
-	local function steveAttackCollision( event )
-		local attack = event.object1
-		local other = event.object2
-
-		if(other.myName == "steveAttack") then
-			attack = event.object2
-			other = event.object1
-		end
-
-		--salvo localmente alcuni attributi del nemico prima che, venendo colpito e ucciso, li perda
-		local enemy = {}
-		enemy.drop = other.drop
-		enemy.name = other.name 
-		enemy.x = other.x
-		enemy.y = other.y
-
-		-- Other is an enemy, targettable AND not invincible
-		if( other.isEnemy and other.isTargettable == true ) then 
-			other.lives = other.lives - 1
-
-			other.alpha = 0.5 -- Make the enemy temporairly untargettable 
-			other.isTargettable = false
-
-			if ( other.lives == 0 ) then -- Enemy has no lives left
-				other.isSensor = true
-				other.isEnemy = false
-				timer.performWithDelay(1000, other:applyLinearImpulse( 0.05, -0.30, other.x, other.y ))
-				other.yScale = -1
-
-				--Force the enemy to drop his item 			--MERGED
-				if ( hasAttribute(enemy,"drop") ) then dropItemFrom(enemy) end 
-					
-				timer.performWithDelay(5000, function() other:removeSelf() end)
-				game.addScore(200) -- We will modify this
-			
-			else -- Enemy is still alive
-				
-				local removeMobImmunity = function() 
-					other.alpha=1 
-					other.isTargettable = true
-				end
-				timer.performWithDelay(500, removeMobImmunity)
-
-				-- Knocks back the enemy
-				if (other.x > game.steve.x) then other:applyLinearImpulse(1,1,other.x,other.y) 
-				elseif (other.x < game.steve.x) then other:applyLinearImpulse(-1,1,other.x,other.y)
-				end
-			end
-
-		-- If the object is a item that can be destroyed from steve attacks
-		elseif( other.canBeBroken ) then
-			display.remove(other)
-		end
-	end
-
-	-- General index for every Collision handler in Game
-	local function onCollision( event )
-		-- Index for collisions involving the player
-		if ( (event.object1.myName == "steve") or 
-			 (event.object2.myName == "steve") ) then
-			
-			local steve = event.object1
-			local other = event.object2
-
-			if(other.myName =="steve") then 
-				steve = event.object2
-				other = event.object1
-			end
-
-			if(other.myName == "env" or other.myName == "platform") then
-				environmentCollision(event)
-			elseif (other.myName == "item") then
-				items.itemCollision(game , event, other)
-			elseif (other.isEnemy or other.isDanger) then
-				dangerCollision(event)
-			-- Special case for the level's ending block. Triggers the "Endgame" handler
-			elseif(other.myName == "end_level") then
-				game.levelCompleted = true
-				controlsEnabled = false
-				SSVEnabled = false
-				endGameScreen()
-			else
-				letMeJump = true -- force enable the jump
-			end
-
-		-- Index for collisions involving the player attacking effects
-		elseif( (event.object1.myName == "steveAttack") or 
-			    (event.object2.myName == "steveAttack") ) then
-			steveAttackCollision( event )
-		end
-	end
-
-	-- Allows steve to pass through certain platforms when jumping from below the tile's base
-	local function stevePreCollision( self, event )
-		if ( event.other.myName == "platform" ) then
-
-			-- Compare Y position of character "base" to platform top
-			-- A slight increase (0.2) is added to account for collision location inconsistency
-			-- If collision position is greater than platform top, void/disable the specific collision
-			if ( self.y+(self.height*0.5) > event.other.y-(event.other.height*0.5)+0.2 ) then
-				if event.contact then
-					event.contact.isEnabled = false
-					-- The jump policy is disabled temporairly while the player is passing through
-					self.canJump = false
-				end
-			end
-		end
-		return true
-	end
 ------------------------------------------------------------------------------------
 
 -- CONTROLS HANDLERS ---------------------------------------------------------------
 	
 	local function setSteveVelocity()
-		if (SSVEnabled) then
+		if (game.SSVEnabled) then
 			SSVLaunched = true
 
 			-- ActualSpeed is needed for allowing combinations of two-dimensional movements.
@@ -748,7 +474,7 @@ physics.setGravity( 0, 50 )
 				game.steve:setLinearVelocity(steveXV, game.steve.actualSpeed )
 				game.steve:applyForce(0, game.steve.jumpForce, game.steve.x, game.steve.y)
 
-				if (game.steve.state == STATE_JUMPING and game.steve.jumpForce > - 400 and j ~= 0) then
+				if (game.steve.state == game.STATE_JUMPING and game.steve.jumpForce > - 400 and j ~= 0) then
 					j = j - 1
 					i = i + 1
 
@@ -768,24 +494,22 @@ physics.setGravity( 0, 50 )
 
 	local function dpadTouch(event)
 		local target = event.target
-		local lbutton = ui.getButtonByName("dpadLeft")
-		local rbutton = ui.getButtonByName("dpadRight")
-
-		if (game.state == GAME_RUNNING) then
+		
+		if (game.state == game.GAME_RUNNING) then
 			if (event.phase == "began") then
 				display.currentStage:setFocus( target, event.id )
 
 				if (target.myName == "dpadLeft") then
-					game.steve.direction = DIRECTION_LEFT
-					lbutton.alpha = 0.8
+					game.steve.direction = game.DIRECTION_LEFT
+					ui.dpadLeft.alpha = 0.8
 				elseif (target.myName == "dpadRight") then
-					game.steve.direction = DIRECTION_RIGHT
-					rbutton.alpha = 0.8
+					game.steve.direction = game.DIRECTION_RIGHT
+					ui.dpadRight.alpha = 0.8
 				end
 
-				if (controlsEnabled) then
-					SSVEnabled = true
-					game.steve.state = STATE_WALKING
+				if (game.controlsEnabled) then
+					game.SSVEnabled = true
+					game.steve.state = game.STATE_WALKING
 
 					--avoid walking animation in mid air
 					if(game.steve.airState == "Idle" or game.steve.airState == nil) then
@@ -800,12 +524,12 @@ physics.setGravity( 0, 50 )
 				end
 
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
-				game.steve.state = STATE_IDLE
+				game.steve.state = game.STATE_IDLE
 				game.steveSprite:setSequence("idle")
 
 				Runtime:removeEventListener("enterFrame", setSteveVelocity)	
 
-				lbutton.alpha, rbutton.alpha = 0.1, 0.1
+				ui.dpadLeft.alpha, ui.dpadRight.alpha = 0.1, 0.1
 				display.currentStage:setFocus( target, nil )
 			end
 		end
@@ -814,12 +538,12 @@ physics.setGravity( 0, 50 )
 	end
 
 	local function jumpTouch(event)
-		if (game.state == GAME_RUNNING) then
+		if (game.state == game.GAME_RUNNING) then
 			if (event.phase == "began") then
 				display.currentStage:setFocus( event.target, event.id )
-				if (controlsEnabled and game.steve.canJump == true) then
+				if (game.controlsEnabled and game.steve.canJump == true) then
 					audio.play( jumpSound )
-					game.steve.state = STATE_JUMPING
+					game.steve.state = game.STATE_JUMPING
 
 					SSVType = "jump"
 					Runtime:addEventListener("enterFrame", setSteveVelocity)
@@ -831,12 +555,12 @@ physics.setGravity( 0, 50 )
 					print(" ")
 
 					game.steve.canJump = false
-					letMeJump = false
+					game.letMeJump = false
 				end
 
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
 				display.currentStage:setFocus( event.target, nil )
-				game.steve.state = STATE_IDLE
+				game.steve.state = game.STATE_IDLE
 				game.steve.jumpForce = 0
 				game.steveSprite:setSequence("idle")
 				Runtime:removeEventListener("enterFrame", setSteveVelocity)	
@@ -850,16 +574,16 @@ physics.setGravity( 0, 50 )
 		local attackDuration = 500
 		local actionBtn = event.target
 
-		if (game.state == GAME_RUNNING) then
+		if (game.state == game.GAME_RUNNING) then
 			if (event.phase=="began" and actionBtn.active == true) then
 				display.currentStage:setFocus( actionBtn )
 
-				if (controlsEnabled) then
+				if (game.controlsEnabled) then
 					audio.play( attackSound )
 
 					actionBtn.active = false
 					actionBtn.alpha = 0.5
-					game.steve.state = STATE_ATTACKING
+					game.steve.state = game.STATE_ATTACKING
 					steveAttack = display.newCircle( game.steve.x, game.steve.y, 40)
 					physics.addBody(steveAttack, {isSensor = true})
 					steveAttack.myName = "steveAttack"
@@ -879,7 +603,7 @@ physics.setGravity( 0, 50 )
 					-- Handle the end of the SteveAttack phase
 					local steveAttackStop = function ()
 						display.remove(steveAttack)
-						game.steve.state = STATE_IDLE
+						game.steve.state = game.STATE_IDLE
 						Runtime:removeEventListener("enterFrame" , steveAttackFollowingSteve)
 						actionBtn.active = true
 						actionBtn.alpha = 1
@@ -899,22 +623,20 @@ physics.setGravity( 0, 50 )
 
 	local function pauseResume(event)
 		local target = event.target
-		local psbutton = ui.getButtonByName("pauseBtn")
-		local rsbutton = ui.getButtonByName("resumeBtn")
-		
+	
 		if (event.phase == "began") then
 			display.currentStage:setFocus( target )
 
 		elseif (event.phase == "ended" or "cancelled" == event.phase) then
 			if (target.myName == "pauseBtn") then
-				game.state = GAME_PAUSED
-		        psbutton.isVisible = false
-		        rsbutton.isVisible = true
+				game.state = game.GAME_PAUSED
+		        ui.pauseBtn.isVisible = false
+		        ui.resumeBtn.isVisible = true
 		        pausePanel:show({ y = display.screenOriginY+225,})
 		    elseif (target.myName == "resumeBtn") then
-		    	game.state = GAME_RESUMED
-		    	psbutton.isVisible = true
-		        rsbutton.isVisible = false
+		    	game.state = game.GAME_RESUMED
+		    	ui.pauseBtn.isVisible = true
+		        ui.resumeBtn.isVisible = false
 		        pausePanel:hide()
 		    end
 		    display.currentStage:setFocus( nil )
@@ -926,7 +648,7 @@ physics.setGravity( 0, 50 )
 	--// DA COMPLETARE //
 	local function balloonTouch(event) 
 		local target = event.target
-		if (game.state == GAME_RUNNING) then
+		if (game.state == game.GAME_RUNNING) then
 			if (event.phase == "began") then
 				display.currentStage:setFocus( event.target )
 
@@ -1055,13 +777,13 @@ physics.setGravity( 0, 50 )
 		game.steve.maxJumpForce = -20
 		physics.addBody( game.steve, { density=1.0, friction=0.7, bounce=0.01} )
 		game.steve.isFixedRotation = true
-		game.steve.state = STATE_IDLE
-		game.steve.direction = DIRECTION_RIGHT
+		game.steve.state = game.STATE_IDLE
+		game.steve.direction = game.DIRECTION_RIGHT
 		game.steve.canJump = false
 
 		game.steve.x, game.steve.y = spawnX, spawnY
 
-		game.steve.preCollision = stevePreCollision
+		game.steve.preCollision = collisions.stevePreCollision
 		game.steve:addEventListener( "preCollision", game.steve )
 	end
 
@@ -1362,30 +1084,22 @@ physics.setGravity( 0, 50 )
 	end
 
 	function game.loadUi()
-		game.ui = ui.loadUi()
+		game.ui = ui.loadUi(game)
 
-		local jumpScreen = ui.createJumpScreen()
-		game.map:getTileLayer("JUMPSCREEN"):addObject(jumpScreen)
-		jumpScreen:addEventListener( "touch", jumpTouch )
+		game.map:getTileLayer("JUMPSCREEN"):addObject(ui.jumpScreen)
+		ui.jumpScreen:addEventListener( "touch", jumpTouch )
 
 		-- Add the UI event listeners
 		--ui.getButtonByName("jumpScreen"):addEventListener("touch", jumpTouch)
-		ui.getButtonByName("dpadLeft"):addEventListener("touch", dpadTouch)
-		ui.getButtonByName("dpadRight"):addEventListener("touch", dpadTouch)
-		ui.getButtonByName("actionBtn"):addEventListener("touch", actionTouch)
-		ui.getButtonByName("pauseBtn"):addEventListener("touch", pauseResume)
-		ui.getButtonByName("resumeBtn"):addEventListener("touch",pauseResume)
+		ui.dpadLeft:addEventListener("touch", dpadTouch)
+		ui.dpadRight:addEventListener("touch", dpadTouch)
+		ui.actionBtn:addEventListener("touch", actionTouch)
+		ui.pauseBtn:addEventListener("touch", pauseResume)
+		ui.resumeBtn:addEventListener("touch",pauseResume)
 		
-		-- Display the number of starting lives (specified by MAX_LIVES)
-		-- ui.getButtonByName("livesText").text = "Lives: ".. game.lives
-		-- Display the life icon structure
-		game.lifeIcons = ui.createLifeIcons(game.lives)
-
-		local dpadLeft = ui.getButtonByName("dpadLeft")
-		local dpadRight = ui.getButtonByName("dpadRight")
 		local function grayOut()
-			transition.to( dpadLeft, {time = 1000, alpha = 0.1}  ) 
-			transition.to( dpadRight, {time = 1000, alpha = 0.1} ) 
+			transition.to( ui.dpadLeft, {time = 1000, alpha = 0.1}  ) 
+			transition.to( ui.dpadRight, {time = 1000, alpha = 0.1} ) 
 		end
 		timer.performWithDelay( 2000, grayOut)
 	end
@@ -1425,7 +1139,7 @@ physics.setGravity( 0, 50 )
 		spawnX, spawnY = spawn.x, spawn.y
 
 		game.score = 0
-		game.lives = MAX_LIVES
+		game.lives = game.MAX_LIVES
 		game.levelCompleted = false
 
 		game.loadUi()
@@ -1436,8 +1150,8 @@ physics.setGravity( 0, 50 )
 
 		game.loadPlayerSensors()
 
-		SSVEnabled = true
-		controlsEnabled = true
+		game.SSVEnabled = true
+		game.controlsEnabled = true
 		SSVLaunched = false
 
 		physics.start()
@@ -1448,7 +1162,7 @@ physics.setGravity( 0, 50 )
 
 
 function game.start()
-	game.state = GAME_RUNNING
+	game.state = game.GAME_RUNNING
 	game.steveSprite:play()
 	physics.start()
 	Runtime:addEventListener("enterFrame", moveCamera)
@@ -1460,14 +1174,14 @@ function game.start()
 end
 
 function game.pause()
-	game.steve.state = STATE_IDLE
+	game.steve.state = game.STATE_IDLE
 	game.steveSprite:pause()
 	physics.pause()
 	audio.pause(1)
 end
 
 function game.resume()
-	game.state = GAME_RUNNING
+	game.state = game.GAME_RUNNING
 	game.steveSprite:play()
 	physics.start()
 	audio.resume(1)
@@ -1485,6 +1199,5 @@ function game.stop()
 end
 
 return game
-
 
 

@@ -7,24 +7,18 @@
 local ui={}
 
 ui.uiGroup = nil
-local jumpScreen, dpadLeft, dpadRight, actionBtn, pauseBtn, resumeBtn
-local lifeIcons = {}
+ui.jumpScreen = nil
+ui.dpadLeft = nil
+ui.dpadRight = nil
+ui.actionbtn = nil
+ui.pauseBtn = nil
+ui.resumeBtn = nil
+ui.scoreText = nil
+ui.pointsText = nil
+ui.lifeIcons = {}
 
-function ui.loadUi()
-	ui.uiGroup = display.newGroup()
-	--ui.uiGroup:insert( ui.createJumpScreen() )
-	ui.uiGroup:insert( ui.createDpadLeft() )
-	ui.uiGroup:insert( ui.createDpadRight() )
-	ui.uiGroup:insert( ui.createActionBtn() )
-	ui.uiGroup:insert( ui.createPauseBtn() )
-	ui.uiGroup:insert( ui.createResumeBtn() )
-	ui.uiGroup:insert( ui.createScoreText() )
-	ui.uiGroup:insert( ui.createPointsText() )
-	--ui.uiGroup:insert( ui.createLivesText() )
 
-	return ui.uiGroup
-end
-
+--Funzione diventata inutile e non usata
 function ui.getButtonByName( name )
 	for i = 1, ui.uiGroup.numChildren do
 		if (ui.uiGroup[i].myName == name) then
@@ -33,111 +27,128 @@ function ui.getButtonByName( name )
 	end
 end
 
-
-function ui.createJumpScreen()
+local function createJumpScreen()
 		-- Se va nello uiGroup
 	-- jumpScreen = display.newImageRect( "ui/emptyScreen.png", display.contentWidth, display.contentHeight )
 	-- jumpScreen.x, jumpScreen.y = display.contentCenterX , display.contentCenterY
 		-- Come sopra ma migliore (non usa immagini)
 	-- jumpScreen = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight )
 		-- Se create viene chiamata esternamente
-	jumpScreen = display.newRect( display.contentCenterX, display.contentCenterY, 10000,10000)
-	jumpScreen.myName = "jumpScreen"
-	jumpScreen.isVisible = false
-	jumpScreen.isHitTestable = true
-	jumpScreen:setFillColor( 0, 255, 0 )
-
-	return jumpScreen
+	ui.jumpScreen = display.newRect( display.contentCenterX, display.contentCenterY, 10000,10000)
+	ui.jumpScreen.myName = "jumpScreen"
+	ui.jumpScreen.isVisible = false
+	ui.jumpScreen.isHitTestable = true
+	ui.jumpScreen:setFillColor( 0, 255, 0 )
 end
 
-function ui.createDpadLeft()
-	dpadLeft = display.newImageRect( "ui/dpadLeft.png", 50, 52 )
-	dpadLeft.anchorX, dpadLeft.anchorY = 0, 1
-	dpadLeft.x, dpadLeft.y =  10, display.contentHeight - dpadLeft.height / 2 - 10
-	dpadLeft.myName = "dpadLeft"
-
-	return dpadLeft
+local function createDpadLeft()
+	ui.dpadLeft = display.newImageRect( "ui/dpadLeft.png", 50, 52 )
+	ui.dpadLeft.anchorX, ui.dpadLeft.anchorY = 0, 1
+	ui.dpadLeft.x, ui.dpadLeft.y =  10, display.contentHeight - ui.dpadLeft.height / 2 - 10
+	ui.dpadLeft.myName = "dpadLeft"
 end
 
-function ui.createDpadRight()
-	dpadRight = display.newImageRect( "ui/dpadRight.png", 50, 52 )
-	dpadRight.anchorX, dpadRight.anchorY = 0, 1
-	dpadRight.x, dpadRight.y = dpadLeft.x + dpadRight.width, dpadLeft.y
-	dpadRight.myName = "dpadRight"
-
-	return dpadRight
+local function createDpadRight()
+	ui.dpadRight = display.newImageRect( "ui/dpadRight.png", 50, 52 )
+	ui.dpadRight.anchorX, ui.dpadRight.anchorY = 0, 1
+	ui.dpadRight.x, ui.dpadRight.y = ui.dpadLeft.x + ui.dpadRight.width, ui.dpadLeft.y
+	ui.dpadRight.myName = "dpadRight"
 end
 
-function ui.createActionBtn()
-	actionBtn = display.newImageRect( "ui/actionbtn.png", 51, 51 )
-	actionBtn.anchorX, actionBtn.anchorY = 1, 1
-	actionBtn.x, actionBtn.y = display.contentWidth - 10, display.contentHeight -10 - actionBtn.height / 2
-	actionBtn.myName = "actionBtn"
-	actionBtn.active = true -- to avoid Action spam
-
-	return actionBtn
+local function createActionBtn()
+	ui.actionBtn = display.newImageRect( "ui/actionbtn.png", 51, 51 )
+	ui.actionBtn.anchorX, ui.actionBtn.anchorY = 1, 1
+	ui.actionBtn.x, ui.actionBtn.y = display.contentWidth - 10, display.contentHeight -10 - ui.actionBtn.height / 2
+	ui.actionBtn.myName = "actionBtn"
+	ui.actionBtn.active = true -- to avoid Action spam
 end
 
-function ui.createPauseBtn()
-    pauseBtn = display.newImageRect( "ui/pause.png", 35, 35 )
-	pauseBtn.anchorX, pauseBtn.anchorY = 1, 0
-	pauseBtn.x, pauseBtn.y = display.contentWidth -10, 30
-    pauseBtn.myName = "pauseBtn"
-
-    return pauseBtn
+local function createPauseBtn()
+    ui.pauseBtn = display.newImageRect( "ui/pause.png", 35, 35 )
+	ui.pauseBtn.anchorX, ui.pauseBtn.anchorY = 1, 0
+	ui.pauseBtn.x, ui.pauseBtn.y = display.contentWidth -10, 30
+    ui.pauseBtn.myName = "pauseBtn"
 end
 
-function ui.createResumeBtn()
-    resumeBtn = display.newImageRect( "ui/resume.png", 35, 35 )
-    resumeBtn.anchorX, resumeBtn.anchorY = 1, 0
-    resumeBtn.x, resumeBtn.y = display.contentWidth -10, 30
-    resumeBtn.myName = "resumeBtn"
-    resumeBtn.isVisible = false
-
-    return resumeBtn
+local function createResumeBtn()
+    ui.resumeBtn = display.newImageRect( "ui/resume.png", 35, 35 )
+    ui.resumeBtn.anchorX, ui.resumeBtn.anchorY = 1, 0
+    ui.resumeBtn.x, ui.resumeBtn.y = display.contentWidth -10, 30
+    ui.resumeBtn.myName = "resumeBtn"
+    ui.resumeBtn.isVisible = false
 end
 
-function ui.createScoreText()
-	scoreText = display.newText( "Score: 0", 0, 0, native.systemFont, 24 )
-	scoreText.anchorX, scoreText. anchorY = 1, 0
-	scoreText.x, scoreText.y = display.contentWidth -55, 30
-	scoreText:setFillColor( 0,0,255 )
-	scoreText.myName = "scoreText"
-
-	return scoreText
+local function createScoreText()
+	ui.scoreText = display.newText( "Score: 0", 0, 0, native.systemFont, 24 )
+	ui.scoreText.anchorX, ui.scoreText. anchorY = 1, 0
+	ui.scoreText.x, ui.scoreText.y = display.contentWidth -55, 30
+	ui.scoreText:setFillColor( 0,0,255 )
+	ui.scoreText.myName = "scoreText"
 end
 
-function ui.createPointsText()
-	pointsText = display.newText( "", display.contentWidth - 80, 60, native.systemFont, 14)
-	pointsText:setFillColor( 0,0,255 )
-	pointsText.isVisible = false
-	pointsText.myName = "pointsText"
-
-	return pointsText
+local function createPointsText()
+	ui.pointsText = display.newText( "", display.contentWidth - 80, 60, native.systemFont, 14)
+	ui.pointsText:setFillColor( 0,0,255 )
+	ui.pointsText.isVisible = false
+	ui.pointsText.myName = "pointsText"
 end
 
-function ui.createLivesText()
-	livesText = display.newText("Lives: ", 0, 0, native.systemFont, 24 )
-	livesText.anchorX, livesText. anchorY = 0, 0
-	livesText.x, livesText.y = 10, 50
-	livesText:setFillColor( 255,0,0 )
-	livesText.myName = "livesText"
-
-	return livesText
+local function createLivesText()
+	ui.livesText = display.newText("Lives: ", 0, 0, native.systemFont, 24 )
+	ui.livesText.anchorX, ui.livesText. anchorY = 0, 0
+	ui.livesText.x, livesText.y = 10, 50
+	ui.livesText:setFillColor( 255,0,0 )
+	ui.livesText.myName = "livesText"
 end
 
 -- Create all the images for the max lives
-function ui.createLifeIcons( maxLives )
+local function createLifeIcons( maxLives )
 	for i = 1, maxLives do
 		local	currIcon = display.newImageRect(ui.uiGroup, "ui/life.png", 30, 30 )
 	    currIcon.anchorX, currIcon.anchorY = 0, 0
 	    currIcon.x = 10 + (currIcon.contentWidth * (i - 1))
 	    currIcon.y = 10 + currIcon.contentHeight / 2
 	    currIcon.isVisible = true
-	    table.insert(lifeIcons,currIcon) 
+	    table.insert(ui.lifeIcons,currIcon) 
 	end
+end
 
-	return lifeIcons
+function ui.loadUi(game)
+	ui.uiGroup = display.newGroup()
+	-- --ui.uiGroup:insert( ui.createJumpScreen() )
+	-- --ui.uiGroup:insert( ui.createLivesText() )
+	createDpadLeft()
+	createDpadRight()
+	createActionBtn()
+	createPauseBtn()
+	createResumeBtn()
+	createScoreText()
+	createPointsText()
+	createJumpScreen()
+	createLifeIcons(game.lives)
+
+	ui.uiGroup:insert( ui.dpadLeft )
+	ui.uiGroup:insert( ui.dpadRight )
+	ui.uiGroup:insert( ui.actionBtn )
+	ui.uiGroup:insert( ui.pauseBtn )
+	ui.uiGroup:insert( ui.resumeBtn )
+	ui.uiGroup:insert( ui.scoreText )
+	ui.uiGroup:insert( ui.pointsText )
+	ui.uiGroup:insert( ui.jumpScreen )
+	--ui.uiGroup:insert( ui.lifeIcons )
+
+	return ui.uiGroup
+end
+
+--Update Life Icons: Works if we Lose or if we Get Lives
+function ui.updateLifeIcons(lives)
+	for i=1, #ui.lifeIcons do
+		if( i <= lives) then
+			ui.lifeIcons[i].isVisible = true
+		else
+			ui.lifeIcons[i].isVisible = false
+		end
+	end
 end
 
 --[[
