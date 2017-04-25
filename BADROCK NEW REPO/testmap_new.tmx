@@ -4,7 +4,7 @@
   <property name="ParallaxEnabled" value="true"/>
  </properties>
  <tileset firstgid="1" name="tilesmap3" tilewidth="32" tileheight="32" tilecount="104" columns="8">
-  <image source="sprites/tilesmap3.png" width="256" height="416"/>
+  <image source="visual/tilesets/tilesmap3.png" width="256" height="416"/>
   <tile id="1">
    <properties>
     <property name="HasBody" value=""/>
@@ -263,34 +263,8 @@
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="105" name="sedia" tilewidth="70" tileheight="113" tilecount="1" columns="1">
-  <image source="sprites/sedia.png" width="70" height="113"/>
-  <tile id="0">
-   <properties>
-    <property name="HasBody" value=""/>
-    <property name="bodyType" value="dynamic"/>
-    <property name="friction" type="float" value="1"/>
-    <property name="isEnemy" value="true"/>
-    <property name="isTargettable" value="true"/>
-    <property name="lives" type="int" value="5"/>
-   </properties>
-  </tile>
- </tileset>
- <tileset firstgid="106" name="paper" tilewidth="51" tileheight="52" tilecount="1" columns="1">
-  <image source="sprites/paper.png" width="51" height="52"/>
-  <tile id="0">
-   <properties>
-    <property name="HasBody" value=""/>
-    <property name="bodyType" value="dynamic"/>
-    <property name="friction" type="float" value="1"/>
-    <property name="isEnemy" value="true"/>
-    <property name="isTargettable" value="true"/>
-    <property name="lives" type="int" value="1"/>
-   </properties>
-  </tile>
- </tileset>
- <tileset firstgid="107" name="tileset-platformer" tilewidth="32" tileheight="32" tilecount="102" columns="6">
-  <image source="sprites/tileset-platformer.png" width="192" height="544"/>
+ <tileset firstgid="105" name="tileset-platformer" tilewidth="32" tileheight="32" tilecount="102" columns="6">
+  <image source="visual/tilesets/tileset-platformer.png" width="192" height="544"/>
   <tile id="12">
    <properties>
     <property name="HasBody" value=""/>
@@ -454,7 +428,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,169,0,169,0,169,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,167,0,167,0,167,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -462,7 +436,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,169,0,0,0,0,0,0,0,0,0,0,0,0,0,169,0,0,169,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,167,0,0,0,0,0,0,0,0,0,0,0,0,0,167,0,0,167,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,36,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,36,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
