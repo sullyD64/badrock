@@ -42,21 +42,21 @@ local function createJumpScreen()
 end
 
 local function createDpadLeft()
-	ui.dpadLeft = display.newImageRect( "visual/ui/dpadLeft.png", 50, 52 )
+	ui.dpadLeft = display.newImageRect( visual.dpadLeft, 50, 52 )
 	ui.dpadLeft.anchorX, ui.dpadLeft.anchorY = 0, 1
 	ui.dpadLeft.x, ui.dpadLeft.y =  10, display.contentHeight - ui.dpadLeft.height / 2 - 10
 	ui.dpadLeft.myName = "dpadLeft"
 end
 
 local function createDpadRight()
-	ui.dpadRight = display.newImageRect( "visual/ui/dpadRight.png", 50, 52 )
+	ui.dpadRight = display.newImageRect( visual.dpadRight, 50, 52 )
 	ui.dpadRight.anchorX, ui.dpadRight.anchorY = 0, 1
 	ui.dpadRight.x, ui.dpadRight.y = ui.dpadLeft.x + ui.dpadRight.width, ui.dpadLeft.y
 	ui.dpadRight.myName = "dpadRight"
 end
 
 local function createActionBtn()
-	ui.actionBtn = display.newImageRect( "visual/ui/actionbtn.png", 51, 51 )
+	ui.actionBtn = display.newImageRect( visual.actionBtn, 51, 51 )
 	ui.actionBtn.anchorX, ui.actionBtn.anchorY = 1, 1
 	ui.actionBtn.x, ui.actionBtn.y = display.contentWidth - 10, display.contentHeight -10 - ui.actionBtn.height / 2
 	ui.actionBtn.myName = "actionBtn"
@@ -64,14 +64,14 @@ local function createActionBtn()
 end
 
 local function createPauseBtn()
-    ui.pauseBtn = display.newImageRect( "visual/ui/pause.png", 35, 35 )
+    ui.pauseBtn = display.newImageRect( visual.pauseButton, 35, 35 )
 	ui.pauseBtn.anchorX, ui.pauseBtn.anchorY = 1, 0
 	ui.pauseBtn.x, ui.pauseBtn.y = display.contentWidth -10, 30
     ui.pauseBtn.myName = "pauseBtn"
 end
 
 local function createResumeBtn()
-    ui.resumeBtn = display.newImageRect( "visual/ui/resume.png", 35, 35 )
+    ui.resumeBtn = display.newImageRect( visual.resumeButton, 35, 35 )
     ui.resumeBtn.anchorX, ui.resumeBtn.anchorY = 1, 0
     ui.resumeBtn.x, ui.resumeBtn.y = display.contentWidth -10, 30
     ui.resumeBtn.myName = "resumeBtn"
@@ -104,7 +104,7 @@ end
 -- Create all the images for the max lives
 local function createLifeIcons( maxLives )
 	for i = 1, maxLives do
-		local	currIcon = display.newImageRect(ui.uiGroup, "visual/ui/life.png", 30, 30 )
+		local	currIcon = display.newImageRect(ui.uiGroup, visual.lifeIcon, 30, 30 )
 	    currIcon.anchorX, currIcon.anchorY = 0, 0
 	    currIcon.x = 10 + (currIcon.contentWidth * (i - 1))
 	    currIcon.y = 10 + currIcon.contentHeight / 2

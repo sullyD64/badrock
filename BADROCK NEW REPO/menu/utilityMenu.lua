@@ -52,7 +52,7 @@ local utility = {}
             sheetContentHeight = 46
         }
         
-    utility.buttonSheet = graphics.newImageSheet( "visual/misc/ButtonSpazi.png", buttonOptions )
+    utility.buttonSheet = graphics.newImageSheet( visual.buttonSheet, buttonOptions )
 
     -- volume slider sheet
     local sliderOptions = {
@@ -66,7 +66,7 @@ local utility = {}
         sheetContentWidth = 232,
         sheetContentHeight = 60
         }
-    utility.sliderSheet = graphics.newImageSheet( "visual/misc/widget-slider.png", sliderOptions )
+    utility.sliderSheet = graphics.newImageSheet( visual.sliderSheet, sliderOptions )
 
     -- checkbox sheet
     local checkboxOptions = {
@@ -76,7 +76,7 @@ local utility = {}
             sheetContentWidth = 128,
             sheetContentHeight = 64
         }
-    utility.checkboxSheet = graphics.newImageSheet( "visual/misc/checkbox.png", checkboxOptions )
+    utility.checkboxSheet = graphics.newImageSheet( visual.checkboxSheet, checkboxOptions )
 
 
 -- -----------------------------------------------------------------------------------

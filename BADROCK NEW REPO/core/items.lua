@@ -11,7 +11,7 @@ items.list = {
 	{
 		name = "coin",
 		type = "bonus",
-		image = "visual/ui/coin.png",
+		image = visual.itemCoin,
 		width = 25,
 		heigth = 25
 
@@ -21,7 +21,7 @@ items.list = {
 	{
 		name = "life",
 		type = "bonus",
-		image = "visual/ui/life2.png",
+		image = visual.itemLife,
 		width = 25,
 		heigth = 25
 		--effect = items.lifeEffect()
@@ -30,16 +30,14 @@ items.list = {
 	{
 		name = "gun",
 		type = "bonus",
-		image = "visual/ui/H.png",
+		image = visual.itemGun,
 		width = 25,
 		heigth = 25
 		--effect = items.lifeEffect()
 	}
-
 }
 
 function items.findItemByName( name )
-	
 	local item = nil
 	for k, v in pairs(items.list) do
 		if (v.name == name) then
@@ -51,9 +49,8 @@ function items.findItemByName( name )
 end
 
 --local function items.lifeEffect()
---	entity.speed = value
+	--entity.speed = value
 --end
-
 
 function items.createItem( name )
 	--Create a new Life Item that is returned when this function is called
@@ -67,37 +64,28 @@ function items.createItem( name )
 	
 	end})
 	item.isSensor = true
-	
 
 	return item
 end
 
-
 -- ITEMS COLLISION HANDLERS ------------------------------------------------------------
 
-	function items.itemCollision(game , event, item)
+	function items.itemCollision( game , event, item )
 		--item.alpha = 0
-		--inserire qui eventuali suoni di collisione con gli item
+		-- inserire qui eventuali suoni di collisione con gli item
 		--display.remove( item )
 		--game.map:getTileLayer("items"):removeObject( item )
 		
 		--List of all items with relative collision handler
-		if(item.name == "coin") then
+		if (item.name == "coin") then
 			coinCollision(game, event, item)
-
-		elseif(item.name == "life") then
+		elseif (item.name == "life") then
 			lifeCollision(game, event, item)
-
 		end
-	
-		item = nil --"Distruzione" dell'item
+		item = nil -- Distruzione dell'item
 	end
 
-
-
-
-	function coinCollision( game , event, coin)
-
+	function coinCollision( game , event, coin )
 		if ( event.phase == "began" ) then
 			--audio.play( coinSound )
 			coin.BodyType = "dynamic"
@@ -109,24 +97,19 @@ end
 	end
 
 	function lifeCollision( game, event, life )
-
 		if ( event.phase == "began" ) then
 			display.remove(life)
 			--audio.play( coinSound )
 			--life.BodyType = "dynamic"
 			game.addLife()
 			
-
 		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
 		end
 	end
-
-
 ----------------------------------------------------------------------------------------
 
 function addDropTo( enemy , itemName )
-	--Add an item drop to an enemy (MAX 1 Drop per Enemy, for "now" )
-
+	--Add an item drop to an enemy (MAX 1 Drop per Enemy, for now )
 	local item = items.findItemByName (itemName)
 	enemy.drop = item
 end

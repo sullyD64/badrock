@@ -3,12 +3,11 @@
 -- collisions.lua
 --
 -----------------------------------------------------------------------------------------
-local physics = require( "physics" )
-local ui = require ( "core.ui" )
-local items = require ( "core.items" )
+local physics = require ( "physics" )
+local ui = require      ( "core.ui" )
+local items = require   ( "core.items" )
+
 local collisions = {}
-
-
 
 -- Collision with Environments (Generic)
 local function environmentCollision( event , game)
@@ -22,15 +21,8 @@ local function environmentCollision( event , game)
 
 	if (event.phase == "began" and env.isGround) then
 		other.canJump = true
-		game.steve.isTouchingGround = true -- non usata
 	end
-		--[[
-		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-			timer.performWithDelay( 250, function() other.canJump = false end )
-			print("collision ended")
-		end
-		]]
-	end
+end
 
 -- Collision with enemies and dangerous things (Only for Steve)
 	local function dangerCollision( event , game)
@@ -51,13 +43,11 @@ local function environmentCollision( event , game)
 				--audio.play( dangerSound ) DA SISTEMARE AUDIO
 				game.steveDeathAnimation(game.steve.x , game.steve.y)
 
-				-- \\ CRITICAL CODE // --
 				game.controlsEnabled = false
 				game.SSVEnabled = false
-				-- NON SPOSTARE CANI MALEDETTI --
 
 				game.lives = game.lives - 1
-				ui.updateLifeIcons(game.lives)	--Refresh the Life Icons
+				ui.updateLifeIcons(game.lives)	-- Refresh the Life Icons
 				
 				if ( game.lives == 0 ) then
 					game.endGameScreen()
@@ -89,7 +79,7 @@ local function environmentCollision( event , game)
 			other = event.object1
 		end
 
-		--salvo localmente alcuni attributi del nemico prima che, venendo colpito e ucciso, li perda
+		-- salvo localmente alcuni attributi del nemico prima che, venendo colpito e ucciso, li perda
 		local enemy = {}
 		enemy.drop = other.drop
 		enemy.name = other.name 
@@ -134,9 +124,6 @@ local function environmentCollision( event , game)
 			display.remove(other)
 		end
 	end
-
-
-
 
 -- General index for every Collision handler in Game
 	function collisions.onCollision( event , game)
@@ -191,7 +178,5 @@ local function environmentCollision( event , game)
 		end
 		return true
 	end
-
-
 
 return collisions

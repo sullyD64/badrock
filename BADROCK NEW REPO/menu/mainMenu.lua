@@ -87,7 +87,7 @@ local bgVolume, bgMuteBtn, fxVolume, fxMuteBtn
         inEasing = easing.outBack,
         outEasing = easing.outCubic
         }
-        optPanel.background = display.newImageRect("visual/misc/panel.png",optPanel.width, optPanel.height-20)
+        optPanel.background = display.newImageRect( visual.panel, optPanel.width, optPanel.height-20)
         --optPanel.background = display.newRoundedRect( 0, 0, optPanel.width-10, optPanel.height-50, 10 )
         --optPanel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
         optPanel:insert( optPanel.background )
@@ -190,7 +190,7 @@ local bgVolume, bgMuteBtn, fxVolume, fxMuteBtn
         onRelease = onOptReturnMenuBtnRelease,
         width = 15,
         height = 15,
-        defaultFile = "visual/misc/exitOptionMenu.png",
+        defaultFile = visual.exitOptionMenu,
         --overFile = "buttonOver.png",
         }
         optPanel.returnMenuBtn.x= 75
@@ -230,7 +230,7 @@ local bgVolume, bgMuteBtn, fxVolume, fxMuteBtn
         inEasing = easing.outBack,
         outEasing = easing.outCubic
         }
-        abtPanel.background = display.newImageRect("visual/misc/panel.png",abtPanel.width, abtPanel.height-20)
+        abtPanel.background = display.newImageRect(visual.panel, abtPanel.width, abtPanel.height-20)
         abtPanel:insert( abtPanel.background )
          
     abtPanel.title = display.newText( "About", 0, -70, "Micolas.ttf", 15 )
@@ -293,19 +293,19 @@ local bgVolume, bgMuteBtn, fxVolume, fxMuteBtn
         backgroundMusic = audio.loadStream( "audio/Undertale - Bonetrousle.mp3" )     -- AUDIO (ovviamente cambiare il brano)     
         
     	-- Load the background
-    	local background = display.newImageRect( "visual/misc/MenuBackground.jpg", display.actualContentWidth, display.actualContentHeight )
+    	local background = display.newImageRect (visual.menuBackground, display.actualContentWidth, display.actualContentHeight )
     	background.anchorX = 0
     	background.anchorY = 0
     	background.x = 0 + display.screenOriginX 
     	background.y = 0 + display.screenOriginY
     	
     	-- Load the logo
-    	local titleLogo = display.newImageRect( "visual/misc/logoShadow.png", 343, 123 )
+    	local titleLogo = display.newImageRect( visual.titleLogo, 343, 123 )
     	titleLogo.x = display.contentCenterX
     	titleLogo.y = 100
 
     	-- Load steve
-    	local steveImage = display.newImageRect( "visual/misc/MenuSteve.png", 115, 113 )
+    	local steveImage = display.newImageRect( visual.menuSteveImage, 115, 113)
     	steveImage.x = display.contentCenterX
     	steveImage.y = display.contentCenterY + 25
         steveImage.direction = 1
@@ -331,8 +331,8 @@ local bgVolume, bgMuteBtn, fxVolume, fxMuteBtn
                     onRelease = onOptionBtnRelease,
                     width = 25,
                     height = 25,
-                    defaultFile = "visual/misc/ingranaggio.png",
-                    overFile = "visual/misc/ingranaggio.png",
+                    defaultFile = visual.optionButtonDefault,
+                    overFile = visual.optionButtonOver
                 }
                 optionBtn.anchorX = 0
                 optionBtn.anchorY = 0

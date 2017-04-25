@@ -50,7 +50,7 @@ local myData = require( "myData" )
         -- background.x = display.contentCenterX
         -- background.y = display.contentCenterY
         
-        local background = display.newImageRect( "visual/misc/LevelBG.png", display.actualContentWidth, display.actualContentHeight )
+        local background = display.newImageRect( visual.levelSelectBackground, display.actualContentWidth, display.actualContentHeight )
         background.anchorX = 0
         background.anchorY = 0
         background.x = 0 + display.screenOriginX 
@@ -127,7 +127,7 @@ local myData = require( "myData" )
             local star = {}
             if myData.settings.levels[i] and myData.settings.levels[i].stars and myData.settings.levels[i].stars > 0 then
                 for j = 1, myData.settings.levels[i].stars do
-                    star[j] = display.newImageRect("visual/misc/star.png", 20, 20)--display.newPolygon( 0, 0, starVertices )
+                    star[j] = display.newImageRect(visual.levelSelectStar, 20, 20) --display.newPolygon( 0, 0, starVertices )
                     --star[j]:setFillColor( 1, 0.9, 0)
                     --star[j].strokeWidth = 1
                     --star[j]:setStrokeColor( 1, 0.8, 0 )

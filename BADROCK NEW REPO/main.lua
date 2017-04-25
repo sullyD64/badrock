@@ -10,6 +10,9 @@ display.setStatusBar( display.HiddenStatusBar )
 -- Include the Corona "composer" module
 local composer = require "composer"
 
+-- Globally loads the visual library
+visual = require "visual.visual"
+
 -- Enable the multitouch 
 system.activate( "multitouch" )
 

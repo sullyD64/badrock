@@ -16,10 +16,10 @@ local enemies = {}
 		bounce = 0.1,
 		friction = 1.0,
 		density = 1.0,
-		image = "visual/sprites/paper.png",
+		image = visual.enemyPaper,
 		height = 40,
 		width = 40,
-		speed=0
+		speed = 0
 		},
 	--2
 		{
@@ -28,12 +28,11 @@ local enemies = {}
 		bounce = 0.1,
 		friction = 1.0,
 		density = 1.0,
-		image = "visual/sprites/sedia.png",
+		image = visual.enemySedia,
 		height = 113,
 		width = 70,
-		speed=0
+		speed = 0
 		}
-
 }
 
 -- Create a new Enemy with his attributes and image if we pass (as a parameter) an object from Tiled
@@ -53,7 +52,5 @@ function enemies.createEnemy( enemy , type )
 		physics.addBody( enemy, { density = en.density, friction = en.friction, bounce = en.bounce} )
 		return enemy
 end
-
-
 
 return enemies

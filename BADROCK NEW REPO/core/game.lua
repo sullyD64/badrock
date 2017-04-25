@@ -4,17 +4,17 @@
 --
 -----------------------------------------------------------------------------------------
 
-local composer   = require ( "composer"    )
-local physics    = require ( "physics"     )
-local math       = require ( "math"        )
-local panel      = require ( "lib.panel"       )
+local composer   = require ( "composer"         )
+local physics    = require ( "physics"          )
+local math       = require ( "math"             )
+local widget     = require ( "widget"           )
+local utility    = require ( "menu.utilityMenu" )
+local panel      = require ( "lib.panel"        )
 local ui         = require ( "core.ui"          )
+local collisions = require ( "core.collisions"  )
 local enemies    = require ( "core.enemies"     )
 local items      = require ( "core.items"       )
-local utility    = require ( "menu.utilityMenu" )
-local widget     = require ( "widget"      )
-local collisions = require ( "core.collisions"  )
-local position   = require ( "lib.position"    )
+local position   = require ( "lib.position"     )
 
 local game = {}
 
@@ -23,18 +23,18 @@ physics.setGravity( 0, 50 )
 
 --===========================================-- 
 
-	game.GAME_RUNNING    = "Running"
-	game.GAME_PAUSED     = "Paused"
-	game.GAME_RESUMED    = "Resumed"
-	game.GAME_ENDED      = "Ended"
+	game.GAME_RUNNING          = "Running"
+	game.GAME_PAUSED           = "Paused"
+	game.GAME_RESUMED          = "Resumed"
+	game.GAME_ENDED            = "Ended"
 	game.STEVE_STATE_IDLE      = "Idle"
 	game.STEVE_STATE_WALKING   = "Walking"
 	game.STEVE_STATE_JUMPING   = "Jumping"
 	game.STEVE_STATE_ATTACKING = "Attacking"
 	game.STEVE_STATE_DIED      = "Died"
-	game.DIRECTION_LEFT  = -1
-	game.DIRECTION_RIGHT =  1
-	game.MAX_LIVES       =  3
+	game.DIRECTION_LEFT        = -1
+	game.DIRECTION_RIGHT       =  1
+	game.MAX_LIVES             =  3
 
 	game.letMeJump = false
 	game.SSVEnabled = true
@@ -184,7 +184,7 @@ physics.setGravity( 0, 50 )
 		inEasing = easing.outBack,
 		outEasing = easing.outCubic
 		}
-		pausePanel.background = display.newImageRect("visual/misc/panel.png",pausePanel.width, pausePanel.height-20)
+		pausePanel.background = display.newImageRect(visual.panel, pausePanel.width, pausePanel.height-20)
 		pausePanel:insert( pausePanel.background )
 		   
 		pausePanel.title = display.newText( "Pause", 0, -70, "Micolas.ttf", 15 )
@@ -411,7 +411,7 @@ physics.setGravity( 0, 50 )
 			local dim = math.random (2, 10)
 			local dx = math.random(-1, 1)
 			local dy = math.random(-1, 1)
-			local frammento = display.newImageRect("visual/ui/life.png", dim, dim)
+			local frammento = display.newImageRect( visual.lifeIcon, dim, dim)
 			frammento.x , frammento.y = sx, sy
 			game.map:getTileLayer("playerEffects"):addObject(frammento)
 			
@@ -766,7 +766,7 @@ physics.setGravity( 0, 50 )
 				sheetContentHeight = 50--40
 			}
 
-			local walkingSheet = graphics.newImageSheet("visual/sprites/steveAnim.png", sheetData)
+			local walkingSheet = graphics.newImageSheet(visual.steveSheetWalking, sheetData)
 
 			local sequenceData = {
 				{name = "walking", start= 1, count =4, time = 300, loopCount=0},
@@ -784,7 +784,7 @@ physics.setGravity( 0, 50 )
 			--game.steveSprite:pause()
 
 		-- Image and physical object
-			game.steve = display.newImageRect( "visual/sprites/rock_original.png", 30, 30 )
+			game.steve = display.newImageRect( visual.steveImage, 30, 30 )
 			game.steve.alpha = 0 
 			game.steve.myName = "steve"
 			game.steve.rotation = 0
@@ -940,7 +940,7 @@ physics.setGravity( 0, 50 )
 
 		-- Loads the image and the sprites.
 		local loadNPCimage = function(npc)
-			npc.staticImage = display.newImageRect( "visual/sprites/carota.png", 51, 128 )
+			npc.staticImage = display.newImageRect( visual.npcImage, 51, 128 )
 			npc.staticImage.x, npc.staticImage.y = npc.x, npc.y
 			game.map:getTileLayer("entities"):addObject(npc.staticImage)
 		end
@@ -961,11 +961,11 @@ physics.setGravity( 0, 50 )
 				anchorX, anchorY = 0.5, 0.5
 			}
 
-			local background = display.newImageRect( "visual/sprites/balloons.png", 134, 107 )
+			local background = display.newImageRect( visual.npcBalloonBackground, 134, 107 )
 			background.anchorY = 1
 			npc.balloon:insert(background)
 
-			local button = display.newImageRect( "visual/sprites/bottonefanculo.png", 58, 40 )
+			local button = display.newImageRect( visual.npcBalloonButton1, 58, 40 )
 			button.x, button.y = background.x, background.y -50
 			npc.balloon:insert(button)
 			npc.balloon.x, npc.balloon.y = npc.x, npc.y -20
