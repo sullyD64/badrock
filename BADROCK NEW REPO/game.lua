@@ -103,7 +103,18 @@ physics.setGravity( 0, 50 )
 				game.steve.airState= "Idle"
 			end
 		end
-
+		-- local function sparaPalle()
+		-- local fireball=game.createFire(game.enemyLevelList[4])
+		-- local fx= game.steve.x-fireball.x
+		-- local fy= game.steve.y-fireball.y
+		-- local count=0
+		-- if (count==0) then
+		-- --fireball:applyLinearImpulse(fx/100,fy/100,fireball.x,fireball.y)
+		-- count=1
+		-- end
+		-- end
+		-- --sparaPalle()
+		-- timer.performWithDelay(3000,sparaPalle(),-1)
 		-- Setting the AirState, needed for the Animation controls
 		
 			-- flag = game.steveSprite.sequence
@@ -1206,7 +1217,9 @@ physics.setGravity( 0, 50 )
 	-- end
 			
 function game.createFire(object)
+			
 			fireball = display.newImageRect("sprites/fireball.png", 32, 32)
+			if(object.x and fireball.x) then
 			fireball.x=object.x-100
 			fireball.y=object.y
 			fireball.xScale=-1
@@ -1214,17 +1227,18 @@ function game.createFire(object)
 			fireball.rotation=90
 			fireball.bodyType="static"
 			physics.addBody(fireball, {density = 1, friction = 1, bounce = 0.5})
-			fireball.gravityScale=0
+			fireball.gravityScale=0.05
 			fireball.isSensor=true
 			fireball.isEnemy=true
-			--fireball.speed=1
+			fireball.speed=1
 			game.map:getTileLayer("entities"):addObject( fireball )
 			return fireball
+			end
 end
 
 function game.restoreEnemies()
 	--qui per ora i va da 1 a 3, in seguito potrebbe aumentare
-	for i=1,3 do
+	for i=1,4 do
 		
 			print(game.enemyLevelList[i]) print(i)
 			--game.enemyLevelList[i]=nil
@@ -1232,6 +1246,8 @@ function game.restoreEnemies()
 	end
 		--game.enemyLevelList=nil
 		game.loadEnemies()
+		timer.performWithDelay(0,sparaPalle(),-1)
+
 end
 	function follow(object)
 		if((object.x~=nil and object.y~=nil) and(game.steve.x~=nil and game.steve.y~=nil)) then
@@ -1619,6 +1635,11 @@ end
 		end
 
 
+			-- local function move4()
+			-- local fireball=game.createFire(obj4)
+   --  		if(fireball) then follow(fireball) end
+			-- end
+
 	function game.loadGame( map, spawn )
 		-- Locally stores the current level map and spawn coordinates
 		game.map = map
@@ -1636,50 +1657,7 @@ end
 
 
 		
-		obj4=game.enemyLevelList[4]
-		if(obj4~=nil) then
-			--local fireball=game.createFire(obj4)
-			fireball = display.newImageRect("sprites/fireball.png", 32, 32)
-			fireball.x=obj4.x-100
-			fireball.y=obj4.y
-			fireball.xScale=-1
-			fireball.yScale=-1
-			fireball.rotation=90
-			fireball.bodyType="dynamic"
-			physics.addBody(fireball, {density = 1, friction = 1, bounce = 0.5})
-			fireball.gravityScale=0.05
-			fireball.isSensor=true
-			fireball.isEnemy=true
-			fireball.speed=1
-			game.map:getTileLayer("entities"):addObject( fireball )
-			--muovi(fireball)
-			local function move4()
-    		follow(fireball)
-			end
-			Runtime:addEventListener( "enterFrame", move4 )
-		end
 
-		local obj1=game.enemyLevelList[3]
-		if(obj1~=nil) then	--and game.state==GAME_RUNNING
-		
-		
-		Runtime:addEventListener( "enterFrame", move1 )
-		-- else
-		-- Runtime:removeEventListener("enterFrame", move1)
-		end
-		local obj2=game.enemyLevelList[2]
-		if(obj1~=nil) then
-
-		
-		Runtime:addEventListener( "enterFrame", move2 )
-		end
-
-		local obj3=game.enemyLevelList[1]
-		if(obj1~=nil) then
-		--print("ok")
-		
-		Runtime:addEventListener( "enterFrame", move3 )
-		end
 
 
 
@@ -1728,6 +1706,18 @@ end
 -- transition.to(cerchio,{y=offScreen*2,time=objSpeed*speedFactor})
 -- if resume==2 then timer.performWithDelay(1,stop)  end
 
+		function sparaPalle()
+		local fireball=game.createFire(game.enemyLevelList[4])
+		--qui bisogna passare coordinate di steve aggiornate, quelle attuali per ora sono le coordinate del punto di spawn o di morte
+		local fx= game.steve.x-fireball.x
+		local fy= game.steve.y-fireball.y
+		local count=0
+		--if (count==0) then
+		fireball:applyLinearImpulse(fx/100,fy/100,fireball.x,fireball.y)
+		--count=1
+		--end
+		end
+		--sparaPalle()
 function game.start()
 	game.state = GAME_RUNNING
 	game.steveSprite:play()
@@ -1745,6 +1735,37 @@ function game.start()
 	Runtime:addEventListener("enterFrame", onUpdate)
 	timer.performWithDelay(200, debug, 0)
 	audio.play(backgroundMusic, {channel = 1 , loops=-1})
+
+		timer.performWithDelay(0,sparaPalle(),-1)
+	obj4=game.enemyLevelList[4]
+		if(obj4~=nil) then
+
+--così crea un muro infinito di fuoco
+		--Runtime:addEventListener( "enterFrame", move4 )
+		--transition.to
+		end
+
+		local obj1=game.enemyLevelList[3]
+		if(obj1~=nil) then	--and game.state==GAME_RUNNING
+		
+		
+		Runtime:addEventListener( "enterFrame", move1 )
+		-- else
+		-- Runtime:removeEventListener("enterFrame", move1)
+		end
+		local obj2=game.enemyLevelList[2]
+		if(obj1~=nil) then
+
+		
+		Runtime:addEventListener( "enterFrame", move2 )
+		end
+
+		local obj3=game.enemyLevelList[1]
+		if(obj1~=nil) then
+		--print("ok")
+		
+		Runtime:addEventListener( "enterFrame", move3 )
+		end
 end
 
 function game.pause()

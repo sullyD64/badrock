@@ -9,9 +9,9 @@ platforms.list = {
 		bounce = 0,
 		friction = 1.0,
 		density = 1.0,
-		image = "sprites/rock-platform.png",
+		image = "sprites/rock-platform2.png",
 		height = 50,
-		width = 300,
+		width = 150,
 		speed=0
 		}
 }
@@ -34,6 +34,7 @@ function platforms.createPlatform( platform, type )
 		--platform.yScale=1
 		physics.addBody( platform, { density = p.density, friction = p.friction, bounce = p.bounce} )
 		platform.bodyType="static"
+		platform.HasBody=true
 		return platform
 end
 
