@@ -1250,8 +1250,10 @@ function game.restoreEnemies()
 
 end
 	function follow(object)
-		if((object.x~=nil and object.y~=nil) and(game.steve.x~=nil and game.steve.y~=nil)) then
+		if((object.x~=nil and object.y~=nil) and(game.steve.x~=nil and game.steve.y~=nil) and game.state~="Paused") then--il problema è che poi non richiama la transizione del disaggro
+																														--per colpa del game.paused quando steve muore
 		object.isFixedRotation=true
+		object.speed=1--quello sopra continua a essere flash
 		if(math.abs(object.x-game.steve.x)<=400) then
 		local angle= math.atan2(game.steve.y - object.y, game.steve.x - object.x) -- work out angle between target and missile
 		object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
