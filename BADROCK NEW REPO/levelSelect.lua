@@ -3,13 +3,71 @@ local scene = composer.newScene()
  
 local widget = require( "widget" )
 local utility = require("utilityMenu")
--- Require "global" data table (http://coronalabs.com/blog/2013/05/28/tutorial-goodbye-globals/)
--- This will contain relevant data like the current level, max levels etc.
 local myData = require( "myData" )
+
+-- -----------------------------------------------------------------------------------
+-- Skins panel
+-- -----------------------------------------------------------------------------------
+    local function onSkinReturnBtnRelease()  
+        skinPanel:hide()
+        return true
+    end
+ -- Create the skins panel (shown when the clockwork is pressed/released)
+    skinPanel = utility.newPanel{
+        location = "custom",
+        onComplete = panelTransDone,
+        width = display.contentWidth * 0.95,
+        height = display.contentHeight * 0.50,
+        speed = 220,
+        anchorX = 1.0,
+        anchorY = 0.5,
+        x = display.screenOriginX,
+        y = display.contentCenterY - 10,
+        inEasing = easing.linear,
+        outEasing = easing.outCubic
+        }
+        --skinPanel.background = display.newImageRect("misc/panel.png",skinPanel.width, skinPanel.height-20)
+        skinPanel.background = display.newRoundedRect( 0, 0, skinPanel.width, skinPanel.height-20, 10 )
+        skinPanel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
+        skinPanel:insert( skinPanel.background )
+         
+    skinPanel.title = display.newText( "Wardrobe", 0, -70, "Micolas.ttf", 15 )
+    skinPanel.title:setFillColor( 1, 1, 1 )
+    skinPanel:insert( skinPanel.title )
+
+
+
+            -- Create the button to exit the options menu
+        skinPanel.returnBtn = widget.newButton {
+            --label = "Return",
+            onRelease = onSkinReturnBtnRelease,
+            width = 15,
+            height = 15,
+            defaultFile = "misc/exitOptionMenu.png",
+            --overFile = "buttonOver.png",
+            }
+            skinPanel.returnBtn.x= 75
+            skinPanel.returnBtn.y = -70
+            skinPanel:insert(skinPanel.returnBtn)
+
+
+        skinPanel.selectGroup = widget.newScrollView({
+            width = skinPanel.width-20,
+            height = skinPanel.height,
+            scrollWidth = 460,
+            scrollHeight = 800,
+            hideBackground = true,
+            verticalScrollDisabled = true
+        })
+        skinPanel:insert(skinPanel.selectGroup)
+
+
 
 
 -- -----------------------------------------------------------------------------------
--- Button handlers
+
+-- -----------------------------------------------------------------------------------
+-- Buttons
 -- -----------------------------------------------------------------------------------
 
     -- Button handler to cancel the level selection and return to the menu
@@ -22,7 +80,9 @@ local myData = require( "myData" )
     local function handleSkinsButtonEvent( event )
         if ( "ended" == event.phase ) then
             --composer.gotoScene( "menu", { effect="fade", time=333 } )
-            skinPanel:show()
+            skinPanel:show({
+            x = display.contentWidth-12,
+            })
         end
     end
      
@@ -30,13 +90,75 @@ local myData = require( "myData" )
     local function handleLevelSelect( event )
         if ( "ended" == event.phase ) then
             myData.settings.currentLevel = event.target.id
-            -- Purge the game scene so we have a fresh start
-            composer.removeScene( "game", false )
+            composer.removeScene( "level" .. tostring(event.target.id), false )
             audio.stop()
             -- Go to the game scene
             composer.gotoScene( "level" .. tostring(event.target.id), { effect="crossFade", time=280 } )
         end
     end
+
+    -- Create buttons-----------------------------------------------------------------
+        -- Create a cancel button for return to the menu scene.
+        local backButton = widget.newButton({
+            width = 40,
+            height = 38,
+            sheet = utility.buttonSheet,
+            topLeftFrame = 1,
+            topMiddleFrame = 2,
+            topRightFrame = 3,
+            middleLeftFrame = 4,
+            bottomLeftFrame = 5,
+            bottomMiddleFrame = 6,
+            bottomRightFrame = 7,
+            middleRightFrame = 8,
+            middleFrame = 9,
+            topLeftOverFrame = 10,
+            topMiddleOverFrame = 11,
+            topRightOverFrame = 12,
+            middleLeftOverFrame = 13,
+            middleOverFrame = 14,
+            middleRightOverFrame = 15,
+            bottomLeftOverFrame = 16,
+            bottomMiddleOverFrame = 17,
+            bottomRightOverFrame = 18,
+            id = "back",
+            label = "B",
+            labelColor = { default={1}, over={128} },
+            onEvent = handleCancelButtonEvent
+        })
+        backButton.x = display.contentWidth - 30
+        backButton.y = display.contentHeight - 50
+
+        local skinButton = widget.newButton({
+            width = 170,
+            height = 38,
+            sheet = utility.buttonSheet,
+            topLeftFrame = 1,
+            topMiddleFrame = 2,
+            topRightFrame = 3,
+            middleLeftFrame = 4,
+            bottomLeftFrame = 5,
+            bottomMiddleFrame = 6,
+            bottomRightFrame = 7,
+            middleRightFrame = 8,
+            middleFrame = 9,
+            topLeftOverFrame = 10,
+            topMiddleOverFrame = 11,
+            topRightOverFrame = 12,
+            middleLeftOverFrame = 13,
+            middleOverFrame = 14,
+            middleRightOverFrame = 15,
+            bottomLeftOverFrame = 16,
+            bottomMiddleOverFrame = 17,
+            bottomRightOverFrame = 18,
+            id = "skins",
+            label = "Skins",
+            labelColor = { default={1}, over={128} },
+            onEvent = handleSkinsButtonEvent
+        })
+        skinButton.x = display.contentCenterX
+        skinButton.y = display.contentHeight - 50
+    -- -------------------------------------------------------------------------------
 
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
@@ -71,7 +193,7 @@ local myData = require( "myData" )
      
         -- 'xOffset', 'yOffset' and 'cellCount' are used to position the buttons in the grid.
         local xOffset = display.screenOriginX + 20 --64
-        local yOffset = display.contentCenterY - 30
+        local yOffset = display.contentCenterY - 50
         local cellCount = 1
      
         -- Define the array to hold the buttons
@@ -152,67 +274,6 @@ local myData = require( "myData" )
         sceneGroup:insert( levelSelectGroup )
         levelSelectGroup.x = display.contentCenterX
         levelSelectGroup.y = display.contentCenterY
-     
-        -- Create a cancel button for return to the menu scene.
-        local backButton = widget.newButton({
-            width = 40,
-            height = 38,
-            sheet = utility.buttonSheet,
-            topLeftFrame = 1,
-            topMiddleFrame = 2,
-            topRightFrame = 3,
-            middleLeftFrame = 4,
-            bottomLeftFrame = 5,
-            bottomMiddleFrame = 6,
-            bottomRightFrame = 7,
-            middleRightFrame = 8,
-            middleFrame = 9,
-            topLeftOverFrame = 10,
-            topMiddleOverFrame = 11,
-            topRightOverFrame = 12,
-            middleLeftOverFrame = 13,
-            middleOverFrame = 14,
-            middleRightOverFrame = 15,
-            bottomLeftOverFrame = 16,
-            bottomMiddleOverFrame = 17,
-            bottomRightOverFrame = 18,
-            id = "back",
-            label = "B",
-            labelColor = { default={1}, over={128} },
-            onEvent = handleCancelButtonEvent
-        })
-        backButton.x = display.contentWidth - 30
-        backButton.y = display.contentHeight - 50
-
-        local skinButton = widget.newButton({
-            width = 170,
-            height = 38,
-            sheet = utility.buttonSheet,
-            topLeftFrame = 1,
-            topMiddleFrame = 2,
-            topRightFrame = 3,
-            middleLeftFrame = 4,
-            bottomLeftFrame = 5,
-            bottomMiddleFrame = 6,
-            bottomRightFrame = 7,
-            middleRightFrame = 8,
-            middleFrame = 9,
-            topLeftOverFrame = 10,
-            topMiddleOverFrame = 11,
-            topRightOverFrame = 12,
-            middleLeftOverFrame = 13,
-            middleOverFrame = 14,
-            middleRightOverFrame = 15,
-            bottomLeftOverFrame = 16,
-            bottomMiddleOverFrame = 17,
-            bottomRightOverFrame = 18,
-            id = "skins",
-            label = "Skins",
-            labelColor = { default={1}, over={128} },
-            onEvent = handleSkinsButtonEvent
-        })
-        skinButton.x = display.contentCenterX
-        skinButton.y = display.contentHeight - 50
 
 
         sceneGroup:insert( backButton )

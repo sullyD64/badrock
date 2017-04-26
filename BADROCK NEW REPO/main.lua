@@ -3,7 +3,8 @@
 -- main.lua
 --
 -----------------------------------------------------------------------------------------
-
+local sfx = require( "sfx" )					--HERE
+sfx.init()
 -- Hide the status bar
 display.setStatusBar( display.HiddenStatusBar )
 
@@ -13,11 +14,17 @@ local composer = require "composer"
 -- Enable the multitouch 
 system.activate( "multitouch" )
 
--- Reserve channel 1 for background music
-audio.reserveChannels( 1 )
--- Reduce the overall volume of the channel
-audio.setVolume( 0.2, { channel=1 } )
 
+-- -- Reserve channel 1 and 2 for background music and sound effect
+-- audio.reserveChannels(2)
+-- -- Reduce the overall volume of the channel
+-- audio.setVolume( 0, { channel=1 } )
 
 -- load menu screen
 composer.gotoScene( "menu" )
+
+
+
+
+
+

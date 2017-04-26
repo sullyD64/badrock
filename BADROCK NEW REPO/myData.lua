@@ -6,7 +6,6 @@ M.settings.unlockedLevels = 2
 M.settings.soundOn = true
 M.settings.musicOn = true
 M.settings.levels = {}
-M.settings.levels = {} 
 M.settings.levels[1] = {}
 M.settings.levels[1].stars = 3
 M.settings.levels[1].score = 3833
