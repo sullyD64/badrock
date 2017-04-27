@@ -1,16 +1,19 @@
+local composer  = require ( "composer"      ) 
 local utility  = require ( "utilityMenu"  )
 local widget   = require ( "widget"		  )
 local myData   = require ( "myData"       )
-local soundMenu= require ( "sfxMenu"      ) 
+local sfxMenu  = require ( "sfxMenu"      ) 
 
 
 local pause = {}
+	pause.psbutton = nil
+	pause.rsbutton = nil
 
 -- PAUSE MENU ---------------------------------------------------------------------
 
     local function onSoundMenuBtnRelease()  
-        transition.fadeOut( pause.panel, { time=100 } )
-        soundMenu.panel:show({
+        --transition.fadeOut( pause.panel, { time=100 } )
+        sfxMenu.panel:show({
              y = display.screenOriginY+225,
              time =250})
         return true
@@ -18,17 +21,14 @@ local pause = {}
 
     -- Return to the main Menu
     local function onMenuBtnRelease()  
-        local psbutton = ui.getButtonByName("pauseBtn")
-		local rsbutton = ui.getButtonByName("resumeBtn")
         pause.panel:hide({
             speed = 250,
             transition = easing.outElastic
         })
-		psbutton.isVisible = true
-		rsbutton.isVisible = false
+		pause.psbutton.isVisible = true
+		pause.rsbutton.isVisible = false
 		audio.fadeOut(1,100)
 		audio.stop(1)
-		--composer.removeScene( "level1" )
         composer.gotoScene( "menu", { effect="fade", time=280 } )
         return true
     end
@@ -91,6 +91,13 @@ local pause = {}
 	        pause.panel.menuBtn.y = 39
 	        pause.panel:insert(pause.panel.menuBtn)
 	-- -------------------------------------------------------------------------------
+
+	pause.group = display.newGroup()
+    pause.group:insert(pause.panel)
+    pause.group:insert(sfxMenu.panel)
+    assert(pause.group[1] == pause.panel) -- do1 is on the bottom
+    assert(pause.group[2] == sfxMenu.panel) -- do2 is on the top (front)
+    
 -- ---------------------------------------------------------------------------------
 
 return pause

@@ -38,7 +38,6 @@ sfx.playMusic = function( handle, options )
       -- ^ Le opzioni ci dicono di non riprodurre suoni
       return false
    end
-      print("l'audio va")
    audio.rewind(handle)
    audio.play( handle, options )
 end

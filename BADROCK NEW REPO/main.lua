@@ -3,7 +3,7 @@
 -- main.lua
 --
 -----------------------------------------------------------------------------------------
-local sfx = require( "sfx" )					--HERE
+local sfx = require( "sfx" )
 sfx.init()
 -- Hide the status bar
 display.setStatusBar( display.HiddenStatusBar )

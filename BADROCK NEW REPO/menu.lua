@@ -11,8 +11,8 @@ local composer = require( "composer" )
 local widget = require ("widget")
 local utility = require ("utilityMenu")
 local sfx = require( "sfx" )                
---local myData = require( "myData" ) 
 local genMenu = require( "generalMenu" ) 
+--local myData = require( "myData" ) 
 
 local scene = composer.newScene()
 
@@ -21,7 +21,7 @@ local playBtn, optionBtn, shopBtn
 
 
 
-
+ 
 -- Menu Buttons ----------------------------------------------------------------------
 
     local function onPlayBtnRelease()
@@ -215,7 +215,7 @@ local playBtn, optionBtn, shopBtn
     -- destroy()
     function scene:destroy( event )
     	local sceneGroup = self.view
-        --audio.dispose()
+        audio.dispose()
         playBtn:removeSelf()	-- widgets must be manually removed
 		playBtn = nil
 		optionBtn:removeSelf()

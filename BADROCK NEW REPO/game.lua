@@ -7,7 +7,7 @@
 local composer = require ( "composer"     )
 local physics  = require ( "physics"      )
 local math     = require ( "math"         )
-local panel    = require ( "panel"        )
+local panel    = require ( "utilityMenu"  )
 local ui       = require ( "ui"           )
 local enemies  = require ( "enemies"      )
 local items    = require ( "items"        )
@@ -733,6 +733,8 @@ physics.setGravity( 0, 50 )
 				game.state = GAME_PAUSED
 		        psbutton.isVisible = false
 		        rsbutton.isVisible = true
+		        pauseMenu.psbutton = ui.getButtonByName("pauseBtn")
+				pauseMenu.rsbutton = ui.getButtonByName("resumeBtn")
 		        pauseMenu.panel:show({ y = display.screenOriginY+225,})
 		    elseif (target.myName == "resumeBtn") then
 		    	game.state = GAME_RESUMED
@@ -1136,8 +1138,10 @@ physics.setGravity( 0, 50 )
 				location = "static",
 				onComplete = panelTransDone,
 				speed = 200,
-				x, y = npc.x, npc.y,
-				anchorX, anchorY = 0.5, 0.5
+				x = npc.x,
+				y =  npc.y,
+				anchorX = 0.5, 
+				anchorY = 0.5
 			}
 
 			local background = display.newImageRect( "sprites/balloons.png", 134, 107 )

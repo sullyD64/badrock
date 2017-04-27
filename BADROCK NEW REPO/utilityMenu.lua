@@ -154,8 +154,7 @@ local utility = {}
     --             options.x = display.actualContentWidth - opt.width
     --         end 
     --         transition.to( self, options )
-    --     end
-     
+    --     end     
     --     function container:hide()
     --         local options = {
     --             time = opt.speed,
@@ -289,7 +288,7 @@ local utility = {}
         local options = {
             time = tab.speed or opt.speed,
             transition = tab.transition or opt.outEasing,
-            alpha = tab.alpha,
+            --alpha = tab.alpha,
             x = tab.x or opt.x,
             y= tab.y or opt.y
         }

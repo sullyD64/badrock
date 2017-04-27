@@ -8,13 +8,14 @@ local opt = {}
 
 -- Options menu -----------------------------------------------------------------------
 
+
     local function onOptReturnMenuBtnRelease()  
         opt.panel:hide()
         return true
     end
 
     local function onAboutBtnRelease()  
-        transition.fadeOut( opt.panel, { time=100 } )
+        --transition.fadeOut( opt.panel, { time=100 } )
         aboutMenu.panel:show({
             y = display.screenOriginY+225,
             time =250})
@@ -22,7 +23,7 @@ local opt = {}
     end
 
     local function onSoundMenuBtnRelease()  
-        transition.fadeOut( opt.panel, { time=100 } )
+        --transition.fadeOut( opt.panel, { time=100 } )
         sfxMenu.panel:show({
              y = display.screenOriginY+225,
              time =250})
@@ -105,5 +106,12 @@ local opt = {}
             opt.panel.soundMenuBtn.y = 39
             opt.panel:insert(opt.panel.soundMenuBtn)
     -- -------------------------------------------------------------------------------
+    opt.group = display.newGroup()
+    opt.group:insert(opt.panel)
+    opt.group:insert(aboutMenu.panel)
+    opt.group:insert(sfxMenu.panel)
+    assert(opt.group[1] == opt.panel) -- do1 is on the bottom
+    assert(opt.group[2] == aboutMenu.panel) -- do2 is on the top (front)
+    assert(opt.group[3] == sfxMenu.panel)
 -- -----------------------------------------------------------------------------------
 return opt
