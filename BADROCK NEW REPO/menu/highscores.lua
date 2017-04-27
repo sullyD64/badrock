@@ -48,7 +48,7 @@ end
 
 local function gotoMenu(event)
 	if (event.phase == "ended") then 
-    	composer.gotoScene( "menu", { time=1500, effect="crossFade" } )
+    	composer.gotoScene( "menu.mainMenu", { time=1500, effect="crossFade" } )
     end
 end
 

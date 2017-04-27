@@ -10,11 +10,11 @@ local math       = require ( "math"             )
 local widget     = require ( "widget"           )
 local utility    = require ( "menu.utilityMenu" )
 local panel      = require ( "lib.panel"        )
+local entity     = require ( "lib.entity"       )
 local ui         = require ( "core.ui"          )
 local collisions = require ( "core.collisions"  )
 local enemies    = require ( "core.enemies"     )
 local items      = require ( "core.items"       )
-local position   = require ( "lib.position"     )
 
 local game = {}
 
@@ -40,7 +40,6 @@ physics.setGravity( 0, 50 )
 	game.SSVEnabled = true
 	game.controlsEnabled = true
 	game.levelCompleted = false
-	local spawnX, spawnY
 	local SSVLaunched, SSVType
 
 --===========================================-- 
@@ -54,7 +53,6 @@ physics.setGravity( 0, 50 )
 		--print("Level ended: ")
 		--print(game.levelCompleted)
 		--print(spawnX .. "   " .. spawnY)
-
 		--print(game.steve.canJump)
 		-- if (game.steve.jumpForce) then
 		-- 	print("jumpForce: " ..game.steve.jumpForce)
@@ -73,9 +71,8 @@ physics.setGravity( 0, 50 )
 
 	-- The main game loop, every function is described as follows.
 	local function onUpdate ()
-		--	game.steveSprite.x , game.steveSprite.y = posX , posY
-		if((game.steve.x) and (game.steve.y)) then
-			game.steveSprite.x = game.steve.x 
+		if(game.steve.x and game.steve.y) then
+			game.steveSprite.x = game.steve.x
 			game.steveSprite.y = game.steve.y -10
 		 	--(offset della sprite rispetto a game.steve)
 			game.steveSprite.xScale = game.steve.direction
@@ -367,8 +364,8 @@ physics.setGravity( 0, 50 )
 
 			-- Switches scene (from "levelX" to "highscores").
 			composer.setVariable( "finalScore", game.score )
-			composer.removeScene( "highscores" )
-			composer.gotoScene( "highscores", { time=1500, effect="crossFade" } )
+			composer.removeScene( "menu.highscores" )
+			composer.gotoScene( "menu.highscores", { time=1500, effect="crossFade" } )
 		end
 		timer.performWithDelay( 1500, endGame )
 
@@ -380,10 +377,10 @@ physics.setGravity( 0, 50 )
 	function game.restoreSteve()
 		transition.to(game.steve, { time=0, onComplete = function()
 			game.steve.isBodyActive = false
-			game.steve.x, game.steve.y = spawnX, spawnY
+			game.steve.x, game.steve.y = game.spawn.x, game.spawn.y
 		end})
 
-		game.map:fadeToPosition (spawnX, spawnY, 250)
+		game.map:fadeToPosition (game.spawn.x, game.spawn.y, 250)
 		
 		-- Steve can't move or jump during the animation
 		game.steve.state = game.STEVE_STATE_IDLE
@@ -472,6 +469,7 @@ physics.setGravity( 0, 50 )
 			local steveXV, steveYV = game.steve:getLinearVelocity()
 			if (SSVType == "walk") then
 				-- When walking, ActualSpeed will be 'direction * walkForce'
+				game.steve.state = game.STEVE_STATE_WALKING
 				game.steve:setLinearVelocity(game.steve.actualSpeed, steveYV)
 			elseif (SSVType == "jump" and game.steve.jumpForce < 0) then
 				-- When jumping, ActualSpeed will be 'jumpForce'
@@ -766,7 +764,7 @@ physics.setGravity( 0, 50 )
 				sheetContentHeight = 50--40
 			}
 
-			local walkingSheet = graphics.newImageSheet(visual.steveSheetWalking, sheetData)
+			-- local walkingSheet = graphics.newImageSheet(visual.steveSheetWalking, sheetData)
 
 			local sequenceData = {
 				{name = "walking", start= 1, count =4, time = 300, loopCount=0},
@@ -775,8 +773,17 @@ physics.setGravity( 0, 50 )
 				{name = "jumping", start= 1, count =1, time = 300, loopCount=0 }
 			}
 
-			game.steveSprite = display.newSprite( walkingSheet , sequenceData)
-			game.map:getTileLayer("playerEffects"):addObject( game.steveSprite )
+			game.steveSprite = entity.newEntity{
+				graphicType = "animated",
+				filePath = visual.steveSheetWalking,
+				spriteOptions = sheetData,
+				spriteSequence = sequenceData,
+				bodyType = "static",
+				physicsParams = { isSensor = true },
+				eName = "steveSprite"
+			}
+
+			game.steveSprite:addOnMap( game.map )
 
 			game.steveSprite:setSequence("idle")
 			--game.steveSprite:setFrame(1)
@@ -784,20 +791,34 @@ physics.setGravity( 0, 50 )
 			--game.steveSprite:pause()
 
 		-- Image and physical object
-			game.steve = display.newImageRect( visual.steveImage, 30, 30 )
-			game.steve.alpha = 0 
+
+			game.steve = entity.newEntity{
+				graphicType = "static",
+				filePath = visual.steveImage,
+				width = 30,
+				height = 30,
+				bodyType = "dynamic",
+				physicsParams = { density=1.0, friction=0.7, bounce=0.01 },
+				alpha = 0,
+				isFixedRotation = true,
+				eName = "steve"
+			}
+
+			-- game.steve = display.newImageRect( visual.steveImage, 30, 30 )
+			-- game.steve.alpha = 0
+			-- physics.addBody( game.steve, { density=1.0, friction=0.7, bounce=0.01} )
+			-- game.steve.isFixedRotation = true
+
 			game.steve.myName = "steve"
-			game.steve.rotation = 0
 			game.steve.walkForce = 150
 			game.steve.maxJumpForce = -20
-			physics.addBody( game.steve, { density=1.0, friction=0.7, bounce=0.01} )
-			game.steve.isFixedRotation = true
+			
 			game.steve.state = game.STEVE_STATE_IDLE
 			game.steve.direction = game.DIRECTION_RIGHT
 			game.steve.canJump = false
 
 		-- Binds Steve to the initial spawn point in the current game.
-		game.steve.x, game.steve.y = spawnX, spawnY
+		game.steve.x, game.steve.y = game.spawn.x, game.spawn.y
 
 		game.steve.preCollision = collisions.stevePreCollision
 		game.steve:addEventListener( "preCollision", game.steve )
@@ -809,10 +830,8 @@ physics.setGravity( 0, 50 )
 		local sensorD
 		-- local sensorE
 		local followSteve = function (event)
-			sensorD.x = game.steve.x
-			sensorD.y = game.steve.y
-			-- sensorE.x = game.steve.x
-			-- sensorE.y = game.steve.y
+			sensorD.x, sensorD.y = game.steve.x, game.steve.y
+			-- sensorE.x, sensorE.y = game.steve.x, game.steve.y
 		end
 
 		sensorD = display.newCircle( game.steve.x, game.steve.y, 50 )
@@ -1065,7 +1084,7 @@ physics.setGravity( 0, 50 )
 	function game.loadGame( map, spawn )
 		-- Locally stores the current level map and spawn coordinates
 		game.map = map
-		spawnX, spawnY = spawn.x, spawn.y
+		game.spawn = spawn
 
 		game.score = 0
 		game.lives = game.MAX_LIVES
@@ -1102,7 +1121,7 @@ physics.setGravity( 0, 50 )
 	]]
 
 	function f(object)
-		local angle= math.atan2(game.steve.y - object.y, game.steve.x - object.x) -- work out angle between target and missile
+		local angle= math.atan2(game.steve.x - object.y, game.steve.y - object.x) -- work out angle between target and missile
 		object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
 		object.y = object.y + (math.sin(angle) * object.speed) -- update y pos in relation to angle
 	end
@@ -1228,11 +1247,11 @@ end
 function game.stop()
 	game.disposeSounds()
 	package.loaded[physics] = nil
+
 	Runtime:removeEventListener("enterFrame", moveCamera)
 	Runtime:removeEventListener("collision", npcDetectByCollision)
 	Runtime:removeEventListener("collision", onCollision)
 	Runtime:removeEventListener( "enterFrame", onUpdate )
-
 	--audio.stop(1)
 end
 
