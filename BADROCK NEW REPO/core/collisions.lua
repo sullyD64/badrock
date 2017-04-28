@@ -6,6 +6,7 @@
 local physics = require ( "physics" )
 local ui = require      ( "core.ui" )
 local items = require   ( "core.items" )
+local sfx = require 	("audio.sfx")
 
 local collisions = {}
 local game
@@ -44,7 +45,7 @@ local function dangerCollision( event )
 		if (game.steve.state ~= game.STATE_DIED) then 
 			game.steve.state = game.STATE_DIED
 
-			--audio.play( dangerSound ) DA SISTEMARE AUDIO
+			sfx.playSound( sfx.dangerSound, { channel = 5 } )
 			game.steveDeathAnimation(game.steve.x , game.steve.y)
 
 			game.controlsEnabled = false

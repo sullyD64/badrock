@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------------------------
 
 local physics  = require ( "physics"      )
+local sfx      = require ( "audio.sfx"    )
 
 local items = {}
 
@@ -88,7 +89,7 @@ end
 
 	function coinCollision( game , event, coin )
 		if ( event.phase == "began" ) then
-			--audio.play( coinSound )
+			sfx.playSound( sfx.coinSound, { channel = 3 } )
 			coin.BodyType = "dynamic"
 			display.remove( coin )
 			game.addScore(100)
@@ -100,7 +101,6 @@ end
 	function lifeCollision( game, event, life )
 		if ( event.phase == "began" ) then
 			display.remove(life)
-			--audio.play( coinSound )
 			--life.BodyType = "dynamic"
 			game.addLife()
 			

@@ -7,15 +7,17 @@
 local composer   = require ( "composer"         )
 local physics    = require ( "physics"          )
 local math       = require ( "math"             )
-local widget     = require ( "widget"           )
-local utility    = require ( "menu.utilityMenu" )
-local panel      = require ( "lib.panel"        )
+-- local widget     = require ( "widget"           )
+-- local utility    = require ( "menu.utilityMenu" )
+local panel      = require ( "menu.utilityMenu" )
 local entity     = require ( "lib.entity"       )
 local ui         = require ( "core.ui"          )
 local collisions = require ( "core.collisions"  )
 local player     = require ( "core.player"      )
 local enemies    = require ( "core.enemies"     )
 local items      = require ( "core.items"       )
+local sfx        = require ( "audio.sfx"        )
+local pauseMenu  = require ( "menu.pauseMenu"   )
 
 local game = {}
 
@@ -117,183 +119,6 @@ physics.setGravity( 0, 50 )
 	local function moveCamera( event ) 
 		game.map:update(event)
 	end
-------------------------------------------------------------------------------------
-
--- PAUSE MENU -----------------------------------------------------------
-	local pausePanel, bgVolume, bgMuteBtn, fxVolume, fxMuteBtn
-
-	local function onMenuBtnRelease()  
-		pausePanel:hide({
-			speed = 250,
-			transition = easing.outElastic
-		})
-		game.state = game.GAME_ENDED
-
-		--ui.pauseButton.isVisible = true
-		--ui.resumeButton.isVisible = false
-		composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
-		return true
-	end
-
-	-- Background Volume slider listener
-	local function bgVolumeListener( event )
-		print( "Slider at " .. event.value .. "%" )
-		audio.setVolume( event.value/100, { channel=1 } )
-	end
-
-	-- Effects Volume slider listener (canale fx?)
-	local function fxVolumeListener( event )
-		print( "Slider at " .. event.value .. "%" )
-		audio.setVolume( event.value/100, { channel=2 } )
-	end
-
-	-- Handle press events for the mute background music checkbox [[funziona con pause-resume]]
-	local function onBgMuteSwitchPress( event )
-		local switch = event.target
-		print( "Switch with ID '"..switch.id.."' is on: "..tostring(switch.isOn) )
-		if (switch.isOn) then 
-			audio.pause({channel =1})
-			else audio.resume({channel =1})
-		end
-	end
-
-	-- Handle press events for the mute effects checkbox [[canale fx?]]
-	local function onFxMuteSwitchPress( event )
-		local switch = event.target
-		print( "Switch with ID '"..switch.id.."' is on: "..tostring(switch.isOn) )
-		if (switch.isOn) then 
-				audio.pause({channel =2})
-				else audio.resume({channel =2})
-		end
-	end
-
-	-- Create the options panel (shown when the clockwork is pressed/released)
-	pausePanel = utility.newPanel{
-		location = "custom",
-		onComplete = panelTransDone,
-		width = display.contentWidth * 0.35,
-		height = display.contentHeight * 0.65,
-		speed = 250,
-		anchorX = 0.5,
-		anchorY = 1.0,
-		x = display.contentCenterX,
-		y = display.screenOriginY,
-		inEasing = easing.outBack,
-		outEasing = easing.outCubic
-		}
-		pausePanel.background = display.newImageRect(visual.panel, pausePanel.width, pausePanel.height-20)
-		pausePanel:insert( pausePanel.background )
-		   
-		pausePanel.title = display.newText( "Pause", 0, -70, "Micolas.ttf", 15 )
-		pausePanel.title:setFillColor( 1, 1, 1 )
-		pausePanel:insert( pausePanel.title )
-
-	-- Create the background music volume slider
-	pausePanel.bgVolume = widget.newSlider {
-		sheet = utility.sliderSheet,
-		leftFrame = 1,
-		middleFrame = 2,
-		rightFrame = 3,
-		fillFrame = 4,
-		frameWidth = 18,
-		frameHeight = 16,
-		handleFrame = 5,
-		handleWidth = 18,
-		handleHeight = 18,
-		top = 100,
-		left= 50,
-		orientation = "horizontal",
-		width = 140,
-		value = 40,  -- Start slider at 40%
-		listener = bgVolumeListener
-		}
-
-		pausePanel.bgVolume.x= -10
-		pausePanel.bgVolume.y = -30
-		pausePanel:insert(pausePanel.bgVolume)
-
-	-- Create the effects volume slider
-	pausePanel.fxVolume = widget.newSlider {
-		sheet = utility.sliderSheet,
-		leftFrame = 1,
-		middleFrame = 2,
-		rightFrame = 3,
-		fillFrame = 4,
-		frameWidth = 18,
-		frameHeight = 16,
-		handleFrame = 5,
-		handleWidth = 18,
-		handleHeight = 18,
-		top = 100,
-		left= 50,
-		orientation = "horizontal",
-		width = 140,
-		value = 40,  -- Start slider at 40%
-		listener = fxVolumeListener
-		}
-
-		pausePanel.fxVolume.x= -10
-		pausePanel.fxVolume.y = 5
-		pausePanel:insert(pausePanel.fxVolume)
-
-		pausePanel.bgVolumeText = display.newText( "Music", -20, -48,  "Micolas.ttf", 15 )
-		pausePanel.bgVolumeText:setFillColor( 0, 0, 0 )
-		pausePanel:insert(pausePanel.bgVolumeText)
-
-		pausePanel.fxVolumeText = display.newText( "Sound Effects", -20, -12, "Micolas.ttf", 15 )
-		pausePanel.fxVolumeText:setFillColor( 0, 0, 0 )
-		pausePanel:insert(pausePanel.fxVolumeText)
-
-	-- Create the background mute checkbox
-	pausePanel.bgMuteBtn = widget.newSwitch {
-		sheet = utility.checkboxSheet,
-		frameOff = 1,
-		frameOn = 2,
-		left = 0,
-		top = 100,
-		style = "checkbox",
-		id = "Checkbox",
-		onPress = onBgMuteSwitchPress,
-		height = 15,
-		width = 15
-		}
-		pausePanel.bgMuteBtn.x= 64
-		pausePanel.bgMuteBtn.y = -30
-		pausePanel:insert(pausePanel.bgMuteBtn)
-
-	-- Create the effects mute checkbox
-	pausePanel.fxMuteBtn = widget.newSwitch {
-		sheet = utility.checkboxSheet,
-		frameOff = 1,
-		frameOn = 2,
-		left = 0,
-		top = 100,
-		style = "checkbox",
-		id = "Checkbox",
-		onPress = onFxMuteSwitchPress,
-		height = 15,
-		width = 15
-		}
-		pausePanel.fxMuteBtn.x= 64
-		pausePanel.fxMuteBtn.y = 5
-		pausePanel:insert(pausePanel.fxMuteBtn)
-
-	-- Create the about button
-	pausePanel.menuBtn = widget.newButton {
-		label = "Menu",
-		onRelease = onMenuBtnRelease,
-		emboss = false,
-		shape = "roundedRect",
-		width = 40,
-		height = 15,
-		cornerRadius = 2,
-		fillColor = { default={0.78,0.79,0.78,1}, over={1,0.1,0.7,0.4} },
-		strokeColor = { default={0,0,0,1}, over={0.8,0.8,1,1} },
-		strokeWidth = 1,
-		}
-		pausePanel.menuBtn.x= -60
-		pausePanel.menuBtn.y = 39
-		pausePanel:insert(pausePanel.menuBtn)
 ------------------------------------------------------------------------------------
 
 -- MISCELLANEOUS FUNCTIONS ---------------------------------------------------------
@@ -548,7 +373,7 @@ physics.setGravity( 0, 50 )
 			if (event.phase == "began") then
 				display.currentStage:setFocus( event.target, event.id )
 				if (game.controlsEnabled and game.steve.canJump == true) then
-					audio.play( jumpSound )
+					sfx.playSound( sfx.jumpSound, { channel = 2 } )
 					game.steve.state = game.STEVE_STATE_JUMPING
 
 					SSVType = "jump"
@@ -585,7 +410,7 @@ physics.setGravity( 0, 50 )
 				display.currentStage:setFocus( actionBtn )
 
 				if (game.controlsEnabled) then
-					audio.play( attackSound )
+					sfx.playSound( sfx.attackSound, { channel = 4 } )
 
 					-- Visually simulate the button press
 					actionBtn.active = false
@@ -641,12 +466,14 @@ physics.setGravity( 0, 50 )
 				game.state = game.GAME_PAUSED
 				ui.pauseBtn.isVisible = false
 				ui.resumeBtn.isVisible = true
-				pausePanel:show({ y = display.screenOriginY+225,})
+				pauseMenu.psbutton = ui.getButtonByName("pauseBtn")
+				pauseMenu.rsbutton = ui.getButtonByName("resumeBtn")
+		        pauseMenu.panel:show({ y = display.screenOriginY+225,})
 			elseif (target.myName == "resumeBtn") then
 				game.state = game.GAME_RESUMED
 				ui.pauseBtn.isVisible = true
 				ui.resumeBtn.isVisible = false
-				pausePanel:hide()
+				pauseMenu.panel:hide()
 			end
 			display.currentStage:setFocus( nil )
 		end
@@ -895,8 +722,10 @@ physics.setGravity( 0, 50 )
 				location = "static",
 				onComplete = panelTransDone,
 				speed = 200,
-				x, y = npc.x, npc.y,
-				anchorX, anchorY = 0.5, 0.5
+				x = npc.x,
+				y = npc.y,
+				anchorX = 0.5,
+				anchorY = 0.5
 			}
 
 			local background = display.newImageRect( visual.npcBalloonBackground, 134, 107 )
@@ -966,25 +795,6 @@ physics.setGravity( 0, 50 )
 		timer.performWithDelay( 2000, lowerDpadAlpha)
 	end
 
-	-- Loads all the sounds and BGM.
-	function game.loadSounds()
-		backgroundMusic = audio.loadStream("audio/overside8bit.wav")
-		--backgroundMusic = audio.loadStream( nil )
-		jumpSound = audio.loadSound("audio/jump.wav")
-		coinSound = audio.loadSound("audio/coin.wav")
-		attackSound = audio.loadSound( "audio/attack.wav")
-		dangerSound = audio.loadSound( "audio/danger3.wav")
-	end
-
-	-- Disposes the sounds when -endGame- is triggered.
-	function game.disposeSounds()
-		audio.dispose( backgroundMusic )
-		audio.dispose( jumpSound )
-		audio.dispose( coinSound )
-		audio.dispose( attackSound )
-		audio.dispose( dangerSound )
-	end
-
 	-- Disables the ui when -endGame- is triggered [NOT USED]
 	--[[
 		function game.disableUi()
@@ -1005,6 +815,7 @@ physics.setGravity( 0, 50 )
 		game.map:getTileLayer("playerEffects"):destroy()
 		game.map:getTileLayer("items"):destroy()
 		game.map:getTileLayer("balloons"):destroy()
+		game.map:getTileLayer("sensors"):destroy()
 		game.map:getTileLayer("entities"):destroy()
 	end
 
@@ -1022,7 +833,6 @@ physics.setGravity( 0, 50 )
 		game.loadUi()
 		game.loadEnemies()
 		game.loadNPCS()
-		game.loadSounds()
 
 		game.loadPlayer()
 
@@ -1158,32 +968,27 @@ function game.start()
 	Runtime:addEventListener("enterFrame", onUpdate)
 
 	timer.performWithDelay(200, debug, 0)
-	audio.play(backgroundMusic, {channel = 1 , loops=-1})
 end
 
 function game.pause()
 	game.steve.state = game.STEVE_STATE_IDLE
 	game.steveSprite:pause()
 	physics.pause()
-	audio.pause(1)
 end
 
 function game.resume()
 	game.state = game.GAME_RUNNING
 	game.steveSprite:play()
 	physics.start()
-	audio.resume(1)
 end
 
 function game.stop()
-	game.disposeSounds()
 	game.removeAllEntities()
 
 	Runtime:removeEventListener("enterFrame", moveCamera)
 	Runtime:removeEventListener("collision", npcDetectByCollision)
 	Runtime:removeEventListener("collision", onCollision)
 	Runtime:removeEventListener( "enterFrame", onUpdate )
-	--audio.stop(1)
 
 	package.loaded[physics] = nil
 	package.loaded[ui] = nil

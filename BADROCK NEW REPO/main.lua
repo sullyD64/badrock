@@ -9,6 +9,7 @@ display.setStatusBar( display.HiddenStatusBar )
 
 -- Include the Corona "composer" module
 local composer = require "composer"
+local sfx = require( "audio.sfx" )
 
 -- Globally loads the visual library
 visual = require "visual.visual"
@@ -16,11 +17,7 @@ visual = require "visual.visual"
 -- Enable the multitouch 
 system.activate( "multitouch" )
 
--- Reserve channel 1 for background music
-audio.reserveChannels( 1 )
--- Reduce the overall volume of the channel
-audio.setVolume( 0.2, { channel=1 } )
-
+sfx.init()
 
 -- load menu screen
 composer.gotoScene( "menu.mainMenu" )

@@ -10,6 +10,8 @@ local scene = composer.newScene()
 lime = require("lime.lime")
 lime.disableScreenCulling() 
 local game = require ( "core.game" )
+local sfx = require ("audio.sfx")
+local myData = require ("myData")
 
 
 -- -----------------------------------------------------------------------------------
@@ -25,6 +27,11 @@ local map, visual, physical
 -- create()
 function scene:create( event )
 	local sceneGroup = self.view
+
+	if myData.settings.musicOn == false then
+		audio.play(sfx.bgLvlMusic, {channel = 1 , loops=-1})
+		audio.pause(1)
+	end
 
 	map = lime.loadMap("testmap_new.tmx")
 	--map = lime.loadMap("longMapTest.tmx")
@@ -46,7 +53,7 @@ function scene:show( event )
 	local phase = event.phase
 	
 	if (phase == "will") then
-		
+		sfx.playMusic(sfx.bgLvlMusic, {channel = 1 , loops=-1})
 	elseif (phase == "did") then
 		game.start()	
 	end
@@ -58,18 +65,18 @@ function scene:hide( event )
 	local phase = event.phase
 	
 	if (phase == "will") then
-	
-	elseif (phase == "did") then
+		audio.fadeOut(1,10)
 		game.stop()
+		game.ui:removeSelf()
+	elseif (phase == "did") then
+		package.loaded[game] = nil
 	end		
 end
 
 -- destroy()
 function scene:destroy( event )
 	local sceneGroup = self.view
-
-	game.stop()
-	package.loaded[game] = nil
+	audio.dispose()
 end
 
 -- -----------------------------------------------------------------------------------
