@@ -15,7 +15,6 @@
 -- Examples of Entity: Steve, an Enemy, an NPC, a Boss, an Item, a Parcticle (e.g. bolts, rocks, ..)
 -----------------------------------------------------------------------------------------
 
-
 local physics = require ( "physics")
 
 local entity = {}
@@ -29,7 +28,7 @@ function entity.newEntity( options )
 	opt.graphicType = customOptions.graphicType or "static"
 	opt.filePath = customOptions.filePath	--required
 
-	-- required if graphycType is "static"
+	-- required if graphicType is "static"
 	opt.width = customOptions.width
 	opt.height = customOptions.height
 

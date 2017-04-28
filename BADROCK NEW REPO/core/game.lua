@@ -68,9 +68,12 @@ physics.setGravity( 0, 50 )
 
 	-- The main game loop, every function is described as follows.
 	local function onUpdate ()
+
 		if(game.steve.x and game.steve.y) then
 			game.steveSprite.x = game.steve.x
 			game.steveSprite.y = game.steve.y -10
+			game.sensorD.x, game.sensorD.y = game.steve.x, game.steve.y
+		 	-- game.steve.sensorE.x, game.steve.sensorE.y = game.steve.x, game.steve.y
 		 	--(offset della sprite rispetto a game.steve)
 			game.steveSprite.xScale = game.steve.direction
 		end
@@ -116,7 +119,7 @@ physics.setGravity( 0, 50 )
 	end
 ------------------------------------------------------------------------------------
 
--- PAUSE MENU ----------------------------------------------------------------------
+-- PAUSE MENU -----------------------------------------------------------
 	local pausePanel, bgVolume, bgMuteBtn, fxVolume, fxMuteBtn
 
 	local function onMenuBtnRelease()  
@@ -699,6 +702,8 @@ physics.setGravity( 0, 50 )
 				  (event.object2.sensorName == "E") ) then
 				sensorN = event.object1
 
+				print("collision")
+
 				--[[
 					-- if (event.object2.sensorName == "D") then
 					-- 	sensorD = event.object2
@@ -718,7 +723,7 @@ physics.setGravity( 0, 50 )
 					flag = "hide"
 				end
 
-				-- Switches between the two if blocks (next collision will enter the other if)
+				-- Switches between the two if blocks (next collision will enter the other 'if')
 				if (collName == "contact") then
 					contactEnabled = false
 					releaseEnabled = true
@@ -751,13 +756,14 @@ physics.setGravity( 0, 50 )
 	-- See player.lua
 	function game.loadPlayer()
 		game.steve, game.steveSprite = player.loadPlayer( game )
+		game.sensorD = player.loadSensors( game )
 
 		game.steveSprite:setSequence("idle")
 		--game.steveSprite:setFrame(1)
 		game.steveSprite:play()
 		--game.steveSprite:pause()
 
-		game.steve.state = game.STEVE_STATE_IDLE
+		game.steve.state = game.steve_STATE_IDLE
 		game.steve.direction = game.DIRECTION_RIGHT
 		game.steve.canJump = false
 
@@ -765,36 +771,6 @@ physics.setGravity( 0, 50 )
 		game.steve:addEventListener( "preCollision", game.steve )
 
 		game.map:setFocus( game.steve )
-	end
-
-	-- Loads invisible "sensor" circles surrounding the player.
-	-- Visually istantiates the sensors in the current game's map.
-	function game.loadPlayerSensors()
-		local sensorD
-		-- local sensorE
-		local followSteve = function (event)
-			sensorD.x, sensorD.y = game.steve.x, game.steve.y
-			-- sensorE.x, sensorE.y = game.steve.x, game.steve.y
-		end
-
-		sensorD = display.newCircle( game.steve.x, game.steve.y, 50 )
-		physics.addBody( sensorD, {isSensor = true, radius = 50} )
-		sensorD.sensorName = "D"
-		sensorD:setFillColor( 100, 50, 0 )
-		sensorD.alpha = 0
-		--sensorD.collType = "sensor"
-		--sensorD.preCollision = sensorPreCollision
-		--sensorD:addEventListener( "preCollision", sensorD )
-
-		-- sensorE = display.newCircle( game.steve.x, game.steve.y, 40)
-		-- physics.addBody(sensorE, {isSensor = true, radius = 40})
-		-- sensorE.sensorName = "E"
-		-- sensorE:setFillColor(0,200,255)
-		-- sensorE.alpha=0.4
-
-		Runtime:addEventListener( "enterFrame", followSteve )
-		game.map:getTileLayer( "playerEffects"):addObject( sensorD )
-		-- game.map:getTileLayer("playerEffects"):addObject( sensorE )
 	end
 
 	-- An enemy is an animated Entity capable of moving on the map and performing other actions 
@@ -949,14 +925,14 @@ physics.setGravity( 0, 50 )
 			physics.addBody(npc.sensorN, {isSensor = true, radius = 60})
 			npc.sensorN.sensorName = "N"
 			npc.sensorN:setFillColor(0,100,0)
-			npc.sensorN.alpha=0 --MODIFICTO DA FABIO
+			npc.sensorN.alpha = 0.5
 			
 			-- npc.sensorN.collType = "sensor"
 			-- npc.sensorN.preCollision = sensorPreCollision
 			-- npc.sensorN:addEventListener( "preCollision", npc.sensorN )
 
 			Runtime:addEventListener( "enterFrame", followNpc )
-			game.map:getTileLayer("entities"):addObject(npc.sensorN)
+			game.map:getTileLayer("sensors"):addObject(npc.sensorN)
 		end
 
 		for i = 1, #game.npcs, 1 do
@@ -1044,12 +1020,11 @@ physics.setGravity( 0, 50 )
 		game.levelCompleted = false
 
 		game.loadUi()
-		game.loadPlayer()
 		game.loadEnemies()
 		game.loadNPCS()
 		game.loadSounds()
 
-		game.loadPlayerSensors()
+		game.loadPlayer()
 
 		-- Critical, do not modify.
 		game.SSVEnabled = true
