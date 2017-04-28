@@ -70,14 +70,14 @@
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="dynamic"/>
-    <property name="canBeBroken" value="true"/>
+    <property name="isBreakable" value="true"/>
    </properties>
   </tile>
   <tile id="36">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="dynamic"/>
-    <property name="canBeBroken" value="true"/>
+    <property name="isBreakable" value="true"/>
    </properties>
   </tile>
   <tile id="37">

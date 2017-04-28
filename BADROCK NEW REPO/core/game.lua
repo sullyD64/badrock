@@ -13,6 +13,7 @@ local panel      = require ( "lib.panel"        )
 local entity     = require ( "lib.entity"       )
 local ui         = require ( "core.ui"          )
 local collisions = require ( "core.collisions"  )
+local player     = require ( "core.player"      )
 local enemies    = require ( "core.enemies"     )
 local items      = require ( "core.items"       )
 
@@ -47,13 +48,10 @@ physics.setGravity( 0, 50 )
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- The only purpose of this is for text debugging on the console, do not add anything else.
 	local function debug(event)
-		--print("Steve Coordinates (x=" .. posX .. " , y=" .. posY .. ")")
 		--print(game.steve.canJump)
 		--print("Game " .. game.state)
 		--print("Level ended: ")
 		--print(game.levelCompleted)
-		--print(spawnX .. "   " .. spawnY)
-		--print(game.steve.canJump)
 		-- if (game.steve.jumpForce) then
 		-- 	print("jumpForce: " ..game.steve.jumpForce)
 		-- end
@@ -66,7 +64,6 @@ physics.setGravity( 0, 50 )
 		--if (game.steveSprite.phase)then print("AnimState"..game.steveSprite.phase) end
 		--print("SteveY: "..game.steve.y)
 		--print("SpriteY: "..game.steveSprite.y)
-		--print( "TESTisPlaying: ", game.testSprite.isPlaying)
 	end
 
 	-- The main game loop, every function is described as follows.
@@ -354,20 +351,20 @@ physics.setGravity( 0, 50 )
 				} )
 
 		-- What follows is executed with a brief delay.
-		local endGame = function()
-			game.ui:removeSelf( )
+			local endGame = function()
+				game.ui:removeSelf( )
 
-			-- Removes the event listener if endGame was triggered while still inputing a movement.
-			if (SSVLaunched) then
-				Runtime:removeEventListener( "enterFrame", setSteveVelocity )
+				-- Removes the event listener if endGame was triggered while still inputing a movement.
+				if (SSVLaunched) then
+					Runtime:removeEventListener( "enterFrame", setSteveVelocity )
+				end
+
+				-- Switches scene (from "levelX" to "highscores").
+				composer.setVariable( "finalScore", game.score )
+				composer.removeScene( "menu.highscores" )
+				composer.gotoScene( "menu.highscores", { time=1500, effect="crossFade" } )
 			end
-
-			-- Switches scene (from "levelX" to "highscores").
-			composer.setVariable( "finalScore", game.score )
-			composer.removeScene( "menu.highscores" )
-			composer.gotoScene( "menu.highscores", { time=1500, effect="crossFade" } )
-		end
-		timer.performWithDelay( 1500, endGame )
+			timer.performWithDelay( 1500, endGame )
 
 		game.state = game.GAME_ENDED
 		return true
@@ -453,7 +450,7 @@ physics.setGravity( 0, 50 )
 -- COLLISION HANDLERS --------------------------------------------------------------
 	-- See collisions.lua
 	local function onCollision( event )
-		collisions.onCollision( event , game )
+		collisions.onCollision( event )
 	end
 ------------------------------------------------------------------------------------
 
@@ -751,77 +748,23 @@ physics.setGravity( 0, 50 )
 ------------------------------------------------------------------------------------
 
 -- GAME INITIALIZATION -------------------------------------------------------------
-	-- Loads the player's image, animations and initializes its attributes.
-	-- Visually istantiates the player in the current game's map.
+	-- See player.lua
 	function game.loadPlayer()
+		game.steve, game.steveSprite = player.loadPlayer( game )
 
-		-- Sprite and animation sequences
-			local sheetData ={
-				height = 50,
-				width = 30,
-				numFrames = 4,
-				sheetContentWidth = 120,--120,
-				sheetContentHeight = 50--40
-			}
+		game.steveSprite:setSequence("idle")
+		--game.steveSprite:setFrame(1)
+		game.steveSprite:play()
+		--game.steveSprite:pause()
 
-			-- local walkingSheet = graphics.newImageSheet(visual.steveSheetWalking, sheetData)
-
-			local sequenceData = {
-				{name = "walking", start= 1, count =4, time = 300, loopCount=0},
-				{name = "idle", start= 1, count =1, time = 300, loopCount=0},
-				{name = "falling", start= 1, count =1, time = 300, loopCount=0},
-				{name = "jumping", start= 1, count =1, time = 300, loopCount=0 }
-			}
-
-			game.steveSprite = entity.newEntity{
-				graphicType = "animated",
-				filePath = visual.steveSheetWalking,
-				spriteOptions = sheetData,
-				spriteSequence = sequenceData,
-				bodyType = "static",
-				physicsParams = { isSensor = true },
-				eName = "steveSprite"
-			}
-
-			game.steveSprite:addOnMap( game.map )
-
-			game.steveSprite:setSequence("idle")
-			--game.steveSprite:setFrame(1)
-			game.steveSprite:play()
-			--game.steveSprite:pause()
-
-		-- Image and physical object
-
-			game.steve = entity.newEntity{
-				graphicType = "static",
-				filePath = visual.steveImage,
-				width = 30,
-				height = 30,
-				bodyType = "dynamic",
-				physicsParams = { density=1.0, friction=0.7, bounce=0.01 },
-				alpha = 0,
-				isFixedRotation = true,
-				eName = "steve"
-			}
-
-			-- game.steve = display.newImageRect( visual.steveImage, 30, 30 )
-			-- game.steve.alpha = 0
-			-- physics.addBody( game.steve, { density=1.0, friction=0.7, bounce=0.01} )
-			-- game.steve.isFixedRotation = true
-
-			game.steve.myName = "steve"
-			game.steve.walkForce = 150
-			game.steve.maxJumpForce = -20
-			
-			game.steve.state = game.STEVE_STATE_IDLE
-			game.steve.direction = game.DIRECTION_RIGHT
-			game.steve.canJump = false
-
-		-- Binds Steve to the initial spawn point in the current game.
-		game.steve.x, game.steve.y = game.spawn.x, game.spawn.y
+		game.steve.state = game.STEVE_STATE_IDLE
+		game.steve.direction = game.DIRECTION_RIGHT
+		game.steve.canJump = false
 
 		game.steve.preCollision = collisions.stevePreCollision
 		game.steve:addEventListener( "preCollision", game.steve )
+
+		game.map:setFocus( game.steve )
 	end
 
 	-- Loads invisible "sensor" circles surrounding the player.
@@ -854,7 +797,7 @@ physics.setGravity( 0, 50 )
 		-- game.map:getTileLayer("playerEffects"):addObject( sensorE )
 	end
 
-	-- An enemy is an animated entity capable of moving on the map and performing other actions 
+	-- An enemy is an animated Entity capable of moving on the map and performing other actions 
 	-- which can kill Steve in several ways.
 	-- Loads all the enemies and initializes their attributes.
 	-- Visually istantiates the enemies in the current game's map.
@@ -1079,6 +1022,16 @@ physics.setGravity( 0, 50 )
 		end
 	  ]]
 
+	-- Removes every Entity on the map when -game.stop- is triggered
+		-- [[ lavori in corso: introdurre lista di entità in game ]]
+	function game.removeAllEntities()
+		game.map:getTileLayer("playerObject"):destroy()
+		game.map:getTileLayer("playerEffects"):destroy()
+		game.map:getTileLayer("items"):destroy()
+		game.map:getTileLayer("balloons"):destroy()
+		game.map:getTileLayer("entities"):destroy()
+	end
+
 	-- Main entry point (must be called from the current level).
 	-- Triggers all the -game.load- functions.
 	function game.loadGame( map, spawn )
@@ -1110,14 +1063,14 @@ physics.setGravity( 0, 50 )
 
 -- GIGI WIP-------------------------------------------------------------------------
 	--[[
-	function prova()
-	for k,v in ipairs(game.enemyLevelList) do
-	transition.to(game.enemyLevelList[k], {
-			time=1500,
-			x=(game.enemyLevelList[k].x - 120),
-			onComplete=prova()
-		})
-	end
+		function prova()
+		for k,v in ipairs(game.enemyLevelList) do
+		transition.to(game.enemyLevelList[k], {
+				time=1500,
+				x=(game.enemyLevelList[k].x - 120),
+				onComplete=prova()
+			})
+		end
 	]]
 
 	function f(object)
@@ -1222,10 +1175,13 @@ function game.start()
 	game.state = game.GAME_RUNNING
 	game.steveSprite:play()
 	physics.start()
+
 	Runtime:addEventListener("enterFrame", moveCamera)
+	collisions.setGame( game )
 	Runtime:addEventListener("collision", onCollision)
 	Runtime:addEventListener("collision", npcDetectByCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
+
 	timer.performWithDelay(200, debug, 0)
 	audio.play(backgroundMusic, {channel = 1 , loops=-1})
 end
@@ -1246,13 +1202,19 @@ end
 
 function game.stop()
 	game.disposeSounds()
-	package.loaded[physics] = nil
+	game.removeAllEntities()
 
 	Runtime:removeEventListener("enterFrame", moveCamera)
 	Runtime:removeEventListener("collision", npcDetectByCollision)
 	Runtime:removeEventListener("collision", onCollision)
 	Runtime:removeEventListener( "enterFrame", onUpdate )
 	--audio.stop(1)
+
+	package.loaded[physics] = nil
+	package.loaded[ui] = nil
+	package.loaded[entity] = nil
+	package.loaded[enemies] = nil
+	package.loaded[collisions] = nil
 end
 
 return game

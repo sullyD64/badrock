@@ -33,27 +33,11 @@ function scene:create( event )
 
 	physical = lime.buildPhysical(map)
 
-	--[[	-- ATTENZIONE -- 
-	La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
-	playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
-	e due layer di TILE playerObject e playerEffects
+	-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
+	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
+	-- e due Tile Layer -vuoti-  playerObject e playerEffects.
+	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0") )
 
-	/////////////////DA RICONTROLLARE////////////////////////////
-	]]
-	local layer = map:getObjectLayer("playerSpawn")	
-	local spawn = layer:getObject("spawn0")
-	game.loadGame( map, spawn )
-	--game.level = map
-	mainGroup = display.newGroup()
-	local steve = game.steve
-
-	mainGroup:insert( steve )
-	sceneGroup:insert( mainGroup )
-
-	map:getTileLayer("playerObject"):addObject( steve )
-	map:setFocus( steve )
-
-	sceneGroup:insert( game.ui )
 end
 
 -- show()
@@ -76,7 +60,7 @@ function scene:hide( event )
 	if (phase == "will") then
 	
 	elseif (phase == "did") then
-		--game.pause()
+		game.stop()
 	end		
 end
 
@@ -84,7 +68,7 @@ end
 function scene:destroy( event )
 	local sceneGroup = self.view
 
-	--game.stop()
+	game.stop()
 	package.loaded[game] = nil
 end
 

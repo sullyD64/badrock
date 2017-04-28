@@ -2,8 +2,6 @@
 --
 -- entity.lua
 --
------------------------------------------------------------------------------------------
-
 -- An Entity is an object that is represented on the game's current map by a Corona Display Object, 
 -- whether it is a static image or an animated sprite. 
 -- An Entity is first positioned on the map by a Tiled Object representing its "spawn point", and it
@@ -11,10 +9,14 @@
 -- All Entities are Physical Objects (static or dynamic), can move on the map and
 -- interact with each other.
 
+-- All Entities have an unique identifier called "eName":
+-- Use it for collision detection when needed
+
 -- Examples of Entity: Steve, an Enemy, an NPC, a Boss, an Item, a Parcticle (e.g. bolts, rocks, ..)
+-----------------------------------------------------------------------------------------
+
 
 local physics = require ( "physics")
-local lime = require ("lime.lime")
 
 local entity = {}
 
@@ -64,7 +66,7 @@ function entity.newEntity( options )
 	ent.isFixedRotation = customOptions or false
 	ent.eName = customOptions.eName 
 
-	-- Each Entity has an unique name specified by the attribute "eName": this is used for determining
+	-- Each Entity has an unique name specified by the attribute "eName": this is used to determine
 	-- in which Tile Layer it will be added.
 	function ent:addOnMap( map )
 		local name = self.eName
