@@ -8,10 +8,10 @@
 -- is istantiated on a select Tile Level depending by one of the entities attributes.
 -- All Entities are Physical Objects (static or dynamic), can move on the map and
 -- interact with each other.
-
+--
 -- All Entities have an unique identifier called "eName":
 -- Use it for collision detection when needed
-
+--
 -- Examples of Entity: Steve, an Enemy, an NPC, a Boss, an Item, a Parcticle (e.g. bolts, rocks, ..)
 -----------------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ function entity.newEntity( options )
 		elseif (opt.graphicType == "animated") then
 			if (opt.spriteOptions and opt.spriteSequence) then
 				local sheet = graphics.newImageSheet( opt.filePath, opt.spriteOptions )
-				ent = display.newSprite(sheet, opt.spriteSequence)		
+				ent = display.newSprite(sheet, opt.spriteSequence)
 			else
 				error ("invalid sprite options or sequence data")
 			end

@@ -7,9 +7,6 @@
 local composer   = require ( "composer"         )
 local physics    = require ( "physics"          )
 local math       = require ( "math"             )
--- local widget     = require ( "widget"           )
--- local utility    = require ( "menu.utilityMenu" )
-local panel      = require ( "menu.utilityMenu" )
 local entity     = require ( "lib.entity"       )
 local ui         = require ( "core.ui"          )
 local collisions = require ( "core.collisions"  )
@@ -17,7 +14,10 @@ local player     = require ( "core.player"      )
 local enemies    = require ( "core.enemies"     )
 local items      = require ( "core.items"       )
 local sfx        = require ( "audio.sfx"        )
+local panel      = require ( "menu.utilityMenu" )
 local pauseMenu  = require ( "menu.pauseMenu"   )
+-- local widget  = require ( "widget"           )
+-- local utility = require ( "menu.utilityMenu" )
 
 local game = {}
 
@@ -528,8 +528,6 @@ physics.setGravity( 0, 50 )
 				( (event.object2.sensorName == "D")   or 
 				  (event.object2.sensorName == "E") ) then
 				sensorN = event.object1
-
-				print("collision")
 
 				--[[
 					-- if (event.object2.sensorName == "D") then

@@ -64,18 +64,18 @@ local function createActionBtn()
 end
 
 local function createPauseBtn()
-    ui.pauseBtn = display.newImageRect( visual.pauseButton, 35, 35 )
+	ui.pauseBtn = display.newImageRect( visual.pauseButton, 35, 35 )
 	ui.pauseBtn.anchorX, ui.pauseBtn.anchorY = 1, 0
 	ui.pauseBtn.x, ui.pauseBtn.y = display.contentWidth -10, 30
-    ui.pauseBtn.myName = "pauseBtn"
+	ui.pauseBtn.myName = "pauseBtn"
 end
 
 local function createResumeBtn()
-    ui.resumeBtn = display.newImageRect( visual.resumeButton, 35, 35 )
-    ui.resumeBtn.anchorX, ui.resumeBtn.anchorY = 1, 0
-    ui.resumeBtn.x, ui.resumeBtn.y = display.contentWidth -10, 30
-    ui.resumeBtn.myName = "resumeBtn"
-    ui.resumeBtn.isVisible = false
+	ui.resumeBtn = display.newImageRect( visual.resumeButton, 35, 35 )
+	ui.resumeBtn.anchorX, ui.resumeBtn.anchorY = 1, 0
+	ui.resumeBtn.x, ui.resumeBtn.y = display.contentWidth -10, 30
+	ui.resumeBtn.myName = "resumeBtn"
+	ui.resumeBtn.isVisible = false
 end
 
 local function createScoreText()

@@ -2,13 +2,12 @@
 --
 -- panel.lua
 --
------------------------------------------------------------------------------------------
-
 -- Sligthly modified version of the "SlidingPanel" class.
 -- This allows to specify the widget coordinates as well as the anchor points,
 -- plus, a "static" position can be declared which will override the show() and hide()
 -- methods to perform a simple alpha channel fade in-out of the display objects contained
 -- in the panel.
+-----------------------------------------------------------------------------------------
 
 local widget = require ( "widget" )
 
