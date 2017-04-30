@@ -2,10 +2,10 @@
 --
 -- player.lua
 --
--- The player is an Entity, see entity.lua for more
+-- The player is an anmiated Entity (see entity.lua for more).
 -----------------------------------------------------------------------------------------
 
-local entity = require ("lib.entity")
+local entity = require ( "lib.entity" )
 
 local player = {}
 local settings = {
@@ -105,6 +105,5 @@ function player.loadSensors( currentGame )
 		
 		-- return sensorD, sensorE
 end
-
 
 return player

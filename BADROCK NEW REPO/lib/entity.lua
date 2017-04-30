@@ -74,8 +74,6 @@ function entity.newEntity( options )
 				map:getTileLayer("playerObject"):addObject(self)
 			elseif (name == "item") then
 				map:getTileLayer("items"):addObject(self)
-			elseif (name == "balloon") then
-				map:getTileLayer("balloons"):addObject(self)
 			else
 				map:getTileLayer("entities"):addObject(self)
 			end

@@ -12,6 +12,7 @@ local ui         = require ( "core.ui"          )
 local collisions = require ( "core.collisions"  )
 local player     = require ( "core.player"      )
 local enemies    = require ( "core.enemies"     )
+local npcs       = require ( "core.npcs"        )
 local items      = require ( "core.items"       )
 local sfx        = require ( "audio.sfx"        )
 local panel      = require ( "menu.utilityMenu" )
@@ -516,7 +517,7 @@ physics.setGravity( 0, 50 )
 			end
 		end
 
-		-- Handles the triggering of the event of showing/hiding one npc's balloon.
+		-- Handles the showing/hiding event for one npc's balloon.
 		-- Steve and every npc have an invisible "sensor" physical object surrounding
 		-- and following them at runtime. This function handles the collision between
 		-- the two (in future three) sensors, and acts differently depending if the
@@ -567,14 +568,14 @@ physics.setGravity( 0, 50 )
 		end
 
 		-- [[Non so ancora se mi servirà a qualcosa]]
-		local function sensorPreCollision ( self, event )
+		--[[local function sensorPreCollision ( self, event )
 			if ( "sensor" ~= event.other.collType ) then
 				if event.contact then
 					event.contact.isEnabled = false
 				end
 			end
 			return true
-		end
+		end]]
 ------------------------------------------------------------------------------------
 
 -- GAME INITIALIZATION -------------------------------------------------------------
@@ -596,6 +597,18 @@ physics.setGravity( 0, 50 )
 		game.steve:addEventListener( "preCollision", game.steve )
 
 		game.map:setFocus( game.steve )
+	end
+
+	-- See npcs.lua
+	function game.loadNPCS() 
+		game.npcs = npcs.loadNPCs( game )
+
+		------------------------------------------------------------------------
+			-- wip for controls, will be removed soon
+			for k, v in ipairs(game.npcs) do
+				game.npcs[k].balloon.button:addEventListener( "touch", balloonTouch )
+			end
+		------------------------------------------------------------------------
 	end
 
 	-- An enemy is an animated Entity capable of moving on the map and performing other actions 
@@ -691,81 +704,6 @@ physics.setGravity( 0, 50 )
 
 		for k, v in pairs(game.enemyLevelList) do
 			muovi(game.enemyLevelList[k])
-		end
-	end
-
-	-- An NPC (non-playable character) is an animated entity with whom Steve can interact.
-	-- Loads the npcs's images, speech balloons and initializes their attributes.
-	-- Visually instantiates the npcs in the current game's map.
-	function game.loadNPCS() 
-		local layer = game.map:getObjectLayer("npcSpawn")
-		game.npcs = layer:getObjects("npc")
-
-		-- Loads the image and the sprites.
-		local loadNPCimage = function(npc)
-			npc.staticImage = display.newImageRect( visual.npcImage, 51, 128 )
-			npc.staticImage.x, npc.staticImage.y = npc.x, npc.y
-			game.map:getTileLayer("entities"):addObject(npc.staticImage)
-		end
-
-		-- Loads the speech balloon, the text and the buttons.
-		local loadBalloon = function(npc)
-			local panelTransDone = function( target )
-				if ( target.completeState ) then
-					--print( "PANEL STATE IS: "..target.completeState )
-				end
-			end
-			
-			npc.balloon = panel.newPanel{
-				location = "static",
-				onComplete = panelTransDone,
-				speed = 200,
-				x = npc.x,
-				y = npc.y,
-				anchorX = 0.5,
-				anchorY = 0.5
-			}
-
-			local background = display.newImageRect( visual.npcBalloonBackground, 134, 107 )
-			background.anchorY = 1
-			npc.balloon:insert(background)
-
-			local button = display.newImageRect( visual.npcBalloonButton1, 58, 40 )
-			button.x, button.y = background.x, background.y -50
-			npc.balloon:insert(button)
-			npc.balloon.x, npc.balloon.y = npc.x, npc.y -20
-			npc.balloon.alpha = 0
-			npc.balloon:hide()
-
-			game.map:getTileLayer("balloons"):addObject(npc.balloon)
-			button:addEventListener( "touch", balloonTouch )
-		end
-
-		-- Loads the sensor for -npcDetect-.
-		local loadSensor = function(npc)
-			local followNpc = function ()
-				npc.sensorN.x = npc.x
-				npc.sensorN.y = npc.y
-			end
-
-			npc.sensorN = display.newCircle( npc.x, npc.y, 60)
-			physics.addBody(npc.sensorN, {isSensor = true, radius = 60})
-			npc.sensorN.sensorName = "N"
-			npc.sensorN:setFillColor(0,100,0)
-			npc.sensorN.alpha = 0.5
-			
-			-- npc.sensorN.collType = "sensor"
-			-- npc.sensorN.preCollision = sensorPreCollision
-			-- npc.sensorN:addEventListener( "preCollision", npc.sensorN )
-
-			Runtime:addEventListener( "enterFrame", followNpc )
-			game.map:getTileLayer("sensors"):addObject(npc.sensorN)
-		end
-
-		for i = 1, #game.npcs, 1 do
-			loadNPCimage(game.npcs[i])
-			loadBalloon(game.npcs[i])
-			loadSensor(game.npcs[i])
 		end
 	end
 
