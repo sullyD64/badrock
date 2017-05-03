@@ -51,7 +51,6 @@ function entity.newEntity( options )
 
 	if (opt.graphicType == "sensor") then 
 		opt.filePath = "bypassed"
-		opt.eName = "sensor"
 		opt.physicsParams = {isSensor = true, radius = opt.radius}
 	end
 
@@ -87,7 +86,9 @@ function entity.newEntity( options )
 	ent.alpha = customOptions.alpha or 1
 	ent.rotation = customOptions.rotation or 0
 	ent.isFixedRotation = customOptions.isFixedRotation or false
-	ent.eName = customOptions.eName 
+	ent.eName = customOptions.eName
+
+	if (ent.sensorName) then ent.eName = "sensor" end
 
 	-- Each Entity has an unique name specified by the attribute "eName": this is used to determine
 	-- in which Tile Layer it will be added.

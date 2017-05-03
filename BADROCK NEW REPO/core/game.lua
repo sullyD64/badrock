@@ -276,13 +276,6 @@ physics.setGravity( 0, 50 )
 	end
 ------------------------------------------------------------------------------------
 
--- COLLISION HANDLERS --------------------------------------------------------------
-	-- See collisions.lua
-	local function onCollision( event )
-		collisions.onCollision( event )
-	end
-------------------------------------------------------------------------------------
-
 -- CONTROLS HANDLERS ---------------------------------------------------------------
 	-- Main movement handler: it physically translates Steve in the map by applying physical forces.
 	local function setSteveVelocity()
@@ -499,83 +492,6 @@ physics.setGravity( 0, 50 )
 
 		return true --Prevents touch propagation to underlying objects
 	end
-------------------------------------------------------------------------------------
-
--- NPCDETECT 3.0--------------------------------------------------------------------
-	local contactEnabled = true
-	local releaseEnabled = false
-
-		-- Params: one npc from the npcs list and one flag string.
-		-- The flag is calculated by the type of collision detected.
-		local function toggleNpcBalloon ( npc, flag )
-			if (flag == "show") then
-				-- npc.balloon.alpha = 1
-				npc.balloon:show()
-			elseif (flag == "hide") then
-				-- npc.balloon.alpha = 0
-				npc.balloon:hide()
-			end
-		end
-
-		-- Handles the showing/hiding event for one npc's balloon.
-		-- Steve and every npc have an invisible "sensor" physical object surrounding
-		-- and following them at runtime. This function handles the collision between
-		-- the two (in future three) sensors, and acts differently depending if the
-		-- collision is a "contact" or a "release" between the two circles.
-		local function npcDetectByCollision ( event )
-			local sensorN, collName, flag 
-			if ( (event.object1.sensorName == "N")   or 
-				 (event.object2.sensorName == "N") ) and 
-				( (event.object2.sensorName == "D")   or 
-				  (event.object2.sensorName == "E") ) then
-				sensorN = event.object1
-
-				--[[
-					-- if (event.object2.sensorName == "D") then
-					-- 	sensorD = event.object2
-					-- elseif (event.object2.sensorName == "E") then
-					-- 	sensorE = event.object2
-					-- end
-					-- if (sensorN.sensorName ~= "N") then
-					-- 	sensorN = event.object2
-					-- end
-				]]--
-
-				if (contactEnabled) then 
-					collName = "contact"
-					flag = "show"
-				elseif (releaseEnabled) then
-					collName = "release"
-					flag = "hide"
-				end
-
-				-- Switches between the two if blocks (next collision will enter the other 'if')
-				if (collName == "contact") then
-					contactEnabled = false
-					releaseEnabled = true
-				elseif (collName == "release") then
-					releaseEnabled = false
-					contactEnabled = true
-				end
-
-				for i = 1, #game.npcs, 1 do
-					-- Selects the npc associated to the sensorN and calls the toggle function
-					if (game.npcs[i].sensorN == sensorN) then
-						toggleNpcBalloon(game.npcs[i], flag)
-					end
-				end
-			end
-		end
-
-		-- [[Non so ancora se mi servirà a qualcosa]]
-		--[[local function sensorPreCollision ( self, event )
-			if ( "sensor" ~= event.other.collType ) then
-				if event.contact then
-					event.contact.isEnabled = false
-				end
-			end
-			return true
-		end]]
 ------------------------------------------------------------------------------------
 
 -- GAME INITIALIZATION -------------------------------------------------------------
@@ -898,8 +814,7 @@ function game.start()
 
 	Runtime:addEventListener("enterFrame", moveCamera)
 	collisions.setGame( game )
-	Runtime:addEventListener("collision", onCollision)
-	Runtime:addEventListener("collision", npcDetectByCollision)
+	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 
 	timer.performWithDelay(200, debug, 0)
@@ -921,8 +836,7 @@ function game.stop()
 	game.removeAllEntities()
 
 	Runtime:removeEventListener("enterFrame", moveCamera)
-	Runtime:removeEventListener("collision", npcDetectByCollision)
-	Runtime:removeEventListener("collision", onCollision)
+	Runtime:removeEventListener("collision", collisions.onCollision)
 	Runtime:removeEventListener( "enterFrame", onUpdate )
 
 	package.loaded[physics] = nil

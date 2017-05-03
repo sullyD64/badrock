@@ -85,12 +85,25 @@ function npcs.loadNPCs( currentGame )
 			balloon.button = button -- wip for control handler, will be removed soon
 			-----------------------------------------------------------------
 
+			-- Handles the showing/hiding event for one npc's balloon.
+			-- Params: a NPC from the NPCs list and a flag string.
+			-- The flag is calculated by the type of collision detected.
+			function balloon:toggle ( flag )
+				if (flag == "show") then
+					-- npc.balloon.alpha = 1
+					npc.balloon:show()
+				elseif (flag == "hide") then
+					-- npc.balloon.alpha = 0
+					npc.balloon:hide()
+				end
+			end
+
 			currentMap:getTileLayer("balloons"):addObject(balloon)
 
 			return balloon
 		end
 
-	-- Loads the sensor for -npcDetect-.
+	-- Loads the sensor for -npcDetectByCollision-.
 		local loadSensor = function(npc)
 			local sensorN = entity.newEntity{
 				graphicType = "sensor",

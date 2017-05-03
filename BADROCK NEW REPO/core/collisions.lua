@@ -3,10 +3,11 @@
 -- collisions.lua
 --
 -----------------------------------------------------------------------------------------
-local physics = require ( "physics" )
-local ui = require      ( "core.ui" )
-local items = require   ( "core.items" )
-local sfx = require 	("audio.sfx")
+local physics = require ( "physics"    )
+local ui      = require ( "core.ui"    )
+local npcs    = require ( "core.npcs"  )
+local items   = require ( "core.items" )
+local sfx     = require ( "audio.sfx"  )
 
 local collisions = {}
 local game
@@ -73,7 +74,7 @@ local function dangerCollision( event )
 	end
 end
 
--- Collision between an Enemy and the player's Attack
+-- Collision between the player's Attack and an Enemy
 local function steveAttackCollision( event )
 	local attack = event.object1
 	local other = event.object2
@@ -129,41 +130,95 @@ local function steveAttackCollision( event )
 	end
 end
 
--- Main collision handler index
-function collisions.onCollision( event )
-	-- Index for collisions involving the player
-		if ( (event.object1.eName == "steve") or 
-			 (event.object2.eName == "steve") ) then
-			
-			local steve = event.object1
-			local other = event.object2
+-------------------------------------
+	-- Used by npcDetectByCollision
+	local contactEnabled = true
+	local releaseEnabled = false
+-------------------------------------
 
-			if(other.eName =="steve") then 
-				steve = event.object2
-				other = event.object1
-			end
+-- Steve and every npc have an invisible "sensor" physical object surrounding
+-- and following them at runtime. This function handles the collision between
+-- the two (in future three) sensors, and acts differently depending if the
+-- collision is a "contact" or a "release" between the two circles.
+local function npcDetectByCollision( event )
+	local sensorN, collName, flag 
+	if ( (event.object1.sensorName == "N") or (event.object2.sensorName == "N") ) and 
+		( (event.object2.sensorName == "D") or (event.object2.sensorName == "E") ) then
+		sensorN = event.object1
 
-			if(other.myName == "env" or other.myName == "platform") then
-				environmentCollision(event)
-			elseif (other.myName == "item") then
-				items.itemCollision(game, event, other)
-			elseif (other.isEnemy or other.isDanger) then
-				dangerCollision(event)
-			-- Special case for the level's ending block. Triggers -endGameScreen-
-			elseif(other.myName == "end_level") then
-				game.levelCompleted = true
-				game.endGameScreen()
-			else
-				game.letMeJump = true -- force enable the jump
-			end
+		--[[
+			-- if (event.object2.sensorName == "D") then
+			-- 	sensorD = event.object2
+			-- elseif (event.object2.sensorName == "E") then
+			-- 	sensorE = event.object2
+			-- end
+			-- if (sensorN.sensorName ~= "N") then
+			-- 	sensorN = event.object2
+			-- end
+		]]--
 
-	-- Index for collisions involving the player's Attack
-		elseif( (event.object1.myName == "steveAttack") or 
-			    (event.object2.myName == "steveAttack") ) then
-			steveAttackCollision( event )
+		if (contactEnabled) then 
+			collName = "contact"
+			flag = "show"
+		elseif (releaseEnabled) then
+			collName = "release"
+			flag = "hide"
 		end
+
+		-- Switches between the two if blocks (next collision will enter the other 'if')
+		if (collName == "contact") then
+			contactEnabled = false
+			releaseEnabled = true
+		elseif (collName == "release") then
+			releaseEnabled = false
+			contactEnabled = true
+		end
+
+		for i=1, #game.npcs, 1 do
+			-- Selects the npc associated to the sensorN and calls the toggle function
+			if (game.npcs[i].sensorN == sensorN) then
+				--toggleNpcBalloon(game.npcs[i], flag)
+				game.npcs[i].balloon:toggle(flag)
+			end
+		end
+	end
 end
 
+
+-- Main collision handler index
+function collisions.onCollision( event )
+	local o1, o2 = event.object1, event.object2
+
+	-- Index for collisions involving the player
+	if ( (o1.eName == "steve") or (o2.eName == "steve") ) then
+		local steve, other = o1, o2
+		if(other.eName =="steve") then steve, other = o2, o1 end
+
+		if(other.myName == "env" or other.myName == "platform") then
+			environmentCollision(event)
+		elseif (other.myName == "item") then
+			items.itemCollision(game, event, other)
+		elseif (other.isEnemy or other.isDanger) then
+			dangerCollision(event)
+		-- Special case for the level's ending block. Triggers -endGameScreen-
+		elseif(other.myName == "end_level") then
+			game.levelCompleted = true
+			game.endGameScreen()
+		else
+			game.letMeJump = true -- force enable the jump
+		end
+
+	-- Index for collisions involving the player's Attack
+	elseif( (o1.myName == "steveAttack") or (o2.myName == "steveAttack") ) then
+		steveAttackCollision( event )
+	
+	-- Index for collisions involving sensors
+	elseif( (o1.eName == "sensor") and (o2.eName == "sensor") ) then
+		npcDetectByCollision( event )
+	end
+end
+
+--------------------------------------------------------------------------------------------------
 -- Allows the player to pass through certain platforms when jumping from below the platform's base
 function collisions.stevePreCollision( self, event )
 	if ( event.other.myName == "platform" ) then
@@ -181,5 +236,7 @@ function collisions.stevePreCollision( self, event )
 	end
 	return true
 end
+--------------------------------------------------------------------------------------------------
+
 
 return collisions
