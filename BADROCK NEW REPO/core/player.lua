@@ -2,7 +2,11 @@
 --
 -- player.lua
 --
--- The player is an anmiated Entity (see entity.lua for more).
+-- The player is an animated Entity (see entity.lua for more).
+-- It is composed of three parts:
+-- 1) The hitbox (an invisible image),
+-- 2) A Sprite sequence (for the visual animations),
+-- 3) A Sensor (to be used with the npcs' sensors and other entities).
 -----------------------------------------------------------------------------------------
 
 local entity = require ( "lib.entity" )
@@ -13,8 +17,11 @@ local settings = {
 	walkForce = 150,
 	maxJumpForce = -20,
 
-	sensor1Radius = 50,	-- wip
-	sensor1Alpha = 0.5,
+	sensorOpts = {
+		radius = 50,
+		alpha = 0.5,
+		color = {20, 50, 200},
+	},
 
 	sheetData = {
 		height = 50,
@@ -32,9 +39,9 @@ local settings = {
 	},
 }
 
--- Loads the player's image, animations and initializes its attributes.
+-- Loads the player's image, animations and sensor and initializes its attributes.
 -- Visually istantiates the player in the current game's map.
--- @return player, sprite (two Entities)
+-- @return player, sprite, sensorD (three Entities)
 function player.loadPlayer( currentGame )
 	-- Loads the Main Entity ("hitbox")
 		local player = entity.newEntity{
@@ -60,6 +67,17 @@ function player.loadPlayer( currentGame )
 			eName = "steveSprite"
 		}
 
+	-- Loads the sensor, used to extend the player's "collision box"
+		local sensorD = entity.newEntity{
+			graphicType = "sensor",
+			parentX = player.x,
+			parentY = player.y,
+			radius = settings.sensorOpts.radius,
+			color = settings.sensorOpts.color,
+			alpha = settings.sensorOpts.alpha,
+			sensorName = "D"
+		}
+
 	-- Binds the player to the starting spawn point in the current game.
 		local currentSpawn = currentGame.spawn
 		player.x, player.y = currentSpawn.x, currentSpawn.y
@@ -71,39 +89,10 @@ function player.loadPlayer( currentGame )
 		local currentMap = currentGame.map
 		player:addOnMap ( currentMap )
 		sprite:addOnMap ( currentMap )
+		sensorD:addOnMap(currentMap)
 
-		return player, sprite
+		return player, sprite, sensorD
 end
 
--- Loads invisible sensor(s) surrounding the player.
--- A Sensor is used to extend an entity's "collision box"
--- Visually istantiates the sensor(s) in the current game's map.
--- @return sensorD
-function player.loadSensors( currentGame )
-	local player = currentGame.steve
-	local currentMap = currentGame.map
-
-	local sensorD
-	sensorD = display.newCircle( player.x, player.y, settings.sensor1Radius )
-	physics.addBody( sensorD, {isSensor = true, radius = settings.sensor1Radius} )
-	sensorD.sensorName = "D"
-	sensorD:setFillColor( 100, 50, 0 )
-	sensorD.alpha = settings.sensor1Alpha
-
-	currentMap:getTileLayer("sensors"):addObject(sensorD)
-
-	return sensorD
-
-	-- local sensorE
-		-- sensorE = display.newCircle( player..x, player..y, 40)
-		-- physics.addBody(sensorE, {isSensor = true, radius = 40})
-		-- sensorE.sensorName = "E"
-		-- sensorE.setFillColor( 0, 200, 255)
-		-- sensorE.alpha=0.4
-
-		-- currentMap:getTileLayer("sensors"):addObject(sensorE)
-		
-		-- return sensorD, sensorE
-end
 
 return player

@@ -17,8 +17,11 @@ local panel  = require ( "menu.utilityMenu" )
 local npcs = {}
 
 local settings = {
-	sensorAlpha = 0.5,
-	sensorRadius = 60,
+	sensorOpts = {
+		radius = 60,
+		alpha = 0.5,
+		color = {100, 100, 0},
+	},
 }
 
 -- Loads the npcs's images, speech balloons and initializes their attributes.
@@ -79,7 +82,7 @@ function npcs.loadNPCs( currentGame )
 			balloon:hide()
 
 			-----------------------------------------------------------------
-			balloon.button = button -- wip for controls, will be removed soon
+			balloon.button = button -- wip for control handler, will be removed soon
 			-----------------------------------------------------------------
 
 			currentMap:getTileLayer("balloons"):addObject(balloon)
@@ -89,17 +92,19 @@ function npcs.loadNPCs( currentGame )
 
 	-- Loads the sensor for -npcDetect-.
 		local loadSensor = function(npc)
-			local sensorN
-			sensorN = display.newCircle( npc.x, npc.y, 60)
-			physics.addBody(sensorN, {isSensor = true, radius = settings.sensorRadius})
-			sensorN.sensorName = "N"
-			sensorN:setFillColor( 0, 100, 0 )
-			sensorN.alpha = settings.sensorAlpha
-
+			local sensorN = entity.newEntity{
+				graphicType = "sensor",
+				parentX = npc.x,
+				parentY = npc.y,
+				radius = settings.sensorOpts.radius,
+				color = settings.sensorOpts.color,
+				alpha = settings.sensorOpts.alpha,
+				sensorName = "N"
+			}
+			-- Needed for sticking the sensor to the npc
 			sensorN.gravityScale = 0
-			sensorN.x, sensorN.y = npc.x, npc.y
-	
-			currentMap:getTileLayer("sensors"):addObject(sensorN)
+
+			sensorN:addOnMap(currentMap)
 
 			return sensorN
 		end

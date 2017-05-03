@@ -581,8 +581,7 @@ physics.setGravity( 0, 50 )
 -- GAME INITIALIZATION -------------------------------------------------------------
 	-- See player.lua
 	function game.loadPlayer()
-		game.steve, game.steveSprite = player.loadPlayer( game )
-		game.sensorD = player.loadSensors( game )
+		game.steve, game.steveSprite, game.sensorD = player.loadPlayer( game )
 
 		game.steveSprite:setSequence("idle")
 		--game.steveSprite:setFrame(1)
@@ -604,7 +603,7 @@ physics.setGravity( 0, 50 )
 		game.npcs = npcs.loadNPCs( game )
 
 		------------------------------------------------------------------------
-			-- wip for controls, will be removed soon
+			-- wip for control handlers, will be removed soon
 			for k, v in ipairs(game.npcs) do
 				game.npcs[k].balloon.button:addEventListener( "touch", balloonTouch )
 			end
