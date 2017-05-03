@@ -3,7 +3,6 @@
 -- items.lua
 --
 -----------------------------------------------------------------------------------------
-
 local physics  = require ( "physics"      )
 local sfx      = require ( "audio.sfx"    )
 

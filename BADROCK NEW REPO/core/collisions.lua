@@ -2,6 +2,9 @@
 --
 -- collisions.lua
 --
+-- This class handles all the #COLLISION# events between physical objects in the current 
+-- map, whether they are Tiles or Entities. For this, it needs to store the current game 
+-- in order to make it visible to the local collision handlers.
 -----------------------------------------------------------------------------------------
 local physics = require ( "physics"    )
 local ui      = require ( "core.ui"    )

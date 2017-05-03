@@ -10,7 +10,6 @@
 -- 3) A Sensor (to be used with the player's sensor for detecting proximity for showing or
 --    hiding the balloon).
 -----------------------------------------------------------------------------------------
-
 local entity = require ( "lib.entity"       )
 local panel  = require ( "menu.utilityMenu" )
 

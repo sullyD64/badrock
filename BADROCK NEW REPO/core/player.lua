@@ -2,13 +2,12 @@
 --
 -- player.lua
 --
--- The player is an animated Entity (see entity.lua for more).
+-- The player is visually represented by an animated Entity (see entity.lua for more).
 -- It is composed of three parts:
--- 1) The hitbox (an invisible image),
+-- 1) The hitbox (an invisible image), which state is modified by the controller,
 -- 2) A Sprite sequence (for the visual animations),
 -- 3) A Sensor (to be used with the npcs' sensors and other entities).
 -----------------------------------------------------------------------------------------
-
 local entity = require ( "lib.entity" )
 
 local player = {}

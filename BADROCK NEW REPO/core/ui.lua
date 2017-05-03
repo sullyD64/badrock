@@ -17,8 +17,7 @@ ui.scoreText = nil
 ui.pointsText = nil
 ui.lifeIcons = {}
 
-
---Funzione diventata inutile e non usata
+-- this is STILL used by pauseMenu
 function ui.getButtonByName( name )
 	for i = 1, ui.uiGroup.numChildren do
 		if (ui.uiGroup[i].myName == name) then
@@ -150,23 +149,5 @@ function ui.updateLifeIcons(lives)
 		end
 	end
 end
-
---[[
-	function ui.createBalloon()
-		balloon = display.newGroup()
-
-		local background = display.newImageRect( "sprites/balloons.png", 134, 107 )
-		background.anchorY = 1
-
-		balloon.button = display.newImageRect( "sprites/bottonefanculo.png", 58, 40 )
-		balloon.button.x = background.x
-		balloon.button.y = background.y -50
-
-		balloon:insert(background)
-		balloon:insert(balloon.button)
-
-		return balloon
-	end
-]]
 
 return ui

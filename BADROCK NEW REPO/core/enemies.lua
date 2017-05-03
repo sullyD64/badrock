@@ -3,8 +3,8 @@
 -- enemies.lua
 --
 -----------------------------------------------------------------------------------------
-local physics =  require ( "physics" )
-local items = require ( "core.items" )
+local physics = require ( "physics"    )
+local items   = require ( "core.items" )
 
 local enemies = {}
 

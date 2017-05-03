@@ -2,6 +2,11 @@
 --
 -- game.lua
 --
+-- Game is intended to be the "simulator" of the application logic tier.
+-- Accessibility to child modules (like the controller) is granted depending on the 
+-- simulation state.
+-- At startup, this class istantiates all the domain objects by calling the initializator 
+-- methods contained in the "core" modules.
 -----------------------------------------------------------------------------------------
 
 local composer   = require ( "composer"         )
@@ -36,8 +41,8 @@ physics.setGravity( 0, 50 )
 	game.STEVE_STATE_JUMPING   = "Jumping"
 	game.STEVE_STATE_ATTACKING = "Attacking"
 	game.STEVE_STATE_DIED      = "Died"
-	game.DIRECTION_LEFT        = -1
-	game.DIRECTION_RIGHT       =  1
+	game.DIRECTION_LEFT        = -1				-- servono??
+	game.DIRECTION_RIGHT       =  1				-- servono??
 	game.MAX_LIVES             =  3
 
 	game.letMeJump = false
@@ -71,7 +76,8 @@ physics.setGravity( 0, 50 )
 
 	-- The main game loop, every function is described as follows.
 	local function onUpdate ()
-
+		-- Keeps the player's image, sprite and sensor all joined.
+		-- (remember that ONLY the image "steve" acts as the hitbox)
 		if(game.steve.x and game.steve.y) then
 			game.steveSprite.x = game.steve.x
 			game.steveSprite.y = game.steve.y -10
@@ -300,7 +306,7 @@ physics.setGravity( 0, 50 )
 					j = j - 1
 					i = i + 1
 
-					maths = - i
+					local maths = - i
 					-- maths = - math.exp( i/2 ) + 1
 					-- maths - game.steve.jumpForce*math.exp(-i/100000000)
 					game.steve.jumpForce = game.steve.jumpForce + maths
@@ -527,9 +533,9 @@ physics.setGravity( 0, 50 )
 	end
 
 	-- An enemy is an animated Entity capable of moving on the map and performing other actions 
-	-- which can kill Steve in several ways.
-	-- Loads all the enemies and initializes their attributes.
-	-- Visually istantiates the enemies in the current game's map.
+		-- which can kill Steve in several ways.
+		-- Loads all the enemies and initializes their attributes.
+		-- Visually istantiates the enemies in the current game's map.
 	function game.loadEnemies()
 		--[[Richiede che sulla mappa ci siano degli OGGETTI con il tipo = tipoNemico]]
 
@@ -623,7 +629,7 @@ physics.setGravity( 0, 50 )
 	end
 
 	-- Loads the UI's images and handlers.
-	-- Visually istantiates the UI in the current game's map.
+		-- Visually istantiates the UI in the current game's map.
 	function game.loadUi()
 		game.ui = ui.loadUi(game)
 
@@ -645,19 +651,6 @@ physics.setGravity( 0, 50 )
 		end
 		timer.performWithDelay( 2000, lowerDpadAlpha)
 	end
-
-	-- Disables the ui when -endGame- is triggered [NOT USED]
-	--[[
-		function game.disableUi()
-			-- Removes any residual event listener from the UI
-			ui.getButtonByName("jumpScreen"):removeEventListener("touch", jumpTouch)
-			ui.getButtonByName("dpadLeft"):removeEventListener("touch", dpadTouch)
-			ui.getButtonByName("dpadRight"):removeEventListener("touch", dpadTouch)
-			ui.getButtonByName("actionBtn"):removeEventListener("touch", actionTouch)
-			ui.getButtonByName("pauseBtn"):removeEventListener("touch", pauseResume)
-			ui.getButtonByName("resumeBtn"):removeEventListener("touch",pauseResume)
-		end
-	  ]]
 
 	-- Removes every Entity on the map when -game.stop- is triggered
 		-- [[ lavori in corso: introdurre lista di entità in game ]]
@@ -688,8 +681,6 @@ physics.setGravity( 0, 50 )
 		game.loadPlayer()
 
 		-- Critical, do not modify.
-		game.SSVEnabled = true
-		game.controlsEnabled = true
 		SSVLaunched = false
 
 		physics.start()
