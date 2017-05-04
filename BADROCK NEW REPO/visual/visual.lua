@@ -24,8 +24,11 @@ local visual = {
 	levelIconBg            = "visual/misc/levelIconBg.png",
 
 	dpadLeft               = "visual/ui/dpadLeft.png",
+	dpadLeft_over          = "visual/ui/dpadLeft_over.png",
 	dpadRight              = "visual/ui/dpadRight.png",
+	dpadRight_over         = "visual/ui/dpadRight_over.png",
 	actionBtn              = "visual/ui/actionbtn.png",
+	-- actionBtn_over      = "visual/ui/actionbtn_over.png",
 	pauseButton            = "visual/ui/pause.png",
 	resumeButton           = "visual/ui/resume.png",
 	lifeIcon               = "visual/ui/life.png",

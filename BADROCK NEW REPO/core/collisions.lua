@@ -43,8 +43,8 @@ local function dangerCollision( event )
 
 	-- Avoid Steve to take damage from enemy while attacking 
 	-- (but only if the enemy isn't invincible)
-	if ( (game.steve.state ~= game.STATE_ATTACKING and (other.isEnemy or other.isDanger) ) or
-		 (game.steve.state == game.STATE_ATTACKING and other.isDanger) ) then 
+	if ( (game.steve.state ~= game.STEVE_STATE_ATTACKING and (other.isEnemy or other.isDanger) ) or
+		 (game.steve.state == game.STEVE_STATE_ATTACKING and other.isDanger) ) then 
 
 		if (game.steve.state ~= game.STATE_DIED) then 
 			game.steve.state = game.STATE_DIED

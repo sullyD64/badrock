@@ -3,7 +3,7 @@
 -- entity.lua
 --
 -- An Entity is an object that is represented on the game's current map by a Corona Display Object, 
--- whether it is a static image or an animated sprite. 
+-- whether it is a static image or an animated sprite or a shape. 
 -- An Entity is first positioned on the map by a Tiled Object representing its "spawn point", and it
 -- is istantiated on a select Tile Level depending by one of the entities attributes.
 -- All Entities are Physical Objects (static or dynamic), can move on the map and
@@ -60,7 +60,7 @@ function entity.newEntity( options )
 			if (opt.width and opt.height) then
 				ent = display.newImageRect( opt.filePath, opt.width, opt.height )
 			else
-				error ("no width or heigth specified for the new image")
+				error ("no width or height specified for the new image")
 			end
 		elseif (opt.graphicType == "animated") then
 			if (opt.spriteOptions and opt.spriteSequence) then
@@ -106,15 +106,6 @@ function entity.newEntity( options )
 			end
 		else
 			error("invalid or non-existent map")
-		end
-	end
-
-	function ent:setPosition( pos )
-		if (pos) then
-			ent.position = pos
-			ent.x, ent.y =ent.position:unpack()
-		else
-			error ("invalid or non-existent position")
 		end
 	end
 

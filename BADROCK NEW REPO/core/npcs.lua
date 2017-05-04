@@ -89,11 +89,9 @@ function npcs.loadNPCs( currentGame )
 			-- The flag is calculated by the type of collision detected.
 			function balloon:toggle ( flag )
 				if (flag == "show") then
-					-- npc.balloon.alpha = 1
-					npc.balloon:show()
+					self:show()
 				elseif (flag == "hide") then
-					-- npc.balloon.alpha = 0
-					npc.balloon:hide()
+					self:hide()
 				end
 			end
 
@@ -121,7 +119,7 @@ function npcs.loadNPCs( currentGame )
 			return sensorN
 		end
 
-	for i = 1, #npcList, 1 do
+	for i, v in ipairs(npcList) do
 			npcList[i].staticImage = loadNPCEntity(npcList[i])
 			npcList[i].balloon = loadBalloon(npcList[i])
 			npcList[i].sensorN = loadSensor(npcList[i])

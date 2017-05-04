@@ -20,9 +20,9 @@ local enemies    = require ( "core.enemies"     )
 local npcs       = require ( "core.npcs"        )
 local items      = require ( "core.items"       )
 local sfx        = require ( "audio.sfx"        )
-local panel      = require ( "menu.utilityMenu" )
 local pauseMenu  = require ( "menu.pauseMenu"   )
 -- local widget  = require ( "widget"           )
+-- local panel   = require ( "menu.utilityMenu" )
 -- local utility = require ( "menu.utilityMenu" )
 
 local game = {}
@@ -44,6 +44,22 @@ physics.setGravity( 0, 50 )
 	game.DIRECTION_LEFT        = -1				-- servono??
 	game.DIRECTION_RIGHT       =  1				-- servono??
 	game.MAX_LIVES             =  3
+
+	game.state = {
+		RUNNING = "Running",
+		PAUSED  = "Paused",
+		RESUMED = "Resumed",
+		ENDED   = "Ended",
+	}
+
+	game.steve = {}
+
+	game.steve.state = {
+		IDLE      = "Idle",
+		WALKING   = "Walking",
+		ATTACKING = "Attacking",
+		DEAD      = "Dead",
+	}
 
 	game.letMeJump = false
 	game.SSVEnabled = true
@@ -526,8 +542,8 @@ physics.setGravity( 0, 50 )
 
 		------------------------------------------------------------------------
 			-- wip for control handlers, will be removed soon
-			for k, v in ipairs(game.npcs) do
-				game.npcs[k].balloon.button:addEventListener( "touch", balloonTouch )
+			for i, v in ipairs(game.npcs) do
+				game.npcs[i].balloon.button:addEventListener( "touch", balloonTouch )
 			end
 		------------------------------------------------------------------------
 	end

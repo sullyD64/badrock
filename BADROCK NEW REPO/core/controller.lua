@@ -10,16 +10,20 @@
 -----------------------------------------------------------------------------------------
 local physics = require ( "physics"   )
 local ui      = require ( "core.ui"   )
--- more imports??
+
 
 local controller = {}
 
-local game, player
+local game   = {}
+local player = {}
 
-function controller.setGame ( currentGame, player )
+function controller.load ( currentGame, player )
 	game = currentGame
 	player = player
 end
+
+local function loadUIListeners
+
 
 
 local SSVEnabled
