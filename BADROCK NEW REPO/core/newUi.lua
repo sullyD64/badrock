@@ -2,15 +2,36 @@
 --
 -- newUi.lua
 --
+-- This module is tied to the controller which is the only class that uses it.
+-- Although UI is mainly "passive", it requires the controller for storing in a table its
+-- "listeners" function; in that way each button can reference one of the controller methods
+-- when the button is created.
+-- Additional functions provide easy shortcuts for toggling the enablement for the whole ui.
 -----------------------------------------------------------------------------------------
 local widget     = require ( "widget"     )
 local controller = require ( "controller" )
 
 local ui = {}
 
+-- Locally stores the list of references to the controller's listener functions
+local listeners = controller.listeners
+
+-- Stores the data tables for the -widget.newButton- calls.
 local buttonData = {
-	-- #1 dpadLeft
-	{
+	-- Touchable area (invisible button)
+	--1
+	jumpScreen = {
+		options = {
+			id = "jumpScreen",
+			width = 10000,
+			heigth = 10000,
+			onPress = listeners.onJumpTouch
+		}
+	}
+
+	-- Touchable buttons
+	--2
+	dpadLeft = {
 		options = {
 			id = "dpadLeft",
 			defaultFile = visual.dpadLeft,
@@ -23,9 +44,8 @@ local buttonData = {
 		aX = 0,
 		aY = 1,
 	},
-
-	-- #2 dpadRight
-	{
+	--3
+	dpadRight = {
 		options = {
 			id = "dpadRight",
 			defaultFile = visual.dpadRight,
@@ -38,9 +58,8 @@ local buttonData = {
 		aX = 0,
 		aY = 1,
 	},
-
-	-- #3 actionBtn
-	{
+	--4
+	actionBtn = {
 		options = {
 			id = "actionBtn",
 			defaultFile = visual.actionBtn,
@@ -53,9 +72,8 @@ local buttonData = {
 		aX = 1,
 		aY = 1,
 	},
-
-	-- #4 pauseBtn
-	{
+	--5
+	pauseBtn = {
 		options = {
 			id = "pauseBtn",
 			defaultFile = visual.pauseBtn,
@@ -67,9 +85,8 @@ local buttonData = {
 		aX = 1,
 		aY = 0,
 	},
-
-	-- #5 resumeBtn
-	{
+	--6
+	resumeBtn = {
 		options = {
 			id = "resumeBtn",
 			defaultFile = visual.resumeBtn,
@@ -82,8 +99,9 @@ local buttonData = {
 		aY = 0,
 	},
 
-	-- #6 scoreText
-	{	
+	-- Untouchable text-only buttons
+	--7
+ 	scoreText = {
 		options = {
 			id = "scoreText",
 			textOnly = true,
@@ -100,9 +118,8 @@ local buttonData = {
 		aX = 1,
 		aY = 0,
 	},
-
-	-- #7 scoreUpText
-	{	
+	--8
+	scoreUpText = {
 		options = {
 			id = "scoreUpText",
 			textOnly = true,
@@ -120,9 +137,8 @@ local buttonData = {
 		aY = 0.5,
 		isVisible = false,
 	},
-
-	-- #8 livesText
-	{	
+	--9
+	livesText = {
 		options = {
 			id = "livesText",
 			textOnly = true,
@@ -142,67 +158,81 @@ local buttonData = {
 	},
 }
 
-ui.buttons = display.newGroup()
-
+-- Contains all the calls to -widget.newButton- and adds selected buttons to the UI Group.
 local function createButtons()
-	-- Special case for the jumpScreen
-	local jumpScreen = display.newRect( display.contentCenterX, display.contentCenterY, 10000,10000)
-		-- jumpScreen:setFillColor( 0, 255, 0 )
-		jumpScreen.id = "jumpScreen"
+	local buttonGroup = display.newGroup()
+
+	local jumpScreen  = widget.newButton ( buttonData.jumpScreen.options  )
+		jumpScreen:setFillColor( 0, 255, 0 )
 		jumpScreen.isVisible = false
 		jumpScreen.isHitTestable = true
-		buttons:insert( jumpScreen )
+		--	buttonGroup:insert( jumpScreen )		-- NO!
 
-	local dpadLeft = widget.newButton( buttonData[1].options )
-		dpadLeft.anchorX, dpadLeft.anchorY = button[1].aX, button[1].ay
-		buttons:insert( dpadLeft )
+	local dpadLeft    = widget.newButton ( buttonData.dpadLeft.options    )
+		dpadLeft.anchorX, dpadLeft.anchorY = buttonData.dpadLeft.aX, buttonData.dpadLeft.ay
+		buttonGroup:insert( dpadLeft )
 
-	local dpadRight = widget.newButton( buttonData[2].options )
-		dpadRight.anchorX, dpadRight.anchorY = button[2].aX, button[2].ay
-		buttons:insert( dpadRight )
+	local dpadRight   = widget.newButton ( buttonData.dpadRight.options   )
+		dpadRight.anchorX, dpadRight.anchorY = buttonData.dpadRight.aX, buttonData.dpadRight.ay
+		buttonGroup:insert( dpadRight )
 
-	local actionBtn = widget.newButton( buttonData[3].options )
-		actionBtn.anchorX, actionBtn.anchorY = button[3].aX, button[3].ay
-		buttons:insert( actionBtn )
+	local actionBtn   = widget.newButton ( buttonData.actionBtn.options   )
+		actionBtn.anchorX, actionBtn.anchorY = buttonData.actionBtn.aX, buttonData.actionBtn.ay
+		buttonGroup:insert( actionBtn )
 
-	local pauseBtn = widget.newButton( buttonData[4].options )
-		pauseBtn.anchorX, pauseBtn.anchorY = button[4].aX, button[4].ay
-		buttons:insert( pauseBtn )
+	local pauseBtn    = widget.newButton ( buttonData.pauseBtn.options    )
+		pauseBtn.anchorX, pauseBtn.anchorY = buttonData.pauseBtn.aX, buttonData.pauseBtn.ay
+		buttonGroup:insert( pauseBtn )
 		----------------------
 		pauseBtn.active = true -- Controller (avoid action spam)
 		----------------------
 
-	local resumeBtn = widget.newButton( buttonData[5].options )
-		resumeBtn.anchorX, resumeBtn.anchorY = button[5].aX, button[5].ay
-		buttons:insert( resumeBtn )
+	local resumeBtn   = widget.newButton ( buttonData.resumeBtn.options   )
+		resumeBtn.anchorX, resumeBtn.anchorY = buttonData.resumeBtn.aX, buttonData.resumeBtn.ay
+		buttonGroup:insert( resumeBtn )
 		----------------------
 		resumeBtn.isVisible = false -- Controller
 		----------------------
 
-	local scoreText = widget.newButton( buttonData[6].options )
-		scoreText.anchorX, scoreText.anchorY = button[6].aX, button[6].ay
-		buttons:insert( scoreText )
+	local scoreText   = widget.newButton ( buttonData.scoreText.options   )
+		scoreText.anchorX, scoreText.anchorY = buttonData.scoreText.aX, buttonData.scoreText.ay
+		buttonGroup:insert( scoreText )
 
-	local scoreUpText = widget.newButton( buttonData[7].options )
-		scoreUpText.anchorX, scoreUpText.anchorY = button[7].aX, button[7].ay
-		buttons:insert( scoreUpText )
+	local scoreUpText = widget.newButton ( buttonData.scoreUpText.options )
+		scoreUpText.anchorX, scoreUpText.anchorY = buttonData.scoreUpText.aX, buttonData.scoreUpText.ay
+		buttonGroup:insert( scoreUpText )
 		----------------------
 		scoreUpText.isVisible = false -- Controller
 		----------------------
-	
-	local livesText = widget.newButton( buttonData[8].options )
-		livesText.anchorX, livesText.anchorY = button[8].aX, button[8].ay
-		buttons:insert( livesText )
+
+	local livesText   = widget.newButton ( buttonData.livesText.options   )
+		livesText.anchorX, livesText.anchorY = buttonData.livesText.aX, buttonData.livesText.ay
+		buttonGroup:insert( livesText )
+
+	local buttons = {
+		jumpScreen, 
+		dpadLeft, dpadRight, actionBtn, 
+		pauseBtn, resumeBtn, 
+		scoreText, scoreUpText, livesText
+	}
+
+	return buttons, buttonGroup
 end
 
+-- This function is called by the controller.
+-- (Important: THIS causes the UI to appear on the screen!)
+-- The only exception is the jumpScreen, which has to be manually istantiated on the map.
+function ui.loadUI()
+	-- Buttons refers to the WHOLE UI (including jumpScreen), use it for drastical changes
+	-- ButtonGroup refers to every button that goes BEFORE the map.
+	ui.buttons, ui.buttonGroup = createButtons()
+end
 
+-- Shortcut which allows to toggle enablement to the whole UI
 function ui:setEnabled( boolean )
-	-- skips the jumpScreen
-	for 2, #ui.buttons, 1 do
+	for i in pairs (ui.buttons) do
 		ui.buttons[i]:setEnabled( boolean )
 	end
-
-	ui.buttons[1].isEnabled = boolean
 end
 
 	

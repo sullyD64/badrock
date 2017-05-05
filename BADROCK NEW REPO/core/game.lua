@@ -13,12 +13,13 @@ local composer   = require ( "composer"         )
 local physics    = require ( "physics"          )
 local math       = require ( "math"             )
 local entity     = require ( "lib.entity"       )
-local ui         = require ( "core.ui"          )
-local collisions = require ( "core.collisions"  )
 local player     = require ( "core.player"      )
 local enemies    = require ( "core.enemies"     )
 local npcs       = require ( "core.npcs"        )
 local items      = require ( "core.items"       )
+local controller = require ( "core.controller"  )
+local ui         = require ( "core.ui"          )
+local collisions = require ( "core.collisions"  )
 local sfx        = require ( "audio.sfx"        )
 local pauseMenu  = require ( "menu.pauseMenu"   )
 -- local widget  = require ( "widget"           )
@@ -45,7 +46,7 @@ physics.setGravity( 0, 50 )
 	game.DIRECTION_RIGHT       =  1				-- servono??
 	game.MAX_LIVES             =  3
 
-	game.state = {
+	game.states = {
 		RUNNING = "Running",
 		PAUSED  = "Paused",
 		RESUMED = "Resumed",
@@ -54,7 +55,7 @@ physics.setGravity( 0, 50 )
 
 	game.steve = {}
 
-	game.steve.state = {
+	game.steve.states = {
 		IDLE      = "Idle",
 		WALKING   = "Walking",
 		ATTACKING = "Attacking",
@@ -72,8 +73,7 @@ physics.setGravity( 0, 50 )
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- The only purpose of this is for text debugging on the console, do not add anything else.
 	local function debug(event)
-		--print(game.steve.canJump)
-		--print("Game " .. game.state)
+		print("Game " .. game.state)
 		--print("Level ended: ")
 		--print(game.levelCompleted)
 		-- if (game.steve.jumpForce) then
@@ -82,7 +82,10 @@ physics.setGravity( 0, 50 )
 		--local xv, yv = game.steve:getLinearVelocity()
 		--print(yv)
 		--print("AirState "..game.steve.airState)
-		--print("STATE "..game.steve.state)
+		print(game.steve.state)
+		if (game.steve.canJump == true) then print ("Steve can jump")
+		elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
+		print("")
 		--print("Sequence: "..game.steveSprite.sequence)
 		--print( "STEVEisPlaying: ", game.steveSprite.isPlaying)
 		--if (game.steveSprite.phase)then print("AnimState"..game.steveSprite.phase) end
@@ -518,32 +521,32 @@ physics.setGravity( 0, 50 )
 
 -- GAME INITIALIZATION -------------------------------------------------------------
 	-- See player.lua
-	function game.loadPlayer()
-		game.steve, game.steveSprite, game.sensorD = player.loadPlayer( game )
+	function game:loadPlayer()
+		self.steve, self.steveSprite, self.sensorD = player.loadPlayer( self )
 
-		game.steveSprite:setSequence("idle")
-		--game.steveSprite:setFrame(1)
-		game.steveSprite:play()
-		--game.steveSprite:pause()
+		self.steveSprite:setSequence("idle")
+		--self.steveSprite:setFrame(1)
+		self.steveSprite:play()
+		--self.steveSprite:pause()
 
-		game.steve.state = game.steve_STATE_IDLE
-		game.steve.direction = game.DIRECTION_RIGHT
-		game.steve.canJump = false
+		self.steve.state = self.steve_STATE_IDLE
+		self.steve.direction = self.DIRECTION_RIGHT
+		self.steve.canJump = false
 
-		game.steve.preCollision = collisions.stevePreCollision
-		game.steve:addEventListener( "preCollision", game.steve )
+		self.steve.preCollision = collisions.stevePreCollision
+		self.steve:addEventListener( "preCollision", self.steve )
 
-		game.map:setFocus( game.steve )
+		self.map:setFocus( self.steve )
 	end
 
 	-- See npcs.lua
-	function game.loadNPCS() 
-		game.npcs = npcs.loadNPCs( game )
+	function game:loadNPCS() 
+		self.npcs = npcs.loadNPCs( self )
 
 		------------------------------------------------------------------------
 			-- wip for control handlers, will be removed soon
-			for i, v in ipairs(game.npcs) do
-				game.npcs[i].balloon.button:addEventListener( "touch", balloonTouch )
+			for i, v in ipairs(self.npcs) do
+				self.npcs[i].balloon.button:addEventListener( "touch", balloonTouch )
 			end
 		------------------------------------------------------------------------
 	end
@@ -552,7 +555,7 @@ physics.setGravity( 0, 50 )
 		-- which can kill Steve in several ways.
 		-- Loads all the enemies and initializes their attributes.
 		-- Visually istantiates the enemies in the current game's map.
-	function game.loadEnemies()
+	function game:loadEnemies()
 		--[[Richiede che sulla mappa ci siano degli OGGETTI con il tipo = tipoNemico]]
 
 		-- The enemy list is empty at the start of each game.
@@ -646,40 +649,44 @@ physics.setGravity( 0, 50 )
 
 	-- Loads the UI's images and handlers.
 		-- Visually istantiates the UI in the current game's map.
-	function game.loadUi()
-		game.ui = ui.loadUi(game)
+	function game:loadUi()
+		self.ui = ui.loadUi(self)
 
-		game.map:getTileLayer("JUMPSCREEN"):addObject(ui.jumpScreen)
+		self.map:getTileLayer("JUMPSCREEN"):addObject(ui.jumpScreen)
 		ui.jumpScreen:addEventListener( "touch", jumpTouch )
 
 		-- Adds the event handlers to the UI.
 		--ui.getButtonByName("jumpScreen"):addEventListener("touch", jumpTouch)
-		ui.dpadLeft:addEventListener("touch", dpadTouch)
-		ui.dpadRight:addEventListener("touch", dpadTouch)
-		ui.actionBtn:addEventListener("touch", actionTouch)
-		ui.pauseBtn:addEventListener("touch", pauseResume)
-		ui.resumeBtn:addEventListener("touch",pauseResume)
+			ui.dpadLeft:addEventListener("touch", dpadTouch)
+			ui.dpadRight:addEventListener("touch", dpadTouch)
+			ui.actionBtn:addEventListener("touch", actionTouch)
+			ui.pauseBtn:addEventListener("touch", pauseResume)
+			ui.resumeBtn:addEventListener("touch",pauseResume)
 
 		-- After a brief delay at game start, the dpad becomes transparent.
-		local function lowerDpadAlpha()
-			transition.to( ui.dpadLeft, {time = 1000, alpha = 0.1}  ) 
-			transition.to( ui.dpadRight, {time = 1000, alpha = 0.1} ) 
-		end
-		timer.performWithDelay( 2000, lowerDpadAlpha)
+		-- local function lowerDpadAlpha()
+		-- 	transition.to( ui.dpadLeft, {time = 1000, alpha = 0.1}  ) 
+		-- 	transition.to( ui.dpadRight, {time = 1000, alpha = 0.1} ) 
+		-- end
+		-- timer.performWithDelay( 2000, lowerDpadAlpha)
+	end
+
+	function game:loadController()
+		controller.load(self)
 	end
 
 	-- Removes every Entity on the map when -game.stop- is triggered
 		-- [[ lavori in corso: introdurre lista di entità in game ]]
-	function game.removeAllEntities()
-		game.map:getTileLayer("playerObject"):destroy()
-		game.map:getTileLayer("playerEffects"):destroy()
-		game.map:getTileLayer("items"):destroy()
-		game.map:getTileLayer("balloons"):destroy()
-		game.map:getTileLayer("sensors"):destroy()
-		game.map:getTileLayer("entities"):destroy()
+	function game:removeAllEntities()
+		self.map:getTileLayer("playerObject"):destroy()
+		self.map:getTileLayer("playerEffects"):destroy()
+		self.map:getTileLayer("items"):destroy()
+		self.map:getTileLayer("balloons"):destroy()
+		self.map:getTileLayer("sensors"):destroy()
+		self.map:getTileLayer("entities"):destroy()
 	end
 
-	-- Main entry point (must be called from the current level).
+	-- Main entry point for initialization (must be called from the current level).
 	-- Triggers all the -game.load- functions.
 	function game.loadGame( map, spawn )
 		-- Locally stores the current level map and spawn coordinates
@@ -690,11 +697,16 @@ physics.setGravity( 0, 50 )
 		game.lives = game.MAX_LIVES
 		game.levelCompleted = false
 
-		game.loadUi()
-		game.loadEnemies()
-		game.loadNPCS()
+	
 
-		game.loadPlayer()
+		--game.loadController()
+
+		game:loadEnemies()
+		game:loadNPCS()
+
+		game:loadPlayer()
+
+		game:loadUi()
 
 		-- Critical, do not modify.
 		SSVLaunched = false
@@ -813,9 +825,10 @@ physics.setGravity( 0, 50 )
 	end
 ------------------------------------------------------------------------------------
 
-
+-- MAIN ENTRY POINT (must be called from the current level after -game.loadGame-).
 function game.start()
 	game.state = game.GAME_RUNNING
+	game.steve.state = game.STEVE_STATE_IDLE
 	game.steveSprite:play()
 	physics.start()
 
@@ -840,7 +853,7 @@ function game.resume()
 end
 
 function game.stop()
-	game.removeAllEntities()
+	game:removeAllEntities()
 
 	Runtime:removeEventListener("enterFrame", moveCamera)
 	Runtime:removeEventListener("collision", collisions.onCollision)
@@ -850,6 +863,7 @@ function game.stop()
 	package.loaded[ui] = nil
 	package.loaded[entity] = nil
 	package.loaded[enemies] = nil
+	package.loaded[npcs] = nil
 	package.loaded[collisions] = nil
 end
 
