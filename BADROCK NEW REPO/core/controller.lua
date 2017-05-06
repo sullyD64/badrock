@@ -22,18 +22,8 @@ local sState = {}
 
 -- CONTROLS HANDLERS ---------------------------------------------------------------
 
--- This table should be accessed ONLY by the UI when declaring each widget's handler.
-local listeners = {}
-
-function controller.onProvaRelease(event)
-	print("vaffanculo")
-	return true
-end
-
-
-
 -- Inputs movement on the y-axis.
-listeners.onJumpEvent = function(event)
+local function onJumpEvent(event)
 	if (game.state == gState.RUNNING) then
 		if (event.phase == "began") then
 			display.currentStage:setFocus( event.target, event.id )
@@ -67,13 +57,11 @@ end
 
 -- Inputs game pause (and opens the pause panel) if game is running 
 -- and resume if paused, switching visibility between the two buttons.
-listeners.onPauseOrResumeRelease = function(event)
+local function onPauseResumeEvent(event)
 	local target = event.target
 
 	if (event.phase == "began") then
 		display.currentStage:setFocus( target, event.id )
-
-	elseif (event.phase == "ended" or "cancelled" == event.phase) then
 		if (event.target.id == "pauseBtn") then
 			game.state = gState.PAUSED
 			ui:setEnabled( false )
@@ -93,6 +81,9 @@ listeners.onPauseOrResumeRelease = function(event)
 			-----------------------------------------------------
 			game.state = gState.RESUMED
 		end
+		
+	elseif (event.phase == "ended" or "cancelled" == event.phase) then
+		
 		display.currentStage:setFocus( nil )
 	end
 
@@ -110,13 +101,11 @@ function controller.setGame ( currentGame, gameStateList, playerStateList )
 end
 
 function controller.prepareUI()
-	ui.setListeners( self )
-
 	ui.loadUI()
+	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.jump)
 
-	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.jumpScreen)
-
-	ui.buttons.pause.isHitTestable = true
+	ui.buttons.pause:addEventListener( "touch", onPauseResumeEvent )
+	ui.buttons.resume:addEventListener( "touch", onPauseResumeEvent )
 
 	ui.buttons.action.active = true
 	ui.buttons.resume.isVisible = false

@@ -3,9 +3,6 @@
 -- newUi.lua
 --
 -- This module is tied to the controller which is the only class that uses it.
--- Although UI is mainly "passive", it a controller reference for storing in a table its
--- "listeners" function; in that way each button can reference one of the controller methods
--- when the button is created.
 -- Additional functions provide easy shortcuts for toggling the enablement for the whole ui.
 -----------------------------------------------------------------------------------------
 local widget = require ( "widget" )
@@ -14,12 +11,6 @@ local ui = {
 	buttons = {},
 	buttonGroup = {}
 }
-
-local controller = {}
--- Locally stores the list of references to the controller's listener functions
-function ui.setListeners( list )
-	controller = list
-end
 
 -- Stores the data tables for the -widget.newButton- calls.
 local buttonData = {
@@ -44,7 +35,6 @@ local buttonData = {
 				height = 52,
 				x = 10,
 				y = display.contentHeight - 52 / 2 - 10,
-				onRelease = controller.onProvaRelease
 			},
 			aX = 0,
 			aY = 1,
@@ -82,7 +72,6 @@ local buttonData = {
 			options = {
 				id = "pauseBtn",
 				defaultFile = visual.pauseBtn,
-				overFile = "visual/ui/actionbtn.png",
 				width = 35,
 				height = 35,
 				x = display.contentWidth - 10,
@@ -168,9 +157,9 @@ local buttonData = {
 local function createButtons()
 	local buttonGroup = display.newGroup()
 
-	local jumpScreen  = widget.newButton ( buttonData.jumpScreen.options  )
+	local jumpScreen = widget.newButton ( buttonData.jumpScreen.options  )
 		jumpScreen:setFillColor( 0, 255, 0 )
-		jumpScreen.isVisible = true
+		jumpScreen.isVisible = false
 		jumpScreen.isHitTestable = true
 		-- buttonGroup:insert( jumpScreen )		-- NO!
 

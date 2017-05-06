@@ -66,7 +66,7 @@ function scene:hide( event )
 	if (phase == "will") then
 		audio.fadeOut(1,10)
 		game.stop()
-		game.ui:removeSelf()
+		--game.ui:removeSelf()
 	elseif (phase == "did") then
 		package.loaded[game] = nil
 	end		
