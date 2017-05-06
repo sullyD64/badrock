@@ -104,7 +104,11 @@ function controller.prepareUI()
 	ui.loadUI()
 	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.jump)
 
-	ui.buttons.pause:addEventListener( "touch", onPauseResumeEvent )
+	-- ui.buttons.jump:  addEventListener( "touch", onJumpEvent )
+	-- ui.buttons.dleft: addEventListener( "touch", onDpadEvent )	
+	-- ui.buttons.dright:addEventListener( "touch", onDpadEvent )
+	-- ui.buttons.action:addEventListener( "touch", onActionEvent )
+	ui.buttons.pause: addEventListener( "touch", onPauseResumeEvent )
 	ui.buttons.resume:addEventListener( "touch", onPauseResumeEvent )
 
 	ui.buttons.action.active = true

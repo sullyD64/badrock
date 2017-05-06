@@ -698,13 +698,10 @@ physics.setGravity( 0, 50 )
 		game.lives = game.MAX_LIVES
 		game.levelCompleted = false
 
-		-- game:loadEnemies()
-		-- game:loadNPCS()
 		game:loadPlayer()
-	
-		-- game:loadUi()
+		game:loadEnemies()
+		game:loadNPCS()
 
-	
 		-- Critical, do not modify.
 		SSVLaunched = false
 
@@ -712,14 +709,7 @@ physics.setGravity( 0, 50 )
 		controller.setGame( game, gameStateList, playerStateList  )
 		controller.prepareUI()
 
-		local count = display.currentStage.numChildren
-		print( "Number of objects on the screen = " .. count )
-
-		for i=1,display.currentStage.numChildren do
-		    local child = display.currentStage[i]
-		    local description = (child.isVisible and "visible") or "not visible"
-		    print( "child["..i.."] is " .. description )
-		end
+		-- game:loadUi()
 
 		physics.start()
 		physics.pause()

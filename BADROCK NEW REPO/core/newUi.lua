@@ -202,6 +202,7 @@ local function createButtons()
 		action = actionBtn,
 		pause = pauseBtn,
 		resume = resumeBtn,
+		---------------------
 		score = scoreText,
 		scoreUp = scoreUpText,
 		lives = livesText
