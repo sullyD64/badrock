@@ -687,13 +687,13 @@
   <object id="10" name="npc" x="88" y="552"/>
  </objectgroup>
  <objectgroup name="enemySpawn">
-  <object id="2" name="paper01" type="paper" x="519" y="357">
+  <object id="2" name="enemy" type="paper" x="519" y="357">
    <properties>
     <property name="drop" value="gun"/>
    </properties>
   </object>
-  <object id="3" name="sedia01" type="sedia" x="832" y="226"/>
-  <object id="11" name="paper02" type="paper" x="560" y="550">
+  <object id="3" name="enemy" type="sedia" x="832" y="226"/>
+  <object id="11" name="enemy" type="paper" x="560" y="550">
    <properties>
     <property name="drop" value="life"/>
    </properties>
