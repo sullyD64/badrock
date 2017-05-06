@@ -556,102 +556,16 @@ physics.setGravity( 0, 50 )
 		------------------------------------------------------------------------
 	end
 
-	-- An enemy is an animated Entity capable of moving on the map and performing other actions 
+		-- An enemy is an animated Entity capable of moving on the map and performing other actions 
 		-- which can kill Steve in several ways.
 		-- Loads all the enemies and initializes their attributes.
 		-- Visually istantiates the enemies in the current game's map.
-	function game:loadEnemies()
-		--[[Richiede che sulla mappa ci siano degli OGGETTI con il tipo = tipoNemico]]
+	function game:loadEnemies() 
+		self.enemies = enemies.loadEnemies( self)
 
-		-- The enemy list is empty at the start of each game.
-		game.enemyLevelList = {}
-		local enemy = nil
-		local enemyList = game.map:getObjectLayer("enemySpawn").objects
-
-		for k, v in pairs(enemyList) do
-			enemy = enemyList[k]
-			--print ("primax= "..enemy.x.." primay= "..enemy.y)
-			local en = enemies.createEnemy(enemy, enemy.type)
-				--[[assegno qui la posizione perchè nella funzione precedente
-					magicamente si perdono i valori della posizione]]
-				en.x = enemy.x
-				en.y = enemy.y
-				en.name = enemy.name
-				--muovi4(en)
-
-			-- If the enemy holds something, assign 
-			if(enemy.drop ~=nil) then
-				en.drop = enemy.drop 
-			end
-
-			game.map:getTileLayer("entities"):addObject( en )
-			table.insert (game.enemyLevelList , en)
-
-			--muovi(en)
-		end
-
-		--[[
-			2 sedia, 3 paper sopra, 1 paper sotto
-			for i=1,2 do
-				local obj= game.enemyLevelList[i]
-				transition.to( obj, { time=1500, onComplete=muovi(obj)} )
-				print(obj)
-				--table.remove (enemyList[0])
-			end
-			transition.to( game.enemyLevelList[2], { time=1500, x=(game.enemyLevelList[2].x - 120), onComplete=muovi(game.enemyLevelList[1]) } )
-			transition.to( game.enemyLevelList[2], { time=1500, x=(game.enemyLevelList[1].x - 120), onComplete=muovi(game.enemyLevelList[3]) } )
-				for i=2,3 do
-				local obj= game.enemyLevelList[i]
-				muovi(obj)
-				print(obj)
-				--table.remove (enemyList[0])
-			end
-			if(math.random(3)==1) then muovi(game.enemyLevelList[1])
-			elseif(math.random(3)==2) then muovi(game.enemyLevelList[2])
-			elseif(math.random(3)==3) then muovi(game.enemyLevelList[3])
-			end
-			esaurimento di memoria
-			muovi(game.enemyLevelList[3],game.enemyLevelList[2],game.enemyLevelList[1])	--si muove comunque l'ultimo e solo lui
-			muovi2(game.enemyLevelList[1])
-			muovi(game.enemyLevelList[3])
-			local i=0
-			for i=0,1 do
-				for k, v in pairs(game.enemyLevelList) do
-					muovi(game.enemyLevelList[k])
-					i=i+1
-				end
-			end
-			local txt = display.newText( "Hello", 0, 0 )
-				local g1 = display.newGroup()
-				local g2 = display.newGroup()
-		               
-			for k, v in pairs(game.enemyLevelList) do
-				g1:insert(game.enemyLevelList[k])  
-			end
-			--g1:toBack()
-			--muovi(g1)
-			prova()
-			muovi(game.enemyLevelList[1])
-			muovi(game.enemyLevelList[3])
-			muovi(game.enemyLevelList[2])
-			
-			muovi3(game.enemyLevelList)
-			for i=1,3 do
-					timer.performWithDelay(1000,muovi(game.enemyLevelList[1]))
-					timer.performWithDelay(2000,muovi(game.enemyLevelList[2]))
-					timer.performWithDelay(1000,muovi(game.enemyLevelList[3]))
-			end
-
-			for k, v in pairs(game.enemyLevelList) do
-				game.enemyLevelList[k].speed=5	
-			end
-		]]
-
-		for k, v in pairs(game.enemyLevelList) do
-			muovi(game.enemyLevelList[k])
-		end
 	end
 
+	
 	-- Loads the UI's images and handlers.
 		-- Visually istantiates the UI in the current game's map.
 	function game:loadUi()
@@ -766,44 +680,7 @@ physics.setGravity( 0, 50 )
 		goLeft()
 	end
 
-	function muovi4(table)
-		function goLeft ()
-			-- mi scandiscono tutta la table, ma crash
-			print(table)
-			transition.to( table, { time=2500, x=(table.x - 120), onComplete=function()
-				timer.performWithDelay(1000,goRight)
-				end } )
-		end
 
-		function goRight ()
-			-- mi scandiscono tutta la table, ma crash
-			print(table)
-			transition.to( table, { time=2500, x=(table.x + 120), onComplete=function()
-				timer.performWithDelay(1000,goLeft)
-				end } )
-		end
-		goLeft()
-	end
-
-	-- questa muove tutti ma dopo un po' crasha, troppi controlli
-	function muovi3(table)
-		function goLeft ()
-			-- mi scandiscono tutta la table, ma crash
-			for k,v in ipairs(table) do
-			print(table[k])
-			transition.to( table[k], { time=2500, x=(table[k].x - 120), onComplete=goRight } )
-			end
-		end
-
-		function goRight ()
-			-- mi scandiscono tutta la table, ma crash
-			for k,v in ipairs(table) do
-			print(table[k])
-			transition.to( table[k], { time=2500, x=(table[k].x + 120), onComplete=goLeft } )
-			end
-		end
-		goLeft()
-	end
 
 	-- i nemici dovrebbero seguire steve, per alcuni, liste
 	function segui(steve)

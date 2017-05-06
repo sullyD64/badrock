@@ -1,56 +1,72 @@
------------------------------------------------------------------------------------------
---
--- enemies.lua
---
------------------------------------------------------------------------------------------
-local physics = require ( "physics"    )
-local items   = require ( "core.items" )
+
+local entity = require ( "lib.entity"       )
+local panel  = require ( "menu.utilityMenu" )
 
 local enemies = {}
 
-	enemies.list = {
-	--1
-		{
-		type = "paper",
-		lives = 1,
-		bounce = 0.1,
-		friction = 1.0,
-		density = 1.0,
-		image = visual.enemyPaper,
-		height = 40,
-		width = 40,
-		speed = 0
-		},
-	--2
-		{
-		type = "sedia",
-		lives = 5,
-		bounce = 0.1,
-		friction = 1.0,
-		density = 1.0,
-		image = visual.enemySedia,
-		height = 113,
-		width = 70,
-		speed = 0
-		}
-}
 
--- Create a new Enemy with his attributes and image if we pass (as a parameter) an object from Tiled
-function enemies.createEnemy( enemy , type )
-		local en = nil
-		for k, v in pairs(enemies.list) do
-			if (v.type == type) then
-				en = v
-				break
-			end
+
+-- Loads the enemies's images, speech balloons and initializes their attributes.
+-- Visually instantiates the enemies in the current game's map.
+-- @return enemies (a table of enemies)
+function enemies.loadEnemies( currentGame ) 
+	local currentMap = currentGame.map
+	local enemyList = currentMap:getObjectLayer("enemySpawn"):getObjects("enemy")
+	local imageList= {}
+
+	-- Loads the main Entity.
+		local loadenemyEntity = function( enemy )
+
+ 			for i, v in pairs(enemyList) do
+ 			local staticImage
+ 			print(enemyList[i].type)
+ 				if (v.type == "paper") then
+ 				staticImage = entity.newEntity{
+				graphicType = "static",
+				filePath = visual.enemyPaper,
+				width = 40,
+				height = 40,
+				bodyType = "dynamic",
+				physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
+				eName = "enemy"
+				}
+				staticImage.lives=1
+				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
+				
+ 				
+
+				elseif (v.type == "sedia") then
+ 				staticImage = entity.newEntity{
+				graphicType = "static",
+				filePath = visual.enemySedia,
+				width = 70,
+				height = 113,
+				bodyType = "dynamic",
+				physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
+				eName = "enemy"
+				}
+				staticImage.lives=5
+				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
+				
+ 				
+ 				end
+ 				staticImage.isTargettable=true
+ 				staticImage.isEnemy=true
+ 				if(enemyList[i].drop ~=nil) then
+				staticImage.drop = enemyList[i].drop
+				end
+
+ 				staticImage:addOnMap( currentMap )
+ 			end
+
+
+			return staticImage
 		end
-		enemy = display.newImageRect (en.image , en.width, en.height)
-		enemy.type = type
-		enemy.lives = en.lives
-		enemy.isEnemy = true
-		enemy.isTargettable = true
-		physics.addBody( enemy, { density = en.density, friction = en.friction, bounce = en.bounce} )
-		return enemy
+
+--la scansione del ciclo dei nemici in tutta la mappa è fatta all'interno di loadenemy
+	enemyList[1].staticImage = loadenemyEntity(enemyList[1])
+
+	return enemyList
 end
 
 return enemies

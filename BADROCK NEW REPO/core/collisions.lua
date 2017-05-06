@@ -10,7 +10,7 @@
 -- current state, position on the map, sprite sequence and other properties,
 -----------------------------------------------------------------------------------------
 local physics = require ( "physics"    )
---local ui      = require ( "core.ui"    )
+local ui      = require ( "core.ui"    )
 --local npcs    = require ( "core.npcs"  )
 local items   = require ( "core.items" )
 local sfx     = require ( "audio.sfx"  )
@@ -100,6 +100,7 @@ local function steveAttackCollision( event )
 
 	-- Other is an enemy, targettable AND not invincible
 	if( other.isEnemy and other.isTargettable == true ) then 
+		print ("tar")
 		other.lives = other.lives - 1
 
 		other.alpha = 0.5 -- Make the enemy temporairly untargettable 
@@ -134,6 +135,10 @@ local function steveAttackCollision( event )
 	-- If the object is a item that can be destroyed from steve attacks
 	elseif( other.isBreakable ) then
 		display.remove(other)
+	elseif(other.isEnemy==false) then print("noEn")
+	elseif(other.isEnemy==true) then print("èEn")
+	elseif(other.isEnemy==true) then print("ètar")	
+	elseif(other.isTargettable==false) then print ("notar")
 	end
 end
 
