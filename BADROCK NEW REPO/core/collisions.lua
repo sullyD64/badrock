@@ -5,12 +5,12 @@
 -- This class handles all the #COLLISION# events between physical objects in the current 
 -- map, whether they are Tiles or Entities. For this, it needs to store the current game 
 -- in order to make it visible to the local collision handlers.
--- Also, game control the activation (Runtime:addEventListener/removeEventListener).
+-- Also, game controls the activation (Runtime:addEventListener/removeEventListener).
 -- These methods can access and modify the Game's current state, aswell as the Player's
 -- current state, position on the map, sprite sequence and other properties,
 -----------------------------------------------------------------------------------------
 local physics = require ( "physics"    )
---local ui      = require ( "core.ui"    )
+local ui      = require ( "core.ui"    )
 --local npcs    = require ( "core.npcs"  )
 local items   = require ( "core.items" )
 local sfx     = require ( "audio.sfx"  )

@@ -46,21 +46,20 @@ physics.setGravity( 0, 50 )
 	game.DIRECTION_RIGHT       =  1				-- servono??
 	game.MAX_LIVES             =  3
 
-	game.states = {
+	local gameStateList = {
 		RUNNING = "Running",
 		PAUSED  = "Paused",
 		RESUMED = "Resumed",
 		ENDED   = "Ended",
 	}
 
-	game.steve = {}
+	local playerStateList = {
+		IDLE      = "Idle",
+		WALKING   = "Walking",
+		ATTACKING = "Attacking",
+		DEAD      = "Dead",
+	}
 
-	game.steve.states = {
-			IDLE      = "Idle",
-			WALKING   = "Walking",
-			ATTACKING = "Attacking",
-			DEAD      = "Dead",
-		}
 
 	game.letMeJump = false
 	game.SSVEnabled = true
@@ -73,7 +72,12 @@ physics.setGravity( 0, 50 )
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- The only purpose of this is for text debugging on the console, do not add anything else.
 	local function debug(event)
-		print("Game " .. game.state)
+		-- print("Game " .. game.state)
+		-- print(game.steve.state)
+		-- if (game.steve.canJump == true) then print ("Steve can jump")
+		-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
+		-- print("")
+
 		--print("Level ended: ")
 		--print(game.levelCompleted)
 		-- if (game.steve.jumpForce) then
@@ -82,10 +86,6 @@ physics.setGravity( 0, 50 )
 		--local xv, yv = game.steve:getLinearVelocity()
 		--print(yv)
 		--print("AirState "..game.steve.airState)
-		print(game.steve.state)
-		if (game.steve.canJump == true) then print ("Steve can jump")
-		elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
-		print("")
 		--print("Sequence: "..game.steveSprite.sequence)
 		--print( "STEVEisPlaying: ", game.steveSprite.isPlaying)
 		--if (game.steveSprite.phase)then print("AnimState"..game.steveSprite.phase) end
@@ -524,10 +524,10 @@ physics.setGravity( 0, 50 )
 	function game:loadPlayer()
 		self.steve, self.steveSprite, self.sensorD = player.loadPlayer( self )
 
-		------
-		self.steve.sprite = self.steveSprite
+		-------------------------------------
+		self.steve.sprite = self.steveSprite  -- for controller
 		self.steve.sensorD = self.sensorD
-		------
+		-------------------------------------
 
 		self.steveSprite:setSequence("idle")
 		--self.steveSprite:setFrame(1)
@@ -698,18 +698,18 @@ physics.setGravity( 0, 50 )
 		game.lives = game.MAX_LIVES
 		game.levelCompleted = false
 
-		game:loadEnemies()
-		game:loadNPCS()
+		-- game:loadEnemies()
+		-- game:loadNPCS()
 		game:loadPlayer()
 
-		game:loadUi()
+		-- game:loadUi()
 
 		-- Critical, do not modify.
 		SSVLaunched = false
 
 		collisions.setGame( game )
-		-- controller.setGame( game )
-		-- controller.prepareUI()
+		controller.setGame( game, gameStateList, playerStateList  )
+		controller:prepareUI()
 
 		physics.start()
 		physics.pause()
@@ -827,9 +827,11 @@ physics.setGravity( 0, 50 )
 
 -- MAIN ENTRY POINT (must be called from the current level after -game.loadGame-).
 function game.start()
-	game.state = game.GAME_RUNNING
-	game.steve.state = game.STEVE_STATE_IDLE
-	game.steveSprite:play()
+	-- game.state = game.GAME_RUNNING
+	-- game.steve.state = game.STEVE_STATE_IDLE
+	-- game.steveSprite:play()
+
+	controller:start()
 	physics.start()
 
 	Runtime:addEventListener("enterFrame", moveCamera)

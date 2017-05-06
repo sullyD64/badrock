@@ -44,7 +44,6 @@ function scene:create( event )
 	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
 	-- e due Tile Layer -vuoti-  playerObject e playerEffects.
 	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0") )
-
 end
 
 -- show()

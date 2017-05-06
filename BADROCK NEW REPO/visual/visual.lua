@@ -29,8 +29,8 @@ local visual = {
 	dpadRight_over         = "visual/ui/dpadRight_over.png",
 	actionBtn              = "visual/ui/actionbtn.png",
 	-- actionBtn_over      = "visual/ui/actionbtn_over.png",
-	pauseButton            = "visual/ui/pause.png",
-	resumeButton           = "visual/ui/resume.png",
+	pauseBtn               = "visual/ui/pause.png",
+	resumeBtn              = "visual/ui/resume.png",
 	lifeIcon               = "visual/ui/life.png",
 
 	steveSheetWalking      = "visual/sprites/steveAnim.png",

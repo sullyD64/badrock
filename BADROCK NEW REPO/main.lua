@@ -17,6 +17,8 @@ sfx.init()
 -- Globally loads the visual library
 visual = require "visual.visual"
 
+util = require "lib.util"
+
 -- Enable the multitouch 
 system.activate( "multitouch" )
 
