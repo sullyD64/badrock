@@ -44,7 +44,6 @@ function scene:create( event )
 	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
 	-- e due Tile Layer -vuoti-  playerObject e playerEffects.
 	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0") )
-
 end
 
 -- show()
@@ -67,7 +66,7 @@ function scene:hide( event )
 	if (phase == "will") then
 		audio.fadeOut(1,10)
 		game.stop()
-		game.ui:removeSelf()
+		--game.ui:removeSelf()
 	elseif (phase == "did") then
 		package.loaded[game] = nil
 	end		

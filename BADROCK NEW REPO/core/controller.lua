@@ -15,67 +15,101 @@ local pauseMenu  = require ( "menu.pauseMenu"   )
 
 local controller = {}
 
--- local game, steve
--- local gState, sState
-
-
------------------------------------------
--- Prototype of control handler function
-local onJumpTouch = function(event)
-end
------------------------------------------
-
+local game = {}
+local steve = {}
+local gState = {}
+local sState = {}
 
 -- CONTROLS HANDLERS ---------------------------------------------------------------
-	-- -- Inputs game pause (and opens the pause panel) if game is running and resume if paused.
-	-- local function pauseResume(event)
-	-- 	local target = event.target
 
-	-- 	if (event.phase == "began") then
-	-- 		display.currentStage:setFocus( target )
+-- Inputs movement on the y-axis.
+local function onJumpEvent(event)
+	if (game.state == gState.RUNNING) then
+		if (event.phase == "began") then
+			display.currentStage:setFocus( event.target, event.id )
+			if (steve.canJump == true) then
+				--sfx.playSound( sfx.jumpSound, { channel = 2 } )
+				steve.state = sState.JUMPING
 
-	-- 	elseif (event.phase == "ended" or "cancelled" == event.phase) then
-	-- 		if (target.myName == "pauseBtn") then
-	-- 			game.state = game.GAME_PAUSED
-	-- 			ui.pauseBtn.isVisible = false
-	-- 			ui.resumeBtn.isVisible = true
-	-- 			pauseMenu.psbutton = ui.getButtonByName("pauseBtn")
-	-- 			pauseMenu.rsbutton = ui.getButtonByName("resumeBtn")
-	-- 	        pauseMenu.panel:show({ y = display.screenOriginY+225,})
-	-- 		elseif (target.myName == "resumeBtn") then
-	-- 			game.state = game.GAME_RESUMED
-	-- 			ui.pauseBtn.isVisible = true
-	-- 			ui.resumeBtn.isVisible = false
-	-- 			pauseMenu.panel:hide()
-	-- 		end
-	-- 		display.currentStage:setFocus( nil )
-	-- 	end
+				SSVType = "jump"
+				Runtime:addEventListener("enterFrame", setSteveVelocity)
+				steve.jumpForce = -200
+				steve.actualSpeed = game.steve.jumpForce
 
-	-- 	return true --Prevents touch propagation to underlying objects
-	-- end
+				i = 0
+				j = 18
+
+				steve.canJump = false
+				letMeJump = false
+			end
+
+		elseif (event.phase == "ended" or "cancelled" == event.phase) then
+			display.currentStage:setFocus( event.target, nil )
+			steve.state = sState.IDLE
+			steve.jumpForce = 0
+			steve.sprite:setSequence("idle")
+			Runtime:removeEventListener("enterFrame", setSteveVelocity)	
+		end
+	end
+
+	return true
+end
+
+-- Inputs game pause (and opens the pause panel) if game is running 
+-- and resume if paused, switching visibility between the two buttons.
+local function onPauseResumeEvent(event)
+	local target = event.target
+
+	if (event.phase == "began") then
+		display.currentStage:setFocus( target, event.id )
+		if (event.target.id == "pauseBtn") then
+			game.state = gState.PAUSED
+			ui:setEnabled( false )
+			ui.buttons.resume:setEnabled( true )
+			ui.buttons.pause.isVisible = false
+			ui.buttons.resume.isVisible = true
+			-----------------------------------------------------
+			pauseMenu.panel:show({y = display.screenOriginY+225})
+			-----------------------------------------------------
+		elseif (event.target.id == "resumeBtn") then
+			ui.buttons.pause.isVisible = true
+			ui.buttons.resume.isVisible = false
+			ui.buttons.pause:setEnabled( true )
+			ui.buttons.resume:setEnabled( false )
+			-----------------------------------------------------
+			pauseMenu.panel:hide()
+			-----------------------------------------------------
+			game.state = gState.RESUMED
+		end
+		
+	elseif (event.phase == "ended" or "cancelled" == event.phase) then
+		
+		display.currentStage:setFocus( nil )
+	end
+
+	return true
+end
 ------------------------------------------------------------------------------------
 
-
-
--- This table should be accessed ONLY by the UI when declaring each widget's handler.
-controller.listeners = {
-	--onJumpTouch,
-	-- ...
-}
-
 -- This function is accessed from -game.loadGame-.
-function controller.setGame ( currentGame )
+function controller.setGame ( currentGame, gameStateList, playerStateList )
 	game = currentGame
-	steve = game.steve
+	steve = currentGame.steve
 
-	gState = game.states
-	sState = steve.states
+	gState = gameStateList
+	sState = playerStateList
 end
 
 function controller.prepareUI()
-	ui.setListeners( controller )
 	ui.loadUI()
-	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.jumpScreen)
+	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.jump)
+
+	ui.buttons.pause:addEventListener( "touch", onPauseResumeEvent )
+	ui.buttons.resume:addEventListener( "touch", onPauseResumeEvent )
+
+	ui.buttons.action.active = true
+	ui.buttons.resume.isVisible = false
+	ui.buttons.scoreUp.isVisible = false
 end
 
 -- Called by -game.start()-.

@@ -11,8 +11,8 @@ local sfxMenu  = require ( "menu.sfxMenu"     )
 local utility  = require ( "menu.utilityMenu" )
 
 local pause = {}
-pause.psbutton = nil
-pause.rsbutton = nil
+-- pause.psbutton = nil
+-- pause.rsbutton = nil
 
 -- PAUSE MENU ---------------------------------------------------------------------
 
@@ -30,8 +30,8 @@ pause.rsbutton = nil
 			speed = 250,
 			transition = easing.outElastic
 		})
-		pause.psbutton.isVisible = true
-		pause.rsbutton.isVisible = false
+		-- pause.psbutton.isVisible = true
+		-- pause.rsbutton.isVisible = false
 		audio.fadeOut(1,100)
 		audio.stop(1)
 		composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
