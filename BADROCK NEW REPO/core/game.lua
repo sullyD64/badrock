@@ -3,7 +3,7 @@
 -- game.lua
 --
 -- Game is intended to be the "simulator" of the application logic tier.
--- Accessibility to child modules (like the controller) is granted depending on the 
+-- Accessibility to child modules (like collisions) is granted depending on the 
 -- simulation state.
 -- At startup, this class istantiates all the domain objects by calling the initializator 
 -- methods contained in the "core" modules.
@@ -56,11 +56,11 @@ physics.setGravity( 0, 50 )
 	game.steve = {}
 
 	game.steve.states = {
-		IDLE      = "Idle",
-		WALKING   = "Walking",
-		ATTACKING = "Attacking",
-		DEAD      = "Dead",
-	}
+			IDLE      = "Idle",
+			WALKING   = "Walking",
+			ATTACKING = "Attacking",
+			DEAD      = "Dead",
+		}
 
 	game.letMeJump = false
 	game.SSVEnabled = true
@@ -524,6 +524,11 @@ physics.setGravity( 0, 50 )
 	function game:loadPlayer()
 		self.steve, self.steveSprite, self.sensorD = player.loadPlayer( self )
 
+		------
+		self.steve.sprite = self.steveSprite
+		self.steve.sensorD = self.sensorD
+		------
+
 		self.steveSprite:setSequence("idle")
 		--self.steveSprite:setFrame(1)
 		self.steveSprite:play()
@@ -671,10 +676,6 @@ physics.setGravity( 0, 50 )
 		-- timer.performWithDelay( 2000, lowerDpadAlpha)
 	end
 
-	function game:loadController()
-		controller.load(self)
-	end
-
 	-- Removes every Entity on the map when -game.stop- is triggered
 		-- [[ lavori in corso: introdurre lista di entità in game ]]
 	function game:removeAllEntities()
@@ -697,19 +698,18 @@ physics.setGravity( 0, 50 )
 		game.lives = game.MAX_LIVES
 		game.levelCompleted = false
 
-	
-
-		--game.loadController()
-
 		game:loadEnemies()
 		game:loadNPCS()
-
 		game:loadPlayer()
 
 		game:loadUi()
 
 		-- Critical, do not modify.
 		SSVLaunched = false
+
+		collisions.setGame( game )
+		-- controller.setGame( game )
+		-- controller.prepareUI()
 
 		physics.start()
 		physics.pause()
@@ -833,7 +833,6 @@ function game.start()
 	physics.start()
 
 	Runtime:addEventListener("enterFrame", moveCamera)
-	collisions.setGame( game )
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 

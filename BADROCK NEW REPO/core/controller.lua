@@ -10,19 +10,20 @@
 -- Each handler is private and should not be accessed outside the module.
 -----------------------------------------------------------------------------------------
 local physics = require ( "physics"   )
-local ui      = require ( "core.ui"   )
+local ui      = require ( "core.newUi"   )
+local pauseMenu  = require ( "menu.pauseMenu"   )
 
 local controller = {}
 
-local game   = {}
-local player = {}
+-- local game, steve
+-- local gState, sState
+
 
 -----------------------------------------
 -- Prototype of control handler function
 local onJumpTouch = function(event)
 end
 -----------------------------------------
-
 
 
 -- CONTROLS HANDLERS ---------------------------------------------------------------
@@ -54,25 +55,41 @@ end
 	-- end
 ------------------------------------------------------------------------------------
 
--- This table should be accessed ONLY by the UI.
+
+
+-- This table should be accessed ONLY by the UI when declaring each widget's handler.
 controller.listeners = {
-	onJumpTouch,
+	--onJumpTouch,
 	-- ...
 }
 
+-- This function is accessed from -game.loadGame-.
+function controller.setGame ( currentGame )
+	game = currentGame
+	steve = game.steve
 
-local function launchUIListeners()
-	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.jumpScreen)
-
+	gState = game.states
+	sState = steve.states
 end
 
--- This function is accessed by Game inside -game.loadGame-.
-function controller.load ( currentGame )
-	game = currentGame
-	player = currentGame.steve
-
+function controller.prepareUI()
+	ui.setListeners( controller )
 	ui.loadUI()
-	launchUIListeners()
+	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.jumpScreen)
+end
+
+-- Called by -game.start()-.
+function controller:start()
+	game.state = gState.RUNNING
+	steve.state = sState.IDLE
+	steve.sprite:play()
+	ui:setEnabled( true )
+end
+
+function controller:pause()
+	game.state = gState.PAUSED
+	steve.sprite:pause()
+	ui:setEnabled( false )
 end
 
 local SSVEnabled
