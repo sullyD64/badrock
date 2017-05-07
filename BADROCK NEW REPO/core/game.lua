@@ -56,6 +56,7 @@ physics.setGravity( 0, 50 )
 	local playerStateList = {
 		IDLE      = "Idle",
 		WALKING   = "Walking",
+		JUMPING   = "Jumping",
 		ATTACKING = "Attacking",
 		DEAD      = "Dead",
 	}
@@ -76,9 +77,11 @@ physics.setGravity( 0, 50 )
 		-- print(game.steve.state)
 		-- if (game.steve.canJump == true) then print ("Steve can jump")
 		-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
+		-- print(controller.controlsEnabled)
 		-- print("")
 
-		--print("Level ended: ")
+
+		--print("Level ended successful: ")
 		--print(game.levelCompleted)
 		-- if (game.steve.jumpForce) then
 		-- 	print("jumpForce: " ..game.steve.jumpForce)
@@ -212,6 +215,8 @@ physics.setGravity( 0, 50 )
 				if (SSVLaunched) then
 					Runtime:removeEventListener( "enterFrame", setSteveVelocity )
 				end
+
+
 
 				-- Switches scene (from "levelX" to "highscores").
 				composer.setVariable( "finalScore", game.score )
@@ -554,18 +559,13 @@ physics.setGravity( 0, 50 )
 				self.npcs[i].balloon.button:addEventListener( "touch", balloonTouch )
 			end
 		------------------------------------------------------------------------
-	end
+	end	
 
-		-- An enemy is an animated Entity capable of moving on the map and performing other actions 
-		-- which can kill Steve in several ways.
-		-- Loads all the enemies and initializes their attributes.
-		-- Visually istantiates the enemies in the current game's map.
+	-- See enemies.lua
 	function game:loadEnemies() 
-		self.enemies = enemies.loadEnemies( self)
-
+		self.enemies = enemies.loadEnemies( self )
 	end
 
-	
 	-- Loads the UI's images and handlers.
 		-- Visually istantiates the UI in the current game's map.
 	function game:loadUi()
@@ -680,8 +680,6 @@ physics.setGravity( 0, 50 )
 		goLeft()
 	end
 
-
-
 	-- i nemici dovrebbero seguire steve, per alcuni, liste
 	function segui(steve)
 		for i = 1, #enemiesList do
@@ -708,8 +706,8 @@ function game.start()
 	-- game.steve.state = game.STEVE_STATE_IDLE
 	-- game.steveSprite:play()
 
-	controller:start()
 	physics.start()
+	controller:start()
 
 	Runtime:addEventListener("enterFrame", moveCamera)
 	Runtime:addEventListener("collision", collisions.onCollision)
@@ -719,15 +717,17 @@ function game.start()
 end
 
 function game.pause()
-	game.steve.state = game.STEVE_STATE_IDLE
-	game.steveSprite:pause()
+	-- game.steve.state = game.STEVE_STATE_IDLE
+	-- game.steveSprite:pause()
 	physics.pause()
+	controller:pause()
 end
 
 function game.resume()
-	game.state = game.GAME_RUNNING
-	game.steveSprite:play()
+	-- game.state = game.GAME_RUNNING
+	-- game.steveSprite:play()
 	physics.start()
+	controller:start()
 end
 
 function game.stop()

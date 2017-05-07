@@ -13,8 +13,8 @@ local entity = require ( "lib.entity" )
 local player = {}
 local settings = {
 
-	walkForce = 150,
-	maxJumpForce = -20,
+	-- walkForce = 150,
+	-- jumpForce = -200,
 
 	sensorOpts = {
 		radius = 50,
@@ -81,8 +81,8 @@ function player.loadPlayer( currentGame )
 		local currentSpawn = currentGame.spawn
 		player.x, player.y = currentSpawn.x, currentSpawn.y
 
-		player.walkForce = settings.walkForce
-		player.maxJumpForce = settings.maxJumpForce
+		-- player.walkForce = settings.walkForce
+		-- player.jumpForce = settings.jumpForce
 
 	-- Insert the player's hitbox and sprite in the current map
 		local currentMap = currentGame.map
