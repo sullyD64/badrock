@@ -721,6 +721,7 @@ function game.pause()
 	-- game.steveSprite:pause()
 	physics.pause()
 	controller:pause()
+	transition.pause()
 end
 
 function game.resume()
@@ -728,6 +729,7 @@ function game.resume()
 	-- game.steveSprite:play()
 	physics.start()
 	controller:start()
+	transition.resume()
 end
 
 function game.stop()
