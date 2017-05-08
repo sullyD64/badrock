@@ -7,6 +7,7 @@
 -----------------------------------------------------------------------------------------
 local entity = require ( "lib.entity"       )
 local panel  = require ( "menu.utilityMenu" )
+local collisions = require ( "core.collisions"  )
 
 local enemies = {}
 
@@ -14,7 +15,7 @@ local enemies = {}
 function follow(currentGame,object,player)
 		local currentMap = currentGame.map
 		if((object.x~=nil and object.y~=nil) and(player.x~=nil and player.y~=nil) and currentGame.state~="Paused") then--il problema è che poi non richiama la transizione del disaggro
-																														--per colpa del game.paused quando steve muore
+																									--per colpa del game.paused quando steve muore
 			object.isFixedRotation=true
 			object.speed=1--quello sopra continua a essere flash
 			if(math.abs(object.x-player.x)<=400) then
@@ -69,12 +70,9 @@ function follow(currentGame,object,player)
 						end
 
 					end
-				
-				
 			end
 		end
 end
-
 
 -- GIGI WIP-------------------------------------------------------------------------
 	--[[
@@ -87,6 +85,16 @@ end
 			})
 		end
 	]]
+
+	function salta(object,player)
+		if(object.y>player.y) then
+		local impulso= (object.y-player.y)
+		if(impulso<=150) then
+		object:applyLinearImpulse( 0, -impulso/3, object.x, object.y )
+		end
+		--transition.to( object, { time=1500, y=object.y-20 } )
+		end
+	end
 
 	function f(object)
 		local angle= math.atan2(game.steve.x - object.y, game.steve.y - object.x) -- work out angle between target and missile
@@ -137,61 +145,79 @@ end
 function enemies.loadEnemies( currentGame ) 
 	local currentMap = currentGame.map
 	local enemyList = currentMap:getObjectLayer("enemySpawn"):getObjects("enemy")
-	local player = currentGame.steve
+	local player= currentGame.steve
 
 	-- Loads the main Entity.
-		local loadenemyEntity = function( enemy )
-		 	for i, v in pairs(enemyList) do
-				local staticImage
-				--print(enemyList[i].type)
-				if (v.type == "paper") then
-					staticImage = entity.newEntity{
-						graphicType = "static",
-						filePath = visual.enemyPaper,
-						width = 40,
-						height = 40,
-						bodyType = "dynamic",
-						physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
-						eName = "enemy"
-					}
-					staticImage.lives=1
-					staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
-
-					local function move()
-						follow(currentGame,staticImage,player)
-					end
-			
-					Runtime:addEventListener( "enterFrame", move )		
-
-				elseif (v.type == "sedia") then
-					staticImage = entity.newEntity{
-						graphicType = "static",
-						filePath = visual.enemySedia,
-						width = 70,
-						height = 113,
-						bodyType = "dynamic",
-						physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
-						eName = "enemy"
-					}
-					staticImage.lives=5
-					staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y		
-				end
-				staticImage.isTargettable=true
-				staticImage.isEnemy=true
-
-				if(enemyList[i].drop ~=nil) then
-					staticImage.drop = enemyList[i].drop
+	local loadenemyEntity = function( enemy )
+		for i, v in pairs(enemyList) do
+			local staticImage
+			--print(enemyList[i].type)
+			if (v.type == "paper") then
+				staticImage = entity.newEntity{
+					graphicType = "static",
+					filePath = visual.enemyPaper,
+					width = 40,
+					height = 40,
+					bodyType = "dynamic",
+					physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
+					eName = "enemy"
+				}
+				staticImage.lives=1
+				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
+				
+				local function move()
+					follow(currentGame,staticImage,player)
 				end
 
-				staticImage:addOnMap( currentMap )	
+				local listener = {}
+				function listener:timer( event )
+					salta(staticImage,player)
+					print("no")
+				end
+
+				function s(object,player)
+					timer.performWithDelay( 3000, listener )
+				end
+
+				Runtime:addEventListener( "enterFrame", move )	--inseguono steve
+				timer.performWithDelay(2000,s,-1)				--saltano se steve è sopra le piattaforme (restringere range)
+
+				staticImage.preCollision = collisions.enemyPreCollision
+				staticImage:addEventListener( "preCollision", staticImage)
+
+				--deadcode, indagare malfunzionamento
+				staticImage.towerCollision = collisions.enemyFormazioneATorre
+				staticImage:addEventListener( "towerCollision", staticImage)
+
+			elseif (v.type == "sedia") then
+				staticImage = entity.newEntity{
+					graphicType = "static",
+					filePath = visual.enemySedia,
+					width = 70,
+					height = 113,
+					bodyType = "dynamic",
+					physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
+					eName = "enemy"
+				}
+				staticImage.lives=5
+				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
 			end
 
-			return staticImage
+			staticImage.isTargettable=true
+			staticImage.isEnemy=true
+
+			if(enemyList[i].drop ~=nil) then
+				staticImage.drop = enemyList[i].drop
+			end
+
+			staticImage:addOnMap( currentMap )
 		end
+		return staticImage
+	end
 
 	--la scansione del ciclo dei nemici in tutta la mappa è fatta all'interno di loadenemy
 	enemyList[1].staticImage = loadenemyEntity(enemyList[1])
-
+	
 	return enemyList
 end
 

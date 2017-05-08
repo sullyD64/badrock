@@ -141,12 +141,12 @@ local function attackCollision( event )
 		end	
 end
 
+
 -------------------------------------
 	-- Used by npcDetectByCollision
 	local contactEnabled = true
 	local releaseEnabled = false
 -------------------------------------
-
 -- Steve and every npc have an invisible "sensor" physical object surrounding
 -- and following them at runtime. This function handles the collision between
 -- the two (in future three) sensors, and acts differently depending if the
@@ -185,7 +185,6 @@ local function npcDetectByCollision( event )
 		end
 	end
 end
-
 
 -- Main collision handler index
 function collisions.onCollision( event )
@@ -250,5 +249,36 @@ function collisions.stevePreCollision( self, event )
 	return true
 end
 --------------------------------------------------------------------------------------------------
+
+
+
+function collisions.enemyPreCollision( self, event )
+	if ( event.other.myName == "platform" ) then
+		if ( self.y+(self.height*0.5) > event.other.y-(event.other.height*0.5)+0.2 ) then
+			if event.contact then
+				event.contact.isEnabled = false
+			end
+		end
+	return true
+	end
+end
+
+-- Per risolvere il problema della formazione a torre indesiderata dei nemici, 
+-- in altre situazioni potremmo volerla come fight mode invece, per ora no
+local tower = false
+function collisions.enemyFormazioneATorre( self, event )
+	if ( event.other.eName == "enemy" and tower==false and self.x==event.other.x ) then
+		print("collisioneTOrre")
+		if ( self.y+(self.height*0.5) > event.other.y-(event.other.height*0.5)+0.2 ) then
+			if event.contact then
+				event.other.x=event.other.x-100		--sposto il nemico
+			end
+		end
+	
+	return true
+	else print ("noCollisioneTorre")
+	return false
+	end
+end
 
 return collisions
