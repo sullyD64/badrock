@@ -5,7 +5,7 @@
 -- An Entity is an object that is represented on the game's current map by a Corona Display Object, 
 -- whether it is a static image or an animated sprite or a shape. 
 -- An Entity is first positioned on the map by a Tiled Object representing its "spawn point", and it
--- is istantiated on a select Tile Level depending by one of the entities attributes.
+-- is istantiated on a select Tile Layer depending by one of the entities attributes.
 -- All Entities are Physical Objects (static or dynamic), can move on the map and
 -- interact with each other.
 --
@@ -13,7 +13,7 @@
 -- Use it for collision detection when needed
 --
 -- Examples of Entity: Steve, an Enemy, an NPC, a Boss, an Item, a Parcticle (e.g. bolts, rocks, ..)
--- # WIP: Sensors are also entities
+-- Sensors are also entities
 -----------------------------------------------------------------------------------------
 
 local physics = require ( "physics")
@@ -27,6 +27,7 @@ function entity.newEntity( options )
 	local opt = {}
 
 	-- by leaving this field blank, overrides default with static (most frequent)
+	-- VALUES: [ "static", "animated", "sensor" ]
 	opt.graphicType = customOptions.graphicType or "static"
 
 	-- always required (except for sensors)

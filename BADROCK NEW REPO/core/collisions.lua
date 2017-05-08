@@ -138,8 +138,7 @@ local function attackCollision( event )
 		elseif(other.isEnemy==true) then print("èEn")
 		elseif(other.isEnemy==true) then print("ètar")	
 		elseif(other.isTargettable==false) then print ("notar")
-		end
-	
+		end	
 end
 
 -------------------------------------
@@ -211,6 +210,8 @@ function collisions.onCollision( event )
 			-----------------------------------------------------------------
 			controller.letMeJump = true -- force enable the jump [CONTROLLER]
 			-----------------------------------------------------------------
+			if (o1.eName == "steve") then o1.letMeJump = true
+				elseif (o2.eName == "steve") then o2.letMeJump = true end
 		end
 
 	-- -- Index for collisions involving the player's Attack

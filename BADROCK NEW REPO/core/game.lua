@@ -44,7 +44,10 @@ physics.setGravity( 0, 50 )
 	game.STEVE_STATE_DIED      = "Died"
 	game.DIRECTION_LEFT        = -1				-- servono??
 	game.DIRECTION_RIGHT       =  1				-- servono??
+
+	-------------------------------
 	game.MAX_LIVES             =  3
+	-------------------------------
 
 	local gameStateList = {
 		RUNNING = "Running",
@@ -74,8 +77,8 @@ physics.setGravity( 0, 50 )
 	local function debug(event)
 		-- print("Game " .. game.state)
 		-- print(game.steve.state)
-		if (game.steve.canJump == true) then print ("Steve can jump")
-		elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
+		-- if (game.steve.canJump == true) then print ("Steve can jump")
+		-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
 		--	print(controller.controlsEnabled)
 		-- print("")
 
@@ -111,14 +114,14 @@ physics.setGravity( 0, 50 )
 		end
 
 		-- Jumping is allowed only in two circumstances:
-		-- 1) The player is touching the ground (see jumpTouch())
-		-- 2) The player isn't falling (his vertical speed is greater than 0)
+		-- 1) The player is touching the ground (see collisions)
+		-- 2) The player isn't falling (his vertical speed is >= 0)
 		-- This block checks the second condition.
-		if (game.SSVEnabled) then
+		if (controller.SSVEnabled) then
 			local xv, yv = game.steve:getLinearVelocity()
-			if (yv > 0 and controller.letMeJump == false) then 
+			if (yv > 0 and game.steve.letMeJump == false) then 
 				game.steve.canJump = false
-			elseif (yv == 0 and controller.letMeJump == true) then
+			elseif (yv == 0 and game.steve.letMeJump == true) then
 				game.steve.canJump = true
 			end
 
@@ -310,202 +313,202 @@ physics.setGravity( 0, 50 )
 
 -- CONTROLS HANDLERS ---------------------------------------------------------------
 	-- Main movement handler: it physically translates Steve in the map by applying physical forces.
-	local function setSteveVelocity()
-		if (game.SSVEnabled) then
-			SSVLaunched = true
+		-- local function setSteveVelocity()
+		-- 	if (game.SSVEnabled) then
+		-- 		SSVLaunched = true
 
-			-- ActualSpeed is needed for allowing combinations of two-dimensional movements.
-			-- In both cases (x-movement or y-movement), we set the character's linear velocity at each
-			-- frame, overriding one of the two linear velocities when a movement is input.
-			local steveXV, steveYV = game.steve:getLinearVelocity()
-			if (SSVType == "walk") then
-				-- When walking, ActualSpeed will be 'direction * walkForce'
-				game.steve.state = game.STEVE_STATE_WALKING
-				game.steve:setLinearVelocity(game.steve.actualSpeed, steveYV)
-			elseif (SSVType == "jump" and game.steve.jumpForce < 0) then
-				-- When jumping, ActualSpeed will be 'jumpForce'
-				game.steve:setLinearVelocity(steveXV, game.steve.actualSpeed )
-				game.steve:applyForce(0, game.steve.jumpForce, game.steve.x, game.steve.y)
+		-- 		-- ActualSpeed is needed for allowing combinations of two-dimensional movements.
+		-- 		-- In both cases (x-movement or y-movement), we set the character's linear velocity at each
+		-- 		-- frame, overriding one of the two linear velocities when a movement is input.
+		-- 		local steveXV, steveYV = game.steve:getLinearVelocity()
+		-- 		if (SSVType == "walk") then
+		-- 			-- When walking, ActualSpeed will be 'direction * walkForce'
+		-- 			game.steve.state = game.STEVE_STATE_WALKING
+		-- 			game.steve:setLinearVelocity(game.steve.actualSpeed, steveYV)
+		-- 		elseif (SSVType == "jump" and game.steve.jumpForce < 0) then
+		-- 			-- When jumping, ActualSpeed will be 'jumpForce'
+		-- 			game.steve:setLinearVelocity(steveXV, game.steve.actualSpeed )
+		-- 			game.steve:applyForce(0, game.steve.jumpForce, game.steve.x, game.steve.y)
 
-				if (   game.steve.state == game.STEVE_STATE_JUMPING
-					and game.steve.jumpForce > - 400 and j ~= 0) then
-					j = j - 1
-					i = i + 1
+		-- 			if (   game.steve.state == game.STEVE_STATE_JUMPING
+		-- 				and game.steve.jumpForce > - 400 and j ~= 0) then
+		-- 				j = j - 1
+		-- 				i = i + 1
 
-					local maths = - i
-					-- maths = - math.exp( i/2 ) + 1
-					-- maths - game.steve.jumpForce*math.exp(-i/100000000)
-					game.steve.jumpForce = game.steve.jumpForce + maths
-				else
-					game.steve.jumpForce = 0
-				end
+		-- 				local maths = - i
+		-- 				-- maths = - math.exp( i/2 ) + 1
+		-- 				-- maths - game.steve.jumpForce*math.exp(-i/100000000)
+		-- 				game.steve.jumpForce = game.steve.jumpForce + maths
+		-- 			else
+		-- 				game.steve.jumpForce = 0
+		-- 			end
 
-				--print("i:" ..i.. "| j:" ..j.. "	| jumpForce:" .. 
-				--game.steve.jumpForce .. " | maths: " .. maths)
-			end
-		end
-	end
+		-- 			--print("i:" ..i.. "| j:" ..j.. "	| jumpForce:" .. 
+		-- 			--game.steve.jumpForce .. " | maths: " .. maths)
+		-- 		end
+		-- 	end
+		-- end
 
 	-- Inputs movement on the x-axis.
-	local function dpadTouch(event)
-		local target = event.target
-		
-		if (game.state == game.GAME_RUNNING) then
-			if (event.phase == "began") then
-				display.currentStage:setFocus( target, event.id )
+		-- local function dpadTouch(event)
+		-- 	local target = event.target
+			
+		-- 	if (game.state == game.GAME_RUNNING) then
+		-- 		if (event.phase == "began") then
+		-- 			display.currentStage:setFocus( target, event.id )
 
-				-- Visually simulate the button press (depending on which is pressed).
-				if (target.myName == "dpadLeft") then
-					game.steve.direction = game.DIRECTION_LEFT
-					ui.dpadLeft.alpha = 0.8
-				elseif (target.myName == "dpadRight") then
-					game.steve.direction = game.DIRECTION_RIGHT
-					ui.dpadRight.alpha = 0.8
-				end
+		-- 			-- Visually simulate the button press (depending on which is pressed).
+		-- 			if (target.myName == "dpadLeft") then
+		-- 				game.steve.direction = game.DIRECTION_LEFT
+		-- 				ui.dpadLeft.alpha = 0.8
+		-- 			elseif (target.myName == "dpadRight") then
+		-- 				game.steve.direction = game.DIRECTION_RIGHT
+		-- 				ui.dpadRight.alpha = 0.8
+		-- 			end
 
-				if (game.controlsEnabled) then
-					game.SSVEnabled = true
-					game.steve.state = game.STEVE_STATE_WALKING
+		-- 			if (game.controlsEnabled) then
+		-- 				game.SSVEnabled = true
+		-- 				game.steve.state = game.STEVE_STATE_WALKING
 
-					--avoid walking animation in mid air
-					if(game.steve.airState == "Idle" or game.steve.airState == nil) then
-						game.steveSprite:setSequence("walking")
-						game.steveSprite:play()
-					end
+		-- 				--avoid walking animation in mid air
+		-- 				if(game.steve.airState == "Idle" or game.steve.airState == nil) then
+		-- 					game.steveSprite:setSequence("walking")
+		-- 					game.steveSprite:play()
+		-- 				end
 
-					SSVType = "walk"
-					Runtime:addEventListener("enterFrame", setSteveVelocity)
-					game.steve.actualSpeed = game.steve.direction * game.steve.walkForce
-					game.steve.xScale = game.steve.direction
-				end
+		-- 				SSVType = "walk"
+		-- 				Runtime:addEventListener("enterFrame", setSteveVelocity)
+		-- 				game.steve.actualSpeed = game.steve.direction * game.steve.walkForce
+		-- 				game.steve.xScale = game.steve.direction
+		-- 			end
 
-			elseif (event.phase == "ended" or "cancelled" == event.phase) then
-				game.steve.state = game.STEVE_STATE_IDLE
-				game.steveSprite:setSequence("idle")
+		-- 		elseif (event.phase == "ended" or "cancelled" == event.phase) then
+		-- 			game.steve.state = game.STEVE_STATE_IDLE
+		-- 			game.steveSprite:setSequence("idle")
 
-				Runtime:removeEventListener("enterFrame", setSteveVelocity)	
+		-- 			Runtime:removeEventListener("enterFrame", setSteveVelocity)	
 
-				ui.dpadLeft.alpha, ui.dpadRight.alpha = 0.1, 0.1
-				display.currentStage:setFocus( target, nil )
-			end
-		end
+		-- 			ui.dpadLeft.alpha, ui.dpadRight.alpha = 0.1, 0.1
+		-- 			display.currentStage:setFocus( target, nil )
+		-- 		end
+		-- 	end
 
-		return true --Prevents touch propagation to underlying objects
-	end
+		-- 	return true --Prevents touch propagation to underlying objects
+		-- end
 
 	-- Inputs movement on the y-axis.
-	local function jumpTouch(event)
-		if (game.state == game.GAME_RUNNING) then
-			if (event.phase == "began") then
-				display.currentStage:setFocus( event.target, event.id )
-				if (game.controlsEnabled and game.steve.canJump == true) then
-					sfx.playSound( sfx.jumpSound, { channel = 2 } )
-					game.steve.state = game.STEVE_STATE_JUMPING
+		-- local function jumpTouch(event)
+		-- 	if (game.state == game.GAME_RUNNING) then
+		-- 		if (event.phase == "began") then
+		-- 			display.currentStage:setFocus( event.target, event.id )
+		-- 			if (game.controlsEnabled and game.steve.canJump == true) then
+		-- 				sfx.playSound( sfx.jumpSound, { channel = 2 } )
+		-- 				game.steve.state = game.STEVE_STATE_JUMPING
 
-					SSVType = "jump"
-					Runtime:addEventListener("enterFrame", setSteveVelocity)
-					game.steve.jumpForce = -200
-					game.steve.actualSpeed = game.steve.jumpForce
+		-- 				SSVType = "jump"
+		-- 				Runtime:addEventListener("enterFrame", setSteveVelocity)
+		-- 				game.steve.jumpForce = -200
+		-- 				game.steve.actualSpeed = game.steve.jumpForce
 
-					i = 0
-					j = 18
+		-- 				i = 0
+		-- 				j = 18
 
-					game.steve.canJump = false
-					game.letMeJump = false
-				end
+		-- 				game.steve.canJump = false
+		-- 				game.letMeJump = false
+		-- 			end
 
-			elseif (event.phase == "ended" or "cancelled" == event.phase) then
-				display.currentStage:setFocus( event.target, nil )
-				game.steve.state = game.STEVE_STATE_IDLE
-				game.steve.jumpForce = 0
-				game.steveSprite:setSequence("idle")
-				Runtime:removeEventListener("enterFrame", setSteveVelocity)	
-			end
-		end
+		-- 		elseif (event.phase == "ended" or "cancelled" == event.phase) then
+		-- 			display.currentStage:setFocus( event.target, nil )
+		-- 			game.steve.state = game.STEVE_STATE_IDLE
+		-- 			game.steve.jumpForce = 0
+		-- 			game.steveSprite:setSequence("idle")
+		-- 			Runtime:removeEventListener("enterFrame", setSteveVelocity)	
+		-- 		end
+		-- 	end
 
-		return true --Prevents touch propagation to underlying objects
-	end
+		-- 	return true --Prevents touch propagation to underlying objects
+		-- end
 
 	-- Inputs action, depending on the current weapon equipped or other circumstances.
-	local function actionTouch( event )
-		local attackDuration = 500
-		local actionBtn = event.target
+		-- local function actionTouch( event )
+		-- 	local attackDuration = 500
+		-- 	local actionBtn = event.target
 
-		if (game.state == game.GAME_RUNNING) then
-			if (event.phase=="began" and actionBtn.active == true) then
-				display.currentStage:setFocus( actionBtn )
+		-- 	if (game.state == game.GAME_RUNNING) then
+		-- 		if (event.phase=="began" and actionBtn.active == true) then
+		-- 			display.currentStage:setFocus( actionBtn )
 
-				if (game.controlsEnabled) then
-					sfx.playSound( sfx.attackSound, { channel = 4 } )
+		-- 			if (game.controlsEnabled) then
+		-- 				sfx.playSound( sfx.attackSound, { channel = 4 } )
 
-					-- Visually simulate the button press
-					actionBtn.active = false
-					actionBtn.alpha = 0.5
+		-- 				-- Visually simulate the button press
+		-- 				actionBtn.active = false
+		-- 				actionBtn.alpha = 0.5
 
-					game.steve.state = game.STEVE_STATE_ATTACKING
-					steveAttack = display.newCircle( game.steve.x, game.steve.y, 40)
-					physics.addBody(steveAttack, {isSensor = true})
-					steveAttack.myName = "steveAttack"
-					steveAttack:setFillColor(0,0,255)
-					steveAttack.alpha=0.6
-					game.map:getTileLayer("playerEffects"):addObject( steveAttack )
-					game.steveSprite.alpha=0
+		-- 				game.steve.state = game.STEVE_STATE_ATTACKING
+		-- 				steveAttack = display.newCircle( game.steve.x, game.steve.y, 40)
+		-- 				physics.addBody(steveAttack, {isSensor = true})
+		-- 				steveAttack.myName = "steveAttack"
+		-- 				steveAttack:setFillColor(0,0,255)
+		-- 				steveAttack.alpha=0.6
+		-- 				game.map:getTileLayer("playerEffects"):addObject( steveAttack )
+		-- 				game.steveSprite.alpha=0
 
-					-- Steve dashes forward
-					game.steve:applyLinearImpulse( game.steve.direction * 8, 0, game.steve.x, game.steve.y )
+		-- 				-- Steve dashes forward
+		-- 				game.steve:applyLinearImpulse( game.steve.direction * 8, 0, game.steve.x, game.steve.y )
 
-					-- Visually links the SteveAttack to Steve
-					local steveAttackFollowingSteve = function ()
-						steveAttack.x, steveAttack.y = game.steve.x, game.steve.y
-					end
+		-- 				-- Visually links the SteveAttack to Steve
+		-- 				local steveAttackFollowingSteve = function ()
+		-- 					steveAttack.x, steveAttack.y = game.steve.x, game.steve.y
+		-- 				end
 
-					-- Handles the end of the attack phase
-					local steveAttackStop = function ()
-						display.remove(steveAttack)
-						game.steve.state = game.STEVE_STATE_IDLE
-						Runtime:removeEventListener("enterFrame" , steveAttackFollowingSteve)
-						actionBtn.active = true
-						actionBtn.alpha = 1
-						game.steveSprite.alpha = 1
-					end
+		-- 				-- Handles the end of the attack phase
+		-- 				local steveAttackStop = function ()
+		-- 					display.remove(steveAttack)
+		-- 					game.steve.state = game.STEVE_STATE_IDLE
+		-- 					Runtime:removeEventListener("enterFrame" , steveAttackFollowingSteve)
+		-- 					actionBtn.active = true
+		-- 					actionBtn.alpha = 1
+		-- 					game.steveSprite.alpha = 1
+		-- 				end
 
-					Runtime:addEventListener("enterFrame", steveAttackFollowingSteve)
-					timer.performWithDelay(attackDuration, steveAttackStop)
-				end
-			elseif (event.phase == "ended" or "cancelled" == event.phase) then
-				display.currentStage:setFocus( nil )
-			end
-		end
+		-- 				Runtime:addEventListener("enterFrame", steveAttackFollowingSteve)
+		-- 				timer.performWithDelay(attackDuration, steveAttackStop)
+		-- 			end
+		-- 		elseif (event.phase == "ended" or "cancelled" == event.phase) then
+		-- 			display.currentStage:setFocus( nil )
+		-- 		end
+		-- 	end
 
-		return true --Prevents touch propagation to underlying objects
-	end
+		-- 	return true --Prevents touch propagation to underlying objects
+		-- end
 
 	-- Inputs game pause (and opens the pause panel) if game is running and resume if paused.
-	local function pauseResume(event)
-		local target = event.target
+		-- local function pauseResume(event)
+		-- 	local target = event.target
 
-		if (event.phase == "began") then
-			display.currentStage:setFocus( target )
+		-- 	if (event.phase == "began") then
+		-- 		display.currentStage:setFocus( target )
 
-		elseif (event.phase == "ended" or "cancelled" == event.phase) then
-			if (target.myName == "pauseBtn") then
-				game.state = game.GAME_PAUSED
-				ui.pauseBtn.isVisible = false
-				ui.resumeBtn.isVisible = true
-				pauseMenu.psbutton = ui.getButtonByName("pauseBtn")
-				pauseMenu.rsbutton = ui.getButtonByName("resumeBtn")
-		        pauseMenu.panel:show({ y = display.screenOriginY+225,})
-			elseif (target.myName == "resumeBtn") then
-				game.state = game.GAME_RESUMED
-				ui.pauseBtn.isVisible = true
-				ui.resumeBtn.isVisible = false
-				pauseMenu.panel:hide()
-			end
-			display.currentStage:setFocus( nil )
-		end
+		-- 	elseif (event.phase == "ended" or "cancelled" == event.phase) then
+		-- 		if (target.myName == "pauseBtn") then
+		-- 			game.state = game.GAME_PAUSED
+		-- 			ui.pauseBtn.isVisible = false
+		-- 			ui.resumeBtn.isVisible = true
+		-- 			pauseMenu.psbutton = ui.getButtonByName("pauseBtn")
+		-- 			pauseMenu.rsbutton = ui.getButtonByName("resumeBtn")
+		-- 	        pauseMenu.panel:show({ y = display.screenOriginY+225,})
+		-- 		elseif (target.myName == "resumeBtn") then
+		-- 			game.state = game.GAME_RESUMED
+		-- 			ui.pauseBtn.isVisible = true
+		-- 			ui.resumeBtn.isVisible = false
+		-- 			pauseMenu.panel:hide()
+		-- 		end
+		-- 		display.currentStage:setFocus( nil )
+		-- 	end
 
-		return true --Prevents touch propagation to underlying objects
-	end
+		-- 	return true --Prevents touch propagation to underlying objects
+		-- end
 
 	-- Inputs interaction with an npc's ballon.
 	local function balloonTouch(event) 
@@ -532,6 +535,7 @@ physics.setGravity( 0, 50 )
 		self.steve, self.steveSprite, self.sensorD = player.loadPlayer( self )
 
 		-------------------------------------
+		--self.steve, self.steve.sprite, self.steve.sensorD = player.loadPlayer( self )
 		self.steve.defaultAttack = player.loadAttack( self )
 		self.steve.sprite = self.steveSprite  -- for controller
 		self.steve.sensorD = self.sensorD
@@ -571,27 +575,27 @@ physics.setGravity( 0, 50 )
 
 	-- Loads the UI's images and handlers.
 		-- Visually istantiates the UI in the current game's map.
-	function game:loadUi()
-		self.ui = ui.loadUi(self)
+		-- function game:loadUi()
+		-- 	self.ui = ui.loadUi(self)
 
-		self.map:getTileLayer("JUMPSCREEN"):addObject(ui.jumpScreen)
-		ui.jumpScreen:addEventListener( "touch", jumpTouch )
+		-- 	self.map:getTileLayer("JUMPSCREEN"):addObject(ui.jumpScreen)
+		-- 	ui.jumpScreen:addEventListener( "touch", jumpTouch )
 
-		-- Adds the event handlers to the UI.
-		--ui.getButtonByName("jumpScreen"):addEventListener("touch", jumpTouch)
-			ui.dpadLeft:addEventListener("touch", dpadTouch)
-			ui.dpadRight:addEventListener("touch", dpadTouch)
-			ui.actionBtn:addEventListener("touch", actionTouch)
-			ui.pauseBtn:addEventListener("touch", pauseResume)
-			ui.resumeBtn:addEventListener("touch",pauseResume)
+		-- 	-- Adds the event handlers to the UI.
+		-- 	--ui.getButtonByName("jumpScreen"):addEventListener("touch", jumpTouch)
+		-- 		ui.dpadLeft:addEventListener("touch", dpadTouch)
+		-- 		ui.dpadRight:addEventListener("touch", dpadTouch)
+		-- 		ui.actionBtn:addEventListener("touch", actionTouch)
+		-- 		ui.pauseBtn:addEventListener("touch", pauseResume)
+		-- 		ui.resumeBtn:addEventListener("touch",pauseResume)
 
-		-- After a brief delay at game start, the dpad becomes transparent.
-		-- local function lowerDpadAlpha()
-		-- 	transition.to( ui.dpadLeft, {time = 1000, alpha = 0.1}  ) 
-		-- 	transition.to( ui.dpadRight, {time = 1000, alpha = 0.1} ) 
+		-- 	-- After a brief delay at game start, the dpad becomes transparent.
+		-- 	-- local function lowerDpadAlpha()
+		-- 	-- 	transition.to( ui.dpadLeft, {time = 1000, alpha = 0.1}  ) 
+		-- 	-- 	transition.to( ui.dpadRight, {time = 1000, alpha = 0.1} ) 
+		-- 	-- end
+		-- 	-- timer.performWithDelay( 2000, lowerDpadAlpha)
 		-- end
-		-- timer.performWithDelay( 2000, lowerDpadAlpha)
-	end
 
 	-- Removes every Entity on the map when -game.stop- is triggered
 		-- [[ lavori in corso: introdurre lista di entità in game ]]
