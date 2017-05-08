@@ -20,53 +20,51 @@ function enemies.loadEnemies( currentGame )
 
 	-- Loads the main Entity.
 		local loadenemyEntity = function( enemy )
-
- 			for i, v in pairs(enemyList) do
-	 			local staticImage
-	 			--print(enemyList[i].type)
- 				if (v.type == "paper") then
- 				staticImage = entity.newEntity{
-				graphicType = "static",
-				filePath = visual.enemyPaper,
-				width = 40,
-				height = 40,
-				bodyType = "dynamic",
-				physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
-				eName = "enemy"
-				}
-				staticImage.lives=1
-				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
-				
+		 	for i, v in pairs(enemyList) do
+				local staticImage
+				--print(enemyList[i].type)
+				if (v.type == "paper") then
+					staticImage = entity.newEntity{
+						graphicType = "static",
+						filePath = visual.enemyPaper,
+						width = 40,
+						height = 40,
+						bodyType = "dynamic",
+						physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
+						eName = "enemy"
+					}
+					staticImage.lives=1
+					staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
+						
 				elseif (v.type == "sedia") then
- 				staticImage = entity.newEntity{
-				graphicType = "static",
-				filePath = visual.enemySedia,
-				width = 70,
-				height = 113,
-				bodyType = "dynamic",
-				physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
-				eName = "enemy"
-				}
-				staticImage.lives=5
-				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
-				
- 				end
- 				staticImage.isTargettable=true
- 				staticImage.isEnemy=true
+					staticImage = entity.newEntity{
+						graphicType = "static",
+						filePath = visual.enemySedia,
+						width = 70,
+						height = 113,
+						bodyType = "dynamic",
+						physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
+						eName = "enemy"
+					}
+					staticImage.lives=5
+					staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
+						
+				end
+				staticImage.isTargettable=true
+				staticImage.isEnemy=true
 
- 				if(enemyList[i].drop ~=nil) then
+				if(enemyList[i].drop ~=nil) then
 					staticImage.drop = enemyList[i].drop
 				end
 
- 				staticImage:addOnMap( currentMap )
- 			end
+				staticImage:addOnMap( currentMap )
+			end
 
 			return staticImage
 		end
 
 	--la scansione del ciclo dei nemici in tutta la mappa è fatta all'interno di loadenemy
 	enemyList[1].staticImage = loadenemyEntity(enemyList[1])
-
 	return enemyList
 end
 

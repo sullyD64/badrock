@@ -2,8 +2,9 @@
 --
 -- newUi.lua
 --
--- This module is tied to the controller which is the only class that uses it.
--- Additional functions provide easy shortcuts for toggling the enablement for the whole ui.
+-- Here are declared all the visual aspects regarding the game's UI buttons.
+-- This module is tied to the controller which is the only class that uses it, while
+-- additional functions provide easy shortcuts for toggling the enablement for the whole ui.
 -----------------------------------------------------------------------------------------
 local widget = require ( "widget" )
 

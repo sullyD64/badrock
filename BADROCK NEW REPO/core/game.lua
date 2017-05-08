@@ -61,7 +61,6 @@ physics.setGravity( 0, 50 )
 		DEAD      = "Dead",
 	}
 
-
 	game.letMeJump = false
 	game.SSVEnabled = true
 	game.controlsEnabled = true
@@ -75,9 +74,9 @@ physics.setGravity( 0, 50 )
 	local function debug(event)
 		-- print("Game " .. game.state)
 		-- print(game.steve.state)
-		-- if (game.steve.canJump == true) then print ("Steve can jump")
-		-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
-		-- print(controller.controlsEnabled)
+		if (game.steve.canJump == true) then print ("Steve can jump")
+		elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
+		--	print(controller.controlsEnabled)
 		-- print("")
 
 
@@ -103,10 +102,12 @@ physics.setGravity( 0, 50 )
 		if(game.steve.x and game.steve.y) then
 			game.steveSprite.x = game.steve.x
 			game.steveSprite.y = game.steve.y -10
-			game.sensorD.x, game.sensorD.y = game.steve.x, game.steve.y
-		 	-- game.steve.sensorE.x, game.steve.sensorE.y = game.steve.x, game.steve.y
-		 	--(offset della sprite rispetto a game.steve)
+			 	--(offset della sprite rispetto a game.steve)
 			game.steveSprite.xScale = game.steve.direction
+			game.sensorD.x, game.sensorD.y = game.steve.x, game.steve.y
+			if (game.steve.attack) then
+				game.steve.attack.x, game.steve.attack.y = game.steve.x, game.steve.y
+			end
 		end
 
 		-- Jumping is allowed only in two circumstances:
@@ -115,9 +116,9 @@ physics.setGravity( 0, 50 )
 		-- This block checks the second condition.
 		if (game.SSVEnabled) then
 			local xv, yv = game.steve:getLinearVelocity()
-			if (yv > 0 and game.letMeJump == false) then 
+			if (yv > 0 and controller.letMeJump == false) then 
 				game.steve.canJump = false
-			elseif (yv == 0 and game.letMeJump == true) then
+			elseif (yv == 0 and controller.letMeJump == true) then
 				game.steve.canJump = true
 			end
 
@@ -154,26 +155,27 @@ physics.setGravity( 0, 50 )
 	-- Adds points to the current game's score (points are fixed for now).
 	function game.addScore(points)
 		
-		game.score = game.score + points
-		ui.scoreText.text = "Score: " .. game.score
-		local pointsTimer = 250
+		--[TEMPORARIO: da spostare in controller!]
+		-- game.score = game.score + points
+		-- ui.scoreText.text = "Score: " .. game.score
+		-- local pointsTimer = 250
 
-		if (ui.pointsText.isVisible == false) then
-			ui.pointsText.text = ("+" .. points)
-			ui.pointsText.isVisible = true 
-			pointsTimer = 250
-		end
+		-- if (ui.pointsText.isVisible == false) then
+		-- 	ui.pointsText.text = ("+" .. points)
+		-- 	ui.pointsText.isVisible = true 
+		-- 	pointsTimer = 250
+		-- end
 
-		-- Fancy animation
-		local pointsFade = function () 
-			transition.to( ui.pointsText, { alpha = 0, time = 250, effect = "crossfade", 
-				onComplete = function() 
-					ui.pointsText.isVisible = false
-					ui.pointsText.alpha = 1
-				end
-				} )
-			end
-		timer.performWithDelay(pointsTimer, pointsFade)
+		-- -- Fancy animation
+		-- local pointsFade = function () 
+		-- 	transition.to( ui.pointsText, { alpha = 0, time = 250, effect = "crossfade", 
+		-- 		onComplete = function() 
+		-- 			ui.pointsText.isVisible = false
+		-- 			ui.pointsText.alpha = 1
+		-- 		end
+		-- 		} )
+		-- 	end
+		-- timer.performWithDelay(pointsTimer, pointsFade)
 		end
 
 	--Adds -one- life to the current game's lives.
@@ -530,6 +532,7 @@ physics.setGravity( 0, 50 )
 		self.steve, self.steveSprite, self.sensorD = player.loadPlayer( self )
 
 		-------------------------------------
+		self.steve.defaultAttack = player.loadAttack( self )
 		self.steve.sprite = self.steveSprite  -- for controller
 		self.steve.sensorD = self.sensorD
 		-------------------------------------

@@ -16,6 +16,12 @@ local settings = {
 	-- walkForce = 150,
 	-- jumpForce = -200,
 
+	attackOpts = {
+		radius = 40,
+		alpha = 0.6,
+		color = {0, 0, 255},
+	},
+
 	sensorOpts = {
 		radius = 50,
 		alpha = 0.5,
@@ -84,13 +90,52 @@ function player.loadPlayer( currentGame )
 		-- player.walkForce = settings.walkForce
 		-- player.jumpForce = settings.jumpForce
 
-	-- Insert the player's hitbox and sprite in the current map
+	-- Inserts the player's hitbox and sprite in the current map
 		local currentMap = currentGame.map
 		player:addOnMap ( currentMap )
 		sprite:addOnMap ( currentMap )
-		sensorD:addOnMap(currentMap)
+		sensorD:addOnMap ( currentMap )
 
 		return player, sprite, sensorD
+end
+
+-- Loads the player's default (for now) attack
+-- The attack is composed of two entities:
+-- 1) The sensor hitbox
+-- 2) The animated sprite [da implementare]
+-- @return two Entities
+function player.loadAttack( currentGame )
+	local player = currentGame.steve
+	local currentMap = currentGame.map
+
+	local defaultAttack = entity.newEntity{
+		graphicType = "sensor",
+		parentX = player.x,
+		parentY = player.y,
+		radius = settings.attackOpts.radius,
+		color = settings.attackOpts.color,
+		alpha = settings.attackOpts.alpha,
+		sensorName = "A"
+	}
+
+	defaultAttack.gravityScale = 0
+
+	-- Inserts the attack on the map
+	defaultAttack:addOnMap( currentMap )
+
+	-- The attack is initially inactive
+	defaultAttack.isVisible = false
+	defaultAttack.isBodyActive = false
+
+	-- [da implementare] -------------------------
+	-- defaultAttack.sprite = entity.newEntity{
+
+	-- }
+	--defaultAttack.sprite:addOnMap ( currentMap )
+	--...
+	----------------------------------------------
+
+	return defaultAttack
 end
 
 

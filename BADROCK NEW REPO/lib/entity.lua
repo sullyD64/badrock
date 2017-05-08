@@ -101,7 +101,7 @@ function entity.newEntity( options )
 				map:getTileLayer("items"):addObject(self)
 			elseif (name == "sensor") then
 				map:getTileLayer("sensors"):addObject(self)
-			else
+			else --default
 				map:getTileLayer("entities"):addObject(self)
 			end
 		else

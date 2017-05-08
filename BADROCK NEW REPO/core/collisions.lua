@@ -11,9 +11,10 @@
 -----------------------------------------------------------------------------------------
 local physics = require ( "physics"    )
 local ui      = require ( "core.ui"    )
---local npcs    = require ( "core.npcs"  )
 local items   = require ( "core.items" )
 local sfx     = require ( "audio.sfx"  )
+local controller = require ("core.controller") --[solo per letMeJump]
+
 
 local collisions = {}
 local game
@@ -82,64 +83,63 @@ local function dangerCollision( event )
 end
 
 -- Collision between the player's Attack and an Enemy
-local function steveAttackCollision( event )
-	local attack = event.object1
-	local other = event.object2
+local function attackCollision( event )
+		local attack, other = event.object1, event.object2
 
-	if(other.myName == "steveAttack") then
-		attack = event.object2
-		other = event.object1
-	end
-
-	-- salvo localmente alcuni attributi del nemico prima che, venendo colpito e ucciso, li perda
-	local enemy = {}
-	enemy.drop = other.drop
-	enemy.name = other.name 
-	enemy.x = other.x
-	enemy.y = other.y
-
-	-- Other is an enemy, targettable AND not invincible
-	if( other.isEnemy and other.isTargettable == true ) then 
-		print ("tar")
-		other.lives = other.lives - 1
-
-		other.alpha = 0.5 -- Make the enemy temporairly untargettable 
-		other.isTargettable = false
-
-		if ( other.lives == 0 ) then -- Enemy has no lives left
-			other.isSensor = true
-			other.isEnemy = false
-			timer.performWithDelay(1000, other:applyLinearImpulse( 0.05, -0.30, other.x, other.y ))
-			other.yScale = -1
-
-			--Force the enemy to drop his item
-			if ( game.hasAttribute(enemy,"drop") ) then game.dropItemFrom(enemy) end 
-				
-			timer.performWithDelay(5000, function() other:removeSelf() end)
-			game.addScore(200) -- We will modify this
-		
-		else -- Enemy is still alive
-			
-			local removeMobImmunity = function() 
-				other.alpha=1 
-				other.isTargettable = true
-			end
-			timer.performWithDelay(500, removeMobImmunity)
-
-			-- Knocks back the enemy
-			if (other.x > game.steve.x) then other:applyLinearImpulse(1,1,other.x,other.y) 
-			elseif (other.x < game.steve.x) then other:applyLinearImpulse(-1,1,other.x,other.y)
-			end
+		if (other.sensorName == "A") then
+			attack = event.object2
+			other = event.object1
 		end
 
-	-- If the object is a item that can be destroyed from steve attacks
-	elseif( other.isBreakable ) then
-		display.remove(other)
-	elseif(other.isEnemy==false) then print("noEn")
-	elseif(other.isEnemy==true) then print("èEn")
-	elseif(other.isEnemy==true) then print("ètar")	
-	elseif(other.isTargettable==false) then print ("notar")
-	end
+		-- [Salvo localmente alcuni attributi del nemico prima che li perda venendo colpito e ucciso]
+		local enemyHit = {}
+		enemyHit.drop = other.drop
+		enemyHit.name = other.name 
+		enemyHit.x = other.x
+		enemyHit.y = other.y
+
+		-- The enemy hit must BE an enemy, targettable AND not invincible
+		if( other.isEnemy and other.isTargettable == true ) then 
+			other.lives = other.lives - 1
+
+			other.alpha = 0.5 -- Make the enemy temporairly untargettable 
+			other.isTargettable = false
+
+			if ( other.lives == 0 ) then -- Enemy has no lives left
+				other.isSensor = true
+				other.isEnemy = false
+				timer.performWithDelay(1000, other:applyLinearImpulse( 0.05, -0.30, other.x, other.y ))
+				other.yScale = -1
+
+				--Force the enemy to drop his item
+				if ( game.hasAttribute(enemyHit,"drop") ) then game.dropItemFrom(enemyHit) end 
+					
+				timer.performWithDelay(5000, function() other:removeSelf() end)
+				game.addScore(200) -- We will modify this
+			
+			else -- Enemy is still alive
+				
+				local removeMobImmunity = function() 
+					other.alpha=1 
+					other.isTargettable = true
+				end
+				timer.performWithDelay(500, removeMobImmunity)
+
+				-- Knocks back the enemy
+				if (other.x > game.steve.x) then other:applyLinearImpulse(1,1,other.x,other.y) 
+				elseif (other.x < game.steve.x) then other:applyLinearImpulse(-1,1,other.x,other.y)
+				end
+			end
+
+		-- If the object is a item that can be destroyed from steve attacks
+		elseif( other.isBreakable ) then
+			display.remove(other)
+		elseif(other.isEnemy==false) then print("noEn")
+		elseif(other.isEnemy==true) then print("èEn")
+		elseif(other.isEnemy==true) then print("ètar")	
+		elseif(other.isTargettable==false) then print ("notar")
+		end
+	
 end
 
 -------------------------------------
@@ -153,45 +153,36 @@ end
 -- the two (in future three) sensors, and acts differently depending if the
 -- collision is a "contact" or a "release" between the two circles.
 local function npcDetectByCollision( event )
-	local sensorN, collName, flag 
-	if ( (event.object1.sensorName == "N") or (event.object2.sensorName == "N") ) and 
-		( (event.object2.sensorName == "D") or (event.object2.sensorName == "E") ) then
-		sensorN = event.object1
+	local sensorN, other = event.object1, event.object2
+	local collName, flag
 
-		--[[
-			-- if (event.object2.sensorName == "D") then
-			-- 	sensorD = event.object2
-			-- elseif (event.object2.sensorName == "E") then
-			-- 	sensorE = event.object2
-			-- end
-			-- if (sensorN.sensorName ~= "N") then
-			-- 	sensorN = event.object2
-			-- end
-		]]--
+	if (other.sensorName == "N") then
+		sensorN = event.object2
+		other = event.object1
+	end
 
-		if (contactEnabled) then 
-			collName = "contact"
-			flag = "show"
-		elseif (releaseEnabled) then
-			collName = "release"
-			flag = "hide"
-		end
+	if (contactEnabled) then 
+		collName = "contact"
+		flag = "show"
+	elseif (releaseEnabled) then
+		collName = "release"
+		flag = "hide"
+	end
 
-		-- Switches between the two if blocks (next collision will enter the other 'if')
-		if (collName == "contact") then
-			contactEnabled = false
-			releaseEnabled = true
-		elseif (collName == "release") then
-			releaseEnabled = false
-			contactEnabled = true
-		end
+	-- Switches between the two if blocks (next collision will enter the other 'if')
+	if (collName == "contact") then
+		contactEnabled = false
+		releaseEnabled = true
+	elseif (collName == "release") then
+		releaseEnabled = false
+		contactEnabled = true
+	end
 
-		for i=1, #game.npcs, 1 do
-			-- Selects the npc associated to the sensorN and calls the toggle function
-			if (game.npcs[i].sensorN == sensorN) then
-				--toggleNpcBalloon(game.npcs[i], flag)
-				game.npcs[i].balloon:toggle(flag)
-			end
+	for i=1, #game.npcs, 1 do
+		-- Selects the npc associated to the sensorN and calls the toggle function
+		if (game.npcs[i].sensorN == sensorN) then
+			--toggleNpcBalloon(game.npcs[i], flag)
+			game.npcs[i].balloon:toggle(flag)
 		end
 	end
 end
@@ -217,16 +208,25 @@ function collisions.onCollision( event )
 			game.levelCompleted = true
 			game.endGameScreen()
 		else
-			game.letMeJump = true -- force enable the jump
+			-----------------------------------------------------------------
+			controller.letMeJump = true -- force enable the jump [CONTROLLER]
+			-----------------------------------------------------------------
 		end
 
-	-- Index for collisions involving the player's Attack
-	elseif( (o1.myName == "steveAttack") or (o2.myName == "steveAttack") ) then
-		steveAttackCollision( event )
+	-- -- Index for collisions involving the player's Attack
+	-- elseif( (o1.myName == "steveAttack") or (o2.myName == "steveAttack") ) then
+	-- 	steveAttackCollision( event )
 	
-	-- Index for collisions involving sensors
-	elseif( (o1.eName == "sensor") and (o2.eName == "sensor") ) then
-		npcDetectByCollision( event )
+	-- Index for collisions involving at least one sensor
+	elseif( (o1.eName == "sensor") or (o2.eName == "sensor") ) then
+		if ((o1.sensorName == "N" and o2.sensorName == "D") or
+			 (o2.sensorName == "N" and o1.sensorName == "D")) then
+			npcDetectByCollision( event )
+		elseif 
+			((o1.sensorName == "A" and o2.eName == "enemy") or
+			 (o2.sensorName == "A" and o1.eName == "enemy")) then
+			attackCollision( event )
+		end
 	end
 end
 
@@ -249,6 +249,5 @@ function collisions.stevePreCollision( self, event )
 	return true
 end
 --------------------------------------------------------------------------------------------------
-
 
 return collisions

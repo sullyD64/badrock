@@ -27,7 +27,6 @@ local steve = {}
 local gState = {}
 local sState = {}
 
-
 -- PLAYER MOVEMENT -----------------------------------------------------------------
 	local function makeSteveJump()
 		local steveXV, steveYV = steve:getLinearVelocity()
@@ -51,7 +50,7 @@ local sState = {}
 			-- maths - steve.jumpForce*math.exp(-controller.i/100000000)
 			steve.jumpForce = steve.jumpForce + maths
 
-			print("i:" ..controller.i.. "| j:" ..controller.j.. "	| jumpForce:" .. steve.jumpForce)
+			--print("i:" ..controller.i.. "| j:" ..controller.j.. "	| jumpForce:" .. steve.jumpForce)
 		else
 			steve.jumpForce = 0
 		end
@@ -73,26 +72,28 @@ local sState = {}
 -- Inputs movement on the y-axis.
 local function onJumpEvent(event)
 	local target = event.target
-
 	if (controller.controlsEnabled) then
 		if (event.phase == "began" and steve.canJump == true) then
 			display.currentStage:setFocus( target, event.id )
-			steve.state = sState.JUMPING
+			-- audio --------------------------------------
 			sfx.playSound( sfx.jumpSound, { channel = 2 } )
+			-----------------------------------------------
+			steve.state = sState.JUMPING
 
-			----------------------------------------------------
-			steve.jumpForce = - 200
-			Runtime:addEventListener("enterFrame", makeSteveJump)
-			controller.i = 0
-			controller.j = 16
-			steve.canJump = false
-			letMeJump = false
-			----------------------------------------------------		
+			-- physics ---------------------------------------------
+				steve.jumpForce = - 200
+				Runtime:addEventListener("enterFrame", makeSteveJump)
+				controller.i = 0
+				controller.j = 16
+				steve.canJump = false
+				letMeJump = false
+			--------------------------------------------------------		
 		
 		elseif (event.phase == "ended" or "cancelled" == event.phase) then
 			steve.state = sState.IDLE
 			steve.sprite:setSequence("idle")
-			-------------------------------------------------------
+
+			-- physics ---------------------------------------------
 			steve.jumpForce = 0
 			Runtime:removeEventListener("enterFrame", makeSteveJump)
 			--------------------------------------------------------
@@ -105,7 +106,6 @@ end
 -- Inputs movement on the x-axis.
 local function onDpadEvent(event)
 	local target = event.target
-
 	if (controller.controlsEnabled) then
 		if (event.phase == "began") then
 			display.currentStage:setFocus( target, event.id )
@@ -117,10 +117,9 @@ local function onDpadEvent(event)
 				steve.sprite:play()
 			end
 
-			-- Visually simulate the button press (depending on which is pressed).
+			-- Visually simulate the button press
 			-- target.alpha = 0.8
-			--------------------------------------------------------------
-			-- Determines the direction based on wich button is pressed
+			-- physics -------------------------------------------
 			if (target.id == "dpadLeft") then
 				steve.direction = -1
 			elseif (target.id == "dpadRight") then
@@ -132,13 +131,13 @@ local function onDpadEvent(event)
 			Runtime:addEventListener("enterFrame", makeSteveMove)
 			steve.actualSpeedX = steve.direction * steve.walkForce
 			steve.xScale = steve.direction
-			--------------------------------------------------------------
+			------------------------------------------------------
 
 		elseif (event.phase == "ended" or "cancelled" == event.phase) then
 			steve.state = sState.IDLE
 			steve.sprite:setSequence("idle")
 			--target.alpha = 0.1
-			--------------------------------------------------------
+			-- physics ---------------------------------------------
 			steve.actualspeedX = 0
 			Runtime:removeEventListener("enterFrame", makeSteveMove)	
 			--------------------------------------------------------
@@ -148,66 +147,59 @@ local function onDpadEvent(event)
 	return true
 end
 
--- Inputs action, depending on the current weapon equipped or other circumstances.
-	-- local function actionTouch( event )
-	-- 	local attackDuration = 500
-	-- 	local target = event.target
+-- Inputs attack, depending on the current weapon equipped or other circumstances.
+local function onAttackEvent( event )
+	local target = event.target
+	if (controller.controlsEnabled) then
+		if (event.phase == "began" and target.active == true) then
+			display.currentStage:setFocus( target, event.id )
+			-- audio ----------------------------------------
+			sfx.playSound( sfx.attackSound, { channel = 4 } )
+			-------------------------------------------------
+			steve.state = sState.ATTACKING
+			steve.sprite.alpha = 0
 
-	-- 	--if (game.state == gState.RUNNING) then
-	-- 		if (event.phase=="began" and target.active == true) then
-	-- 			display.currentStage:setFocus( target, event.id )
+			-- Button becomes temporairly inactive
+			target.active = false
+			target.alpha = 0.5
+			-- attack entity -------------------------------
+				if (steve.hasPowerUp) then
+					-- [implementazione futura]
+				else -- default attack
+					steve.attack = steve.defaultAttack
+					steve.attack.duration = 500
 
-	-- 			if (game.controlsEnabled) then
-	-- 				sfx.playSound( sfx.attackSound, { channel = 4 } )
+					-- Position linking is handled in game -> onUpdate
+					steve.attack.isVisible = true
+					steve.attack.isBodyActive = true
 
-	-- 				-- Visually simulate the button press
-	-- 				actionBtn.active = false
-	-- 				actionBtn.alpha = 0.5
+					-- Steve dashes forward
+					steve:applyLinearImpulse( steve.direction * 8, 0, steve.x, steve.y )
+				end
 
-	-- 				game.steve.state = game.STEVE_STATE_ATTACKING
-	-- 				steveAttack = display.newCircle( game.steve.x, game.steve.y, 40)
-	-- 				physics.addBody(steveAttack, {isSensor = true})
-	-- 				steveAttack.myName = "steveAttack"
-	-- 				steveAttack:setFillColor(0,0,255)
-	-- 				steveAttack.alpha=0.6
-	-- 				game.map:getTileLayer("playerEffects"):addObject( steveAttack )
-	-- 				game.steveSprite.alpha=0
-
-	-- 				-- Steve dashes forward
-	-- 				game.steve:applyLinearImpulse( game.steve.direction * 8, 0, game.steve.x, game.steve.y )
-
-	-- 				-- Visually links the SteveAttack to Steve
-	-- 				local steveAttackFollowingSteve = function ()
-	-- 					steveAttack.x, steveAttack.y = game.steve.x, game.steve.y
-	-- 				end
-
-	-- 				-- Handles the end of the attack phase
-	-- 				local steveAttackStop = function ()
-	-- 					display.remove(steveAttack)
-	-- 					game.steve.state = game.STEVE_STATE_IDLE
-	-- 					Runtime:removeEventListener("enterFrame" , steveAttackFollowingSteve)
-	-- 					actionBtn.active = true
-	-- 					actionBtn.alpha = 1
-	-- 					game.steveSprite.alpha = 1
-	-- 				end
-
-	-- 				Runtime:addEventListener("enterFrame", steveAttackFollowingSteve)
-	-- 				timer.performWithDelay(attackDuration, steveAttackStop)
-	-- 			end
-	-- 		elseif (event.phase == "ended" or "cancelled" == event.phase) then
-	-- 			display.currentStage:setFocus( nil )
-	-- 		end
-	-- 	--end
-
-	-- 	return true
-	-- end
-
+				-- Handles the end of the attack phase
+				timer.performWithDelay(steve.attack.duration, 
+					function()
+						-- Button becomes active again 
+						target.active = true
+						target.alpha = 1
+						steve.attack.isVisible = false
+						steve.attack.isBodyActive = false
+						steve.sprite.alpha = 1
+					end
+				)
+			------------------------------------------------				
+		elseif (event.phase == "ended" or "cancelled" == event.phase) then
+			display.currentStage:setFocus( target, nil )
+		end
+		return true
+	end
+end
 
 -- Inputs game pause (and opens the pause panel) if game is running 
 -- and resume if paused, switching visibility between the two buttons.
 local function onPauseResumeEvent(event)
 	local target = event.target
-
 	if (event.phase == "began") then
 		display.currentStage:setFocus( target, event.id )
 		if (event.target.id == "pauseBtn") then
@@ -253,7 +245,7 @@ function controller.prepareUI()
 	ui.buttons.jump:  addEventListener( "touch", onJumpEvent )
 	ui.buttons.dleft: addEventListener( "touch", onDpadEvent )	
 	ui.buttons.dright:addEventListener( "touch", onDpadEvent )
-	-- ui.buttons.action:addEventListener( "touch", onActionEvent )
+	ui.buttons.action:addEventListener( "touch", onAttackEvent )
 	ui.buttons.pause: addEventListener( "touch", onPauseResumeEvent )
 	ui.buttons.resume:addEventListener( "touch", onPauseResumeEvent )
 
