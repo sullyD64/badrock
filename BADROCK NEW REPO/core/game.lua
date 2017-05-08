@@ -633,76 +633,6 @@ physics.setGravity( 0, 50 )
 	end
 ------------------------------------------------------------------------------------
 
--- GIGI WIP-------------------------------------------------------------------------
-	--[[
-		function prova()
-		for k,v in ipairs(game.enemyLevelList) do
-		transition.to(game.enemyLevelList[k], {
-				time=1500,
-				x=(game.enemyLevelList[k].x - 120),
-				onComplete=prova()
-			})
-		end
-	]]
-
-	function f(object)
-		local angle= math.atan2(game.steve.x - object.y, game.steve.y - object.x) -- work out angle between target and missile
-		object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
-		object.y = object.y + (math.sin(angle) * object.speed) -- update y pos in relation to angle
-	end
-
-	function muovi2(object,a,b)
-		function goLeft ()
-			transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
-			transition.to( a, { time=1500, x=(a.x - 120), onComplete=goRight } )
-			transition.to( b, { time=1500, x=(b.x - 120), onComplete=goRight } )
-		end
-
-		function goRight ()
-			transition.to( object, { time=1500, x=(object.x - 120), onComplete=goLeft } )
-			transition.to( a, { time=1500, x=(a.x - 120), onComplete=goLeft } )
-			transition.to( b, { time=1500, x=(b.x - 120), onComplete=goLeft } )
-		end
-
-		goLeft()
-	end
-
-	-- i nemici si muovono a destra e sinistra, lista
-	function muovi(object)
-		object.isFixedRotation=true
-		function goLeft ()
-		transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
-		object.xScale=1
-		end
-
-		function goRight ()
-		transition.to( object, { time=1500, x=(object.x + 120), onComplete=goLeft } )
-		object.xScale=-1
-		end
-
-		goLeft()
-	end
-
-	-- i nemici dovrebbero seguire steve, per alcuni, liste
-	function segui(steve)
-		for i = 1, #enemiesList do
-			local distanceX = steve.x - enemiesList[i].x
-			local distanceY = steve.y - enemiesList[i].y
-
-			local angleRadians = math.atan2(distanceY, distanceX)
-			local angleDegrees = math.deg(angleRadians)
-
-			local enemySpeed = 5
-
-			local enemyMoveDistanceX = enemySpeed*math.cos(angleDegrees)
-			local enemyMoveDistanceY = enemySpeed*math.sin(angleDegrees)
-
-			enemy.x = enemy.x + enemyMoveDistanceX
-			enemy.y = enemy.y + enemyMoveDistanceY
-		end
-	end
-------------------------------------------------------------------------------------
-
 -- MAIN ENTRY POINT (must be called from the current level after -game.loadGame-).
 function game.start()
 	-- game.state = game.GAME_RUNNING
@@ -724,6 +654,7 @@ function game.pause()
 	-- game.steveSprite:pause()
 	physics.pause()
 	controller:pause()
+	transition.pause()
 end
 
 function game.resume()
@@ -731,6 +662,7 @@ function game.resume()
 	-- game.steveSprite:play()
 	physics.start()
 	controller:start()
+	transition.resume()
 end
 
 function game.stop()
