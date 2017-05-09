@@ -34,7 +34,6 @@ function scene:create( event )
 	end
 
 	map = lime.loadMap("testmap_new.tmx")
-	--map = lime.loadMap("longMapTest.tmx")
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 
@@ -65,10 +64,7 @@ function scene:hide( event )
 	
 	if (phase == "will") then
 		audio.fadeOut(1,10)
-		game.stop()
-		--game.ui:removeSelf()
 	elseif (phase == "did") then
-		package.loaded[game] = nil
 	end		
 end
 
@@ -76,6 +72,7 @@ end
 function scene:destroy( event )
 	local sceneGroup = self.view
 	audio.dispose()
+	package.loaded[game] = nil
 end
 
 -- -----------------------------------------------------------------------------------

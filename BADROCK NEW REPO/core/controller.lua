@@ -8,20 +8,22 @@
 -- current state, position on the map, sprite sequence and other properties, and they
 -- are only enabled under certain circumstances.
 -- Each handler is private and should not be accessed outside the module.
+-- Controller also comunicates directly with the game's UI; for this reason, it offers
+-- some methods to visually manipulate the UI, like visualizing the score or other 
+-- 'system' responses for the uses.
 -----------------------------------------------------------------------------------------
-local physics   = require ( "physics"        )		-- serve?
-local ui        = require ( "core.newUi"     )
+local ui        = require ( "core.ui"        )
 local sfx       = require ( "audio.sfx"      )
 local pauseMenu = require ( "menu.pauseMenu" )
 
 local controller = {
-	controlsEnabled, i, j,
-	SSVEnabled,
-	SSVLaunched
+	controlsEnabled,
+	SSVEnabled,					-- SSV: "Set Steve Velocity"
+	SSVLaunched,
+	i, j, 						-- these two are needed for the variable jump height
+	endGameOccurring,	
+	deathBeingHandled,
 }
-
-local SSVEnabled
-local SSVLaunched, SSVType
 
 local game = {}
 local steve = {}
@@ -29,7 +31,22 @@ local gState = {}
 local sState = {}
 
 -- PLAYER MOVEMENT -----------------------------------------------------------------
+	-- Code in this whole block cooperates strictly with the two movement handlers. 
+	-- Names are self-explanatory, while all that it's done is applying forces and 
+	-- modifying the linear velocity of the Player's "hitbox" entity.
+	-- Those two functions are runtime functions, which are toggled depending on the
+	-- movement handlers' event phases; there can be cases in which those functions
+	-- are launched, but never stop executing (i.e. when endGame is triggered):
+	-- this is known to cause multiple errors.
+	-- For this reason, controller needs to store a local variable which indicates if
+	-- those methods are launched and are calculating stuff.
+	-- [Remember that before changing scene, those two methods MUST be stopped! Else
+	--  they will keep running even in other scenes].
+
 	local function makeSteveJump()
+		-----------------------------
+		controller.SSVLaunched = true
+		-----------------------------
 		local steveXV, steveYV = steve:getLinearVelocity()
 			
 		if (steve.jumpForce > -400 and controller.j ~= 0) then
@@ -58,6 +75,9 @@ local sState = {}
 	end
 
 	local function makeSteveMove()
+		-----------------------------
+		controller.SSVLaunched = true
+		-----------------------------
 		local steveXV, steveYV = steve:getLinearVelocity()
 		-- In both cases (x-movement or y-movement), we set the character's linear velocity at each
 		-- frame, overriding one of the two linear velocities when a movement is input.
@@ -87,7 +107,7 @@ local sState = {}
 					controller.i = 0
 					controller.j = 16
 					steve.canJump = false
-					steve.letMeJump = false
+					steve.firstJumpReady = false
 				--------------------------------------------------------		
 			
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
@@ -97,6 +117,8 @@ local sState = {}
 				-- physics ---------------------------------------------
 				steve.jumpForce = 0
 				Runtime:removeEventListener("enterFrame", makeSteveJump)
+				-- permissions -----------------------------------------
+				controller.SSVLaunched = false
 				--------------------------------------------------------
 				display.currentStage:setFocus( target, nil )	
 			end
@@ -141,6 +163,8 @@ local sState = {}
 				-- physics ---------------------------------------------
 				steve.actualspeedX = 0
 				Runtime:removeEventListener("enterFrame", makeSteveMove)	
+				-- permissions -----------------------------------------
+				controller.SSVLaunched = false
 				--------------------------------------------------------
 				display.currentStage:setFocus( target, nil )
 			end
@@ -149,7 +173,7 @@ local sState = {}
 	end
 
 	-- Inputs attack, depending on the current weapon equipped or other circumstances.
-	local function onAttackEvent( event )
+	local function onAttackEvent(event)
 		local target = event.target
 		if (controller.controlsEnabled) then
 			if (event.phase == "began" and target.active == true) then
@@ -178,6 +202,17 @@ local sState = {}
 						steve:applyLinearImpulse( steve.direction * 8, 0, steve.x, steve.y )
 					end
 
+					-- If Steve has died during the attack, the sprite remains invisible
+					local newAlpha = 1 -- default
+					local didSteveDieWhileAttacking = function()
+						--print("sto controllando...")
+						if (steve.state == sState.DEAD) then
+							newAlpha = 0
+							--print("steve è morto :(")
+						end
+					end
+					Runtime:addEventListener("enterFrame", didSteveDieWhileAttacking) 
+
 					-- Handles the end of the attack phase
 					timer.performWithDelay(steve.attack.duration, 
 						function()
@@ -186,7 +221,8 @@ local sState = {}
 							target.alpha = 1
 							steve.attack.isVisible = false
 							steve.attack.isBodyActive = false
-							steve.sprite.alpha = 1
+							steve.sprite.alpha = newAlpha
+							Runtime:removeEventListener( "enterFrame", didSteveDieWhileAttacking)
 						end
 					)
 				------------------------------------------------				
@@ -223,25 +259,177 @@ local sState = {}
 			end
 
 		elseif (event.phase == "ended" or "cancelled" == event.phase) then
-			display.currentStage:setFocus( nil )
+			display.currentStage:setFocus( target, nil )
 		end
 		
 		return true
 	end
 ------------------------------------------------------------------------------------
 
--- This function is accessed from -game.loadGame-.
+-- SPECIAL EVENTS ------------------------------------------------------------------
+	-- For now, the special events are the player's death and the end of the current
+	-- game. Those events must be handled by the controller.
+
+	-- At this point, it's game over. 
+	-- This displays the outcome of the game (good or bad depending from where this function is
+	-- being called) and triggers the end procedure of the current game (Main exit point)
+	-- [@claudia: this will point to the ending menu]
+	function controller.onGameOver(outcome)
+		controller.endGameOccurring = true
+		ui.showOutcome(outcome)
+
+		-- Removes the runtime event listeners if death was triggered
+		-- while still inputing a movement.
+		if (controller.SSVLaunched == true) then
+			Runtime:removeEventListener( "enterFrame", makeSteveJump )
+			Runtime:removeEventListener( "enterFrame", makeSteveMove )
+		end
+
+		controller:pause()
+
+		timer.performWithDelay( 1500,
+			function()
+				game.map:setFocus( nil )
+				game:removeAllEntities()
+				ui.buttons.scoreUp:setLabel("")
+				ui.buttons.lifeUp:setLabel("")
+				ui.buttons = nil
+				ui.emptyLifeIcons()
+
+				display.remove(ui.buttonGroup)
+			
+				-- The declaration below triggers the final call in the game loop
+				game.state = gState.ENDED
+			end
+		)
+	end
+
+	-- Restores the player at the current spawn point in the current game 
+	-- (called from onDeath if lives are > 0).
+	local function handleRespawn()
+		local respawnPlayer = function()
+			local spawn = game.spawnPoint
+			steve.x, steve.y = spawn.x, spawn.y
+			steve.sprite.x, steve.sprite.y = steve.x, steve.y
+			game.map:fadeToPosition(spawn.x, spawn.y, 250)
+
+			steve:setLinearVelocity( 0, 0 )
+			steve.canJump = false
+			transition.to( steve.sprite, { alpha = 1, time = 1000,
+				--transition = easing.outExpo,
+				onStart = function()
+					-- Steve falls to the ground
+					steve.isBodyActive = true
+					steve.sensorD.isBodyActive = true
+					steve.sensorD.isVisible = true
+				end
+			})
+			transition.to( steve.sprite, { time = 500,
+				onComplete = function()
+					-- Controls are active again
+					steve.state = sState.IDLE
+					controller.deathBeingHandled = false
+					controller:start()
+				end
+			})
+		end
+		steve.isBodyActive = false
+		steve.sensorD.isBodyActive = false
+		steve.sensorD.isVisible = false
+		steve.sprite.alpha = 0
+		steve.sprite:setSequence("idle")
+		steve.sprite:pause()	
+		transition.to(steve.sprite, { time = 2000, 
+			onComplete = function()
+				respawnPlayer()
+			end
+		})
+	end
+
+	-- Handles the player's death event.
+	-- (called from game inside the game loop)
+	function controller.onDeath()
+		-- This flag is needed to break the loop where onDeath has been called 
+		-- from launching it again until the handling is completed.
+		controller.deathBeingHandled = true
+		-- audio ----------------------------------------
+		sfx.playSound( sfx.dangerSound, { channel = 5 } )
+		-- animation ------------------------------------
+		steve.deathAnimation(game, steve.x , steve.y)
+		-------------------------------------------------
+
+		-- Removes the runtime event listeners if death was triggered
+		-- while still inputing a movement.
+		if (controller.SSVLaunched == true) then
+			Runtime:removeEventListener( "enterFrame", makeSteveJump )
+			Runtime:removeEventListener( "enterFrame", makeSteveMove )
+		end
+
+		controller:pause()
+
+		game.lives = game.lives - 1
+		if (game.lives == 0) then
+			controller.onGameOver("Failed")
+		elseif ( game.lives > 0 ) then
+			ui.updateLifeIcons(game.lives)
+			handleRespawn()
+		end
+	end
+------------------------------------------------------------------------------------
+
+-- AUXILIARY FUNCTIONS -------------------------------------------------------------
+	-- They call the UI for showing informations
+
+	-- Adds specified points to the score
+	function controller.addScore(points)
+		game.score = game.score + points
+		ui.buttons.score:setLabel("Score: "..game.score)
+		local textTimer = 250
+		local scoreUp = ui.buttons.scoreUp
+
+		if (scoreUp.isVisible == false) then
+			scoreUp:setLabel("+" .. points)
+			scoreUp.isVisible = true 
+		end
+
+		-- Visually animates the scoreUp text element
+		timer.performWithDelay(textTimer, ui.textFade(scoreUp, 250))
+	end
+
+	-- Adds a life to the lives and visually updates the lifeIcons array
+	function controller.addOneLife()
+		if(game.lives < game.MAX_LIVES ) then
+			game.lives = game.lives + 1
+			ui.updateLifeIcons(game.lives)
+			local textTimer = 250
+			local lifeUp = ui.buttons.lifeUp
+
+			if (lifeUp.isVisible == false) then
+				lifeUp:setLabel("1 up")
+				lifeUp.isVisible = true 
+			end
+
+		-- Visually animates the lifeUp text element
+		timer.performWithDelay(textTimer, ui.textFade(lifeUp, 750))
+		end
+	end
+------------------------------------------------------------------------------------
+
+-- Main entry point for Controller (accessed from -game.loadGame-).
 function controller.setGame ( currentGame, gameStateList, playerStateList )
 	game = currentGame
 	steve = currentGame.steve
-
 	gState = gameStateList
 	sState = playerStateList
 end
 
+-- Calls the UI initialization and prepares the event listeners
 function controller.prepareUI()
-	ui.loadUI()
+	timer.performWithDelay(1000, ui.loadUI())
 	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.jump)
+	------------------------------
+	ui.createLifeIcons(game.lives)	-- Prone to refactoring (see ui)
+	------------------------------
 
 	ui.buttons.jump:  addEventListener( "touch", onJumpEvent )
 	ui.buttons.dleft: addEventListener( "touch", onDpadEvent )
@@ -253,9 +441,10 @@ function controller.prepareUI()
 	ui.buttons.action.active = true
 	ui.buttons.resume.isVisible = false
 	ui.buttons.scoreUp.isVisible = false
+	ui.buttons.lifeUp.isVisible = false
 end
 
--- Called by -game.start and game.resume-.
+
 function controller:start()
 	game.state = gState.RUNNING
 	steve.state = sState.IDLE
@@ -264,6 +453,7 @@ function controller:start()
 
 	controller.controlsEnabled = true
 	controller.SSVEnabled = true
+	controller.SSVLaunched = false
 end
 
 function controller:pause()
@@ -273,6 +463,7 @@ function controller:pause()
 
 	controller.controlsEnabled = false
 	controller.SSVEnabled = false
+	controller.SSVLaunched = false
 end
 
 return controller

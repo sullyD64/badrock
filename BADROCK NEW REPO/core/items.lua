@@ -101,14 +101,14 @@ end
 		if ( event.phase == "began" ) then
 			display.remove(life)
 			--life.BodyType = "dynamic"
-			game.addLife()
+			game.addOneLife()
 			
 		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
 		end
 	end
 ----------------------------------------------------------------------------------------
 
-function addDropTo( enemy , itemName )
+function addDropTo( enemy, itemName )
 	--Add an item drop to an enemy (MAX 1 Drop per Enemy, for now )
 	local item = items.findItemByName (itemName)
 	enemy.drop = item

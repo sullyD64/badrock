@@ -1,153 +1,325 @@
 -----------------------------------------------------------------------------------------
 --
--- ui.lua
+-- newUi.lua
 --
+-- Here are declared all the visual aspects regarding the game's UI buttons.
+-- This module is tied to the controller which is the only class that uses it, while
+-- additional functions provide easy shortcuts for toggling the enablement for the whole ui.
 -----------------------------------------------------------------------------------------
+local widget = require ( "widget" )
 
-local ui={}
+local ui = {
+	buttons = {},
+	buttonGroup = {}
+}
 
-ui.uiGroup = nil
-ui.jumpScreen = nil
-ui.dpadLeft = nil
-ui.dpadRight = nil
-ui.actionbtn = nil
-ui.pauseBtn = nil
-ui.resumeBtn = nil
-ui.scoreText = nil
-ui.pointsText = nil
-ui.lifeIcons = {}
+-- Stores the data tables for the -widget.newButton- calls.
+local buttonData = {
+	-- Touchable area (invisible button)
+		--1
+		jumpScreen = {
+			options = {
+				id = "jumpScreen",
+				width = 10000,
+				height = 10000,
+			},
+		},
 
--- this is STILL used by pauseMenu
-function ui.getButtonByName( name )
-	for i = 1, ui.uiGroup.numChildren do
-		if (ui.uiGroup[i].myName == name) then
-			return ui.uiGroup[i]
-		end 
-	end
-end
+	-- Touchable buttons
+		--2
+		dpadLeft = {
+			options = {
+				id = "dpadLeft",
+				defaultFile = visual.dpadLeft,
+				overFile = visual.dpadLeft_over,
+				width = 50,
+				height = 52,
+				x = 10,
+				y = display.contentHeight - 52 / 2 - 10,
+			},
+			aX = 0,
+			aY = 1,
+		},
+		--3
+		dpadRight = {
+			options = {
+				id = "dpadRight",
+				defaultFile = visual.dpadRight,
+				overFile = visual.dpadRight_over,
+				width = 50,
+				height = 52,
+				x = 60,	-- (dpadLeft.x + dpadRight.width)
+				y = display.contentHeight - 52 / 2 - 10,
+			},
+			aX = 0,
+			aY = 1,
+		},
+		--4
+		actionBtn = {
+			options = {
+				id = "actionBtn",
+				defaultFile = visual.actionBtn,
+				overFile = visual.actionBtn_over,
+				width = 51,
+				height = 51,
+				x = display.contentWidth - 10,
+				y = display.contentHeight - 10 - 51 / 2, --REWORK ME!
+			},
+			aX = 1,
+			aY = 1,
+		},
+		--5
+		pauseBtn = {
+			options = {
+				id = "pauseBtn",
+				defaultFile = visual.pauseBtn,
+				width = 35,
+				height = 35,
+				x = display.contentWidth - 10,
+				y = 30,
+			},
+			aX = 1,
+			aY = 0,
+		},
+		--6
+		resumeBtn = {
+			options = {
+				id = "resumeBtn",
+				defaultFile = visual.resumeBtn,
+				width = 35,
+				height = 35,
+				x = display.contentWidth - 10,
+				y = 30,
+			},
+			aX = 1,
+			aY = 0,
+		},
 
-local function createJumpScreen()
-		-- Se va nello uiGroup
-	-- jumpScreen = display.newImageRect( "ui/emptyScreen.png", display.contentWidth, display.contentHeight )
-	-- jumpScreen.x, jumpScreen.y = display.contentCenterX , display.contentCenterY
-		-- Come sopra ma migliore (non usa immagini)
-	-- jumpScreen = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight )
-		-- Se create viene chiamata esternamente
-	ui.jumpScreen = display.newRect( display.contentCenterX, display.contentCenterY, 10000,10000)
-	ui.jumpScreen.myName = "jumpScreen"
-	ui.jumpScreen.isVisible = false
-	ui.jumpScreen.isHitTestable = true
-	ui.jumpScreen:setFillColor( 0, 255, 0 )
-end
+	-- Untouchable text-only buttons
+		--7
+	 	scoreText = {
+			options = {
+				id = "scoreText",
+				textOnly = true,
+				label = "Score: 0",
+				font = "micolas.ttf",
+				fontSize = 20,
+				labelColor = {
+					default = { 0,220,255 },
+					over = { 0,220,255 },
+				},
+				x = display.contentWidth - 55,
+				y = 30,
+			},
+			aX = 1,
+			aY = 0,
+		},
+		--8
+		scoreUpText = {
+			options = {
+				id = "scoreUpText",
+				textOnly = true,
+				label = "",
+				font = "micolas.ttf",
+				fontSize = 14,
+				labelColor = {
+					default = { 0,210,255 },
+					over = { 0,210,255 },
+				},
+				x = display.contentWidth - 80,
+				y = 60,
+			},
+			aX = 0.5,
+			aY = 0.5,
+		},
+		--9
+		livesText = {
+			options = {
+				id = "livesText",
+				textOnly = true,
+				label = "",
+				font = "micolas.ttf",
+				fontSize = 14,
+				labelColor = {
+					default = { 255,210,0 },
+					over = { 255,210,0 },
+				},
+				x = display.contentWidth - 80,
+				y = 60,
+			},
+			aX = 0,
+			aY = 0,
+		},
+		--10
+		lifeUpText = {
+			options = {
+				id = "lifeUpText",
+				textOnly = true,
+				label = "",
+				font = "micolas.ttf",
+				fontSize = 20,
+				labelColor = {
+					default = { 0,210,255 },
+					over = { 0,210,255 },
+				},
+				x = 80,
+				y = 60,
+			},
+			aX = 0.5,
+			aY = 0.5,
+		},
+}
 
-local function createDpadLeft()
-	ui.dpadLeft = display.newImageRect( visual.dpadLeft, 50, 52 )
-	ui.dpadLeft.anchorX, ui.dpadLeft.anchorY = 0, 1
-	ui.dpadLeft.x, ui.dpadLeft.y =  10, display.contentHeight - ui.dpadLeft.height / 2 - 10
-	ui.dpadLeft.myName = "dpadLeft"
-end
 
-local function createDpadRight()
-	ui.dpadRight = display.newImageRect( visual.dpadRight, 50, 52 )
-	ui.dpadRight.anchorX, ui.dpadRight.anchorY = 0, 1
-	ui.dpadRight.x, ui.dpadRight.y = ui.dpadLeft.x + ui.dpadRight.width, ui.dpadLeft.y
-	ui.dpadRight.myName = "dpadRight"
-end
+---------------------------------------------------------------------------------
+-- [This section will be likely modified in the future, we will decide next meet 
+-- if it's worth keeping an icon for every life or a simpler single-icon counter].
+	ui.lifeIcons = {}
 
-local function createActionBtn()
-	ui.actionBtn = display.newImageRect( visual.actionBtn, 51, 51 )
-	ui.actionBtn.anchorX, ui.actionBtn.anchorY = 1, 1
-	ui.actionBtn.x, ui.actionBtn.y = display.contentWidth - 10, display.contentHeight -10 - ui.actionBtn.height / 2
-	ui.actionBtn.myName = "actionBtn"
-	ui.actionBtn.active = true -- to avoid Action spam
-end
-
-local function createPauseBtn()
-	ui.pauseBtn = display.newImageRect( visual.pauseBtn, 35, 35 )
-	ui.pauseBtn.anchorX, ui.pauseBtn.anchorY = 1, 0
-	ui.pauseBtn.x, ui.pauseBtn.y = display.contentWidth -10, 30
-	ui.pauseBtn.myName = "pauseBtn"
-end
-
-local function createResumeBtn()
-	ui.resumeBtn = display.newImageRect( visual.resumeBtn, 35, 35 )
-	ui.resumeBtn.anchorX, ui.resumeBtn.anchorY = 1, 0
-	ui.resumeBtn.x, ui.resumeBtn.y = display.contentWidth -10, 30
-	ui.resumeBtn.myName = "resumeBtn"
-	ui.resumeBtn.isVisible = false
-end
-
-local function createScoreText()
-	ui.scoreText = display.newText( "Score: 0", 0, 0, native.systemFont, 24 )
-	ui.scoreText.anchorX, ui.scoreText. anchorY = 1, 0
-	ui.scoreText.x, ui.scoreText.y = display.contentWidth -55, 30
-	ui.scoreText:setFillColor( 0,0,255 )
-	ui.scoreText.myName = "scoreText"
-end
-
-local function createPointsText()
-	ui.pointsText = display.newText( "", display.contentWidth - 80, 60, native.systemFont, 14)
-	ui.pointsText:setFillColor( 0,0,255 )
-	ui.pointsText.isVisible = false
-	ui.pointsText.myName = "pointsText"
-end
-
-local function createLivesText()
-	ui.livesText = display.newText("Lives: ", 0, 0, native.systemFont, 24 )
-	ui.livesText.anchorX, ui.livesText. anchorY = 0, 0
-	ui.livesText.x, livesText.y = 10, 50
-	ui.livesText:setFillColor( 255,0,0 )
-	ui.livesText.myName = "livesText"
-end
-
--- Create all the images for the max lives
-local function createLifeIcons( maxLives )
-	for i = 1, maxLives do
-		local	currIcon = display.newImageRect(ui.uiGroup, visual.lifeIcon, 30, 30 )
-	    currIcon.anchorX, currIcon.anchorY = 0, 0
-	    currIcon.x = 10 + (currIcon.contentWidth * (i - 1))
-	    currIcon.y = 10 + currIcon.contentHeight / 2
-	    currIcon.isVisible = true
-	    table.insert(ui.lifeIcons,currIcon) 
-	end
-end
-
-function ui.loadUi(game)
-	ui.uiGroup = display.newGroup()
-	-- --ui.uiGroup:insert( ui.createJumpScreen() )
-	-- --ui.uiGroup:insert( ui.createLivesText() )
-	createDpadLeft()
-	createDpadRight()
-	createActionBtn()
-	createPauseBtn()
-	createResumeBtn()
-	createScoreText()
-	createPointsText()
-	createJumpScreen()
-	createLifeIcons(game.lives)
-
-	ui.uiGroup:insert( ui.dpadLeft )
-	ui.uiGroup:insert( ui.dpadRight )
-	ui.uiGroup:insert( ui.actionBtn )
-	ui.uiGroup:insert( ui.pauseBtn )
-	ui.uiGroup:insert( ui.resumeBtn )
-	ui.uiGroup:insert( ui.scoreText )
-	ui.uiGroup:insert( ui.pointsText )
-	ui.uiGroup:insert( ui.jumpScreen )
-	--ui.uiGroup:insert( ui.lifeIcons )
-
-	return ui.uiGroup
-end
-
---Update Life Icons: Works if we Lose or if we Get Lives
-function ui.updateLifeIcons(lives)
-	for i=1, #ui.lifeIcons do
-		if( i <= lives) then
-			ui.lifeIcons[i].isVisible = true
-		else
-			ui.lifeIcons[i].isVisible = false
+	-- Updates the lifeIcon array, either if a life is added or removed
+	function ui.updateLifeIcons( currentLivesNumber )
+		for i = 1, #ui.lifeIcons do
+			if( i <= currentLivesNumber ) then
+				ui.lifeIcons[i].isVisible = true
+			else
+				ui.lifeIcons[i].isVisible = false
+			end
 		end
 	end
+
+	-- Creates the lifeIcon array initialized to the current game's max lives allowed.
+	function ui.createLifeIcons( maxLivesNumber )
+		for i = 1, maxLivesNumber do
+			local	lifeIcon = display.newImageRect(ui.buttonGroup, visual.lifeIcon, 30, 30 )
+		    lifeIcon.anchorX, lifeIcon.anchorY = 0, 0
+		    lifeIcon.x = 10 + (lifeIcon.contentWidth * (i - 1))
+		    lifeIcon.y = 10 + lifeIcon.contentHeight / 2
+		    lifeIcon.isVisible = true
+		    table.insert(ui.lifeIcons,lifeIcon) 
+		end
+	end
+
+	-- Empties the lifeIcon array
+	function ui.emptyLifeIcons()
+		--print("Before: ".. #ui.lifeIcons)
+		for i in pairs (ui.lifeIcons) do
+			ui.lifeIcons[i] = nil
+		end
+		--print("After: ".. #ui.lifeIcons)
+	end
+---------------------------------------------------------------------------------
+
+-- Contains all the calls to -widget.newButton- and adds selected buttons to the UI Group.
+local function createButtons()
+	local buttonGroup = display.newGroup()
+
+	local jumpScreen = widget.newButton ( buttonData.jumpScreen.options  )
+		jumpScreen:setFillColor( 0, 255, 0 )
+		jumpScreen.isVisible = false
+		jumpScreen.isHitTestable = true
+		-- buttonGroup:insert( jumpScreen )		-- NO!
+
+	local dpadLeft    = widget.newButton ( buttonData.dpadLeft.options    )
+		dpadLeft.anchorX, dpadLeft.anchorY = buttonData.dpadLeft.aX, buttonData.dpadLeft.aY
+		buttonGroup:insert( dpadLeft )
+
+	local dpadRight   = widget.newButton ( buttonData.dpadRight.options   )
+		dpadRight.anchorX, dpadRight.anchorY = buttonData.dpadRight.aX, buttonData.dpadRight.aY
+		buttonGroup:insert( dpadRight )
+
+	local actionBtn   = widget.newButton ( buttonData.actionBtn.options   )
+		actionBtn.anchorX, actionBtn.anchorY = buttonData.actionBtn.aX, buttonData.actionBtn.aY
+		buttonGroup:insert( actionBtn )
+
+	local pauseBtn    = widget.newButton ( buttonData.pauseBtn.options    )
+		pauseBtn.anchorX, pauseBtn.anchorY = buttonData.pauseBtn.aX, buttonData.pauseBtn.aY
+		buttonGroup:insert( pauseBtn )
+
+	local resumeBtn   = widget.newButton ( buttonData.resumeBtn.options   )
+		resumeBtn.anchorX, resumeBtn.anchorY = buttonData.resumeBtn.aX, buttonData.resumeBtn.aY
+		buttonGroup:insert( resumeBtn )
+
+	local scoreText   = widget.newButton ( buttonData.scoreText.options   )
+		scoreText.anchorX, scoreText.anchorY = buttonData.scoreText.aX, buttonData.scoreText.aY
+		buttonGroup:insert( scoreText )
+
+	local scoreUpText = widget.newButton ( buttonData.scoreUpText.options )
+		scoreUpText.anchorX, scoreUpText.anchorY = buttonData.scoreUpText.aX, buttonData.scoreUpText.aY
+		buttonGroup:insert( scoreUpText )
+
+	local livesText   = widget.newButton ( buttonData.livesText.options   )
+		livesText.anchorX, livesText.anchorY = buttonData.livesText.aX, buttonData.livesText.aY
+		buttonGroup:insert( livesText )
+
+	local lifeUpText = widget.newButton ( buttonData.lifeUpText.options )
+		lifeUpText.anchorX, lifeUpText.anchorY = buttonData.lifeUpText.aX, buttonData.lifeUpText.aY
+		buttonGroup:insert( lifeUpText )
+
+	local buttons = {
+		jump = jumpScreen,
+		dleft = dpadLeft,
+		dright = dpadRight,
+		action = actionBtn,
+		pause = pauseBtn,
+		resume = resumeBtn,
+		---------------------
+		score = scoreText,
+		scoreUp = scoreUpText,
+		lives = livesText,
+		lifeUp = lifeUpText
+	}
+
+	buttonGroup:toFront()
+	return buttons, buttonGroup
 end
 
+-- This function is called by the controller.
+-- (Important: THIS causes the UI to appear on the screen!)
+-- The only exception is the jumpScreen, which has to be manually istantiated on the map.
+function ui.loadUI()
+	-- Buttons refers to the WHOLE UI (including jumpScreen), use it for drastical changes
+	-- ButtonGroup refers to every button that goes BEFORE the map.
+	ui.buttons, ui.buttonGroup = createButtons()
+end
+
+-- Shortcut which allows to toggle enablement to the whole UI
+function ui:setEnabled( boolean )
+	for i in pairs (ui.buttons) do
+		ui.buttons[i]:setEnabled( boolean )
+	end
+end
+
+
+-- Animates one of the two <x>UpTexts
+	function ui.textFade( textWidget, duration )	
+		transition.to( textWidget, { 
+			alpha = 0,
+			time = duration,
+			effect = "crossfade", 
+			onComplete = function() 
+				textWidget.isVisible = false
+				textWidget.alpha = 1
+			end
+		})
+	end
+
+-- Shows and animates the final text when game ends.
+function ui.showOutcome( outcome )
+		local finalText = display.newText ("",	display.contentCenterX, display.contentCenterY, native.systemFontBold, 34)
+		ui.buttonGroup:insert(finalText)
+		if (outcome == "Completed") then
+			finalText.text = "Level Completed ;)"
+			finalText:setFillColor( 0.75, 0.8, 1 )
+		elseif (outcome == "Failed") then
+			finalText.text = "Level Failed :("
+			finalText:setFillColor( 1, 0, 0 )
+		end
+		transition.to(finalText, { alpha = 0, time = 2000,
+			onComplete = function()
+				display.remove( finalText )
+			end
+		})
+	end
+
+	
 return ui

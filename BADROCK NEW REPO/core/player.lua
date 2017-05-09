@@ -8,13 +8,11 @@
 -- 2) A Sprite sequence (for the visual animations),
 -- 3) A Sensor (to be used with the npcs' sensors and other entities).
 -----------------------------------------------------------------------------------------
-local entity = require ( "lib.entity" )
+local entity     = require ( "lib.entity"      )
+local collisions = require ( "core.collisions" )
 
 local player = {}
 local settings = {
-
-	-- walkForce = 150,
-	-- jumpForce = -200,
 
 	attackOpts = {
 		radius = 40,
@@ -24,7 +22,7 @@ local settings = {
 
 	sensorOpts = {
 		radius = 50,
-		alpha = 0.5,
+		alpha = 0, --0.5
 		color = {20, 50, 200},
 	},
 
@@ -44,9 +42,46 @@ local settings = {
 	},
 }
 
+-- PLAYER-SPECIFIC FUNCTIONS -------------------------------------------------------
+	-- (must be self-contained and not call anything outside this module)
+
+	-- Animation on Steve's death: he explodes in small rock particles.
+	-- (The particles are Entities)
+	local function defaultPlayerDeathAnimation(currentGame, playerX, playerY)
+		-- body
+		local fragments = {}
+		local numRocks = 10
+		
+		for i = 1, numRocks, 1 do
+			local dim = math.random (2, 10)
+			local directionX = math.random(-1, 1)
+			local directionY = math.random(-1, 1)
+			local frag = entity.newEntity{
+				filePath = visual.lifeIcon,
+				width = dim,
+				height = dim,
+				physicsParams = {density = 1, friction = 1, bounce = 0.5},
+				eName = "parcticle"
+			}	
+			frag.x , frag.y = playerX, playerY
+			frag:addOnMap(currentGame.map)
+			frag:applyLinearImpulse(directionX, directionY, frag.x , frag.y)
+
+			table.insert(fragments , frag)
+		end
+
+		-- Removes physics to the rock fragments after a brief delay.
+		transition.to(fragments, {time = 4000, onComplete = function()
+			for i=1, #fragments, 1 do
+				fragments[i].isBodyActive = false
+			end
+		end})
+	end
+------------------------------------------------------------------------------------
+
 -- Loads the player's image, animations and sensor and initializes its attributes.
 -- Visually istantiates the player in the current game's map.
--- @return player, sprite, sensorD (three Entities)
+-- @return player, player.sprite, player.sensorD (three Entities)
 function player.loadPlayer( currentGame )
 	-- Loads the Main Entity ("hitbox")
 		local player = entity.newEntity{
@@ -84,11 +119,10 @@ function player.loadPlayer( currentGame )
 		}
 
 	-- Binds the player to the starting spawn point in the current game.
-		local currentSpawn = currentGame.spawn
-		player.x, player.y = currentSpawn.x, currentSpawn.y
+		local spawn = currentGame.spawnPoint
+		player.x, player.y = spawn.x, spawn.y
 
-		-- player.walkForce = settings.walkForce
-		-- player.jumpForce = settings.jumpForce
+		player.deathAnimation = defaultPlayerDeathAnimation
 
 	-- Inserts the player's hitbox and sprite in the current map
 		local currentMap = currentGame.map
@@ -96,7 +130,10 @@ function player.loadPlayer( currentGame )
 		sprite:addOnMap ( currentMap )
 		sensorD:addOnMap ( currentMap )
 
-		return player, sprite, sensorD
+		player.sprite = sprite
+		player.sensorD = sensorD
+
+		return player
 end
 
 -- Loads the player's default (for now) attack

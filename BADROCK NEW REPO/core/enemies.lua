@@ -5,8 +5,7 @@
 -- An enemy is an animated Entity capable of moving on the map and performing other actions 
 -- which can kill Steve in several ways.
 -----------------------------------------------------------------------------------------
-local entity = require ( "lib.entity"       )
-local panel  = require ( "menu.utilityMenu" )
+local entity     = require ( "lib.entity"       )
 local collisions = require ( "core.collisions"  )
 
 local enemies = {}
@@ -14,8 +13,9 @@ local enemies = {}
 
 function follow(currentGame,object,player)
 		local currentMap = currentGame.map
-		if((object.x~=nil and object.y~=nil) and(player.x~=nil and player.y~=nil) and currentGame.state~="Paused") then--il problema è che poi non richiama la transizione del disaggro
-																									--per colpa del game.paused quando steve muore
+		if((object.x~=nil and object.y~=nil) and(player.x~=nil and player.y~=nil) and currentGame.state ~= "Paused") then
+		--il problema è che poi non richiama la transizione del disaggro
+		--per colpa del game.paused quando steve muore
 			object.isFixedRotation=true
 			object.speed=1--quello sopra continua a essere flash
 			if(math.abs(object.x-player.x)<=400) then
@@ -44,7 +44,7 @@ function follow(currentGame,object,player)
 
 
 				--i nemici disaggrano steve alla morte, bisogna sistemare il momento in cui lo considerano morto? sgommata se si rimane fermi...
-					if(((player.state == STATE_DIED and currentGame.state=="Running"))) then --and (math.abs(object.x-player.x)<=100 and math.abs(object.y-player.y)<=100)) ) then
+					if(((player.state == "Dead" and currentGame.state == "Running"))) then --and (math.abs(object.x-player.x)<=100 and math.abs(object.y-player.y)<=100)) ) then
 
 						object.xScale=-1
 						
@@ -87,14 +87,16 @@ end
 	]]
 
 	function salta(object,player)
-		if(object.y>player.y) then
-		local impulso= (object.y-player.y)
-		if(impulso<=150) then
-		object:applyLinearImpulse( 0, -impulso/3, object.x, object.y )
+		  if(object.y~=nil) then
+				if(object.y>player.y) then
+					 local impulso= (object.y-player.y)
+					 if(impulso<=150) then
+						  object:applyLinearImpulse( 0, -impulso/3, object.x, object.y )
+					 end
+					 --transition.to( object, { time=1500, y=object.y-20 } )
+				end
 		end
-		--transition.to( object, { time=1500, y=object.y-20 } )
-		end
-	end
+	 end
 
 	function f(object)
 		local angle= math.atan2(game.steve.x - object.y, game.steve.y - object.x) -- work out angle between target and missile
@@ -145,7 +147,7 @@ end
 function enemies.loadEnemies( currentGame ) 
 	local currentMap = currentGame.map
 	local enemyList = currentMap:getObjectLayer("enemySpawn"):getObjects("enemy")
-	local player= currentGame.steve
+	local player = currentGame.steve
 
 	-- Loads the main Entity.
 	local loadenemyEntity = function( enemy )
@@ -172,7 +174,7 @@ function enemies.loadEnemies( currentGame )
 				local listener = {}
 				function listener:timer( event )
 					salta(staticImage,player)
-					print("no")
+					--print("no")
 				end
 
 				function s(object,player)

@@ -11,14 +11,15 @@
 --    hiding the balloon).
 -----------------------------------------------------------------------------------------
 local entity = require ( "lib.entity"       )
+local widget = require ( "widget"           )
 local panel  = require ( "menu.utilityMenu" )
 
 local npcs = {}
 
 local settings = {
 	sensorOpts = {
-		radius = 60,
-		alpha = 0.5,
+		radius = 40,
+		alpha = 0,	-- 0.5
 		color = {100, 100, 0},
 	},
 }
@@ -50,13 +51,11 @@ function npcs.loadNPCs( currentGame )
 	-- Loads the speech balloon, the text and the buttons.
 		local loadBalloon = function( npc )
 			-- Panel status check for debug
-				--[[
-					local panelTransDone = function( target )
+				--[[local panelTransDone = function( target )
 						if ( target.completeState ) then
-							print( "PANEL STATE IS: "..target.completeState )
+							print( "Panel state is: "..target.completeState )
 						end
-					end
-				]]
+					end]]
 
 			local balloon = panel.newPanel{
 				location = "static",
@@ -72,16 +71,43 @@ function npcs.loadNPCs( currentGame )
 			background.anchorY = 1
 			balloon:insert(background)
 
-			local button = display.newImageRect( visual.npcBalloonButton1, 58, 40 )
-			button.x, button.y = background.x, background.y -50
+			-- local button = display.newImageRect( visual.npcBalloonButton1, 58, 40 )
+			-- button.x, button.y = background.x, background.y -50
+			-- balloon:insert(button)
+
+			local onBalloonEvent = function(event)
+				local target = event.target
+
+				if (currentGame.state == "Running") then
+					if (event.phase == "began") then
+						display.currentStage:setFocus( target, id )
+						-- [[Work in progress]]
+						print("BOOP")
+					elseif (event.phase == "ended" or "cancelled" == event.phase) then
+						display.currentStage:setFocus( target, nil )
+					end
+				end
+				return true
+			end
+
+			local button = widget.newButton{
+				id = "npcButton1",
+				defaultFile = visual.npcBalloonButton1,
+				--overFile = visual.npcBalloonButton1_over,
+				width = 58,
+				height = 40,
+				x = background.x,
+				y = background.y -50,
+				onEvent = onBalloonEvent
+			}
 			balloon:insert(button)
+
 
 			balloon.x, balloon.y = npc.x, npc.y -20
 			balloon.alpha = 0
 			balloon:hide()
-
 			-----------------------------------------------------------------
-			balloon.button = button -- wip for control handler, will be removed soon
+			-- balloon.button = button -- wip for control handler, will be removed soon
 			-----------------------------------------------------------------
 
 			-- Handles the showing/hiding event for one npc's balloon.

@@ -34,6 +34,7 @@ local pause = {}
 		-- pause.rsbutton.isVisible = false
 		audio.fadeOut(1,100)
 		audio.stop(1)
+
 		composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
 		return true
 	end
