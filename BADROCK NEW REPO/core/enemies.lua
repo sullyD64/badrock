@@ -167,22 +167,26 @@ function enemies.loadEnemies( currentGame )
 				staticImage.lives=1
 				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
 				
-				local function move()
-					follow(currentGame,staticImage,player)
-				end
+				-- local function move()
+				-- 	follow(currentGame,staticImage,player)=
+				-- end
 
-				local listener = {}
-				function listener:timer( event )
-					salta(staticImage,player)
-					--print("no")
-				end
+				-- local listener = {}
+				-- function listener:timer( event )
+				-- 	salta(staticImage,player)
+				-- 	--print("no")
+				-- end
 
-				function s(object,player)
-					timer.performWithDelay( 3000, listener )
-				end
+				-- function s(object,player)
+				-- 	timer.performWithDelay( 3000, listener )
+				-- end
 
-				Runtime:addEventListener( "enterFrame", move )	--inseguono steve
-				timer.performWithDelay(2000,s,-1)				--saltano se steve è sopra le piattaforme (restringere range)
+				-- -----------------------------------------------------------------
+				-- --inseguono steve
+				-- Runtime:addEventListener( "enterFrame", move )	-- [ when is this method removed???]
+				-- -----------------------------------------------------------------
+				-- --saltano se steve è sopra le piattaforme (restringere range)
+				-- timer.performWithDelay(2000,s,-1)
 
 				staticImage.preCollision = collisions.enemyPreCollision
 				staticImage:addEventListener( "preCollision", staticImage)

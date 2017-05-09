@@ -220,7 +220,14 @@ local playBtn, optionBtn, shopBtn
 		playBtn = nil
 		optionBtn:removeSelf()
 		shopBtn:removeSelf()
-		steveImage:removeSelf()
+
+		-----------------------------------------------------------------------------
+		-- The reason to prefer the latter here is because, while having the the same
+		-- outcome, display.remove() tries to remove the object if it isn't nil, while
+		-- object:removeSelf() can throw an error if the object doesn't exist.
+		--steveImage:removeSelf()
+		display.remove(steveImage)
+		------------------------------------------------------------------------------
 	end
 
 -- -----------------------------------------------------------------------------------

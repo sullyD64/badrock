@@ -25,7 +25,9 @@ local sState = {}		-- Steve state is modified in dangerCollision
 -- This function is accessed from -game.loadGame-.
 function collisions.setGame( currentGame, gameStateList, playerStateList )
 	game = currentGame
-	steve = currentGame.steve
+	if (game) then 
+		steve = currentGame.steve 
+	end
 	gState = gameStateList
 	sState = playerStateList
 end
@@ -96,7 +98,7 @@ local function attackCollision( event )
 				game.dropItemFrom(enemyHit) 
 			end 
 				
-			timer.performWithDelay(5000, function() other:removeSelf() end)
+			timer.performWithDelay(5000, function() display.remove(other) end)
 			---------------------------------------------------------------
 			game.addScore(200) -- [We will modify this (but when???)]
 			---------------------------------------------------------------

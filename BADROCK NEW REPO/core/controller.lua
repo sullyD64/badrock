@@ -295,9 +295,15 @@ local sState = {}
 				ui.buttons.lifeUp:setLabel("")
 				ui.buttons = nil
 				ui.emptyLifeIcons()
+				pauseMenu.setGame(nil)
 
 				display.remove(ui.buttonGroup)
-			
+				
+				game.nextScene = "highscores"
+				if (game.state == gState.TERMINATED) then
+					game.nextScene = "mainmenu"
+				end
+
 				-- The declaration below triggers the final call in the game loop
 				game.state = gState.ENDED
 			end
@@ -418,7 +424,9 @@ local sState = {}
 -- Main entry point for Controller (accessed from -game.loadGame-).
 function controller.setGame ( currentGame, gameStateList, playerStateList )
 	game = currentGame
-	steve = currentGame.steve
+	if (game) then 
+		steve = currentGame.steve 
+	end
 	gState = gameStateList
 	sState = playerStateList
 end
@@ -430,7 +438,6 @@ function controller.prepareUI()
 	------------------------------
 	ui.createLifeIcons(game.lives)	-- Prone to refactoring (see ui)
 	------------------------------
-
 	ui.buttons.jump:  addEventListener( "touch", onJumpEvent )
 	ui.buttons.dleft: addEventListener( "touch", onDpadEvent )
 	ui.buttons.dright:addEventListener( "touch", onDpadEvent )
@@ -442,6 +449,10 @@ function controller.prepareUI()
 	ui.buttons.resume.isVisible = false
 	ui.buttons.scoreUp.isVisible = false
 	ui.buttons.lifeUp.isVisible = false
+
+	-------------------------------
+	pauseMenu.setGame(game, gState)
+	-------------------------------
 end
 
 

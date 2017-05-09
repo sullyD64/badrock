@@ -313,6 +313,9 @@ function ui.showOutcome( outcome )
 		elseif (outcome == "Failed") then
 			finalText.text = "Level Failed :("
 			finalText:setFillColor( 1, 0, 0 )
+		elseif (outcome == "Terminated") then
+			finalText.text = "See you soon!"
+			finalText:setFillColor( 0, 1, 0)
 		end
 		transition.to(finalText, { alpha = 0, time = 2000,
 			onComplete = function()

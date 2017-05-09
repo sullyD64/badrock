@@ -34,6 +34,7 @@ physics.setGravity( 0, 50 )
 		RESUMED   = "Resumed",
 		COMPLETED = "Completed",
 		ENDED     = "Ended",
+		TERMINATED = "Terminated",
 	}
 
 	local playerStateList = {
@@ -117,6 +118,11 @@ physics.setGravity( 0, 50 )
 				controller.endGameOccurring = true
 				game.levelHasBeenCompleted = true
 				controller.onGameOver("Completed")
+			end
+		elseif (state == gameStateList.TERMINATED) then
+			if(controller.endGameOccurring ~= true) then
+				controller.endGameOccurring = true
+				controller.onGameOver("Terminated")
 			end
 		end
 	end
@@ -273,28 +279,34 @@ end
 function game.stop()
 	timer.cancel( dbtimer )
 
-	Runtime:removeEventListener("enterFrame", moveCamera)
-	Runtime:removeEventListener("collision", collisions.onCollision)
+	Runtime:removeEventListener( "enterFrame", moveCamera)
+	Runtime:removeEventListener( "collision", collisions.onCollision)
 	Runtime:removeEventListener( "enterFrame", onUpdate )
-
+	
 	game.map:destroy()
 
 	package.loaded[physics] = nil
-
 	package.loaded[player] = nil
 	package.loaded[enemies] = nil
 	package.loaded[npcs] = nil
 	package.loaded[items] = nil
 
+	if (game.nextScene == "highscores") then
+		-- Switches scene (from "levelX" to "highscores").
+		composer.setVariable( "finalScore", game.score )
+		composer.removeScene( "menu.highscores" )
+		composer.gotoScene( "menu.highscores", { time=1500, effect="crossFade" } )
+	elseif (game.nextScene == "mainmenu") then
+		composer.removeScene( "menu.mainMenu" )
+		composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
+	end
+	game.nextScene = nil
+
+	collisions.setGame(nil)
+	controller.setGame(nil)
+	controller.endGameOccurring = false
 	package.loaded[controller] = nil
 	package.loaded[collisions] = nil
-
-	-- Switches scene (from "levelX" to "highscores").
-	composer.setVariable( "finalScore", game.score )
-	composer.removeScene( "menu.mainMenu" )
-	composer.gotoScene( "menu.mainMenu", { time=1500, effect="crossFade" } )
-
-	controller.endGameOccurring = false
 	package.loaded[composer] = nil
 end
 
