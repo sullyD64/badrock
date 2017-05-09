@@ -27,10 +27,7 @@ function follow(currentGame,object,player)
 					else object.xScale=1
 					end
 					--se steve è sopra una piattaforma non lontana dal nemico allora il nemico salta, non funziona
-					if(((object.y-player.y)>0 and (object.y-player.y)<1000) and (math.abs(player.x-object.x)<40) ) then
-						local impulso= (player.y-object.y)
-						object:applyLinearImpulse( 0, -impulso*4, object.x, object.y )
-					end
+					
 			
 				local vuoto = nil
 				local vuotoList = currentMap:getObjectLayer("cadutaVuoto").objects
@@ -90,9 +87,11 @@ end
 	function salta(object,player)
 		  if(object.y~=nil) then
 				if(object.y>player.y) then
-					 local impulso= (object.y-player.y)
-					 if(impulso<=150) then
-						  object:applyLinearImpulse( 0, -impulso/3, object.x, object.y )
+					 local distanza= (object.y-player.y)
+					 if(distanza<=100) then
+						  object:applyLinearImpulse( 0, -30, object.x, object.y )
+					 elseif(distanza<=150 and distanza>=100) then
+						  object:applyLinearImpulse( 0, -40, object.x, object.y )
 					 end
 					 --transition.to( object, { time=1500, y=object.y-20 } )
 				end
@@ -183,7 +182,7 @@ function enemies.loadEnemies( currentGame )
 				end
 				function move2()
 					print ("running")
-					if(currentGame.state~="Ended") then
+					if(currentGame.state~="Ended" and ims[2]) then
 					follow(currentGame,ims[2],player)
 					end
 				end
