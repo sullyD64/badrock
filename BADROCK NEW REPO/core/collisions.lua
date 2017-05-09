@@ -102,7 +102,8 @@ local function attackCollision( event )
 			if (game.hasAttribute(enemyHit,"drop")) then 
 				game.dropItemFrom(enemyHit) 
 			end 
-				
+			if(other==ims[1]) then Runtime:removeEventListener( "enterFrame", move1 ) ims[1]=nil
+			elseif(other==ims[2]) then Runtime:removeEventListener( "enterFrame", move2 ) ims[2]=nil end
 			timer.performWithDelay(5000, function() display.remove(other) end)
 			---------------------------------------------------------------
 			game.addScore(200) -- [We will modify this (but when???)]

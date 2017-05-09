@@ -294,7 +294,7 @@ end
 
 function game.pause()
 	Runtime:removeEventListener( "enterFrame", move1 )
-	if(ims[2]) then Runtime:removeEventListener( "enterFrame", move2 ) end
+	Runtime:removeEventListener( "enterFrame", move2 )
 
 	physics.pause()
 	controller:pause()
