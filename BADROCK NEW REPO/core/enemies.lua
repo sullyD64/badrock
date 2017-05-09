@@ -12,6 +12,7 @@ local enemies = {}
 
 
 function follow(currentGame,object,player)
+	--print("running")
 		local currentMap = currentGame.map
 		if((object.x~=nil and object.y~=nil) and(player.x~=nil and player.y~=nil) and currentGame.state ~= "Paused") then
 		--il problema è che poi non richiama la transizione del disaggro
@@ -148,6 +149,7 @@ function enemies.loadEnemies( currentGame )
 	local currentMap = currentGame.map
 	local enemyList = currentMap:getObjectLayer("enemySpawn"):getObjects("enemy")
 	local player = currentGame.steve
+	local ims={}
 
 	-- Loads the main Entity.
 	local loadenemyEntity = function( enemy )
@@ -165,28 +167,48 @@ function enemies.loadEnemies( currentGame )
 					eName = "enemy"
 				}
 				staticImage.lives=1
+				staticImage.type= "paper"
 				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
 				
-				-- local function move()
-				-- 	follow(currentGame,staticImage,player)=
-				-- end
+				
+				table.insert(ims , staticImage)
 
-				-- local listener = {}
-				-- function listener:timer( event )
-				-- 	salta(staticImage,player)
-				-- 	--print("no")
-				-- end
+				--inserisco tutte le staticImage in una table e creo delle funzioni locali specifica di ogni immagine, in modo da poter
+				--richiamare i listener in start/resume/stop/pause
+				function move1()
+					print ("running")
+					if(currentGame.state~="Ended" and ims[1]) then
+					follow(currentGame,ims[1],player)
+					end
+				end
+				function move2()
+					print ("running")
+					if(currentGame.state~="Ended") then
+					follow(currentGame,ims[2],player)
+					end
+				end
 
-				-- function s(object,player)
-				-- 	timer.performWithDelay( 3000, listener )
-				-- end
+				local listener = {}
+				function listener:timer( event )
+					salta(staticImage,player)
+					--print("no")
+				end
 
-				-- -----------------------------------------------------------------
-				-- --inseguono steve
-				-- Runtime:addEventListener( "enterFrame", move )	-- [ when is this method removed???]
-				-- -----------------------------------------------------------------
-				-- --saltano se steve è sopra le piattaforme (restringere range)
-				-- timer.performWithDelay(2000,s,-1)
+				function s(object,player)
+					timer.performWithDelay( 3000, listener )
+				end
+
+				
+				-----------------------------------------------------------------
+				--inseguono steve
+				--Runtime:addEventListener( "enterFrame", move ) -- [ when is this method removed???]
+
+				-- store a reference to your listener, so that you can remove it
+				-- equivalent to: local handler; handler = function() ... end
+				
+				-----------------------------------------------------------------
+				--saltano se steve è sopra le piattaforme (restringere range)
+				timer.performWithDelay(2000,s,-1)
 
 				staticImage.preCollision = collisions.enemyPreCollision
 				staticImage:addEventListener( "preCollision", staticImage)
@@ -223,8 +245,14 @@ function enemies.loadEnemies( currentGame )
 
 	--la scansione del ciclo dei nemici in tutta la mappa è fatta all'interno di loadenemy
 	enemyList[1].staticImage = loadenemyEntity(enemyList[1])
+
+	for i=1,2,1 do
+
+	print (ims[i].type)
+	end
 	
-	return enemyList
+	return enemyList,ims,RT
+
 end
 
 return enemies

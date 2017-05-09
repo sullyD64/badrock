@@ -200,11 +200,24 @@ physics.setGravity( 0, 50 )
 	-- See npcs.lua
 	function game:loadNPCS() 
 		self.npcs = npcs.loadNPCs( self )
-	end	
+	end
 
+	ims={}
 	-- See enemies.lua
 	function game:loadEnemies() 
-		self.enemies = enemies.loadEnemies( self )
+		self.enemies,ims = enemies.loadEnemies( self )
+		
+		-- local function move()
+		-- 	print ("running")
+		-- 	for i=1,2,1 do
+		-- 		print(ims[i])
+		
+		-- 		--if(game.state~="Ended") then
+		-- 		follow(game,ims[i],player)
+		-- 		--end
+		-- 	end
+		-- end
+		-- Runtime:addEventListener( "enterFrame", move )
 	end
 
 	-- MAIN ENTRY POINT FOR INITIALIZATION 
@@ -225,6 +238,18 @@ physics.setGravity( 0, 50 )
 		game:loadPlayer()
 		game:loadEnemies()
 		game:loadNPCS()
+
+		-- 		local function move()
+		-- 	print ("running")
+		-- 	for i=1,2,1 do
+		-- 		print(ims[i].eName)
+		
+		-- 		--if(game.state~="Ended") then
+		-- 		follow(game,ims[i],game.steve)
+		-- 		--end
+		-- 	end
+		-- end
+		--Runtime:addEventListener( "enterFrame", move )
 		---------------------------
 
 		-- Logic, controls and UI initialization -----------------
@@ -257,6 +282,9 @@ function game.start()
 	physics.start()
 	controller:start()
 
+	if(ims[1]) then Runtime:addEventListener( "enterFrame", move1 ) end
+	if(ims[2]) then Runtime:addEventListener( "enterFrame", move2 ) end
+
 	Runtime:addEventListener("enterFrame", moveCamera)
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
@@ -265,14 +293,22 @@ function game.start()
 end
 
 function game.pause()
+	Runtime:removeEventListener( "enterFrame", move1 )
+	if(ims[2]) then Runtime:removeEventListener( "enterFrame", move2 ) end
+
 	physics.pause()
 	controller:pause()
+
 	--transition.pause()
 end
 
 function game.resume()
+	if(ims[1]~=nil) then Runtime:addEventListener( "enterFrame", move1 ) end
+	if(ims[2]~=nil) then Runtime:addEventListener( "enterFrame", move2 ) end
+
 	physics.start()
 	controller:start()
+	--Runtime:addEventListener( "enterFrame", move)
 	--transition.resume()
 end
 
@@ -282,6 +318,9 @@ function game.stop()
 	Runtime:removeEventListener( "enterFrame", moveCamera)
 	Runtime:removeEventListener( "collision", collisions.onCollision)
 	Runtime:removeEventListener( "enterFrame", onUpdate )
+
+	if(ims[1]) then Runtime:removeEventListener( "enterFrame", move1 ) end
+	if(ims[2]) then Runtime:removeEventListener( "enterFrame", move2 ) end
 	
 	game.map:destroy()
 
