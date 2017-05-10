@@ -67,9 +67,9 @@ physics.setGravity( 0, 50 )
 		-- print("Endgame being handled in controller.onGameOver:")
 		-- print(controller.endGameOccurring)
 
-		-- for i in pairs (game.paperStaticImageList) do
-		-- 	if(game.paperStaticImageList[i] and game.paperStaticImageList[i].type=="paper") then
-		-- 		print (game.paperStaticImageList[i].type .. " " .. i ..  " is following steve")
+		-- for i in pairs (game.game.paperStaticImageList) do
+		-- 	if(game.game.paperStaticImageList[i] and game.game.paperStaticImageList[i].type=="paper") then
+		-- 		print (game.game.paperStaticImageList[i].type .. " " .. i ..  " is following steve")
 		-- 	end
 		-- end
 		-- print("")
@@ -113,8 +113,20 @@ physics.setGravity( 0, 50 )
 		end
 
 		for i in pairs(game.paperStaticImageList) do
-			if(game.paperStaticImageList[i] and game.paperStaticImageList[i].type=="paper") then
-				game.paperStaticImageList[i]:move()
+			if(game.paperStaticImageList[i] and game.spawnPoint.x and game.paperStaticImageList[i].x and
+			 game.paperStaticImageList[i].type=="paper" and math.abs(game.steve.x-game.paperStaticImageList[i].x)<=230
+			 and math.abs(game.steve.y-game.paperStaticImageList[i].y)<=150) then
+				if(game.steve.state~=playerStateList.DEAD) then
+					print (game.paperStaticImageList[i].type .. " " .. i ..  " is following steve")
+					game.paperStaticImageList[i]:move()
+					--print (game.paperStaticImageList[i].type)
+				
+				elseif(game.steve.state==playerStateList.DEAD and math.abs(game.paperStaticImageList[i].x-game.spawnPoint.x)<=150) then
+					print("Lo spawn è zona franca")
+					game.paperStaticImageList[i].xScale=-1
+					game.paperStaticImageList[i].x=	game.paperStaticImageList[i].x+2	
+					local transition= transition.to(game.paperStaticImageList[i],{time=2000,xScale=-1,x=(game.paperStaticImageList[i].x+200)})
+				end
 			end
 		end
 
@@ -225,10 +237,10 @@ physics.setGravity( 0, 50 )
 		self.npcs = npcs.loadNPCs( self )
 	end
 
-	-- paperStaticImageList={}
+	-- game.paperStaticImageList={}
 	-- See enemies.lua
 	function game:loadEnemies() 
-		self.enemies, self.paperStaticImageList = enemies.loadEnemies( self )
+		self.enemies, game.paperStaticImageList = enemies.loadEnemies( self )
 	end
 
 	-- MAIN ENTRY POINT FOR INITIALIZATION 
@@ -253,10 +265,10 @@ physics.setGravity( 0, 50 )
 		-- 		local function move()
 		-- 	print ("running")
 		-- 	for i=1,2,1 do
-		-- 		print(paperStaticImageList[i].eName)
+		-- 		print(game.paperStaticImageList[i].eName)
 		
 		-- 		--if(game.state~="Ended") then
-		-- 		follow(game,paperStaticImageList[i],game.steve)
+		-- 		follow(game,game.paperStaticImageList[i],game.steve)
 		-- 		--end
 		-- 	end
 		-- end

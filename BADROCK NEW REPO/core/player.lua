@@ -71,9 +71,11 @@ local settings = {
 		end
 
 		-- Removes physics to the rock fragments after a brief delay.
-		transition.to(fragments, {time = 4000, onComplete = function()
+		transition.to(fragments, {time = 2000, onComplete = function()
 			for i=1, #fragments, 1 do
 				fragments[i].isBodyActive = false
+				fragments[i].alpha=0
+				if(gameStateList ~= ENDED) then fragments[i]:removeSelf() end
 			end
 		end})
 	end
