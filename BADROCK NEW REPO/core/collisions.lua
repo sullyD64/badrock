@@ -93,17 +93,13 @@ local function attackCollision( event )
 			other.isEnemy = false
 			timer.performWithDelay(1000, other:applyLinearImpulse( 0.05, -0.30, other.x, other.y ))
 			other.yScale = -1
-
-			--qui bisognerà porre a nil la staticImage del nemico ucciso per poter arrestare i listener relativi in game
-			-- che altrimenti non vengono mutati
-			--ims[1]=nil
-			--ims[2]=nil
+			
 			-- Forces the enemy to drop his item
 			if (game.hasAttribute(enemyHit,"drop")) then 
 				game.dropItemFrom(enemyHit) 
 			end 
-			if(other==ims[1]) then Runtime:removeEventListener( "enterFrame", move1 ) ims[1]=nil
-			elseif(other==ims[2]) then Runtime:removeEventListener( "enterFrame", move2 ) ims[2]=nil end
+			if(other==paperStaticImageList[1]) then paperStaticImageList[1]=nil
+			elseif(other==paperStaticImageList[2]) then paperStaticImageList[2]=nil end
 			timer.performWithDelay(5000, function() display.remove(other) end)
 			---------------------------------------------------------------
 			game.addScore(200) -- [We will modify this (but when???)]

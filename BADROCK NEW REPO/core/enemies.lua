@@ -148,7 +148,8 @@ function enemies.loadEnemies( currentGame )
 	local currentMap = currentGame.map
 	local enemyList = currentMap:getObjectLayer("enemySpawn"):getObjects("enemy")
 	local player = currentGame.steve
-	local ims={}
+	--elenco delle staticImage delle paper
+	local paperStaticImageList={}
 
 	-- Loads the main Entity.
 	local loadenemyEntity = function( enemy )
@@ -170,43 +171,21 @@ function enemies.loadEnemies( currentGame )
 				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
 				
 				
-				table.insert(ims , staticImage)
+				table.insert(paperStaticImageList , staticImage)
 
-				--inserisco tutte le staticImage in una table e creo delle funzioni locali specifica di ogni immagine, in modo da poter
-				--richiamare i listener in start/resume/stop/pause
-				function move1()
-					print ("running")
-					if(currentGame.state~="Ended" and ims[1]) then
-					follow(currentGame,ims[1],player)
-					end
-				end
-				function move2()
-					print ("running")
-					if(currentGame.state~="Ended" and ims[2]) then
-					follow(currentGame,ims[2],player)
-					end
+				function staticImage:move()
+					follow(currentGame,self,player)
 				end
 
 				local listener = {}
 				function listener:timer( event )
 					salta(staticImage,player)
-					--print("no")
 				end
 
 				function s(object,player)
 					timer.performWithDelay( 3000, listener )
 				end
 
-				
-				-----------------------------------------------------------------
-				--inseguono steve
-				--Runtime:addEventListener( "enterFrame", move ) -- [ when is this method removed???]
-
-				-- store a reference to your listener, so that you can remove it
-				-- equivalent to: local handler; handler = function() ... end
-				
-				-----------------------------------------------------------------
-				--saltano se steve è sopra le piattaforme (restringere range)
 				timer.performWithDelay(2000,s,-1)
 
 				staticImage.preCollision = collisions.enemyPreCollision
@@ -247,10 +226,10 @@ function enemies.loadEnemies( currentGame )
 
 	for i=1,2,1 do
 
-	print (ims[i].type)
+	print (paperStaticImageList[i].type)
 	end
 	
-	return enemyList,ims,RT
+	return enemyList,paperStaticImageList
 
 end
 

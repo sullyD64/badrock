@@ -96,9 +96,19 @@ physics.setGravity( 0, 50 )
 				game.steve.airState= "Idle"
 			end
 		end
+		for i=1,2,1 do
+			
+			if(paperStaticImageList[i] and paperStaticImageList[i].type=="paper") then
+				print (paperStaticImageList[i].type .. " " .. i ..  " is following steve")
+				paperStaticImageList[i]:move()
+				--print (paperStaticImageList[i].type)
+			else print("no one is following steve")
+			end
+		end
 
 		if ((game.steve.state == playerStateList.DEAD) and 
-			(controller.deathBeingHandled ~= true)) then
+			(controller.deathBeingHandled ~= true) and
+			(controller.endGameOccurring ~= true)) then
 			controller.deathBeingHandled = true
 			controller.onDeath()
 		end
@@ -107,6 +117,7 @@ physics.setGravity( 0, 50 )
 		-- this invokes the corresponding method (for unification purposes).
 		local state = game.state
 		if (state == gameStateList.RUNNING) then
+
 		elseif (state == gameStateList.RESUMED) then
 			game.resume()
 		elseif (state == gameStateList.PAUSED) then
@@ -202,18 +213,18 @@ physics.setGravity( 0, 50 )
 		self.npcs = npcs.loadNPCs( self )
 	end
 
-	ims={}
+	paperStaticImageList={}
 	-- See enemies.lua
 	function game:loadEnemies() 
-		self.enemies,ims = enemies.loadEnemies( self )
+		self.enemies,paperStaticImageList = enemies.loadEnemies( self )
 		
 		-- local function move()
 		-- 	print ("running")
 		-- 	for i=1,2,1 do
-		-- 		print(ims[i])
+		-- 		print(paperStaticImageList[i])
 		
 		-- 		--if(game.state~="Ended") then
-		-- 		follow(game,ims[i],player)
+		-- 		follow(game,paperStaticImageList[i],player)
 		-- 		--end
 		-- 	end
 		-- end
@@ -242,10 +253,10 @@ physics.setGravity( 0, 50 )
 		-- 		local function move()
 		-- 	print ("running")
 		-- 	for i=1,2,1 do
-		-- 		print(ims[i].eName)
+		-- 		print(paperStaticImageList[i].eName)
 		
 		-- 		--if(game.state~="Ended") then
-		-- 		follow(game,ims[i],game.steve)
+		-- 		follow(game,paperStaticImageList[i],game.steve)
 		-- 		--end
 		-- 	end
 		-- end
@@ -282,9 +293,6 @@ function game.start()
 	physics.start()
 	controller:start()
 
-	if(ims[1]) then Runtime:addEventListener( "enterFrame", move1 ) end
-	if(ims[2]) then Runtime:addEventListener( "enterFrame", move2 ) end
-
 	Runtime:addEventListener("enterFrame", moveCamera)
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
@@ -293,9 +301,6 @@ function game.start()
 end
 
 function game.pause()
-	Runtime:removeEventListener( "enterFrame", move1 )
-	Runtime:removeEventListener( "enterFrame", move2 )
-
 	physics.pause()
 	controller:pause()
 
@@ -303,12 +308,8 @@ function game.pause()
 end
 
 function game.resume()
-	if(ims[1]~=nil) then Runtime:addEventListener( "enterFrame", move1 ) end
-	if(ims[2]~=nil) then Runtime:addEventListener( "enterFrame", move2 ) end
-
 	physics.start()
 	controller:start()
-	--Runtime:addEventListener( "enterFrame", move)
 	--transition.resume()
 end
 
@@ -319,9 +320,6 @@ function game.stop()
 	Runtime:removeEventListener( "collision", collisions.onCollision)
 	Runtime:removeEventListener( "enterFrame", onUpdate )
 
-	if(ims[1]) then Runtime:removeEventListener( "enterFrame", move1 ) end
-	if(ims[2]) then Runtime:removeEventListener( "enterFrame", move2 ) end
-	
 	game.map:destroy()
 
 	package.loaded[physics] = nil
