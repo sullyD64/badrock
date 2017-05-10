@@ -2,16 +2,65 @@
 --
 -- enemies.lua
 --
--- An enemy is an animated Entity capable of moving on the map and performing other actions 
--- which can kill Steve in several ways.
------------------------------------------------------------------------------------------
-local entity     = require ( "lib.entity"       )
-local collisions = require ( "core.collisions"  )
+-- An enemy is an hostile Entity capable of moving on the map and performing other actions 
+-- which can kill Steve in several ways. 
+-- There are several "species" of enemy, which differ in aspect, size and other aspects.
+-- Enemies will also behave differently depending on other parameters. For now, there are 
+-- two types of behavior [in the short future will become three]:
+-- 1) If no additional property is specified, an Enemy will stay still and will only 
+-- 	hurt the Player passively if this collides with him;
+-- 2) If the property isChaser is true, the Enemy will be a Chaser.
+-- 	A Chaser will stay still and have an "aggro" zone surrounding him; if the Player
+--    gets inside this aggro zone, the Chaser will start "chasing" the Player; if the Player
+-- 	dies (by any cause), the Chaser will return to the center of his aggro zone and wait 
+-- 	for the Player to come closer again;
+-- 	There is also a "safe zone" located around the Player's spawn point, which will make
+-- 	the Chaser stop chasing the Player.
+-- 3) [If the property isWalker is true, the Enemy will be a Walker.
+-- 	 A Walker moves on the map following a pre-established route].
+-- 
+-- Every Enemy species and type is guessed from the properties of the objects declared in
+-- the game's current map, all of which indicate the spawn point for that selected Enemy.
+----------------------------------------------------------------------------------------
+local entity     = require ( "lib.entity"      )
+local collisions = require ( "core.collisions" )
 
-local enemies = {}
-
+local enemies = {
+	list = {
+		-- 1 Paper
+			-- For now, ALL paper guys in the map (and only them) are Chasers, and therefore will 
+			-- try to follow the Player if he gets too close to their "aggro" sensor.
+			-- In a future implementation this property (as the isWalker property) will be 
+			-- appliable to single, select Enemies directly from the map file. 
+		{
+			species = "paper",
+			lives = 1,
+			isChaser = true,
+			options = {
+				filePath = visual.enemyPaper,
+				width = 40,
+				height = 40,
+				physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
+				eName = "enemy",
+			},
+		},
+		-- 2 Chair
+		{
+			species = "chair",
+			lives = 2,
+			options = {
+				filePath = visual.enemySedia,
+				width = 70,
+				height = 113,
+				physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
+				eName = "enemy",
+			},
+		},
+	}
+}
 
 function follow(currentGame,object,player)
+	--print("running")
 		local currentMap = currentGame.map
 		if((object.x~=nil and object.y~=nil) and(player.x~=nil and player.y~=nil) and currentGame.state ~= "Paused") then
 		--il problema è che poi non richiama la transizione del disaggro
@@ -26,10 +75,7 @@ function follow(currentGame,object,player)
 					else object.xScale=1
 					end
 					--se steve è sopra una piattaforma non lontana dal nemico allora il nemico salta, non funziona
-					if(((object.y-player.y)>0 and (object.y-player.y)<1000) and (math.abs(player.x-object.x)<40) ) then
-						local impulso= (player.y-object.y)
-						object:applyLinearImpulse( 0, -impulso*4, object.x, object.y )
-					end
+					
 			
 				local vuoto = nil
 				local vuotoList = currentMap:getObjectLayer("cadutaVuoto").objects
@@ -84,74 +130,79 @@ end
 				onComplete=prova()
 			})
 		end
+
+		function f(object)
+			local angle= math.atan2(game.steve.x - object.y, game.steve.y - object.x) -- work out angle between target and missile
+			object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
+			object.y = object.y + (math.sin(angle) * object.speed) -- update y pos in relation to angle
+		end
+
+		-- i nemici si muovono a destra e sinistra, lista
+		function muovi(object)
+			object.isFixedRotation=true
+			function goLeft ()
+			transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
+			object.xScale=1
+			end
+
+			function goRight ()
+			transition.to( object, { time=1500, x=(object.x + 120), onComplete=goLeft } )
+			object.xScale=-1
+			end
+
+			goLeft()
+		end
+
+		-- i nemici dovrebbero seguire steve, per alcuni, liste
+		function segui(steve)
+			for i = 1, #enemiesList do
+				local distanceX = steve.x - enemiesList[i].x
+				local distanceY = steve.y - enemiesList[i].y
+
+				local angleRadians = math.atan2(distanceY, distanceX)
+				local angleDegrees = math.deg(angleRadians)
+
+				local enemySpeed = 5
+
+				local enemyMoveDistanceX = enemySpeed*math.cos(angleDegrees)
+				local enemyMoveDistanceY = enemySpeed*math.sin(angleDegrees)
+
+				enemy.x = enemy.x + enemyMoveDistanceX
+				enemy.y = enemy.y + enemyMoveDistanceY
+			end
+		end
 	]]
 
-	function salta(object,player)
+	local function salta(object,player)
 		  if(object.y~=nil) then
 				if(object.y>player.y) then
-					 local impulso= (object.y-player.y)
-					 if(impulso<=150) then
-						  object:applyLinearImpulse( 0, -impulso/3, object.x, object.y )
+					 local distanza= (object.y-player.y)
+					 if(distanza<=100) then
+						  object:applyLinearImpulse( 0, -30, object.x, object.y )
+					 elseif(distanza<=150 and distanza>=100) then
+						  object:applyLinearImpulse( 0, -40, object.x, object.y )
 					 end
 					 --transition.to( object, { time=1500, y=object.y-20 } )
 				end
 		end
 	 end
-
-	function f(object)
-		local angle= math.atan2(game.steve.x - object.y, game.steve.y - object.x) -- work out angle between target and missile
-		object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
-		object.y = object.y + (math.sin(angle) * object.speed) -- update y pos in relation to angle
-	end
-
-	-- i nemici si muovono a destra e sinistra, lista
-	function muovi(object)
-		object.isFixedRotation=true
-		function goLeft ()
-		transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
-		object.xScale=1
-		end
-
-		function goRight ()
-		transition.to( object, { time=1500, x=(object.x + 120), onComplete=goLeft } )
-		object.xScale=-1
-		end
-
-		goLeft()
-	end
-
-	-- i nemici dovrebbero seguire steve, per alcuni, liste
-	function segui(steve)
-		for i = 1, #enemiesList do
-			local distanceX = steve.x - enemiesList[i].x
-			local distanceY = steve.y - enemiesList[i].y
-
-			local angleRadians = math.atan2(distanceY, distanceX)
-			local angleDegrees = math.deg(angleRadians)
-
-			local enemySpeed = 5
-
-			local enemyMoveDistanceX = enemySpeed*math.cos(angleDegrees)
-			local enemyMoveDistanceY = enemySpeed*math.sin(angleDegrees)
-
-			enemy.x = enemy.x + enemyMoveDistanceX
-			enemy.y = enemy.y + enemyMoveDistanceY
-		end
-	end
 ------------------------------------------------------------------------------------
 
 
 -- Loads the enemies's images (and sprites) and initializes their attributes.
 -- Visually instantiates the enemies in the current game's map.
--- @return enemies (a table of enemies)
+-- @return enemyList (a table of Enemies)
 function enemies.loadEnemies( currentGame ) 
 	local currentMap = currentGame.map
 	local enemyList = currentMap:getObjectLayer("enemySpawn"):getObjects("enemy")
 	local player = currentGame.steve
 
+	--elenco delle staticImage delle paper
+	local paperStaticImageList={}
+
 	-- Loads the main Entity.
 	local loadenemyEntity = function( enemy )
-		for i, v in pairs(enemyList) do
+		for i, v in ipairs(enemyList) do
 			local staticImage
 			--print(enemyList[i].type)
 			if (v.type == "paper") then
@@ -165,29 +216,26 @@ function enemies.loadEnemies( currentGame )
 					eName = "enemy"
 				}
 				staticImage.lives=1
+				staticImage.type= "paper"
 				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
-				
-				-- local function move()
-				-- 	follow(currentGame,staticImage,player)=
-				-- end
+								
+				table.insert(paperStaticImageList , staticImage)
 
-				-- local listener = {}
-				-- function listener:timer( event )
-				-- 	salta(staticImage,player)
-				-- 	--print("no")
-				-- end
+				function staticImage:move()
+					follow(currentGame,self,player)
+				end
 
-				-- function s(object,player)
-				-- 	timer.performWithDelay( 3000, listener )
-				-- end
+				local listener = {}
+				function listener:timer( event )
+					salta(staticImage,player)
+				end
 
-				-- -----------------------------------------------------------------
-				-- --inseguono steve
-				-- Runtime:addEventListener( "enterFrame", move )	-- [ when is this method removed???]
-				-- -----------------------------------------------------------------
-				-- --saltano se steve è sopra le piattaforme (restringere range)
-				-- timer.performWithDelay(2000,s,-1)
-				
+				function s(object,player)
+					timer.performWithDelay( 3000, listener )
+				end
+
+				timer.performWithDelay(2000,s,-1)
+
 				staticImage.preCollision = collisions.enemyPreCollision
 				staticImage:addEventListener( "preCollision", staticImage)
 
@@ -223,8 +271,13 @@ function enemies.loadEnemies( currentGame )
 
 	--la scansione del ciclo dei nemici in tutta la mappa è fatta all'interno di loadenemy
 	enemyList[1].staticImage = loadenemyEntity(enemyList[1])
+
+	-- for i=1,2,1 do
+	-- print (paperStaticImageList[i].type)
+	-- end
 	
-	return enemyList
+	return enemyList,paperStaticImageList
+
 end
 
 return enemies

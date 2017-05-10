@@ -87,17 +87,26 @@ local function attackCollision( event )
 		enemyHit.y = other.y
 
 		other.lives = other.lives - 1
+
 		if ( other.lives == 0 ) then  -- Enemy has no lives left: he is dead	
 			other.isSensor = true
 			other.isEnemy = false
 			timer.performWithDelay(1000, other:applyLinearImpulse( 0.05, -0.30, other.x, other.y ))
 			other.yScale = -1
-
+			
 			-- Forces the enemy to drop his item
 			if (game.hasAttribute(enemyHit,"drop")) then 
 				game.dropItemFrom(enemyHit) 
-			end 
-				
+			end
+
+			-----------------------------------------------------
+			if (other == game.paperStaticImageList[1]) then 
+				game.paperStaticImageList[1] = nil
+			elseif (other == game.paperStaticImageList[2]) then 
+				game.paperStaticImageList[2] = nil 
+			end
+			-----------------------------------------------------
+
 			timer.performWithDelay(5000, function() display.remove(other) end)
 			---------------------------------------------------------------
 			game.addScore(200) -- [We will modify this (but when???)]

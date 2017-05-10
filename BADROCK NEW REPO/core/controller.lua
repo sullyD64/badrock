@@ -277,18 +277,12 @@ local sState = {}
 	function controller.onGameOver(outcome)
 		controller.endGameOccurring = true
 		ui.showOutcome(outcome)
-
-		-- Removes the runtime event listeners if death was triggered
-		-- while still inputing a movement.
-		if (controller.SSVLaunched == true) then
-			Runtime:removeEventListener( "enterFrame", makeSteveJump )
-			Runtime:removeEventListener( "enterFrame", makeSteveMove )
-		end
-
-		controller:pause()
-
+	
 		timer.performWithDelay( 1500,
 			function()
+				-- Removes the runtime event listeners if death was triggered
+				-- while still inputing a movement.
+				controller:pause()
 				game.map:setFocus( nil )
 				game:removeAllEntities()
 				ui.buttons.scoreUp:setLabel("")
@@ -471,6 +465,11 @@ function controller:pause()
 	steve.state = sState.IDLE
 	steve.sprite:pause()
 	ui:setEnabled( false )
+
+	if (controller.SSVLaunched == true) then
+		Runtime:removeEventListener( "enterFrame", makeSteveJump )
+		Runtime:removeEventListener( "enterFrame", makeSteveMove )
+	end
 
 	controller.controlsEnabled = false
 	controller.SSVEnabled = false

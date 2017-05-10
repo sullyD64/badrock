@@ -53,12 +53,25 @@ physics.setGravity( 0, 50 )
 		-- print("Steve is " .. game.steve.state)
 		-- -- if (game.steve.canJump == true) then print ("Steve can jump")
 		-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
-		-- print(controller.controlsEnabled)
 		-- print("Lives: " .. game.lives)
 		-- print("Score: " .. game.score)
-		--print(controller.SSVLaunched)
 
-		print(controller.deathBeingHandled)
+		-- if (controller.controlsEnabled == true) then print("Controls: enabled") 
+		-- elseif (controller.controlsEnabled == false) then print ("Controls: disabled") end
+
+		-- if (controller.SSVLaunched == true) then print("SSV is: launched") 
+		-- elseif (controller.SSVLaunched == false) then print ("SSV is: stopped") end
+
+		-- print("Death being handled in controller.onDeath:")
+		-- print(controller.deathBeingHandled)
+		-- print("Endgame being handled in controller.onGameOver:")
+		-- print(controller.endGameOccurring)
+
+		-- for i in pairs (game.paperStaticImageList) do
+		-- 	if(game.paperStaticImageList[i] and game.paperStaticImageList[i].type=="paper") then
+		-- 		print (game.paperStaticImageList[i].type .. " " .. i ..  " is following steve")
+		-- 	end
+		-- end
 		-- print("")
 	end
 
@@ -99,8 +112,15 @@ physics.setGravity( 0, 50 )
 			end
 		end
 
+		for i in pairs(game.paperStaticImageList) do
+			if(game.paperStaticImageList[i] and game.paperStaticImageList[i].type=="paper") then
+				game.paperStaticImageList[i]:move()
+			end
+		end
+
 		if ((game.steve.state == playerStateList.DEAD) and 
-			(controller.deathBeingHandled ~= true)) then
+			(controller.deathBeingHandled ~= true) and
+			(controller.endGameOccurring ~= true)) then
 			controller.deathBeingHandled = true
 			controller.onDeath()
 		end
@@ -109,6 +129,7 @@ physics.setGravity( 0, 50 )
 		-- this invokes the corresponding method (for unification purposes).
 		local state = game.state
 		if (state == gameStateList.RUNNING) then
+
 		elseif (state == gameStateList.RESUMED) then
 			game.resume()
 		elseif (state == gameStateList.PAUSED) then
@@ -202,11 +223,12 @@ physics.setGravity( 0, 50 )
 	-- See npcs.lua
 	function game:loadNPCS() 
 		self.npcs = npcs.loadNPCs( self )
-	end	
+	end
 
+	-- paperStaticImageList={}
 	-- See enemies.lua
 	function game:loadEnemies() 
-		self.enemies = enemies.loadEnemies( self )
+		self.enemies, self.paperStaticImageList = enemies.loadEnemies( self )
 	end
 
 	-- MAIN ENTRY POINT FOR INITIALIZATION 
@@ -227,6 +249,18 @@ physics.setGravity( 0, 50 )
 		game:loadPlayer()
 		game:loadEnemies()
 		game:loadNPCS()
+
+		-- 		local function move()
+		-- 	print ("running")
+		-- 	for i=1,2,1 do
+		-- 		print(paperStaticImageList[i].eName)
+		
+		-- 		--if(game.state~="Ended") then
+		-- 		follow(game,paperStaticImageList[i],game.steve)
+		-- 		--end
+		-- 	end
+		-- end
+		--Runtime:addEventListener( "enterFrame", move )
 		---------------------------
 
 		-- Logic, controls and UI initialization -----------------
@@ -258,11 +292,9 @@ end
 function game.start()
 	physics.start()
 	controller:start()
-
 	Runtime:addEventListener("enterFrame", moveCamera)
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
-
 	dbtimer = timer.performWithDelay(200, debug, 0)
 end
 
@@ -280,11 +312,9 @@ end
 
 function game.stop()
 	timer.cancel( dbtimer )
-
 	Runtime:removeEventListener( "enterFrame", moveCamera)
 	Runtime:removeEventListener( "collision", collisions.onCollision)
 	Runtime:removeEventListener( "enterFrame", onUpdate )
-	
 	game.map:destroy()
 
 	package.loaded[physics] = nil
@@ -292,7 +322,6 @@ function game.stop()
 	package.loaded[enemies] = nil
 	package.loaded[npcs] = nil
 	package.loaded[items] = nil
-
 	collisions.setGame(nil)
 	controller.setGame(nil)
 	controller.deathBeingHandled = nil

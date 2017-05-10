@@ -26,7 +26,7 @@ local settings = {
 
 -- Loads the npcs's images, speech balloons and initializes their attributes.
 -- Visually instantiates the npcs in the current game's map.
--- @return npcs (a table of NPCS)
+-- @return npcList (a table of NPCS)
 function npcs.loadNPCs( currentGame ) 
 	local currentMap = currentGame.map
 	local npcList = currentMap:getObjectLayer("npcSpawn"):getObjects("npc")
