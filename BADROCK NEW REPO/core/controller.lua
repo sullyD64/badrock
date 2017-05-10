@@ -298,7 +298,7 @@ local sState = {}
 				pauseMenu.setGame(nil)
 
 				display.remove(ui.buttonGroup)
-				
+	
 				game.nextScene = "highscores"
 				if (game.state == gState.TERMINATED) then
 					game.nextScene = "mainmenu"
@@ -334,8 +334,8 @@ local sState = {}
 				onComplete = function()
 					-- Controls are active again
 					steve.state = sState.IDLE
-					controller.deathBeingHandled = false
 					controller:start()
+					controller.deathBeingHandled = false
 				end
 			})
 		end

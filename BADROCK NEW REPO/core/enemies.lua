@@ -187,7 +187,7 @@ function enemies.loadEnemies( currentGame )
 				-- -----------------------------------------------------------------
 				-- --saltano se steve è sopra le piattaforme (restringere range)
 				-- timer.performWithDelay(2000,s,-1)
-
+				
 				staticImage.preCollision = collisions.enemyPreCollision
 				staticImage:addEventListener( "preCollision", staticImage)
 

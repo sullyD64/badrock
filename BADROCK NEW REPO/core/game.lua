@@ -51,12 +51,14 @@ physics.setGravity( 0, 50 )
 	local function debug(event)
 		-- print("Game is " .. game.state)
 		-- print("Steve is " .. game.steve.state)
-		-- if (game.steve.canJump == true) then print ("Steve can jump")
+		-- -- if (game.steve.canJump == true) then print ("Steve can jump")
 		-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
 		-- print(controller.controlsEnabled)
 		-- print("Lives: " .. game.lives)
 		-- print("Score: " .. game.score)
-		-- --print(controller.SSVLaunched)
+		--print(controller.SSVLaunched)
+
+		print(controller.deathBeingHandled)
 		-- print("")
 	end
 
@@ -291,6 +293,11 @@ function game.stop()
 	package.loaded[npcs] = nil
 	package.loaded[items] = nil
 
+	collisions.setGame(nil)
+	controller.setGame(nil)
+	controller.deathBeingHandled = nil
+	controller.endGameOccurring = nil
+
 	if (game.nextScene == "highscores") then
 		-- Switches scene (from "levelX" to "highscores").
 		composer.setVariable( "finalScore", game.score )
@@ -302,9 +309,6 @@ function game.stop()
 	end
 	game.nextScene = nil
 
-	collisions.setGame(nil)
-	controller.setGame(nil)
-	controller.endGameOccurring = false
 	package.loaded[controller] = nil
 	package.loaded[collisions] = nil
 	package.loaded[composer] = nil

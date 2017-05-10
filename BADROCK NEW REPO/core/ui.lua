@@ -317,7 +317,7 @@ function ui.showOutcome( outcome )
 			finalText.text = "See you soon!"
 			finalText:setFillColor( 0, 1, 0)
 		end
-		transition.to(finalText, { alpha = 0, time = 2000,
+		transition.to(finalText, { alpha = 0, time = 1000,
 			onComplete = function()
 				display.remove( finalText )
 			end
