@@ -26,7 +26,7 @@ local entity     = require ( "lib.entity"      )
 local collisions = require ( "core.collisions" )
 
 local enemies = {
-	list = {
+	descriptions = {
 		-- 1 Paper
 			-- For now, ALL paper guys in the map (and only them) are Chasers, and therefore will 
 			-- try to follow the Player if he gets too close to their "aggro" sensor.
@@ -59,66 +59,60 @@ local enemies = {
 	}
 }
 
-function follow(currentGame,object,player)
-	--print("running")
+-- ENEMY-SPECIFIC FUNCTIONS -------------------------------------------------------
+	-- (must be self-contained and not call anything outside this module)
+
+	function follow(currentGame, object, player)
 		local currentMap = currentGame.map
-		if((object.x~=nil and object.y~=nil) and(player.x~=nil and player.y~=nil) and currentGame.state ~= "Paused") then
-		--il problema è che poi non richiama la transizione del disaggro
-		--per colpa del game.paused quando steve muore
-			object.isFixedRotation=true
-			object.speed=1--quello sopra continua a essere flash
-			if(math.abs(object.x-player.x)<=400) then
-				local angle= math.atan2(player.y - object.y, player.x - object.x) -- work out angle between target and missile
-				object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
-					if(player.x>object.x) then
-					object.xScale=-1
-					else object.xScale=1
-					end
-					--se steve è sopra una piattaforma non lontana dal nemico allora il nemico salta, non funziona
-					
-			
+		if ( (object.x ~= nil and object.y ~= nil) and (player.x ~= nil and player.y ~= nil) 
+			and currentGame.state ~= "Paused" ) then
+
+			--il problema è che poi non richiama la transizione del disaggro
+			--per colpa del game.paused quando steve muore
+			object.isFixedRotation = true
+			object.speed = 1 --quello sopra continua a essere flash
+
+			if( math.abs(object.x-player.x) <= 400 ) then
+
+				-- work out angle between target and missile
+				local angle = math.atan2 (player.y - object.y, player.x - object.x) 
+				-- update x pos in relation to angle
+				object.x = object.x + ( math.cos(angle) * object.speed ) 
+				
+				if(player.x > object.x) then
+					object.xScale = -1
+				else 
+					object.xScale = 1
+				end
+				
+				-- se steve è sopra una piattaforma non lontana dal nemico allora il nemico salta, non funziona
 				local vuoto = nil
 				local vuotoList = currentMap:getObjectLayer("cadutaVuoto").objects
 
-					for k, v in pairs(vuotoList) do
-						vuoto = vuotoList[k]
+				for k, v in pairs(vuotoList) do
+					vuoto = vuotoList[k]
+				end
 
-					end
-				local direzione=math.abs(object.x-vuoto.x)
-				local distanzab= math.abs(direzione)
-				local distanzaverticalebordo= math.abs(object.y-vuoto.y)
+				local direzione = math.abs( object.x - vuoto.x )
+				local distanzab = math.abs( direzione )
+				local distanzaverticalebordo = math.abs( object.y - vuoto.y )
 
+				--saltano continuamente a prescindere
+				local salto = false
+				if( distanzab <= 100 and distanzaverticalebordo <= 100 and object.lives ~= 0 ) then
 
-				--i nemici disaggrano steve alla morte, bisogna sistemare il momento in cui lo considerano morto? sgommata se si rimane fermi...
-					if(((player.state == "Dead" and currentGame.state == "Running"))) then --and (math.abs(object.x-player.x)<=100 and math.abs(object.y-player.y)<=100)) ) then
-
-						object.xScale=-1
-						
-						local transition= transition.to(object,{time=3500,xScale=-1,x=(object.x+280)})--onPause= function() print ("transition paused")end})
-					end
-					--dovrebbe disaggrare anche se si trova nei pressi dello spawn point, per evitare che steve spawni dove c'è un nemico
-					-- if (math.abs(currentGame.spawn.x-object.x)<=150 and (currentGame.spawn.y==object.y)) then
-					-- 	object.xScale=-1
-						
-					-- 	local transition= transition.to(object,{time=3500,xScale=-1,x=(object.x+280)})
-					-- end
-
-					--saltano continuamente a prescindere
-					local salto=false
-					if(distanzab<=100 and distanzaverticalebordo<=100 and object.lives~=0 ) then
-						
-						if(object.xScale==-1 and salto==false) then
+					if( object.xScale == -1 and salto == false ) then
 						object:applyLinearImpulse( 5, -15, object.x, object.y )
-						salto=true
-						elseif(object.xScale==1 and salto==false) then
+						salto = true
+					elseif( object.xScale == 1 and salto == false) then
 						object:applyLinearImpulse( -5, -15, object.x, object.y )
-						salto=true
-						end
-
+						salto = true
 					end
+				end
 			end
 		end
-end
+	end
+------------------------------------------------------------------------------------
 
 -- GIGI WIP-------------------------------------------------------------------------
 	--[[
@@ -173,21 +167,59 @@ end
 		end
 	]]
 
+local i = 0
 	local function salta(object,player)
-		  if(object.y~=nil) then
-				if(object.y>player.y) then
-					 local distanza= (object.y-player.y)
-					 if(distanza<=100) then
-						  object:applyLinearImpulse( 0, -30, object.x, object.y )
-					 elseif(distanza<=150 and distanza>=100) then
-						  object:applyLinearImpulse( 0, -40, object.x, object.y )
-					 end
-					 --transition.to( object, { time=1500, y=object.y-20 } )
-				end
+		-- i = i + 1
+		-- print("Salta " .. i)
+		if (object.y ~= nil) then
+			if (object.y > player.y) then
+				local distanza = object.y - player.y
+				if (distanza <= 100) then
+					object:applyLinearImpulse( 0, -30, object.x, object.y )
+				 elseif (distanza <= 150 and distanza >= 100) then
+					object:applyLinearImpulse( 0, -40, object.x, object.y )
+				 end
+					--transition.to( object, { time=1500, y=object.y-20 } )
+			end
 		end
-	 end
+	end
 ------------------------------------------------------------------------------------
 
+
+local function loadChaser( enemy, currentGame )
+	enemy.preCollision = collisions.enemyPreCollision
+	enemy:addEventListener( "preCollision", enemy)
+
+	--deadcode, indagare malfunzionamento
+	enemy.towerCollision = collisions.enemyFormazioneATorre
+	enemy:addEventListener( "towerCollision", enemy)
+
+	local vuotoList = currentGame.map:getObjectLayer("cadutaVuoto").objects
+	-- local player = currentGame.player
+
+	-- chase
+	function enemy:move()
+		follow(currentGame, self, currentGame.steve) -- vuotolist come parametro
+	end
+
+	local listener = {}
+	function listener:timer( event )
+		salta( enemy, currentGame.steve )
+	end
+
+	-- jumpTimerClock
+	-- function s()
+	-- 	i = i + 1
+	-- 	print("s is running " .. i)
+	-- 	timer.performWithDelay( 3000, listener )
+	-- end
+	
+
+	-- jumpTimerClock
+	-----------------------------------------------------
+	timer.performWithDelay(2000, listener, -1) -- [MEMORY LEAK!]
+	-----------------------------------------------------
+end
 
 -- Loads the enemies's images (and sprites) and initializes their attributes.
 -- Visually instantiates the enemies in the current game's map.
@@ -195,89 +227,64 @@ end
 function enemies.loadEnemies( currentGame ) 
 	local currentMap = currentGame.map
 	local enemyList = currentMap:getObjectLayer("enemySpawn"):getObjects("enemy")
-	local player = currentGame.steve
 
-	--elenco delle staticImage delle paper
-	local paperStaticImageList={}
+	local chaserList = {}
+	local walkerList = {}
 
 	-- Loads the main Entity.
-	local loadenemyEntity = function( enemy )
-		for i, v in ipairs(enemyList) do
-			local staticImage
-			--print(enemyList[i].type)
-			if (v.type == "paper") then
-				staticImage = entity.newEntity{
-					graphicType = "static",
-					filePath = visual.enemyPaper,
-					width = 40,
-					height = 40,
-					bodyType = "dynamic",
-					physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
-					eName = "enemy"
-				}
-				staticImage.lives=1
-				staticImage.type= "paper"
-				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
-								
-				table.insert(paperStaticImageList , staticImage)
-
-				function staticImage:move()
-					follow(currentGame,self,player)
-				end
-
-				local listener = {}
-				function listener:timer( event )
-					salta(staticImage,player)
-				end
-
-				function s(object,player)
-					timer.performWithDelay( 3000, listener )
-				end
-
-				timer.performWithDelay(2000,s,-1)
-
-				staticImage.preCollision = collisions.enemyPreCollision
-				staticImage:addEventListener( "preCollision", staticImage)
-
-				--deadcode, indagare malfunzionamento
-				staticImage.towerCollision = collisions.enemyFormazioneATorre
-				staticImage:addEventListener( "towerCollision", staticImage)
-
-			elseif (v.type == "sedia") then
-				staticImage = entity.newEntity{
-					graphicType = "static",
-					filePath = visual.enemySedia,
-					width = 70,
-					height = 113,
-					bodyType = "dynamic",
-					physicsParams = { bounce=0,friction = 1.0, density = 1.0, },
-					eName = "enemy"
-				}
-				staticImage.lives=5
-				staticImage.x, staticImage.y = enemyList[i].x, enemyList[i].y
+	local loadEnemyEntity = function( enemy )
+		local desc
+		for i, v in ipairs(enemies.descriptions) do
+			if (v.species == enemy.type) then
+				desc = v
+				break
 			end
-
-			staticImage.isTargettable=true
-			staticImage.isEnemy=true
-
-			if(enemyList[i].drop ~=nil) then
-				staticImage.drop = enemyList[i].drop
-			end
-
-			staticImage:addOnMap( currentMap )
 		end
+
+		if (desc == nil ) then
+			error(enemy.type .. ": Enemy species not found in the EnemyDescriptions")
+		end
+		
+		local staticImage = entity.newEntity(desc.options)
+		staticImage.species = desc.species
+		staticImage.lives = desc.lives or 1
+		
+		if( enemy.drop ) then
+			staticImage.drop = enemy.drop
+		end
+
+		staticImage.isTargettable = true
+		staticImage.isEnemy = true
+
+		staticImage.x, staticImage.y =  enemy.x, enemy.y
+		staticImage:addOnMap( currentMap )
+
+		---------------------------------------------------------------
+		-- Temporary: assuming the species DOES determine the behavior,
+		-- this is specified in the description list.
+		if (desc.isChaser) then
+			loadChaser(staticImage, currentGame)
+			table.insert(chaserList, staticImage)
+		end
+		---------------------------------------------------------------
+
 		return staticImage
 	end
 
-	--la scansione del ciclo dei nemici in tutta la mappa è fatta all'interno di loadenemy
-	enemyList[1].staticImage = loadenemyEntity(enemyList[1])
+	for i, v in ipairs(enemyList) do
+		enemyList[i].staticImage = loadEnemyEntity(enemyList[i])
+		---------------------------------------------------------------
+		-- Temporary: assuming the species DOES NOT determine the 
+		--	behavior, this is specified in the enemy object in the map,
+		-- so appears in enemyList as an attribute.
+		-- if (enemyList[i].isChaser) then
+		-- 	loadChaser(enemyList[i].staticImage, currentGame)	
+		-- 	table.insert(chaserList, staticImage)
+		-- end
+		---------------------------------------------------------------	
+	end
 
-	-- for i=1,2,1 do
-	-- print (paperStaticImageList[i].type)
-	-- end
-	
-	return enemyList,paperStaticImageList
-
+	return enemyList, chaserList, walkerList
 end
 
 return enemies

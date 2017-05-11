@@ -100,10 +100,16 @@ local function attackCollision( event )
 			end
 
 			-----------------------------------------------------
-			if (other == game.paperStaticImageList[1]) then 
-				game.paperStaticImageList[1] = nil
-			elseif (other == game.paperStaticImageList[2]) then 
-				game.paperStaticImageList[2] = nil 
+			-- if (other == game.chaserList[1]) then 
+			-- 	game.chaserList[1] = nil
+			-- elseif (other == game.chaserList[2]) then 
+			-- 	game.chaserList[2] = nil 
+			-- end
+
+			for i, v in ipairs(game.chaserList) do
+				if (other == v) then
+					game.chaserList[i] = nil
+				end
 			end
 			-----------------------------------------------------
 

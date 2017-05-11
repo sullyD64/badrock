@@ -44,6 +44,7 @@ physics.setGravity( 0, 50 )
 		ATTACKING  = "Attacking",
 		DEAD       = "Dead",
 	}
+	
 --===========================================-- 
 
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
@@ -67,9 +68,9 @@ physics.setGravity( 0, 50 )
 		-- print("Endgame being handled in controller.onGameOver:")
 		-- print(controller.endGameOccurring)
 
-		-- for i in pairs (game.game.paperStaticImageList) do
-		-- 	if(game.game.paperStaticImageList[i] and game.game.paperStaticImageList[i].type=="paper") then
-		-- 		print (game.game.paperStaticImageList[i].type .. " " .. i ..  " is following steve")
+		-- for i in pairs (game.chaserList) do
+		-- 	if(game.chaserList[i] and game.chaserList[i].species=="paper") then
+		-- 		print (game.chaserList[i].species .. " " .. i ..  " is following steve")
 		-- 	end
 		-- end
 		-- print("")
@@ -112,20 +113,26 @@ physics.setGravity( 0, 50 )
 			end
 		end
 
-		for i in pairs(game.paperStaticImageList) do
-			if(game.paperStaticImageList[i] and game.spawnPoint.x and game.paperStaticImageList[i].x and
-			 game.paperStaticImageList[i].type=="paper" and math.abs(game.steve.x-game.paperStaticImageList[i].x)<=230
-			 and math.abs(game.steve.y-game.paperStaticImageList[i].y)<=150) then
-				if(game.steve.state~=playerStateList.DEAD) then
-					print (game.paperStaticImageList[i].type .. " " .. i ..  " is following steve")
-					game.paperStaticImageList[i]:move()
-					--print (game.paperStaticImageList[i].type)
+		for i in pairs(game.chaserList) do
+			if( game.chaserList[i] 
+				and game.spawnPoint.x 
+				and game.chaserList[i].x 
+				and game.chaserList[i].species == "paper" 
+				and math.abs(game.steve.x-game.chaserList[i].x)<=230
+				and math.abs(game.steve.y-game.chaserList[i].y)<=150 ) then
+				if(game.steve.state ~= playerStateList.DEAD) then
+					game.chaserList[i]:move()
 				
-				elseif(game.steve.state==playerStateList.DEAD and math.abs(game.paperStaticImageList[i].x-game.spawnPoint.x)<=150) then
-					print("Lo spawn è zona franca")
-					game.paperStaticImageList[i].xScale=-1
-					game.paperStaticImageList[i].x=	game.paperStaticImageList[i].x+2	
-					local transition= transition.to(game.paperStaticImageList[i],{time=2000,xScale=-1,x=(game.paperStaticImageList[i].x+200)})
+				elseif( game.steve.state == playerStateList.DEAD 
+					and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
+					--print("Lo spawn è zona franca")
+					game.chaserList[i].xScale=-1
+					game.chaserList[i].x =	game.chaserList[i].x+2	
+					transition.to(game.chaserList[i], {
+						time = 2000,
+						xScale = -1,
+						x = (game.chaserList[i].x + 200)
+					})
 				end
 			end
 		end
@@ -141,7 +148,7 @@ physics.setGravity( 0, 50 )
 		-- this invokes the corresponding method (for unification purposes).
 		local state = game.state
 		if (state == gameStateList.RUNNING) then
-
+			
 		elseif (state == gameStateList.RESUMED) then
 			game.resume()
 		elseif (state == gameStateList.PAUSED) then
@@ -237,10 +244,9 @@ physics.setGravity( 0, 50 )
 		self.npcs = npcs.loadNPCs( self )
 	end
 
-	-- game.paperStaticImageList={}
 	-- See enemies.lua
 	function game:loadEnemies() 
-		self.enemies, game.paperStaticImageList = enemies.loadEnemies( self )
+		self.enemies, self.chaserList = enemies.loadEnemies( self )
 	end
 
 	-- MAIN ENTRY POINT FOR INITIALIZATION 
@@ -261,19 +267,6 @@ physics.setGravity( 0, 50 )
 		game:loadPlayer()
 		game:loadEnemies()
 		game:loadNPCS()
-
-		-- 		local function move()
-		-- 	print ("running")
-		-- 	for i=1,2,1 do
-		-- 		print(game.paperStaticImageList[i].eName)
-		
-		-- 		--if(game.state~="Ended") then
-		-- 		follow(game,game.paperStaticImageList[i],game.steve)
-		-- 		--end
-		-- 	end
-		-- end
-		--Runtime:addEventListener( "enterFrame", move )
-		---------------------------
 
 		-- Logic, controls and UI initialization -----------------
 		collisions.setGame( game, gameStateList, playerStateList  )
