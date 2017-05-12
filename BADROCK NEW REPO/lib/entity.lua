@@ -79,7 +79,10 @@ function entity.newEntity( options )
 				error ("no parent position or radius length specified for the new sensor")
 			end
 		end
-		physics.addBody(ent, opt.bodyType, opt.physicsParams)
+		transition.to(ent,{time =0, onComplete= function()
+			physics.addBody(ent, opt.bodyType, opt.physicsParams)
+		end})
+		
 	else
 		error( "invalid source file specified for the new entity" )
 	end

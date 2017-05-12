@@ -3,42 +3,58 @@
 -- items.lua
 --
 -----------------------------------------------------------------------------------------
-local physics  = require ( "physics"      )
-local sfx      = require ( "audio.sfx"    )
+local physics 	 = require ( "physics"      )
+local sfx     	 = require ( "audio.sfx"    )
+local entity 	= require ( "lib.entity" )
+local collisions = require ( "core.collisions" )
 
 local items = {}
 
 items.list = {
-	{
+	{	
 		name = "coin",
-		type = "bonus",
-		image = visual.itemCoin,
+		filePath = visual.itemCoin,
 		width = 25,
-		heigth = 25
-
-
+		height = 25
 	},
 	-- 1 LIFE
 	{
 		name = "life",
-		type = "bonus",
-		image = visual.itemLife,
+		filePath = visual.itemLife,
 		width = 25,
-		heigth = 25
-		--effect = items.lifeEffect()
+		height = 25
 	},
-	-- 2 STAR
+	-- 2 GUN
 	{
 		name = "gun",
-		type = "bonus",
-		image = visual.itemGun,
+		filePath = visual.itemGun,
 		width = 25,
-		heigth = 25
-		--effect = items.lifeEffect()
+		height = 25
+	},
+	-- 3 IMMUNITY
+	{
+		name = "immunity",
+		filePath = visual.itemImmunity,
+		width = 25,
+		height = 25
+	},
+	-- 4 METHEORS RAIN
+	{
+		name = "metheors",
+		filePath = visual.itemMetheor,
+		width = 25,
+		height = 25
+	},
+	-- 5 SUMMON GUARDIAN
+	{
+		name = "summon",
+		filePath = visual.itemGun,
+		width = 25,
+		height = 25
 	}
 }
 
-function items.findItemByName( name )
+local function findItemByName( name )
 	local item = nil
 	for k, v in pairs(items.list) do
 		if (v.name == name) then
@@ -49,69 +65,28 @@ function items.findItemByName( name )
 	return item
 end
 
---local function items.lifeEffect()
-	--entity.speed = value
---end
 
 function items.createItem( name )
-	--Create a new Life Item that is returned when this function is called
-	local i = items.findItemByName(name)
-	local item = display.newImageRect(i.image , i.width, i.heigth)
-	item.name = i.name
-	item.type = i.type
-	item.myName = "item"
-	transition.to(item, {time = 0, onComplete= function()
-	physics.addBody(item )
+	--Create a new Item that is returned when this function is called
+	local i = findItemByName(name)
+	i.eName = "item"
+	local item
 	
-	end})
-	item.isSensor = true
-
+	item = entity.newEntity( i )
+	
+	item.name = i.name
+	item.collision = collisions.itemCollision
+	item:addEventListener("collision")
 	return item
 end
 
--- ITEMS COLLISION HANDLERS ------------------------------------------------------------
-
-	function items.itemCollision( game , event, item )
-		--item.alpha = 0
-		-- inserire qui eventuali suoni di collisione con gli item
-		--display.remove( item )
-		--game.map:getTileLayer("items"):removeObject( item )
-		
-		--List of all items with relative collision handler
-		if (item.name == "coin") then
-			coinCollision(game, event, item)
-		elseif (item.name == "life") then
-			lifeCollision(game, event, item)
-		end
-		item = nil -- Distruzione dell'item
-	end
-
-	function coinCollision( game , event, coin )
-		if ( event.phase == "began" ) then
-			sfx.playSound( sfx.coinSound, { channel = 3 } )
-			coin.BodyType = "dynamic"
-			display.remove( coin )
-			game.addScore(100)
-
-		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-		end
-	end
-
-	function lifeCollision( game, event, life )
-		if ( event.phase == "began" ) then
-			display.remove(life)
-			--life.BodyType = "dynamic"
-			game.addOneLife()
-			
-		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-		end
-	end
-----------------------------------------------------------------------------------------
-
+--------------------------------------------------------------------------------------
+--[[
 function addDropTo( enemy, itemName )
 	--Add an item drop to an enemy (MAX 1 Drop per Enemy, for now )
 	local item = items.findItemByName (itemName)
 	enemy.drop = item
 end
+]]
 
 return items

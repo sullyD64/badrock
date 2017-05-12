@@ -192,11 +192,20 @@ local sState = {}
 						-- [implementazione futura]
 					else -- default attack
 						steve.attack = steve.defaultAttack
-						steve.attack.duration = 500
+						steve.attack.duration = 700
 
 						-- Position linking is handled in game -> onUpdate
+						steve.attack.sprite.isVisible = true
 						steve.attack.isVisible = true
 						steve.attack.isBodyActive = true
+						steve.attack.sprite:setSequence("beginning")
+						steve.attack.sprite:play()
+						steve.attack.sprite:addEventListener("sprite", steve.attack.animationChange)
+						local animationEnding = function()
+							steve.attack.sprite:setSequence("ending")
+							steve.attack.sprite:play()
+						end
+						timer.performWithDelay(steve.attack.duration -300, animationEnding)
 
 						-- Steve dashes forward
 						steve:applyLinearImpulse( steve.direction * 8, 0, steve.x, steve.y )
@@ -208,6 +217,7 @@ local sState = {}
 						--print("sto controllando...")
 						if (steve.state == sState.DEAD) then
 							newAlpha = 0
+							steve.attack.sprite.isVisible = false
 							--print("steve è morto :(")
 						end
 					end
@@ -221,7 +231,10 @@ local sState = {}
 							target.alpha = 1
 							steve.attack.isVisible = false
 							steve.attack.isBodyActive = false
+							steve.attack.sprite:pause()
+							steve.attack.sprite.isVisible = false
 							steve.sprite.alpha = newAlpha
+							steve.attack.sprite:removeEventListener("sprite",steve.attack.animationChange)
 							Runtime:removeEventListener( "enterFrame", didSteveDieWhileAttacking)
 						end
 					)

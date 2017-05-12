@@ -16,7 +16,7 @@ local settings = {
 
 	attackOpts = {
 		radius = 40,
-		alpha = 0.6,
+		alpha = 0,
 		color = {0, 0, 255},
 	},
 
@@ -65,7 +65,10 @@ local settings = {
 			}	
 			frag.x , frag.y = playerX, playerY
 			frag:addOnMap(currentGame.map)
-			frag:applyLinearImpulse(directionX, directionY, frag.x , frag.y)
+			--transition.to aggiunto per dare modo a entity di finire il suo transition.to per creare le roccette (Senza da errore)
+			transition.to(frag,{time =0, onComplete= function()
+				frag:applyLinearImpulse(directionX, directionY, frag.x , frag.y)
+			end})
 
 			table.insert(fragments , frag)
 		end
@@ -164,6 +167,42 @@ function player.loadAttack( currentGame )
 	defaultAttack.isVisible = false
 	defaultAttack.isBodyActive = false
 
+
+	local options = {
+		height = 80,
+		width = 80,
+		numFrames = 13,
+		sheetContentWidth = 240,
+		sheetContentHeight = 400 
+
+	}
+	local sequence ={
+		{name = "beginning", start= 1, count =7, time = 300, loopCount=1},
+		{name = "spinning", start= 8, count =3, time = 300, loopCount= 0},
+		{name = "ending", frames= {11, 12, 13, 1}, time = 300, loopCount=1}
+	}
+
+	 defaultAttack.sprite = entity.newEntity{
+		graphicType = "animated",
+		parentX = player.x,
+		parentY = player.y,
+		filePath = visual.steveAttack,
+		spriteOptions = options,
+		spriteSequence = sequence,
+		physicsParams= {isSensor=true},
+		eName = "steveAttack"
+	}
+
+	
+	defaultAttack.animationChange = function(event)
+		local sprite= event.target
+		if(event.phase == "ended") then
+			sprite:setSequence("spinning")
+			sprite:play()
+		end
+	end
+
+	defaultAttack.sprite:addOnMap( currentMap )
 	-- [da implementare] -------------------------
 	-- defaultAttack.sprite = entity.newEntity{
 

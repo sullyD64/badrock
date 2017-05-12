@@ -9,7 +9,9 @@
 -- These methods can access and modify the Game's current state, aswell as the Player's
 -- current state, position on the map, sprite sequence and other properties.
 -----------------------------------------------------------------------------------------
-local items   = require ( "core.items" )
+--local items   = require ( "core.items" )
+local sfx = require ("audio.sfx")
+local entity = require ("lib.entity")
 
 local collisions = {
 	-- Used by npcDetectByCollision
@@ -63,7 +65,9 @@ local function dangerCollision( event )
 		-- The whole death phase is handled in the controller
 		-- the declaration below triggers a call in the game loop
 		-- (see game and controller)
-		steve.state = sState.DEAD
+		if(steve.immunity == nil) then
+			steve.state = sState.DEAD
+		end
 	end
 end
 
@@ -228,8 +232,8 @@ function collisions.onCollision( event )
 
 		if(other.myName == "env" or other.myName == "platform") then
 			environmentCollision(event)
-		elseif (other.myName == "item") then
-			items.itemCollision(game, event, other)
+		--elseif (other.eName == "item") then
+		--	items.itemCollision(game, event, other)
 		elseif (other.isEnemy or other.isDanger) then
 			dangerCollision(event)
 
@@ -256,5 +260,156 @@ function collisions.onCollision( event )
 		end
 	end
 end
+
+-------------------ITEMS COLLISIONS-----------------------------------------------------------------
+
+	local function lifeCollision( life, event )
+		if ( event.phase == "began" ) then
+			display.remove(life)
+			--life.BodyType = "dynamic"
+			game.addOneLife()
+			
+		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
+		end
+	end
+
+	--[[local function coinCollision( coin, event )
+		if ( event.phase == "began" ) then
+			sfx.playSound( sfx.coinSound, { channel = 3 } )
+			coin.BodyType = "dynamic"
+			display.remove( coin )
+			game.addScore(100)
+			
+		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
+		end
+	end
+	]]
+
+	local function gunCollision( gun, event )
+		if ( event.phase == "began" ) then
+			display.remove(gun)
+			print("hai preso la Gun -- azione ancora da implementare")
+			--da Implementare
+			
+		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
+		end
+	end
+
+	local function immunityCollision( immunityItem , event )
+		if ( event.phase == "began" ) then
+		--[[	display.remove(immunityItem)
+			sfx.playSound( sfx.coinSound, { channel = 3 } )
+			
+			local duration = 3000
+			--per far capire che l'effetto è attivo riduco momentaneamente l'alpha di steve
+			steve.sprite.alpha = 0.5 
+			steve.immunity = true
+			transition.to(steve , { time = duration , onComplete = function()
+				steve.immunity = nil	
+				steve.sprite.alpha = 1
+			end})			
+		]]
+		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
+		end
+	end
+
+	local function metheorsRainCollision( metheorsItem, event )
+		if ( event.phase == "began" ) then
+	--[[		display.remove(metheorsItem)
+			--da Implementare
+			local numberMetheors = 6
+			local metheors = {}
+
+		
+
+			local function createMetheor()
+				local metheor = entity.newEntity{
+				graphicType = "static",
+					filePath = visual.itemMetheor,
+					width = 40,
+					height = 40,
+					bodyType = "dynamic",
+					physicsParams = { isSensor = true , friction = 10.0, density = 0.3, },
+					eName = "item"
+				}
+
+				local directionX = math.random(-2, 2)
+				local directionY = math.random(-1, 1)
+				local c = display.contentCenterX
+				local spawnX = math.random( c - display.contentWidth , c + display.contentWidth)
+				metheor.x , metheor.y = spawnX, display.contentHeight
+				metheor:addOnMap(game.map)
+
+				transition.to(metheor,{time =0, onComplete= function()
+					metheor:applyLinearImpulse(directionX, directionY, metheor.x -5 , metheor.y +7)
+				end})
+
+				local funct = function()
+					display.remove(metheor)
+				end
+				timer.performWithDelay(6000, funct)
+
+				return metheor
+			end
+
+			local function effect()
+				local m = createMetheor()
+				table.insert(metheors, m)
+			end
+
+			local function executeWithDelay()
+				local difference = math.random(1000, 2000)
+				timer.performWithDelay(difference, effect)
+			end
+
+
+
+			for i=0, numberMetheors do
+				executeWithDelay()
+			end
+			
+
+		]]
+		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
+		end
+	end
+
+	local function summonCollision( summonItem, event )
+		if ( event.phase == "began" ) then
+			display.remove(summonItem)
+			--da Implementare
+			
+		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
+		end
+	end
+	--------------------------------------------------------------------
+	function collisions.itemCollision(	self, event )
+		local o = event.other
+		if ( o.eName == "steve") then
+			 
+			--List of all items with relative collision handler
+			if (self.name == "coin") then
+				coinCollision( self, event)
+			elseif (self.name == "life") then
+				lifeCollision( self, event)
+			elseif (self.name == "gun") then
+				gunCollision( self, event)
+			elseif (self.name == "immunity") then
+				immunityCollision( self, event)
+			elseif (self.name == "metheors") then
+				metheorsRainCollision( self, event)
+			elseif (self.name == "life") then
+				lifeCollision( self, event)
+			
+			end
+			item = nil -- Distruzione dell'item
+
+		end
+	
+	end
+
+
+----------------------------------------------------------------------------------------------------
+
 
 return collisions

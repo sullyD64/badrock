@@ -70,7 +70,10 @@ physics.setGravity( 0, 50 )
 			game.steve.sprite.xScale = game.steve.direction
 			game.steve.sensorD.x, game.steve.sensorD.y = game.steve.x, game.steve.y
 			if (game.steve.attack) then
+				game.steve.attack.sprite.xScale = game.steve.direction
+				game.steve.attack.sprite.x, game.steve.attack.sprite.y = game.steve.x, game.steve.y
 				game.steve.attack.x, game.steve.attack.y = game.steve.x, game.steve.y
+				
 			end
 		end
 
@@ -150,7 +153,7 @@ physics.setGravity( 0, 50 )
 		-- Displays the item contained in the attribute -drop- of an enemy.
 		function game.dropItemFrom( enemy )
 			local item = items.createItem(enemy.drop)
-			game.map:getTileLayer("items"):addObject(item)
+			item:addOnMap(game.map)
 			item.x = enemy.x
 			item.y = enemy.y
 		end
