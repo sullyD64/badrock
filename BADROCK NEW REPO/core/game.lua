@@ -50,8 +50,8 @@ physics.setGravity( 0, 50 )
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- The only purpose of this is for text debugging on the console, do not add anything else.
 	local function debug(event)
-		-- print("Game is " .. game.state)
-		-- print("Steve is " .. game.steve.state)
+		print("Game is " .. game.state)
+		print("Steve is " .. game.steve.state)
 		-- -- if (game.steve.canJump == true) then print ("Steve can jump")
 		-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
 		-- print("Lives: " .. game.lives)
