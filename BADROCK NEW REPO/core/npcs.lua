@@ -38,8 +38,7 @@ function npcs.loadNPCs( currentGame )
 				filePath = visual.npcImage,
 				width = 51,
 				height = 128,
-				bodyType = "static",
-				physicsParams = { isSensor = true },
+				notPhysical = true,
 				eName = "npc"
 			}		
 			staticImage.x, staticImage.y = npc.x, npc.y
@@ -51,11 +50,11 @@ function npcs.loadNPCs( currentGame )
 	-- Loads the speech balloon, the text and the buttons.
 		local loadBalloon = function( npc )
 			-- Panel status check for debug
-				--[[local panelTransDone = function( target )
-						if ( target.completeState ) then
-							print( "Panel state is: "..target.completeState )
-						end
-					end]]
+				-- local panelTransDone = function( target )
+				-- 	if ( target.completeState ) then
+				-- 		print( "Panel state is: "..target.completeState )
+				-- 	end
+				-- end
 
 			local balloon = panel.newPanel{
 				location = "static",
@@ -138,7 +137,11 @@ function npcs.loadNPCs( currentGame )
 				sensorName = "N"
 			}
 			-- Needed for sticking the sensor to the npc
-			sensorN.gravityScale = 0
+			transition.to(sensorN, {time = 0, 
+				onComplete = function()
+					sensorN.gravityScale = 0
+				end
+			})
 
 			sensorN:addOnMap(currentMap)
 

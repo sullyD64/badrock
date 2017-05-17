@@ -8,25 +8,18 @@
 -- 2) A Sprite sequence (for the visual animations),
 -- 3) A Sensor (to be used with the npcs' sensors and other entities).
 -----------------------------------------------------------------------------------------
-local entity     = require ( "lib.entity"      )
-local collisions = require ( "core.collisions" )
+local entity = require ( "lib.entity" )
 
 local player = {}
 local settings = {
 
-	attackOpts = {
-		radius = 40,
-		alpha = 0.6,
-		color = {0, 0, 255},
-	},
-
-	sensorOpts = {
+	mainSensorOpts = {
 		radius = 50,
 		alpha = 0, --0.5
 		color = {20, 50, 200},
 	},
 
-	sheetData = {
+	mainSheetData = {
 		height = 50,
 		width = 30,
 		numFrames = 4,
@@ -34,11 +27,31 @@ local settings = {
 		sheetContentHeight = 50 --40
 	},
 
-	sequenceData = {
-		{name = "walking", start= 1, count =4, time = 300, loopCount=0},
-		{name = "idle", start= 1, count =1, time = 300, loopCount=0},
-		{name = "falling", start= 1, count =1, time = 300, loopCount=0},
-		{name = "jumping", start= 1, count =1, time = 300, loopCount=0 }
+	mainSequenceData = {
+		{name = "walking", start=1, count=4, time=300, loopCount=0},
+		{name = "idle",    start=1, count=1, time=300, loopCount=0},
+		{name = "falling", frames = {4}, time=300, loopCount=0},
+		{name = "jumping", frames = {2}, time=300, loopCount=0}
+	},
+
+	attackSensorOpts = {
+		radius = 40,
+		alpha = 0, --0.6
+		color = {0, 0, 255},
+	},
+
+	attackSheetData = {
+		height = 80,
+		width = 80,
+		numFrames = 13,
+		sheetContentWidth = 240,
+		sheetContentHeight = 400 
+	},
+	
+	attackSequenceData = {
+		{name = "beginning", start=1, count=7, time=300, loopCount=1},
+		{name = "spinning",  start=8, count=3, time=300, loopCount=0},
+		{name = "ending",    frames = {11, 12, 13, 1}, time=300, loopCount=1}
 	},
 }
 
@@ -61,13 +74,19 @@ local settings = {
 				width = dim,
 				height = dim,
 				physicsParams = {density = 1, friction = 1, bounce = 0.5},
-				eName = "parcticle"
+				eName = "particle"
 			}	
 			frag.x , frag.y = playerX, playerY
 			frag:addOnMap(currentGame.map)
-			frag:applyLinearImpulse(directionX, directionY, frag.x , frag.y)
+			-- transition.to aggiunto per dare modo a entity di finire 
+			-- il suo transition.to per creare le roccette (Senza da errore)
+			transition.to(frag, {time = 0,
+				onComplete = function()
+					frag:applyLinearImpulse(directionX, directionY, frag.x , frag.y)
+					end
+				})
 
-			table.insert(fragments , frag)
+			table.insert(fragments, frag)
 		end
 
 		-- Removes physics to the rock fragments after a brief delay.
@@ -102,10 +121,9 @@ function player.loadPlayer( currentGame )
 		local sprite = entity.newEntity{
 			graphicType = "animated",
 			filePath = visual.steveSheetWalking,
-			spriteOptions = settings.sheetData,
-			spriteSequence = settings.sequenceData,
-			bodyType = "static",
-			physicsParams = { isSensor = true },
+			spriteOptions = settings.mainSheetData,
+			spriteSequence = settings.mainSequenceData,
+			notPhysical = true,
 			eName = "steveSprite"
 		}
 
@@ -114,9 +132,9 @@ function player.loadPlayer( currentGame )
 			graphicType = "sensor",
 			parentX = player.x,
 			parentY = player.y,
-			radius = settings.sensorOpts.radius,
-			color = settings.sensorOpts.color,
-			alpha = settings.sensorOpts.alpha,
+			radius = settings.mainSensorOpts.radius,
+			color = settings.mainSensorOpts.color,
+			alpha = settings.mainSensorOpts.alpha,
 			sensorName = "D"
 		}
 
@@ -147,32 +165,42 @@ function player.loadAttack( currentGame )
 	local player = currentGame.steve
 	local currentMap = currentGame.map
 
-	local defaultAttack = entity.newEntity{
-		graphicType = "sensor",
-		parentX = player.x,
-		parentY = player.y,
-		radius = settings.attackOpts.radius,
-		color = settings.attackOpts.color,
-		alpha = settings.attackOpts.alpha,
-		sensorName = "A"
-	}
+	-- Loads the Main sensor Entity ("hitbox")
+		local defaultAttack = entity.newEntity{
+			graphicType = "sensor",
+			parentX = player.x,
+			parentY = player.y,
+			radius = settings.attackSensorOpts.radius,
+			color = settings.attackSensorOpts.color,
+			alpha = settings.attackSensorOpts.alpha,
+			sensorName = "A"
+		}
+
+	--Loads the sprite and animation sequences
+		local sprite = entity.newEntity{
+			graphicType = "animated",
+			parentX = player.x,
+			parentY = player.y,
+			filePath = visual.steveAttack,
+			spriteOptions = settings.attackSheetData,
+			spriteSequence = settings.attackSequenceData,
+			notPhysical = true,
+			eName = "steveAttack"
+		}
 
 	defaultAttack.gravityScale = 0
-
-	-- Inserts the attack on the map
-	defaultAttack:addOnMap( currentMap )
 
 	-- The attack is initially inactive
 	defaultAttack.isVisible = false
 	defaultAttack.isBodyActive = false
 
-	-- [da implementare] -------------------------
-	-- defaultAttack.sprite = entity.newEntity{
+	defaultAttack.sprite = sprite
+	defaultAttack.sprite.isVisible = false
+	defaultAttack.sprite.isBodyActive = false
 
-	-- }
-	--defaultAttack.sprite:addOnMap ( currentMap )
-	--...
-	----------------------------------------------
+	-- Inserts the attack hitbox and sprite on the game's current map
+	defaultAttack:addOnMap( currentMap )
+	defaultAttack.sprite:addOnMap( currentMap )
 
 	return defaultAttack
 end

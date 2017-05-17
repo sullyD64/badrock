@@ -14,7 +14,7 @@ local physics    = require ( "physics"          )
 local player     = require ( "core.player"      )
 local enemies    = require ( "core.enemies"     )
 local npcs       = require ( "core.npcs"        )
-local items      = require ( "core.items"       )		-- only used in addDrop [fabio]
+local items      = require ( "core.items"       )
 local controller = require ( "core.controller"  )
 local collisions = require ( "core.collisions"  )
 
@@ -39,8 +39,9 @@ physics.setGravity( 0, 50 )
 
 	local playerStateList = {
 		IDLE       = "Idle",
-		WALKING    = "Walking",
-		JUMPING    = "Jumping",
+		-- WALKING    = "Walking",
+		-- JUMPING    = "Jumping",
+		MOVING     = "Moving",
 		ATTACKING  = "Attacking",
 		DEAD       = "Dead",
 	}
@@ -48,21 +49,28 @@ physics.setGravity( 0, 50 )
 --===========================================-- 
 
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
-	-- The only purpose of this is for text debugging on the console, do not add anything else.
+	-- The only purpose of this is for text debugging on the console.
 	local function debug(event)
 		print("Game is " .. game.state)
 		print("Steve is " .. game.steve.state)
-		-- -- if (game.steve.canJump == true) then print ("Steve can jump")
-		-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
+		print("Steve's sprite is " .. game.steve.sprite.sequence)
 		-- print("Lives: " .. game.lives)
 		-- print("Score: " .. game.score)
 
+		-- if (game.steve.airState) then print("AirState: " .. game.steve.airState) end
+		-- if (game.steve.canJump == true) then print ("Steve can jump")
+		-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
+		-- if (game.steve.isAirborne == true) then print ("Steve is airborne")
+		-- elseif (game.steve.isAirborne == false) then print ("Steve is on the ground") end
+
+		-- if (game.steve.attack and game.steve.attack.sprite) then
+		-- 	print(game.steve.attack.sprite.isBodyActive)
+		-- end
+
 		-- if (controller.controlsEnabled == true) then print("Controls: enabled") 
 		-- elseif (controller.controlsEnabled == false) then print ("Controls: disabled") end
-
 		-- if (controller.SSVLaunched == true) then print("SSV is: launched") 
 		-- elseif (controller.SSVLaunched == false) then print ("SSV is: stopped") end
-
 		-- print("Death being handled in controller.onDeath:")
 		-- print(controller.deathBeingHandled)
 		-- print("Endgame being handled in controller.onGameOver:")
@@ -73,43 +81,101 @@ physics.setGravity( 0, 50 )
 		-- 		print (game.chaserList[i].species .. " " .. i ..  " is following steve")
 		-- 	end
 		-- end
-		-- print("")
+
+		-- print("-----------------------------") -- android debugging
+		print("") -- normal debugging
 	end
 
-	-- The main game loop, every function is described as follows.
-	local function onUpdate ()
-		-- Keeps the player's image, sprite and sensor all joined.
-		-- (remember that ONLY the image "steve" acts as the hitbox)
-		if(game.steve.x and game.steve.y) then
-			game.steve.sprite.x = game.steve.x
-			game.steve.sprite.y = game.steve.y -10
-			 	--(offset della sprite rispetto a game.steve)
-			game.steve.sprite.xScale = game.steve.direction
-			game.steve.sensorD.x, game.steve.sensorD.y = game.steve.x, game.steve.y
-			if (game.steve.attack) then
-				game.steve.attack.x, game.steve.attack.y = game.steve.x, game.steve.y
-			end
-		end
+	-- This loop is executed only if the game's state is RUNNING
+	local function gameRunningLoop()
 
-		-- Jumping is allowed only in two circumstances:
-		-- 1) The player is touching the ground (see collisions)
-		-- 2) The player isn't falling (his vertical speed is >= 0)
-		-- This block checks the second condition.
+		-- The following block is related to jump activation and animation switching.
+			-- Jump controls:
+				-- Jumping is allowed only in two circumstances:
+				-- 1) The player is touching the ground (see collisions)
+				-- 2) The player isn't falling (his vertical speed is >= 0)
+			-- Animation controls:
+				-- The two following conditional blocks allow for some cool animation changes.
+				-- First it's determined the player's "airState" depending on its vertical speed;
+				-- Second, depending on this property, the sprite walking animation sequence is 
+				-- switched depending on the airState.
 		if (controller.SSVEnabled) then
-			local xv, yv = game.steve:getLinearVelocity()
-			if (yv > 0 and game.steve.firstJumpReady == false) then 
-				game.steve.canJump = false
-			elseif (yv == 0 and game.steve.firstJumpReady == true) then
-				game.steve.canJump = true
-			end
+			-- Context: a movement is being input (see controller -> onJumpEvent/onDpadEvent)
+			if (game.steve.state == playerStateList.MOVING) then
+				-- Calculates the hitbox's linear velocity.
+				local xv, yv = game.steve:getLinearVelocity()
 
-			-- Setting the AirState, needed for the Animation controls.
-			if(yv > 0) then
-				game.steve.airState= "Falling"
-			elseif(yv < 0) then
-				game.steve.airState= "Jumping"
-			elseif(yv == 0) then
-				game.steve.airState= "Idle"
+				-- Notes:
+					-- [every variable change follows the rule "IF ~A, then A", this to avoid 
+					-- continuous resetting of a variable to the same value which may waste
+					-- cpu time.]
+					-- [the value 10 is needed to soften the power of this control, to avoid accidental
+					-- invalidation of a legal jump (vertical speed may differ from 0 when colliding 
+					-- with dynamic crates or even tiles)].
+
+				-- Guesses the airState and the isAirborne flags depending on the vertical speed,
+					-- and modifies the sprite sequence.
+					-- Vertical speed is <almost> 0, the player is moving on the ground.
+					if(math.abs(yv) <= 10) then
+						if (game.steve.airState ~= "Idle") then 
+							game.steve.airState = "Idle"
+						end
+						if (game.steve.isAirborne == true) then
+							game.steve.isAirborne = false
+						end
+						-- Horizontal speed is <almost> 0, the player is idle.
+						if (math.abs(xv) <= 10) then
+							if (game.steve.sprite.sequence ~= "idle") then
+								game.steve.sprite:setSequence("idle")
+								game.steve.sprite:play()
+							end
+							
+							if(controller.noMovementDetected ~= true) then
+								controller.noMovementDetected = true
+								controller.toIdle()
+							end
+						
+						-- Horizontal speed's absolute value is significantly high, the player is walking.
+						elseif (math.abs(xv) > 10) then
+							if (game.steve.sprite.sequence ~= "walking") then
+								game.steve.sprite:setSequence("walking")
+								game.steve.sprite:play()
+							end
+						end
+					-- Vertical speed's absolute value is significantly high, the player is airborne.
+					else
+						if(yv < -10) then
+							if (game.steve.airState ~= "ascending") then 
+								game.steve.airState = "ascending"
+								if (game.steve.sprite.sequence ~= "jumping") then
+									game.steve.sprite:setSequence("jumping")
+									game.steve.sprite:play();
+								end
+							end
+						elseif(yv > 10) then
+							if (game.steve.airState ~= "falling") then 
+								game.steve.airState = "falling"
+								if (game.steve.sprite.sequence ~= "falling") then
+									game.steve.sprite:setSequence("falling")
+									game.steve.sprite:play();
+								end
+							end
+						end
+						-- In both cases (ascending or falling) player is airborne.
+						if (game.steve.isAirborne == false) then
+							game.steve.isAirborne = true
+						end
+					end
+
+				-- Jump activation is modified depending on the "isAirborne" flag.
+					-- Thus, if the player can jump, but starts falling (although he hasn't jumped),
+					-- a jump cannot occur ("jumping in mid air").
+					if (game.steve.isAirborne == true) then 
+						game.steve.canJump = false
+					elseif (game.steve.isAirborne == false and 
+						game.steve.hasTouchedGround == true) then
+						game.steve.canJump = true 
+					end
 			end
 		end
 
@@ -125,7 +191,6 @@ physics.setGravity( 0, 50 )
 				
 				elseif( game.steve.state == playerStateList.DEAD 
 					and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
-					--print("Lo spawn è zona franca")
 					game.chaserList[i].xScale=-1
 					game.chaserList[i].x =	game.chaserList[i].x+2	
 					transition.to(game.chaserList[i], {
@@ -137,18 +202,36 @@ physics.setGravity( 0, 50 )
 			end
 		end
 
+		-- Listener for the "player has died" event.
 		if ((game.steve.state == playerStateList.DEAD) and 
 			(controller.deathBeingHandled ~= true) and
 			(controller.endGameOccurring ~= true)) then
 			controller.deathBeingHandled = true
 			controller.onDeath()
 		end
+	end
+
+	-- The main game loop, every function is described as follows.
+	local function onUpdate()
+		-- Keeps the player's image, sprite and sensor all joined.
+		-- (remember that ONLY the image "steve" acts as the hitbox)
+		if(game.steve.x and game.steve.y) then
+			game.steve.sprite.x = game.steve.x
+			game.steve.sprite.y = game.steve.y -10
+			game.steve.sprite.xScale = game.steve.direction
+			game.steve.sensorD.x, game.steve.sensorD.y = game.steve.x, game.steve.y
+			if (game.steve.attack) then
+				game.steve.attack.x, game.steve.attack.y = game.steve.x, game.steve.y
+				game.steve.attack.sprite.x, game.steve.attack.sprite.y = game.steve.x, game.steve.y
+				game.steve.attack.sprite.xScale = game.steve.direction
+			end
+		end
 
 		-- If the game's state is changed by any event or trigger, 
 		-- this invokes the corresponding method (for unification purposes).
 		local state = game.state
 		if (state == gameStateList.RUNNING) then
-			
+			gameRunningLoop()
 		elseif (state == gameStateList.RESUMED) then
 			game.resume()
 		elseif (state == gameStateList.PAUSED) then
@@ -192,30 +275,24 @@ physics.setGravity( 0, 50 )
 		controller.addOneLife()
 	end
 
-	-------------------------------------------------------------------
-	-- [ fabio's refactor to-do ]
+	-- Displays the item contained in the attribute -drop- of an enemy.
+	function game.dropItemFrom( enemy )
+		local item = items.createItem(enemy.drop)
+		item:addOnMap(game.map)
+		item.x = enemy.x
+		item.y = enemy.y
+		item.alpha = 0.5
 
-		-- Displays the item contained in the attribute -drop- of an enemy.
-		function game.dropItemFrom( enemy )
-			local item = items.createItem(enemy.drop)
-			game.map:getTileLayer("items"):addObject(item)
-			item.x = enemy.x
-			item.y = enemy.y
-		end
+		item.preCollision = collisions.itemPreCollision
+		item:addEventListener( "preCollision", item )
 
-		-- Returns True if an object has an attribute specified by its name 
-		-- (attributeName must be a string).
-		function game.hasAttribute( obj , attributeName )
-			local ris = false
-			for k, v in pairs(obj) do
-				if k == attributeName then
-					ris =true
-					break
-				end
+		transition.to(item, { time = 1000, alpha = 1,
+			onComplete = function()
+				item.collision = collisions.itemCollision
+				item:addEventListener("collision")
 			end
-			return ris
-		end
-	-------------------------------------------------------------------	
+		})
+	end
 ------------------------------------------------------------------------------------
 
 -- GAME INITIALIZATION -------------------------------------------------------------
@@ -223,8 +300,9 @@ physics.setGravity( 0, 50 )
 	function game:loadPlayer()
 		self.steve = player.loadPlayer( self )
 		-- From now on, game.steve.sprite and game.steve.sensorD are accessible
-
 		self.steve.defaultAttack = player.loadAttack( self )
+		self.steve.defaultAttack.collision = collisions.attackCollision
+		-- Collision handling is activated in controller
 
 		self.steve.sprite:setSequence("idle")
 		--self.steve.sprite:setFrame(1)
@@ -232,6 +310,9 @@ physics.setGravity( 0, 50 )
 		--self.steve.sprite:pause()
 
 		self.steve.direction = 1
+
+		self.steve.collision = collisions.playerCollision
+		self.steve:addEventListener( "collision", self.steve )
 
 		self.steve.preCollision = collisions.playerPreCollision
 		self.steve:addEventListener( "preCollision", self.steve )
@@ -242,6 +323,11 @@ physics.setGravity( 0, 50 )
 	-- See npcs.lua
 	function game:loadNPCS() 
 		self.npcs = npcs.loadNPCs( self )
+
+		for i in pairs(self.npcs) do
+			self.npcs[i].sensorN.collision = collisions.npcDetectByCollision
+			self.npcs[i].sensorN:addEventListener( "collision", self.npcs[i].sensorN )
+		end
 	end
 
 	-- See enemies.lua

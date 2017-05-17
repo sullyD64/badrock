@@ -3,115 +3,98 @@
 -- items.lua
 --
 -----------------------------------------------------------------------------------------
-local physics  = require ( "physics"      )
-local sfx      = require ( "audio.sfx"    )
+local entity = require ( "lib.entity" )
 
-local items = {}
-
-items.list = {
-	{
-		name = "coin",
-		type = "bonus",
-		image = visual.itemCoin,
-		width = 25,
-		heigth = 25
-
-
-	},
-	-- 1 LIFE
-	{
-		name = "life",
-		type = "bonus",
-		image = visual.itemLife,
-		width = 25,
-		heigth = 25
-		--effect = items.lifeEffect()
-	},
-	-- 2 STAR
-	{
-		name = "gun",
-		type = "bonus",
-		image = visual.itemGun,
-		width = 25,
-		heigth = 25
-		--effect = items.lifeEffect()
+local items = {
+	descriptions = {
+		-- {	
+		-- 	type = "bonus",
+		-- 	itemName = "coin",
+		-- 	filePath = visual.itemCoin,
+		-- 	width = 25,
+		-- 	height = 25
+		-- },
+		-- 1 LIFE
+		{
+			type = "bonus",
+			itemName = "life",
+			filePath = visual.itemLife,
+			width = 25,
+			height = 25
+		},
+		-- 2 GUN
+		{
+			type = "powerup",
+			itemName = "gun",
+			filePath = visual.itemGun,
+			width = 25,
+			height = 25
+		},
+		-- -- 3 IMMUNITY
+		-- {
+		-- 	type = "powerup",
+		-- 	itemName = "immunity",
+		-- 	filePath = visual.itemImmunity,
+		-- 	width = 25,
+		-- 	height = 25
+		-- },
+		-- -- 4 METHEORS RAIN
+		-- {
+		-- 	type = "powerup",
+		-- 	itemName = "metheors",
+		-- 	filePath = visual.itemMetheor,
+		-- 	width = 25,
+		-- 	height = 25
+		-- },
+		-- -- 5 SUMMON GUARDIAN
+		-- {
+		-- 	type = "powerup",
+		-- 	itemName = "summon",
+		-- 	filePath = visual.itemGun,
+		-- 	width = 25,
+		-- 	height = 25
+		-- }
 	}
 }
 
-function items.findItemByName( name )
-	local item = nil
-	for k, v in pairs(items.list) do
-		if (v.name == name) then
-			item = v
+function items.createItem( name )
+	--Create a new Item that is returned when this function is called
+	local desc
+	for i, v in pairs(items.descriptions) do
+		if (v.itemName == name) then
+			desc = v
 			break
 		end
 	end
+
+	if (desc == nil ) then
+		error(name .. ": Item not found in the ItemDescriptions")
+	end
+
+	desc.eName = "item"
+	local item = entity.newEntity( desc )
+	item.type = desc.type
+	item.itemName = desc.itemName
 	return item
 end
 
---local function items.lifeEffect()
-	--entity.speed = value
---end
+--------------------------------------------------------------------------------------
 
-function items.createItem( name )
-	--Create a new Life Item that is returned when this function is called
-	local i = items.findItemByName(name)
-	local item = display.newImageRect(i.image , i.width, i.heigth)
-	item.name = i.name
-	item.type = i.type
-	item.myName = "item"
-	transition.to(item, {time = 0, onComplete= function()
-	physics.addBody(item )
-	
-	end})
-	item.isSensor = true
+-- local function findItemByName( name )
+-- 	local item = nil
+-- 	for k, v in pairs(items.list) do
+-- 		if (v.name == name) then
+-- 			item = v
+-- 			break
+-- 		end
+-- 	end
+-- 	return item
+-- end
 
-	return item
-end
-
--- ITEMS COLLISION HANDLERS ------------------------------------------------------------
-
-	function items.itemCollision( game , event, item )
-		--item.alpha = 0
-		-- inserire qui eventuali suoni di collisione con gli item
-		--display.remove( item )
-		--game.map:getTileLayer("items"):removeObject( item )
-		
-		--List of all items with relative collision handler
-		if (item.name == "coin") then
-			coinCollision(game, event, item)
-		elseif (item.name == "life") then
-			lifeCollision(game, event, item)
-		end
-		item = nil -- Distruzione dell'item
-	end
-
-	function coinCollision( game , event, coin )
-		if ( event.phase == "began" ) then
-			sfx.playSound( sfx.coinSound, { channel = 3 } )
-			coin.BodyType = "dynamic"
-			display.remove( coin )
-			game.addScore(100)
-
-		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-		end
-	end
-
-	function lifeCollision( game, event, life )
-		if ( event.phase == "began" ) then
-			display.remove(life)
-			--life.BodyType = "dynamic"
-			game.addOneLife()
-			
-		elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-		end
-	end
-----------------------------------------------------------------------------------------
-
-function addDropTo( enemy, itemName )
-	--Add an item drop to an enemy (MAX 1 Drop per Enemy, for now )
-	local item = items.findItemByName (itemName)
-	enemy.drop = item
-end
+-- function addDropTo( enemy, itemName )
+-- 	--Add an item drop to an enemy (MAX 1 Drop per Enemy, for now )
+-- 	local item = items.findItemByName (itemName)
+-- 	enemy.drop = item
+-- end
 
 return items

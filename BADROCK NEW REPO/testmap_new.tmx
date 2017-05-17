@@ -10,7 +10,7 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="0"/>
-    <property name="myName" value="env"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="2">
@@ -18,7 +18,7 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="0"/>
-    <property name="myName" value="env"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="8">
@@ -27,7 +27,8 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="platform"/>
+    <property name="isPlatform" value=""/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="24">
@@ -36,7 +37,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="platform"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="32">
@@ -45,7 +46,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="0"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="33">
@@ -54,7 +55,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="0"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="34">
@@ -63,7 +64,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="0"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="35">
@@ -71,6 +72,7 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="dynamic"/>
     <property name="isBreakable" value="true"/>
+    <property name="tName" value="dynamicEnv"/>
    </properties>
   </tile>
   <tile id="36">
@@ -78,6 +80,7 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="dynamic"/>
     <property name="isBreakable" value="true"/>
+    <property name="tName" value="dynamicEnv"/>
    </properties>
   </tile>
   <tile id="37">
@@ -85,7 +88,7 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
     <property name="isSensor" value=""/>
-    <property name="myName" value="end_level"/>
+    <property name="tName" value="endLevel"/>
    </properties>
   </tile>
   <tile id="38">
@@ -93,36 +96,31 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
     <property name="isSensor" value=""/>
-    <property name="myName" value="end_level"/>
+    <property name="tName" value="endLevel"/>
    </properties>
   </tile>
   <tile id="40">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="myName" value="env"/>
+    <property name="friction" type="float" value="1"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="41">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="myName" value="env"/>
+    <property name="friction" type="float" value="1"/>
+    <property name="tName" value="danger"/>
    </properties>
   </tile>
   <tile id="42">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="myName" value="env"/>
-   </properties>
-  </tile>
-  <tile id="43">
-   <properties>
-    <property name="HasBody" value=""/>
-    <property name="bodyType" value="static"/>
-    <property name="isSensor" value="true"/>
-    <property name="myName" value="coin"/>
+    <property name="friction" type="float" value="1"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="45">
@@ -130,7 +128,7 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
     <property name="isSensor" value=""/>
-    <property name="myName" value="end_level"/>
+    <property name="tName" value="endLevel"/>
    </properties>
   </tile>
   <tile id="46">
@@ -138,28 +136,34 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
     <property name="isSensor" value=""/>
-    <property name="myName" value="end_level"/>
+    <property name="tName" value="endLevel"/>
    </properties>
   </tile>
   <tile id="48">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="myName" value="env"/>
+    <property name="friction" type="float" value="1"/>
+    <property name="isSensor" value="true"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="49">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="myName" value="env"/>
+    <property name="friction" type="float" value="1"/>
+    <property name="isSensor" value="true"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="50">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="myName" value="env"/>
+    <property name="friction" type="float" value="1"/>
+    <property name="isSensor" value="true"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="53">
@@ -167,7 +171,7 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
     <property name="isSensor" value=""/>
-    <property name="myName" value="end_level"/>
+    <property name="tName" value="endLevel"/>
    </properties>
   </tile>
   <tile id="54">
@@ -175,14 +179,14 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
     <property name="isSensor" value=""/>
-    <property name="myName" value="end_level"/>
+    <property name="tName" value="endLevel"/>
    </properties>
   </tile>
   <tile id="56">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isDanger" value="true"/>
+    <property name="tName" value="danger"/>
    </properties>
   </tile>
   <tile id="61">
@@ -190,7 +194,7 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
     <property name="isSensor" value=""/>
-    <property name="myName" value="end_level"/>
+    <property name="tName" value="endLevel"/>
    </properties>
   </tile>
   <tile id="62">
@@ -198,14 +202,14 @@
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
     <property name="isSensor" value=""/>
-    <property name="myName" value="end_level"/>
+    <property name="tName" value="endLevel"/>
    </properties>
   </tile>
   <tile id="64">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isDanger" value="true"/>
+    <property name="tName" value="danger"/>
    </properties>
   </tile>
   <tile id="77">
@@ -214,7 +218,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="78">
@@ -223,7 +227,7 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="env"/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="82">
@@ -232,7 +236,8 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="platform"/>
+    <property name="isPlatform" value=""/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="83">
@@ -241,7 +246,8 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="platform"/>
+    <property name="isPlatform" value=""/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="85">
@@ -250,7 +256,8 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="platform"/>
+    <property name="isPlatform" value=""/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
   <tile id="86">
@@ -259,7 +266,8 @@
     <property name="bodyType" value="static"/>
     <property name="friction" type="float" value="1"/>
     <property name="isGround" value=""/>
-    <property name="myName" value="platform"/>
+    <property name="isPlatform" value=""/>
+    <property name="tName" value="env"/>
    </properties>
   </tile>
  </tileset>
@@ -291,28 +299,28 @@
  </tileset>
  <layer name="background" width="37" height="22" opacity="0.97">
   <data encoding="csv">
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,26,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,26,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,26,1,1,1,1,1,1,1,1,1,26,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,26,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,26,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,26,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,26,1,1,1,1,26,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,
-0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,26,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,26,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,26,1,1,1,1,1,1,1,1,1,26,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,26,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,26,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,26,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,26,1,1,1,1,26,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 </data>
  </layer>
  <layer name="colonne" width="37" height="22">
@@ -375,22 +383,22 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,86,9,9,9,9,87,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,9,9,9,9,9,9,0,0,0,0,0,0,0,83,9,9,9,9,9,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,86,9,9,9,9,87,0,0,0,0,0,0,0,83,9,9,9,9,9,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,86,25,9,9,25,9,87,0,0,0,0,0,0,0,0,0,33,34,34,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,86,9,9,9,9,9,87,0,0,0,0,0,0,0,0,0,33,34,34,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,42,42,43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,83,9,9,25,9,9,84,49,50,51,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,83,9,9,9,9,9,84,49,50,51,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,86,9,9,9,9,87,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,86,9,9,9,9,87,0,0,0,0,0,0,0,0,83,84,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-9,9,9,9,0,0,9,9,9,9,9,9,25,9,9,9,9,9,9,9,9,25,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,
-9,25,9,9,0,0,9,9,25,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,25,9,9,0,0,0,0,0,0,0,
-9,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0,
-9,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,0,0,0,0,0
+25,25,25,25,0,0,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
  <layer name="muri" width="37" height="22">
@@ -414,9 +422,9 @@
 3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,
+2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,
+2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0
 </data>
  </layer>
  <layer name="rocce" width="37" height="22">
@@ -428,7 +436,6 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,167,0,167,0,167,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -436,7 +443,8 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,167,0,0,0,0,0,0,0,0,0,0,0,0,0,167,0,0,167,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,36,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,36,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -490,8 +498,8 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,38,39,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,46,47,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,54,55,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,62,63,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,57,0,0,0,0,62,63,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,65,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -700,12 +708,12 @@
   </object>
  </objectgroup>
  <objectgroup name="cadutaVuoto">
-  <object id="13" name="vuoto" x="113" y="634" width="75" height="31">
+  <object id="13" name="vuoto" x="122" y="655" width="75" height="31">
    <properties>
     <property name="HasBody" value=""/>
     <property name="bodyType" value="static"/>
-    <property name="isDanger" value="true"/>
     <property name="isSensor" value="true"/>
+    <property name="tName" value="danger"/>
    </properties>
   </object>
  </objectgroup>
@@ -759,9 +767,9 @@
 0,0,0,0,0,0,0,0,21,22,0,0,0,0,0,0,0,0,0,29,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,29,30,0,0,0,0,0,0,0,0,0,13,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,29,30,0,0,0,0,0,0,0,0,0,21,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,29,30,0,0,0,0,0,0,0,0,0,29,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,13,14,0,0,0,0,0,0,0,0,0,13,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,21,22,0,0,0,0,0,0,0,0,0,21,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,29,30,0,0,0,0,0,0,0,0,0,29,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
 </map>

@@ -248,13 +248,12 @@ function enemies.loadEnemies( currentGame )
 		local staticImage = entity.newEntity(desc.options)
 		staticImage.species = desc.species
 		staticImage.lives = desc.lives or 1
-		
+
 		if( enemy.drop ) then
 			staticImage.drop = enemy.drop
 		end
 
 		staticImage.isTargettable = true
-		staticImage.isEnemy = true
 
 		staticImage.x, staticImage.y =  enemy.x, enemy.y
 		staticImage:addOnMap( currentMap )

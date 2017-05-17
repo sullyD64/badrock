@@ -20,9 +20,10 @@ local controller = {
 	controlsEnabled,
 	SSVEnabled,					-- SSV: "Set Steve Velocity"
 	SSVLaunched,
-	i, j, 						-- these two are needed for the variable jump height
+	i, j, 						-- both are needed for the variable jump height
 	endGameOccurring,	
 	deathBeingHandled,
+	noMovementDetected,		-- needed for resetting the player's state to IDLE
 }
 
 local game = {}
@@ -32,16 +33,16 @@ local sState = {}
 
 -- PLAYER MOVEMENT -----------------------------------------------------------------
 	-- Code in this whole block cooperates strictly with the two movement handlers. 
-	-- Names are self-explanatory, while all that it's done is applying forces and 
-	-- modifying the linear velocity of the Player's "hitbox" entity.
-	-- Those two functions are runtime functions, which are toggled depending on the
-	-- movement handlers' event phases; there can be cases in which those functions
-	-- are launched, but never stop executing (i.e. when endGame is triggered):
-	-- this is known to cause multiple errors.
-	-- For this reason, controller needs to store a local variable which indicates if
-	-- those methods are launched and are calculating stuff.
-	-- [Remember that before changing scene, those two methods MUST be stopped! Else
-	--  they will keep running even in other scenes].
+		-- Names are self-explanatory, while all that it's done is applying forces and 
+		-- modifying the linear velocity of the Player's "hitbox" entity.
+		-- Those two functions are runtime functions, which are toggled depending on the
+		-- movement handlers' event phases; there can be cases in which those functions
+		-- are launched, but never stop executing (i.e. when endGame is triggered):
+		-- this is known to cause multiple errors.
+		-- For this reason, controller needs to store a local variable which indicates if
+		-- those methods are launched and are calculating stuff.
+		-- [Remember that before changing scene, those two methods MUST be stopped! Else
+		--  they will keep running even in other scenes].
 
 	local function makeSteveJump()
 		-----------------------------
@@ -50,8 +51,8 @@ local sState = {}
 		local steveXV, steveYV = steve:getLinearVelocity()
 			
 		if (steve.jumpForce > -400 and controller.j ~= 0) then
-			-- In both cases (x-movement or y-movement), we set the character's linear velocity at each
-			-- frame, overriding one of the two linear velocities when a movement is input.
+			-- In both cases (x-movement or y-movement), we set the character's linear velocity 
+			-- at each frame, overriding one of the two linear velocities when a movement is input.
 			if (steve.actualspeedX ~= 0) then
 				steve:setLinearVelocity(steve.actualSpeedX, steve.jumpForce )
 			else
@@ -99,7 +100,14 @@ local sState = {}
 				-- audio --------------------------------------
 				sfx.playSound( sfx.jumpSound, { channel = 2 } )
 				-----------------------------------------------
-				steve.state = sState.JUMPING
+				steve.state = sState.MOVING
+
+				-- animation ------------------------------------------
+					if (steve.sprite.sequence == "idle") then
+						steve.sprite:setSequence("jumping")
+						steve.sprite:play()
+					end
+				--------------------------------------------------------
 
 				-- physics ---------------------------------------------
 					steve.jumpForce = - 200
@@ -107,13 +115,11 @@ local sState = {}
 					controller.i = 0
 					controller.j = 16
 					steve.canJump = false
-					steve.firstJumpReady = false
+					steve.isAirborne = true
+					steve.hasTouchedGround = false
 				--------------------------------------------------------		
 			
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
-				steve.state = sState.IDLE
-				steve.sprite:setSequence("idle")
-
 				-- physics ---------------------------------------------
 				steve.jumpForce = 0
 				Runtime:removeEventListener("enterFrame", makeSteveJump)
@@ -132,33 +138,32 @@ local sState = {}
 		if (controller.controlsEnabled) then
 			if (event.phase == "began") then
 				display.currentStage:setFocus( target, event.id )
-				steve.state = sState.WALKING
+				steve.state = sState.MOVING 
 
-				--Avoid walking animation in mid air
-				if(steve.airState == "Idle" or steve.airState == nil) then
-					steve.sprite:setSequence("walking")
-					steve.sprite:play()
-				end
+				-- animation ----------------------------------------------
+					if (steve.sprite.sequence == "idle") then
+						steve.sprite:setSequence("walking")
+						steve.sprite:play()
+					end
+				-----------------------------------------------------------
 
 				-- Visually simulate the button press
 				-- target.alpha = 0.8
-				-- physics -------------------------------------------
-				if (target.id == "dpadLeft") then
-					steve.direction = -1
-				elseif (target.id == "dpadRight") then
-					steve.direction = 1
-				end
-				--controller.SSVEnabled = true
-				steve.walkForce = 150
-				controller.SSVType = "walk"
-				Runtime:addEventListener("enterFrame", makeSteveMove)
-				steve.actualSpeedX = steve.direction * steve.walkForce
-				steve.xScale = steve.direction
-				------------------------------------------------------
+				-- physics ----------------------------------------------
+					if (target.id == "dpadLeft") then
+						steve.direction = -1
+					elseif (target.id == "dpadRight") then
+						steve.direction = 1
+					end
+					--controller.SSVEnabled = true
+					steve.walkForce = 150
+					controller.SSVType = "walk"
+					Runtime:addEventListener("enterFrame", makeSteveMove)
+					steve.actualSpeedX = steve.direction * steve.walkForce
+					steve.xScale = steve.direction
+				---------------------------------------------------------
 
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
-				steve.state = sState.IDLE
-				steve.sprite:setSequence("idle")
 				--target.alpha = 0.1
 				-- physics ---------------------------------------------
 				steve.actualspeedX = 0
@@ -187,45 +192,94 @@ local sState = {}
 				-- Button becomes temporairly inactive
 				target.active = false
 				target.alpha = 0.5
-				-- attack entity -------------------------------
-					if (steve.hasPowerUp) then
-						-- [implementazione futura]
-					else -- default attack
-						steve.attack = steve.defaultAttack
-						steve.attack.duration = 500
 
-						-- Position linking is handled in game -> onUpdate
-						steve.attack.isVisible = true
-						steve.attack.isBodyActive = true
+				if (steve.hasPowerUp) then
+					-- [implementazione futura]
+				else -- default attack
+					steve.attack = steve.defaultAttack
+					-- steve.attack.collision = steve.defaultAttack.collision
+					steve.attack.duration = 1000
 
-						-- Steve dashes forward
-						steve:applyLinearImpulse( steve.direction * 8, 0, steve.x, steve.y )
+					-- Position linking is handled in game -> onUpdate
+					steve.attack.isVisible = true
+					steve.attack.isBodyActive = true
+					steve.attack.sprite.isVisible = true
+
+					-- Collision Handler Activation -------------------------
+					steve.attack:addEventListener("collision", steve.attack)
+					---------------------------------------------------------
+
+					-- Steve dashes forward
+					steve:applyLinearImpulse( steve.direction * 8, 0, steve.x, steve.y )
+
+					-- Attack Sprite sequence -------------------------------
+						steve.attack.sprite:setSequence("beginning")
+						steve.attack.sprite:play()
+
+						local spinningPhase = function(event)
+							local sprite = event.target
+							if(event.phase == "ended") then
+								sprite:setSequence("spinning")
+								sprite:play()
+							end
+						end
+						steve.attack.sprite:addEventListener("sprite", spinningPhase)
+
+						timer.performWithDelay(steve.attack.duration - 300, 
+							function()
+								steve.attack.sprite:removeEventListener( "sprite", spinningPhase )
+								steve.attack.sprite:setSequence("ending")
+								steve.attack.sprite:play()
+							end
+						)
+					---------------------------------------------------------
+				end
+
+				-- If Steve has died during the attack, the sprite remains invisible
+				local newAlpha = 1 -- default
+				local didSteveDieWhileAttacking = function()
+					--print("sto controllando...")
+					if (steve.state == sState.DEAD) then
+						newAlpha = 0
+						-------------------------------
+						steve.attack.sprite.isVisible = false
+						steve.attack.sprite:pause()
+						-------------------------------
+						--print("steve è morto :(")
 					end
+				end
+				Runtime:addEventListener("enterFrame", didSteveDieWhileAttacking) 
 
-					-- If Steve has died during the attack, the sprite remains invisible
-					local newAlpha = 1 -- default
-					local didSteveDieWhileAttacking = function()
-						--print("sto controllando...")
-						if (steve.state == sState.DEAD) then
-							newAlpha = 0
-							--print("steve è morto :(")
+				-- Handles the end of the attack phase
+				timer.performWithDelay(steve.attack.duration, 
+					function()
+						-- Button becomes active again 
+						target.active = true
+						target.alpha = 1
+
+						if (steve.state ~= sState.DEAD) then
+							steve.state = sState.IDLE
+						end
+						
+						steve.attack.isVisible = false
+						steve.attack.isBodyActive = false
+						steve.attack.sprite:pause()
+						steve.attack.sprite.isVisible = false
+						steve.sprite.alpha = newAlpha
+						
+						Runtime:removeEventListener( "enterFrame", didSteveDieWhileAttacking)
+						-- Collision Handler Activation ---------------------------
+						steve.attack:removeEventListener("collision", steve.attack)
+						steve.attack = nil
+						-----------------------------------------------------------
+
+						if (steve.sprite.sequence ~= "idle") then
+							steve.sprite:setSequence("idle")
+							steve.sprite:play()
 						end
 					end
-					Runtime:addEventListener("enterFrame", didSteveDieWhileAttacking) 
-
-					-- Handles the end of the attack phase
-					timer.performWithDelay(steve.attack.duration, 
-						function()
-							-- Button becomes active again 
-							target.active = true
-							target.alpha = 1
-							steve.attack.isVisible = false
-							steve.attack.isBodyActive = false
-							steve.sprite.alpha = newAlpha
-							Runtime:removeEventListener( "enterFrame", didSteveDieWhileAttacking)
-						end
-					)
-				------------------------------------------------				
+				)
+								
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
 				display.currentStage:setFocus( target, nil )
 			end
@@ -277,7 +331,20 @@ local sState = {}
 	function controller.onGameOver(outcome)
 		controller.endGameOccurring = true
 		ui.showOutcome(outcome)
-	
+
+		-- Prevents pressing the action button in this phase: if not, any access 
+		-- to the player's state inside onAttack will throw a runtime error
+		ui.buttons.action.active = false
+
+		---------------------------------------
+		-- If GameOver was triggered by onDeath
+		if (steve.state == sState.DEAD) then
+			steve.isBodyActive = false
+			steve.sensorD.isBodyActive = false
+			steve.sensorD.isVisible = false
+			steve.sprite.alpha = 0
+		end
+		---------------------------------------
 		timer.performWithDelay( 1500,
 			function()
 				-- Removes the runtime event listeners if death was triggered
@@ -338,8 +405,8 @@ local sState = {}
 		steve.sensorD.isVisible = false
 		steve.sprite.alpha = 0
 		steve.sprite:setSequence("idle")
-		steve.sprite:pause()	
-		transition.to(steve.sprite, { time = 2000, 
+		steve.sprite:pause()
+		transition.to(steve, { time = 2000, 
 			onComplete = function()
 				respawnPlayer()
 			end
@@ -413,6 +480,34 @@ local sState = {}
 		timer.performWithDelay(textTimer, ui.textFade(lifeUp, 750))
 		end
 	end
+
+	-- Called from onUpdate in game. Waits for a brief time, after which
+	-- resets the player's state to Idle. If during this time any movement 
+	-- is input again, the check will prematurely exit.
+	function controller.toIdle()
+		if (steve.state == sState.MOVING) then
+			if (controller.noMovementDetected == true) then
+				timer.performWithDelay( 2000, 
+					function()
+						-- Inside onUpdate, the player's sprite sequence is set to 
+						-- idle when its xv and yv are 0. After 2 seconds, if the
+						-- current sequence is still idle, then the player's state
+						-- is set to IDLE and this loop is disabled.
+						if (steve.sprite.sequence == "idle") then
+							steve.sprite:setSequence("idle")
+							steve.sprite:play()
+							steve.state = sState.IDLE
+							controller.noMovementDetected = false
+							return
+						else 	-- player has moved again.
+							controller.noMovementDetected = false
+							return
+						end
+					end
+				)
+			end
+		end
+	end
 ------------------------------------------------------------------------------------
 
 -- Main entry point for Controller (accessed from -game.loadGame-).
@@ -449,7 +544,6 @@ function controller.prepareUI()
 	-------------------------------
 end
 
-
 function controller:start()
 	game.state = gState.RUNNING
 	steve.state = sState.IDLE
@@ -459,6 +553,7 @@ function controller:start()
 	controller.controlsEnabled = true
 	controller.SSVEnabled = true
 	controller.SSVLaunched = false
+	controller.noMovementDetected = false
 end
 
 function controller:pause()

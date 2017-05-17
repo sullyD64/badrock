@@ -6,13 +6,13 @@
 -- whether it is a static image or an animated sprite or a shape. 
 -- An Entity is first positioned on the map by a Tiled Object representing its "spawn point", and it
 -- is istantiated on a select Tile Layer depending by one of the entities attributes.
--- All Entities are Physical Objects (static or dynamic), can move on the map and
--- interact with each other.
+-- All Entities are Physical Objects (static or dynamic) [though some Entities can have their
+-- physic body disabled], can move on the map and interact with each other.
 --
 -- All Entities have an unique identifier called "eName":
 -- Use it for collision detection when needed
 --
--- Examples of Entity: Steve, an Enemy, an NPC, a Boss, an Item, a Parcticle (e.g. bolts, rocks, ..)
+-- Examples of Entity: Steve, an Enemy, an NPC, a Boss, an Item, a Particle (e.g. bolts, rocks, ..)
 -- Sensors are also entities
 -----------------------------------------------------------------------------------------
 
@@ -47,6 +47,7 @@ function entity.newEntity( options )
 	opt.radius = customOptions.radius
 	opt.color = customOptions.color or {200, 200, 200} 
 
+	opt.notPhysical = customOptions.notPhysical
 	opt.bodyType = customOptions.bodyType or "dynamic"
 	opt.physicsParams = customOptions.physicsParams
 
@@ -79,20 +80,28 @@ function entity.newEntity( options )
 				error ("no parent position or radius length specified for the new sensor")
 			end
 		end
-		physics.addBody(ent, opt.bodyType, opt.physicsParams)
+
+		-- Adds physical body to the new Entity
+		if (opt.notPhysical == nil) then
+			transition.to(ent, {time = 0, 
+				onComplete = function()
+					physics.addBody(ent, opt.bodyType, opt.physicsParams)
+					ent.rotation = customOptions.rotation or 0
+					ent.isFixedRotation = customOptions.isFixedRotation
+				end
+			})
+		end
 	else
 		error( "invalid source file specified for the new entity" )
 	end
 
 	ent.alpha = customOptions.alpha or 1
-	ent.rotation = customOptions.rotation or 0
-	ent.isFixedRotation = customOptions.isFixedRotation or false
-	ent.eName = customOptions.eName
 
+	-- Each Entity has an unique name specified by the attribute "eName": 
+	-- this is used to determine in which Tile Layer it will be added.
+	ent.eName = customOptions.eName
 	if (ent.sensorName) then ent.eName = "sensor" end
 
-	-- Each Entity has an unique name specified by the attribute "eName": this is used to determine
-	-- in which Tile Layer it will be added.
 	function ent:addOnMap( map )
 		local name = self.eName
 		if (map) then
