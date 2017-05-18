@@ -171,8 +171,8 @@ local i = 0
 	local function salta(object,player)
 		-- i = i + 1
 		-- print("Salta " .. i)
-		if (object.y ~= nil) then
-			if (object.y > player.y) then
+		if (object.y ~= nil and object.x ~= nil ) then
+			if (object.y > player.y and math.abs(object.x-player.x)<=150) then
 				local distanza = object.y - player.y
 				if (distanza <= 100) then
 					object:applyLinearImpulse( 0, -30, object.x, object.y )
