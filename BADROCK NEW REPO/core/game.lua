@@ -39,8 +39,6 @@ physics.setGravity( 0, 50 )
 
 	local playerStateList = {
 		IDLE       = "Idle",
-		-- WALKING    = "Walking",
-		-- JUMPING    = "Jumping",
 		MOVING     = "Moving",
 		ATTACKING  = "Attacking",
 		DEAD       = "Dead",
@@ -51,9 +49,9 @@ physics.setGravity( 0, 50 )
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- The only purpose of this is for text debugging on the console.
 	local function debug(event)
-		print("Game is " .. game.state)
-		print("Steve is " .. game.steve.state)
-		print("Steve's sprite is " .. game.steve.sprite.sequence)
+		-- print("Game is " .. game.state)
+		-- print("Steve is " .. game.steve.state)
+		-- print("Steve's sprite is " .. game.steve.sprite.sequence)
 		-- print("Lives: " .. game.lives)
 		-- print("Score: " .. game.score)
 
@@ -83,7 +81,7 @@ physics.setGravity( 0, 50 )
 		-- end
 
 		-- print("-----------------------------") -- android debugging
-		print("") -- normal debugging
+		-- print("") -- normal debugging
 	end
 
 	-- This loop is executed only if the game's state is RUNNING

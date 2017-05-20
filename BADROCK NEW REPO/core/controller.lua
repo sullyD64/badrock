@@ -18,6 +18,7 @@ local pauseMenu = require ( "menu.pauseMenu" )
 
 local controller = {
 	controlsEnabled,
+	pauseEnabled,
 	SSVEnabled,					-- SSV: "Set Steve Velocity"
 	SSVLaunched,
 	i, j, 						-- both are needed for the variable jump height
@@ -82,7 +83,7 @@ local sState = {}
 		local steveXV, steveYV = steve:getLinearVelocity()
 		-- In both cases (x-movement or y-movement), we set the character's linear velocity at each
 		-- frame, overriding one of the two linear velocities when a movement is input.
-		if (steve.jumpForce ~= 0) then
+		if (steve.jumpForce and steve.jumpForce ~= 0) then
 			steve:setLinearVelocity(steve.actualSpeedX, steve.jumpForce )
 		else
 			steve:setLinearVelocity(steve.actualSpeedX, steveYV )
@@ -98,6 +99,7 @@ local sState = {}
 			if (event.phase == "began" and steve.canJump == true) then
 				display.currentStage:setFocus( target, event.id )
 				-- audio --------------------------------------
+				audio.stop(2)
 				sfx.playSound( sfx.jumpSound, { channel = 2 } )
 				-----------------------------------------------
 				steve.state = sState.MOVING
@@ -258,7 +260,7 @@ local sState = {}
 						target.alpha = 1
 
 						if (steve.state ~= sState.DEAD) then
-							steve.state = sState.IDLE
+							steve.state = sState.MOVING
 						end
 						
 						steve.attack.isVisible = false
@@ -273,10 +275,10 @@ local sState = {}
 						steve.attack = nil
 						-----------------------------------------------------------
 
-						if (steve.sprite.sequence ~= "idle") then
-							steve.sprite:setSequence("idle")
-							steve.sprite:play()
-						end
+						-- if (steve.sprite.sequence ~= "idle") then
+						-- 	steve.sprite:setSequence("idle")
+						-- 	steve.sprite:play()
+						-- end
 					end
 				)
 								
@@ -291,32 +293,35 @@ local sState = {}
 	-- and resume if paused, switching visibility between the two buttons.
 	local function onPauseResumeEvent(event)
 		local target = event.target
-		if (event.phase == "began") then
-			display.currentStage:setFocus( target, event.id )
-			if (event.target.id == "pauseBtn") then
-				game.state = gState.PAUSED
-				ui.buttons.resume:setEnabled( true )
-				ui.buttons.pause.isVisible = false
-				ui.buttons.resume.isVisible = true
-				-----------------------------------------------------
-				pauseMenu.panel:show({y = display.screenOriginY+225})
-				-----------------------------------------------------
-			elseif (event.target.id == "resumeBtn") then
-				game.state = gState.RESUMED
-				ui.buttons.pause.isVisible = true
-				ui.buttons.resume.isVisible = false
-				ui.buttons.pause:setEnabled( true )
-				ui.buttons.resume:setEnabled( false )
-				-----------------------------------------------------
-				pauseMenu.panel:hide()
-				-----------------------------------------------------
+
+		if (controller.pauseEnabled) then
+			if (event.phase == "began") then
+				display.currentStage:setFocus( target, event.id )
+				if (event.target.id == "pauseBtn") then
+					game.state = gState.PAUSED
+					ui.buttons.resume.isEnabled = false
+					ui.buttons.pause.isVisible = false
+					ui.buttons.resume.isVisible = true
+					-----------------------------------------------------
+					pauseMenu.panel:show({y = display.screenOriginY+225})
+					-----------------------------------------------------
+				elseif (event.target.id == "resumeBtn") then
+					game.state = gState.RESUMED
+					ui.buttons.pause.isVisible = true
+					ui.buttons.resume.isVisible = false
+					ui.buttons.pause.isEnabled = true
+					ui.buttons.resume.isEnabled = false
+					-----------------------------------------------------
+					pauseMenu.panel:hide()
+					-----------------------------------------------------
+				end
+
+			elseif (event.phase == "ended" or "cancelled" == event.phase) then
+				display.currentStage:setFocus( target, nil )
 			end
 
-		elseif (event.phase == "ended" or "cancelled" == event.phase) then
-			display.currentStage:setFocus( target, nil )
+			return true
 		end
-		
-		return true
 	end
 ------------------------------------------------------------------------------------
 
@@ -331,14 +336,13 @@ local sState = {}
 	function controller.onGameOver(outcome)
 		controller.endGameOccurring = true
 		ui.showOutcome(outcome)
-
 		-- Prevents pressing the action button in this phase: if not, any access 
 		-- to the player's state inside onAttack will throw a runtime error
 		ui.buttons.action.active = false
-
+		controller.pauseEnabled = false
 		---------------------------------------
 		-- If GameOver was triggered by onDeath
-		if (steve.state == sState.DEAD) then
+		if (controller.deathBeingHandled == true) then
 			steve.isBodyActive = false
 			steve.sensorD.isBodyActive = false
 			steve.sensorD.isVisible = false
@@ -347,18 +351,11 @@ local sState = {}
 		---------------------------------------
 		timer.performWithDelay( 1500,
 			function()
-				-- Removes the runtime event listeners if death was triggered
-				-- while still inputing a movement.
+
 				controller:pause()
 				game.map:setFocus( nil )
 				game:removeAllEntities()
-				ui.buttons.scoreUp:setLabel("")
-				ui.buttons.lifeUp:setLabel("")
-				ui.buttons = nil
-				ui.emptyLifeIcons()
-				pauseMenu.setGame(nil)
-
-				display.remove(ui.buttonGroup)
+				controller.destroyUI()
 	
 				game.nextScene = "highscores"
 				if (game.state == gState.TERMINATED) then
@@ -380,6 +377,9 @@ local sState = {}
 			steve.sprite.x, steve.sprite.y = steve.x, steve.y
 			game.map:fadeToPosition(spawn.x, spawn.y, 250)
 
+			controller.destroyUI()
+			controller.prepareUI()
+
 			steve:setLinearVelocity( 0, 0 )
 			steve.canJump = false
 			transition.to( steve.sprite, { alpha = 1, time = 1000,
@@ -396,6 +396,7 @@ local sState = {}
 					-- Controls are active again
 					steve.state = sState.IDLE
 					controller:start()
+					controller.pauseEnabled = true
 					controller.deathBeingHandled = false
 				end
 			})
@@ -431,14 +432,16 @@ local sState = {}
 			Runtime:removeEventListener( "enterFrame", makeSteveJump )
 			Runtime:removeEventListener( "enterFrame", makeSteveMove )
 		end
-
+		
 		controller:pause()
+		controller.pauseEnabled = false
 
 		game.lives = game.lives - 1
+		ui.updateLifeIcons(game.lives)
+
 		if (game.lives == 0) then
 			controller.onGameOver("Failed")
 		elseif ( game.lives > 0 ) then
-			ui.updateLifeIcons(game.lives)
 			handleRespawn()
 		end
 	end
@@ -538,10 +541,23 @@ function controller.prepareUI()
 	ui.buttons.resume.isVisible = false
 	ui.buttons.scoreUp.isVisible = false
 	ui.buttons.lifeUp.isVisible = false
-
 	-------------------------------
 	pauseMenu.setGame(game, gState)
 	-------------------------------
+end
+
+-- Destroys the UI
+function controller.destroyUI()
+	if (ui.buttons and ui.buttonGroup) then
+		ui.buttons.scoreUp:setLabel("")
+		ui.buttons.lifeUp:setLabel("")
+		ui.buttons = nil
+		ui.emptyLifeIcons()
+		ui.destroyLifeIcons()
+		pauseMenu.setGame(nil)
+		display.remove(ui.buttonGroup)
+
+	end
 end
 
 function controller:start()
@@ -551,6 +567,7 @@ function controller:start()
 	ui:setEnabled( true )
 
 	controller.controlsEnabled = true
+	controller.pauseEnabled = true
 	controller.SSVEnabled = true
 	controller.SSVLaunched = false
 	controller.noMovementDetected = false

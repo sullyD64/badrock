@@ -176,26 +176,34 @@ local buttonData = {
 -- if it's worth keeping an icon for every life or a simpler single-icon counter].
 	ui.lifeIcons = {}
 
-	-- Updates the lifeIcon array, either if a life is added or removed
-	function ui.updateLifeIcons( currentLivesNumber )
-		for i = 1, #ui.lifeIcons do
-			if( i <= currentLivesNumber ) then
-				ui.lifeIcons[i].isVisible = true
-			else
-				ui.lifeIcons[i].isVisible = false
-			end
-		end
+	local function createLifeIconAt( index )
+		local	lifeIcon = display.newImageRect(ui.buttonGroup, visual.lifeIcon, 30, 30 )
+		lifeIcon.anchorX, lifeIcon.anchorY = 0, 0
+		lifeIcon.x = 10 + (lifeIcon.contentWidth * (index - 1))
+		lifeIcon.y = 10 + lifeIcon.contentHeight / 2
+		lifeIcon.isVisible = true
+		table.insert(ui.lifeIcons,lifeIcon)
 	end
 
 	-- Creates the lifeIcon array initialized to the current game's max lives allowed.
 	function ui.createLifeIcons( maxLivesNumber )
 		for i = 1, maxLivesNumber do
-			local	lifeIcon = display.newImageRect(ui.buttonGroup, visual.lifeIcon, 30, 30 )
-		    lifeIcon.anchorX, lifeIcon.anchorY = 0, 0
-		    lifeIcon.x = 10 + (lifeIcon.contentWidth * (i - 1))
-		    lifeIcon.y = 10 + lifeIcon.contentHeight / 2
-		    lifeIcon.isVisible = true
-		    table.insert(ui.lifeIcons,lifeIcon) 
+			createLifeIconAt( i )
+		end
+	end
+
+	-- Updates the lifeIcon array, either if a life is added or removed
+	function ui.updateLifeIcons( currentLivesNumber )
+		for i, v in pairs(ui.lifeIcons) do
+			if (i > currentLivesNumber) then
+				display.remove(v)
+				ui.lifeIcons[i] = nil
+				print ("Steve lost one life. Total lives: "..#ui.lifeIcons)
+			end
+		end
+		if (currentLivesNumber - #ui.lifeIcons == 1) then
+			createLifeIconAt(currentLivesNumber)
+			print ("Steve gained one life. Current lives: "..#ui.lifeIcons)
 		end
 	end
 
@@ -206,6 +214,12 @@ local buttonData = {
 			ui.lifeIcons[i] = nil
 		end
 		--print("After: ".. #ui.lifeIcons)
+	end
+
+	function ui.destroyLifeIcons()
+		for i in pairs (ui.lifeIcons) do
+			display.remove(ui.lifeIcons[i])
+		end
 	end
 ---------------------------------------------------------------------------------
 
@@ -286,22 +300,22 @@ end
 function ui:setEnabled( boolean )
 	for i in pairs (ui.buttons) do
 		ui.buttons[i]:setEnabled( boolean )
+		-- ui.buttons[i].isEnabled = boolean
 	end
 end
 
-
 -- Animates one of the two <x>UpTexts
-	function ui.textFade( textWidget, duration )	
-		transition.to( textWidget, { 
-			alpha = 0,
-			time = duration,
-			effect = "crossfade", 
-			onComplete = function() 
-				textWidget.isVisible = false
-				textWidget.alpha = 1
-			end
-		})
-	end
+function ui.textFade( textWidget, duration )	
+	transition.to( textWidget, { 
+		alpha = 0,
+		time = duration,
+		effect = "crossfade", 
+		onComplete = function() 
+			textWidget.isVisible = false
+			textWidget.alpha = 1
+		end
+	})
+end
 
 -- Shows and animates the final text when game ends.
 function ui.showOutcome( outcome )
