@@ -1,11 +1,10 @@
 -----------------------------------------------------------------------------------------
 --
--- levelSelect.lua
+-- pauseMenu.lua
 --
 -----------------------------------------------------------------------------------------
 --local composer = require ( "composer"       )
 local widget   = require ( "widget"           )
-local myData   = require ( "myData"           )
 local sfxMenu  = require ( "menu.sfxMenu"     )
 local utility  = require ( "menu.utilityMenu" )
 
@@ -44,15 +43,14 @@ end
 		-- pause.rsbutton.isVisible = false
 		audio.fadeOut(1,100)
 		audio.stop(1)
-
-		--------------------------------------------------------------------
+		-- --------------------------------------------------------------------
 		-- Instead of directly triggering composer from here (which is known
 		-- to cause problems destroying the game's packages), pauseMenu simply
 		-- changes the current game's state to "Terminated", so that core/game
 		-- itself can invoke the controller to "shut down" the game.
 		-- (see game -> onUpdate and controller -> onGameOver)
-		game.state = stateList.TERMINATED
-		--composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
+		 game.state = stateList.TERMINATED
+		-- composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
 		--------------------------------------------------------------------
 		return true
 	end

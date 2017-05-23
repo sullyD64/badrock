@@ -21,7 +21,7 @@ local visual = {
 
 	levelSelectBackground  = "visual/misc/LevelBG.png",
 	levelSelectStar        = "visual/misc/star.png",
-	levelIconBg            = "visual/misc/levelIconBg.png",
+	--levelIconBg            = "visual/misc/levelIconBg.png",
 
 	dpadLeft               = "visual/ui/dpadLeft2unpressed.png",
 	dpadLeft_over          = "visual/ui/dpadLeft2.png",

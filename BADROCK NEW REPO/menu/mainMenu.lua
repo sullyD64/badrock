@@ -46,7 +46,7 @@ local playBtn, optionBtn, shopBtn
 	local function onOptionBtnRelease()
 		-- open options panel
 		genMenu.panel:show({
-			y = display.screenOriginY+225,})
+			y = display.actualContentHeight,})
 		return true
 	end
 
@@ -160,8 +160,8 @@ local playBtn, optionBtn, shopBtn
 		titleLogo.x = display.contentCenterX
 		titleLogo.y = 100
 
-		-- Load steve
-		local steveImage = display.newImageRect( visual.menuSteveImage, 115, 113)
+		-- Load menuSteveImage 																	!!!!!!!!!!!
+		local steveImage = display.newImageRect( visual.menuSteveImage, display.actualContentWidth/4.4, display.actualContentWidth/4.3)--115, 113)
 		steveImage.x = display.contentCenterX
 		steveImage.y = display.contentCenterY + 25
 		steveImage.direction = 1

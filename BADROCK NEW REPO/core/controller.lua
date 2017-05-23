@@ -15,6 +15,7 @@
 local ui        = require ( "core.ui"        )
 local sfx       = require ( "audio.sfx"      )
 local pauseMenu = require ( "menu.pauseMenu" )
+local gameResult = require ( "menu.gameResult" )
 
 local controller = {
 	controlsEnabled,
@@ -329,13 +330,50 @@ local sState = {}
 	-- For now, the special events are the player's death and the end of the current
 	-- game. Those events must be handled by the controller.
 
+	-- Lasciata come reference durante la modifica (può ancora servire, non si sa mai) 
+	-- da eliminare alla fine di questa iterazione
+
+	-- function controller.onGameOver(outcome)
+	-- 	controller.endGameOccurring = true
+	-- 	ui.showOutcome(outcome)
+	-- 	-- Prevents pressing the action button in this phase: if not, any access 
+	-- 	-- to the player's state inside onAttack will throw a runtime error
+	-- 	ui.buttons.action.active = false
+	-- 	controller.pauseEnabled = false
+	-- 	---------------------------------------
+	-- 	-- If GameOver was triggered by onDeath
+	-- 	if (controller.deathBeingHandled == true) then
+	-- 		steve.isBodyActive = false
+	-- 		steve.sensorD.isBodyActive = false
+	-- 		steve.sensorD.isVisible = false
+	-- 		steve.sprite.alpha = 0
+	-- 	end
+	-- 	---------------------------------------
+	-- 	timer.performWithDelay( 1500,
+	-- 		function()
+
+	-- 			controller:pause()
+	-- 			game.map:setFocus( nil )
+	-- 			game:removeAllEntities()
+	-- 			controller.destroyUI()
+	
+	-- 			game.nextScene = "highscores"
+	-- 			if (game.state == gState.TERMINATED) then
+	-- 				game.nextScene = "mainmenu"
+	-- 			end
+
+	-- 			-- The declaration below triggers the final call in the game loop
+	-- 			game.state = gState.ENDED
+	-- 		end
+	-- 	)
+	-- end
+
 	-- At this point, it's game over. 
 	-- This displays the outcome of the game (good or bad depending from where this function is
 	-- being called) and triggers the end procedure of the current game (Main exit point)
-	-- [@claudia: this will point to the ending menu]
+
 	function controller.onGameOver(outcome)
-		controller.endGameOccurring = true
-		ui.showOutcome(outcome)
+		controller.endGameOccurring = true 	--? probabilmente non più utile e da togliere, ulteriori controlli da fare
 		-- Prevents pressing the action button in this phase: if not, any access 
 		-- to the player's state inside onAttack will throw a runtime error
 		ui.buttons.action.active = false
@@ -349,23 +387,22 @@ local sState = {}
 			steve.sprite.alpha = 0
 		end
 		---------------------------------------
-		timer.performWithDelay( 1500,
-			function()
+		controller:pause()
+		game.map:setFocus( nil )
+		game:removeAllEntities()
+		controller.destroyUI()
 
-				controller:pause()
-				game.map:setFocus( nil )
-				game:removeAllEntities()
-				controller.destroyUI()
-	
-				game.nextScene = "highscores"
-				if (game.state == gState.TERMINATED) then
-					game.nextScene = "mainmenu"
-				end
-
-				-- The declaration below triggers the final call in the game loop
-				game.state = gState.ENDED
-			end
-		)
+		-- Mostra il menu di fine livello
+		-- gState.Terminated accade quando l'utente decide di interrompere il gioco dal menu di pausa,
+		-- quindi il menu di fine livello non deve essere mostrato, ma la partita deve essere conclusa
+		if (game.state ~= gState.TERMINATED) then
+			gameResult.setGame(game, gState)
+			gameResult.setOutcome(outcome)
+			gameResult.panel:show({ y = display.actualContentHeight,})
+		else
+			-- The declaration below triggers the final call in the game loop
+			game.state = gState.ENDED
+		end
 	end
 
 	-- Restores the player at the current spawn point in the current game 

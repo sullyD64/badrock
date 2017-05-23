@@ -317,26 +317,27 @@ function ui.textFade( textWidget, duration )
 	})
 end
 
--- Shows and animates the final text when game ends.
-function ui.showOutcome( outcome )
-		local finalText = display.newText ("",	display.contentCenterX, display.contentCenterY, native.systemFontBold, 34)
-		ui.buttonGroup:insert(finalText)
-		if (outcome == "Completed") then
-			finalText.text = "Level Completed ;)"
-			finalText:setFillColor( 0.75, 0.8, 1 )
-		elseif (outcome == "Failed") then
-			finalText.text = "Level Failed :("
-			finalText:setFillColor( 1, 0, 0 )
-		elseif (outcome == "Terminated") then
-			finalText.text = "See you soon!"
-			finalText:setFillColor( 0, 1, 0)
-		end
-		transition.to(finalText, { alpha = 0, time = 1000,
-			onComplete = function()
-				display.remove( finalText )
-			end
-		})
-	end
+-- Commentata perché viene sostituita dal menu di fine livello
+-- -- Shows and animates the final text when game ends.
+-- function ui.showOutcome( outcome )
+-- 	local finalText = display.newText ("",	display.contentCenterX, display.contentCenterY, native.systemFontBold, 34)
+-- 	ui.buttonGroup:insert(finalText)
+-- 	if (outcome == "Completed") then
+-- 		finalText.text = "Level Completed ;)"
+-- 		finalText:setFillColor( 0.75, 0.8, 1 )
+-- 	elseif (outcome == "Failed") then
+-- 		finalText.text = "Level Failed :("
+-- 		finalText:setFillColor( 1, 0, 0 )
+-- 	elseif (outcome == "Terminated") then
+-- 		finalText.text = "See you soon!"
+-- 		finalText:setFillColor( 0, 1, 0)
+-- 	end
+-- 	transition.to(finalText, { alpha = 0, time = 1000,
+-- 		onComplete = function()
+-- 			display.remove( finalText )
+-- 		end
+-- 	})
+-- end
 
 	
 return ui

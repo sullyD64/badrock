@@ -186,17 +186,17 @@ local scene    = composer.newScene()
 		-- Use a scrollView to contain the level buttons (for support of more than one full screen).
 		-- Since this will only scroll horizontally, lock vertical scrolling.
 		local levelSelectGroup = widget.newScrollView({
-			width = 460,
-			height = 260,
-			scrollWidth = 460,
-			scrollHeight = 800,
+			width = display.actualContentWidth,--460,
+			height = display.actualContentHeight/1.2,--260,
+			scrollWidth = display.actualContentWidth,--460,
+			scrollHeight = display.actualContentHeight/1.2,--800,
 			hideBackground = true,
 			verticalScrollDisabled = true
 		})
 
 		-- 'xOffset', 'yOffset' and 'cellCount' are used to position the buttons in the grid.
-		local xOffset = display.screenOriginX + 20 --64
-		local yOffset = display.contentCenterY - 50
+		local xOffset = 0 + display.viewableContentWidth/20--display.screenOriginX + display.viewableContentWidth/20 --64
+		local yOffset = display.contentCenterY
 		local cellCount = 1
 
 		-- Define the array to hold the buttons
@@ -211,10 +211,10 @@ local scene    = composer.newScene()
 				onRelease = handleLevelSelect,
 				emboss = false,
 				--shape="roundedRect",
-				width = display.contentWidth - 350,
-				height = display.contentHeight - 200,
-				defaultFile = visual.levelIconBg, --defaultFile = "misc/"..tostring(i).."select.png",
-				overFile= visual.levelIconBg,
+				width = display.viewableContentWidth/3.5,--display.contentWidth - 350,
+				height = display.viewableContentWidth/3.5,--display.contentHeight - 200,
+				defaultFile = "visual/misc/levelIcon"..tostring( i )..".png",--visual.levelIconBg, --defaultFile = "misc/"..tostring(i).."select.png",
+				--overFile= visual.levelIconBg,
 				font = native.systemFontBold,
 				fontSize = 30,
 				labelColor = { default = { 1, 1, 1 }, over = { 0.5, 0.5, 0.5 } },
@@ -226,7 +226,7 @@ local scene    = composer.newScene()
 			})
 			-- Position the button in the grid and add it to the scrollView
 			buttons[i].anchorX = 0
-			buttons[i].anchorY = 0.5
+			buttons[i].anchorY = 0.8
 			buttons[i].x = xOffset
 			buttons[i].y = yOffset
 			levelSelectGroup:insert( buttons[i] )
@@ -250,21 +250,21 @@ local scene    = composer.newScene()
 
 			-- Generate the star and position it relative to the button it goes with.
 			local star = {}
-			if myData.settings.levels[i] and myData.settings.levels[i].stars and myData.settings.levels[i].stars > 0 then
-				for j = 1, myData.settings.levels[i].stars do
-					star[j] = display.newImageRect(visual.levelSelectStar , 20, 20)--display.newPolygon( 0, 0, starVertices )
-					--star[j]:setFillColor( 1, 0.9, 0)
-					--star[j].strokeWidth = 1
-					--star[j]:setStrokeColor( 1, 0.8, 0 )
-					star[j].x = buttons[i].x + (j * 25) +15
-					star[j].y = buttons[i].y + 70
-					levelSelectGroup:insert(star[j])
-				end
+			if myData.settings.levels[i] and myData.settings.levels[i].stars then --and myData.settings.levels[i].stars > 0 then
+					for j = 1, 3 do --myData.settings.levels[i].stars do
+						star[j] = display.newImageRect(visual.levelSelectStar , buttons[i].width/6, buttons[i].width/5.97)--display.newPolygon( 0, 0, starVertices )
+						if j>myData.settings.levels[i].stars then
+							star[j].alpha = 0.2
+						end
+						star[j].x = buttons[i].x + (j * buttons[i].width/5) + buttons[i].width/10
+						star[j].y = buttons[i].y + buttons[i].height/3.5
+						levelSelectGroup:insert(star[j])
+					end
 			end
 			-- Compute the position of the next button.
 			-- This tutorial draws 5 buttons across.
 			-- It also spaces based on the button width and height + initial offset from the left.
-			xOffset = xOffset + buttons[i].width+20
+			xOffset = xOffset + buttons[i].width*1.2--+20
 			cellCount = cellCount + 1
 			-- if ( cellCount > 5 ) then --righe da 5 ognuna
 			--     cellCount = 1

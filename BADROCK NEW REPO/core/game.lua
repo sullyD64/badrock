@@ -175,27 +175,28 @@ physics.setGravity( 0, 50 )
 						game.steve.canJump = true 
 					end
 			end
-		end
 
-		for i in pairs(game.chaserList) do
-			if( game.chaserList[i] 
-				and game.spawnPoint.x 
-				and game.chaserList[i].x 
-				and game.chaserList[i].species == "paper" 
-				and math.abs(game.steve.x-game.chaserList[i].x)<=230
-				and math.abs(game.steve.y-game.chaserList[i].y)<=150 ) then
-				if(game.steve.state ~= playerStateList.DEAD) then
-					game.chaserList[i]:move()
-				
-				elseif( game.steve.state == playerStateList.DEAD 
-					and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
-					game.chaserList[i].xScale=-1
-					game.chaserList[i].x =	game.chaserList[i].x+2	
-					transition.to(game.chaserList[i], {
-						time = 2000,
-						xScale = -1,
-						x = (game.chaserList[i].x + 200)
-					})
+			-- Moves the chasers
+			for i in pairs(game.chaserList) do
+				if( game.chaserList[i] 
+					and game.spawnPoint.x 
+					and game.chaserList[i].x 
+					and game.chaserList[i].species == "paper" 
+					and math.abs(game.steve.x-game.chaserList[i].x)<=230
+					and math.abs(game.steve.y-game.chaserList[i].y)<=150 ) then
+					if(game.steve.state ~= playerStateList.DEAD) then
+						game.chaserList[i]:move()
+					
+					elseif( game.steve.state == playerStateList.DEAD 
+						and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
+						game.chaserList[i].xScale=-1
+						game.chaserList[i].x =	game.chaserList[i].x+2	
+						transition.to(game.chaserList[i], {
+							time = 2000,
+							xScale = -1,
+							x = (game.chaserList[i].x + 200)
+						})
+					end
 				end
 			end
 		end
@@ -241,11 +242,16 @@ physics.setGravity( 0, 50 )
 				controller.endGameOccurring = true
 				game.levelHasBeenCompleted = true
 				controller.onGameOver("Completed")
+				-- salva il punteggio in myData nel caso sia maggiore di quello già memorizzato
+				if (game.score > myData.settings.levels[game.currentLevel].score) then
+					myData.settings.levels[game.currentLevel].score = game.score
+				end
 			end
 		elseif (state == gameStateList.TERMINATED) then
 			if(controller.endGameOccurring ~= true) then
 				controller.endGameOccurring = true
 				controller.onGameOver("Terminated")
+				game.nextScene = "mainMenu"
 			end
 		end
 	end
@@ -336,11 +342,12 @@ physics.setGravity( 0, 50 )
 	-- MAIN ENTRY POINT FOR INITIALIZATION 
 	-- (must be called from the current level).
 	-- Triggers all the -game.load- functions.
-	function game.loadGame( map, spawn )
+	function game.loadGame( map, spawn, lvl )
 		-- Locally stores the current level map and spawn coordinates
 		game.map = map
 		game.spawnPoint = spawn
-
+		game.currentLevel= lvl
+		print("livello"..game.currentLevel)
 		-- Instance parameters ----
 		game.score = 0
 		game.lives = game.MAX_LIVES
@@ -416,16 +423,22 @@ function game.stop()
 	controller.deathBeingHandled = nil
 	controller.endGameOccurring = nil
 
-	if (game.nextScene == "highscores") then
-		-- Switches scene (from "levelX" to "highscores").
-		composer.setVariable( "finalScore", game.score )
-		composer.removeScene( "menu.highscores" )
-		composer.gotoScene( "menu.highscores", { time=1500, effect="crossFade" } )
-	elseif (game.nextScene == "mainmenu") then
+	-- non serve più, lasciato ancora per precauzione, verrà tolto nella prossima iterazione se tutto funziona bene 
+	-- if (game.nextScene == "highscores") then
+	-- 	-- Switches scene (from "levelX" to "highscores").
+	-- 	composer.setVariable( "finalScore", game.score )
+	-- 	composer.removeScene( "menu.highscores" )
+	-- 	composer.gotoScene( "menu.highscores", { time=1500, effect="crossFade" } )
+	if (game.nextScene == "mainMenu") then
 		composer.removeScene( "menu.mainMenu" )
 		composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
+	elseif (game.nextScene == "level"..game.currentLevel) then
+		composer.removeScene( "levels.level"..game.currentLevel )
+		composer.gotoScene( "levels.level"..game.currentLevel, { effect="fade", time=280 } )
+	-- da aggiungere un'altra if nel caso il player voglia andare al livello successivo
 	end
 	game.nextScene = nil
+
 
 	package.loaded[controller] = nil
 	package.loaded[collisions] = nil

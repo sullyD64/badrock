@@ -9,6 +9,8 @@ application =
 	{
 		width = 320,
 		height = 480, 
+		-- width = 720,
+		-- height = 1080, 
 		scale = "zoomEven",
 		fps = 60,
 		
