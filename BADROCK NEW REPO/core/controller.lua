@@ -396,8 +396,7 @@ local sState = {}
 		-- gState.Terminated accade quando l'utente decide di interrompere il gioco dal menu di pausa,
 		-- quindi il menu di fine livello non deve essere mostrato, ma la partita deve essere conclusa
 		if (game.state ~= gState.TERMINATED) then
-			gameResult.setGame(game, gState)
-			gameResult.setOutcome(outcome)
+			gameResult.setGame(game, gState, outcome)
 			gameResult.panel:show({ y = display.actualContentHeight,})
 		else
 			-- The declaration below triggers the final call in the game loop

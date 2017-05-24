@@ -1,14 +1,17 @@
 -----------------------------------------------------------------------------------------
 --
 -- level2.lua
---
+-- nope
 -----------------------------------------------------------------------------------------
 
 local composer = require( "composer" )
 local scene = composer.newScene()
 
 lime = require("lime.lime")
-local game = require ( "game" )
+lime.disableScreenCulling() 
+local game = require ( "core.game" )
+local sfx = require ("audio.sfx")
+local myData = require ("myData")
 
 
 -- -----------------------------------------------------------------------------------
@@ -16,7 +19,6 @@ local game = require ( "game" )
 -- -----------------------------------------------------------------------------------
 
 local map, visual, physical
-
 
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
@@ -26,27 +28,21 @@ local map, visual, physical
 function scene:create( event )
 	local sceneGroup = self.view
 
-	map = lime.loadMap("map_level2.tmx")
+	if myData.settings.musicOn == false then
+		audio.play(sfx.bgLvlMusic, {channel = 1 , loops=-1})
+		audio.pause(1)
+	end
+
+	map = lime.loadMap("testmap_new - 2.tmx")
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 
 	physical = lime.buildPhysical(map)
 
-	-- ATTENZIONE --
-	-- La mappa caricata deve SEMPRE avere un layer di oggetti chiamato
+	-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
 	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
-	-- e due layer di TILE playerObject e playerEffects
-	local layer = map:getObjectLayer("playerSpawn")
-	local spawn = layer:getObject("spawn0")
-	game.create( spawn )
-	mainGroup = display.newGroup()
-	local steve = game.steve
-	mainGroup:insert( steve )
-	sceneGroup:insert( mainGroup )
-
-	map:getTileLayer("playerObject"):addObject( steve )
-	map:setFocus( steve )
-
+	-- e due Tile Layer -vuoti-  playerObject e playerEffects.
+	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0"), 1 )
 end
 
 -- show()
@@ -54,10 +50,10 @@ function scene:show( event )
 	local sceneGroup = self.view
 	local phase = event.phase
 	
-	if 	   ( phase == "will" ) then
-		
-	elseif ( phase == "did" )  then
-		game.start(map)
+	if (phase == "will") then
+		sfx.playMusic(sfx.bgLvlMusic, {channel = 1 , loops=-1})
+	elseif (phase == "did") then
+		game.start()	
 	end
 end
 
@@ -66,17 +62,16 @@ function scene:hide( event )
 	local sceneGroup = self.view
 	local phase = event.phase
 	
-	if 	   ( phase == "will" ) then
-	
-	elseif ( phase == "did" )  then
-		game.stop()
+	if (phase == "will") then
+		audio.fadeOut(1,10)
+	elseif (phase == "did") then
 	end		
 end
 
 -- destroy()
 function scene:destroy( event )
 	local sceneGroup = self.view
-
+	audio.dispose()
 	package.loaded[game] = nil
 end
 
@@ -87,6 +82,6 @@ scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
 
 return scene

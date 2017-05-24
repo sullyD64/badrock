@@ -29,6 +29,7 @@ local playBtn, optionBtn, shopBtn
 			speed = 250,
 			transition = easing.outElastic
 		})
+		composer.removeScene( "menu.levelSelect" )
 		composer.gotoScene( "menu.levelSelect", "fade", 280 )
 
 		return true

@@ -9,34 +9,90 @@ local myData  = require ( "myData" )
 
 local result = {}
 
-local lvl = 0
 ------------------------------------------------
 -- This is required for triggering a change in game's state
 
 local game = {}
 local stateList = {}
-local finalText = display.newText ("", 0, -50, native.systemFontBold, 34)
-local finalScore = display.newText( "", 0, -70, "Micolas.ttf", 15 )
+--local finalText = display.newText ("", 0, -50, native.systemFontBold, 34)
+--local finalScore = display.newText( "", 0, -70, "Micolas.ttf", 15 )
+local stars = {}
 
-function result.setGame( currentGame, gameStates )
-	game = currentGame
-	stateList = gameStates
-	level = game.currentLevel
-	finalScore.text = game.score --myData.settings.levels[game.currentLevel].score
-end
--------------------------------------------------
--- -------------------------------------------------
-function result.setOutcome(outcome)
-		if (outcome == "Completed") then
-			finalText.text = "Congratulations!"
-			finalText:setFillColor( 0.75, 0.8, 1 )
-		elseif (outcome == "Failed") then
-			finalText.text = "Level Failed"
-			finalText:setFillColor( 1, 0, 0 )
+-- function result.setStars(game, outcome)
+-- 	if (outcome == "Completed") then
+-- 		local nStars = 0
+-- 		if (tonumber(game.score)<=200) then
+-- 			nStars = 1
+-- 		elseif (tonumber(game.score)<=400) then
+-- 			nStars = 2
+-- 		elseif (tonumber(game.score)<=600) then
+-- 			nStars = 3
+-- 		end
+-- 		for j = 1, 3 do --myData.settings.levels[i].stars do
+-- 			if j<=nStars then
+-- 				result.panel.star[j].alpha = 1
+-- 			else 
+-- 				result.panel.star[j].alpha = 0.3
+-- 			end		
+-- 		end
+-- 		game.stars = nStars
+-- 		print(game.stars)
+-- 	elseif (outcome == "Failed") then
+-- 		for j = 1, 3 do
+-- 			result.panel.star[j].alpha = 0
+-- 		end
+-- 	end
+-- end
+
+function result.setStars(game, outcome)
+	if (outcome == "Completed") then
+		for j = 1, 3 do --myData.settings.levels[i].stars do
+			if j<=game.stars then
+				result.panel.star[j].alpha = 1
+			else 
+				result.panel.star[j].alpha = 0.3
+			end		
+		end
+		print(game.stars)
+	elseif (outcome == "Failed") then
+		for j = 1, 3 do
+			result.panel.star[j].alpha = 0
 		end
 	end
--- -------------------------------------------------
+end
 
+
+
+function result.setGame( currentGame, gameStates, outcome )
+	game = currentGame
+	stateList = gameStates
+
+	if (outcome == "Completed") then
+		-- decide che testo viene mostrato a schermo
+		result.panel.finalText.text = "Congratulations!"
+		result.panel.finalText:setFillColor( 0.75, 0.8, 1 )
+
+		--abilita o disabilita il tasto per passare al livello successivo
+		-- meglio se outcome è completed o mydata.score già esiste?
+		result.panel.nextLevelBtn.alpha = 1,
+		result.panel.nextLevelBtn:setEnabled( true )
+
+		result.panel.score.text = game.score --myData.settings.levels[game.currentLevel].score
+		
+	elseif (outcome == "Failed") then
+		result.panel.finalText.text = "Level Failed"
+		result.panel.finalText:setFillColor( 1, 0, 0 )
+
+		result.panel.nextLevelBtn.alpha = 0.3, -- possibile mettere anche un'immagine diversa, da decidere
+		result.panel.nextLevelBtn:setEnabled( false )
+
+		result.panel.score.text = ""
+	end
+	result.setStars(game, outcome)
+	level = game.currentLevel
+
+end
+-------------------------------------------------
 
 -- result MENU ---------------------------------------------------------------------
 
@@ -80,7 +136,7 @@ function result.setOutcome(outcome)
 
 		-- cambiare il game state per andare al prossimo livello
 		game.nextScene = "level"..level+1
-		game.state = gState.ENDED
+		game.state = stateList.ENDED
 
 		return true
 	end
@@ -102,10 +158,6 @@ function result.setOutcome(outcome)
 			}
 			result.panel.background = display.newImageRect(visual.panel,result.panel.width, result.panel.height-20)
 			result.panel:insert( result.panel.background )
-			 
-			-- result.panel.title = display.newText( "result", 0, -70, "Micolas.ttf", 15 )
-			-- result.panel.title:setFillColor( 1, 1, 1 )
-			-- result.panel:insert( result.panel.title )
 
 	-- Create the buttons ------------------------------------------------------------
 		-- Create the return to menu button
@@ -124,7 +176,7 @@ function result.setOutcome(outcome)
 			result.panel.menuBtn.x= -60
 			result.panel.menuBtn.y = 39
 			result.panel:insert(result.panel.menuBtn)
-			print("livelloP "..lvl)
+			--print("livelloP "..lvl)
 
 		result.panel.retryBtn = widget.newButton {
 			label = "Retry",
@@ -160,34 +212,28 @@ function result.setOutcome(outcome)
 			}
 			result.panel.nextLevelBtn.x= 15
 			result.panel.nextLevelBtn.y = 39
+
 			result.panel:insert(result.panel.nextLevelBtn)
 	-- -------------------------------------------------------------------------------
 
 	-- Create text result, score, and stars ------------------------------------------
 		
-		result.panel.text= finalText
-		result.panel:insert( result.panel.text )
-		
-		--result.panel.score = display.newText( myData.settings.levels[1].score, 0, -70, "Micolas.ttf", 15 )
+		result.panel.finalText= display.newText ("", 0, -50, native.systemFontBold, 20)
+		result.panel:insert( result.panel.finalText )
 
-		result.panel.score = finalScore
+		result.panel.score = display.newText( "", 0, -70, "Micolas.ttf", 15 )
 		result.panel.score:setFillColor( 1, 1, 1 )
 		result.panel:insert( result.panel.score )
 
-		-- -- Generate the star
-		-- local lvl = game.lvl
-		-- result.panel.star = {}
-		-- if myData.settings.levels[1] and myData.settings.levels[1].stars then --and myData.settings.levels[i].stars > 0 then
-		-- 		for j = 1, 3 do --myData.settings.levels[i].stars do
-		-- 			result.panel.star[j] = display.newImageRect(visual.levelSelectStar , 60,58)
-		-- 			if j>myData.settings.levels[1].stars then
-		-- 				result.panel.star[j].alpha = 0.2
-		-- 			end
-		-- 			result.panel.star[j].x = display.contentCenterX + (j * 25) + 50
-		-- 			result.panel.star[j].y = display.contentCenterY
-		-- 			result.panel:insert(result.panel.star[j])
-		-- 		end
-		-- end
+		-- Generate the star
+		result.panel.star = {}
+				for j = 1, 3 do --myData.settings.levels[i].stars do
+					result.panel.star[j] = display.newImageRect(visual.levelSelectStar , 30,28)
+					result.panel.star[j].x = -60 + (j * 25) + 10 --display.contentCenterX + (j * 25) + 50
+					result.panel.star[j].y = -10 --display.contentCenterY
+					result.panel.star[j].alpha = 0
+					result.panel:insert(result.panel.star[j])
+				end
 	-- -------------------------------------------------------------------------------
 
 -- ---------------------------------------------------------------------------------

@@ -17,15 +17,17 @@ local npcs       = require ( "core.npcs"        )
 local items      = require ( "core.items"       )
 local controller = require ( "core.controller"  )
 local collisions = require ( "core.collisions"  )
-
+local myData = require ("myData")
 local game = {}
+
+
 
 physics.start()
 physics.setGravity( 0, 50 )
 
 --===========================================-- 
 	-------------------------------
-	game.MAX_LIVES             =  3
+	game.MAX_LIVES             =  1
 	-------------------------------
 
 	local gameStateList = {
@@ -241,11 +243,20 @@ physics.setGravity( 0, 50 )
 			if(controller.endGameOccurring ~= true) then
 				controller.endGameOccurring = true
 				game.levelHasBeenCompleted = true
+				-- -- salva il punteggio in myData nel caso sia maggiore di quello già memorizzato
+				-- if (game.score > myData.settings.levels[game.currentLevel].score) then
+				-- 	myData.settings.levels[game.currentLevel].score = game.score
+				-- 	print(game.score)
+				-- end
+				-- if (game.stars > myData.settings.levels[game.currentLevel].stars) then
+				-- 	myData.settings.levels[game.currentLevel].stars = game.stars
+
+				-- end
+				-- if (game.score/game.maxPoints*100 > )
+				-- print(game.stars.." game")
+				game.updateScoreAndStars()
 				controller.onGameOver("Completed")
-				-- salva il punteggio in myData nel caso sia maggiore di quello già memorizzato
-				if (game.score > myData.settings.levels[game.currentLevel].score) then
-					myData.settings.levels[game.currentLevel].score = game.score
-				end
+
 			end
 		elseif (state == gameStateList.TERMINATED) then
 			if(controller.endGameOccurring ~= true) then
@@ -263,6 +274,27 @@ physics.setGravity( 0, 50 )
 ------------------------------------------------------------------------------------
 
 -- MISCELLANEOUS FUNCTIONS ---------------------------------------------------------
+	
+	-- salva il punteggio in myData nel caso sia maggiore di quello già memorizzato
+	function game.updateScoreAndStars()
+		if (game.score > myData.settings.levels[game.currentLevel].score) then
+			myData.settings.levels[game.currentLevel].score = game.score
+			print("punteggio "..game.score)
+		end
+
+		local perc = game.score/game.maxPoints*100
+		if (perc == 100 ) then 
+			game.stars = 3
+		elseif (perc >= 65) then
+			game.stars = 2
+		elseif (perc >= 35 ) then
+			game.stars = 1
+		end
+
+		if (game.stars > myData.settings.levels[game.currentLevel].stars) then
+			myData.settings.levels[game.currentLevel].stars = game.stars
+		end
+	end
 
 	-- Adds points to the current game's score (points are fixed for now).
 	function game.addScore(points)
@@ -342,14 +374,16 @@ physics.setGravity( 0, 50 )
 	-- MAIN ENTRY POINT FOR INITIALIZATION 
 	-- (must be called from the current level).
 	-- Triggers all the -game.load- functions.
-	function game.loadGame( map, spawn, lvl )
+	function game.loadGame( map, spawn, lvl, maxP )
 		-- Locally stores the current level map and spawn coordinates
 		game.map = map
 		game.spawnPoint = spawn
 		game.currentLevel= lvl
 		print("livello"..game.currentLevel)
+		game.maxPoints = maxP
 		-- Instance parameters ----
 		game.score = 0
+		game.stars = 0
 		game.lives = game.MAX_LIVES
 		game.levelHasBeenCompleted = false
 		---------------------------
@@ -432,10 +466,16 @@ function game.stop()
 	if (game.nextScene == "mainMenu") then
 		composer.removeScene( "menu.mainMenu" )
 		composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
-	elseif (game.nextScene == "level"..game.currentLevel) then
-		composer.removeScene( "levels.level"..game.currentLevel )
-		composer.gotoScene( "levels.level"..game.currentLevel, { effect="fade", time=280 } )
-	-- da aggiungere un'altra if nel caso il player voglia andare al livello successivo
+		-- controlla se in nextscene è presente "level" come substring, 
+		-- poi assegna la parte numerica per la prossima scena 
+	elseif (string.find( game.nextScene, "level" )) then 
+		composer.removeScene( "levels.level"..string.sub( game.nextScene, 6 ) )
+		composer.gotoScene( "levels.level"..string.sub( game.nextScene, 6 ), { effect="fade", time=280 } )
+	-- da tenere per precauzione (per ora)
+	-- elseif (game.nextScene == "level"..game.currentLevel) then
+	-- 	composer.removeScene( "levels.level"..game.currentLevel )
+	-- 	composer.gotoScene( "levels.level"..game.currentLevel, { effect="fade", time=280 } )
+
 	end
 	game.nextScene = nil
 
