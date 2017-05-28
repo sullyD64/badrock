@@ -44,6 +44,7 @@ local visual = {
 
 	enemyPaper             = "visual/sprites/paper.png",
 	enemySedia             = "visual/sprites/sedia.png",
+	enemyPaperAnim         = "visual/sprites/paperAnimazione.png",
 	--enemyRobot           = "visual/sprites/robot.png",
 
 	itemCoin               = "visual/ui/coin.png",

@@ -231,6 +231,41 @@ function enemies.loadEnemies( currentGame )
 	local chaserList = {}
 	local walkerList = {}
 
+	--FABIO TEST ANIMAZIONE PAPER ------------------(Funziona, ma va smistato, ovvero ogni riga di codice al suo posto)------
+		local paper = entity.newEntity{
+				graphicType = "animated",
+				filePath = visual.enemyPaperAnim,
+				--width = 40,
+				--height = 40,
+				spriteOptions={
+					height = 45,
+					width = 40,
+					numFrames = 9,
+					sheetContentWidth = 120,
+					sheetContentHeight = 135 
+				},
+				spriteSequence={
+					{name="walking", frames={1,2,3,3,2,1}, time=650, loopCount=0},
+					{name="running", start=4, count=5, time=600, loopCount=0},
+					{name="dead", frames={9}, time=500, loopCount=1}
+				},
+				physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
+				eName = "enemy"
+		}
+		paper.species = "paper"
+		paper.lives = 1
+		paper.isChaser = true
+
+		paper.isFixedRotation=true
+		paper.isTargettable= true
+		paper.x , paper.y = 519, 357
+		paper:addOnMap(currentMap)
+		paper:setSequence("walking")
+		paper:play()
+			
+
+	---------------------------------------------------------------------------------------------------------------
+
 	-- Loads the main Entity.
 	local loadEnemyEntity = function( enemy )
 		local desc
@@ -257,7 +292,6 @@ function enemies.loadEnemies( currentGame )
 
 		staticImage.x, staticImage.y =  enemy.x, enemy.y
 		staticImage:addOnMap( currentMap )
-
 		---------------------------------------------------------------
 		-- Temporary: assuming the species DOES determine the behavior,
 		-- this is specified in the description list.
