@@ -161,7 +161,7 @@ end
 -- 1) The sensor hitbox
 -- 2) The animated sprite [da implementare]
 -- @return two Entities
-function player.loadAttack( currentGame )
+function player.loadDefaultAttack( currentGame )
 	local player = currentGame.steve
 	local currentMap = currentGame.map
 

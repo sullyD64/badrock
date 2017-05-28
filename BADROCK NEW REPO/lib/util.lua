@@ -47,4 +47,39 @@ function util.hasAttribute( obj , attributeName )
 	 end
 	 return ris
 end
+
+
+function util.prepareMap(currentMap)
+	local map = currentMap
+	if not map then return end
+
+	local props = map:getProperties()
+
+	local bounds = {
+		xMin = 0,
+		yMin = 0,
+		xMax = props.tilewidth:getValue() * props.width:getValue() + display.contentCenterX,
+		yMax = props.tileheight:getValue() * props.height:getValue(),
+	}
+	map:setClampingBounds( bounds.xMin, bounds.yMin, bounds.xMax, bounds.yMax )
+
+	for k, tile in pairs(map:getTileLayer("environment"):getTilesWithProperty("tName")) do
+		tName = tile:getProperty("tName"):getValue()
+
+		tile:addProperty(Property:new("HasBody", ""))
+
+		if (tName ~= "dynamicEnv") then
+			tile:addProperty(Property:new("bodyType", "static"))
+			if not tile:hasProperty("isSlippery") and tile:hasProperty("isGround") then
+				tile:addProperty(Property:new("friction", 1))
+			else
+				tile:addProperty(Property:new("friction", 0))
+			end
+		else
+			tile:addProperty(Property:new("bodyType", "dynamic"))
+		end
+	end
+end
+
+
 return util

@@ -9,34 +9,33 @@
 -- methods contained in the "core" modules.
 -----------------------------------------------------------------------------------------
 
-local composer   = require ( "composer"         )
-local physics    = require ( "physics"          )
-local player     = require ( "core.player"      )
-local enemies    = require ( "core.enemies"     )
-local npcs       = require ( "core.npcs"        )
-local items      = require ( "core.items"       )
-local controller = require ( "core.controller"  )
-local collisions = require ( "core.collisions"  )
-local myData = require ("myData")
+local composer   = require ( "composer"        )
+local myData     = require ( "myData"          )
+local physics    = require ( "physics"         )
+local player     = require ( "core.player"     )
+local enemies    = require ( "core.enemies"    )
+local npcs       = require ( "core.npcs"       )
+local items      = require ( "core.items"      )
+local controller = require ( "core.controller" )
+local collisions = require ( "core.collisions" )
+
 local game = {}
-
-
 
 physics.start()
 physics.setGravity( 0, 50 )
 
 --===========================================-- 
 	-------------------------------
-	game.MAX_LIVES             =  1
+	game.MAX_LIVES             =  3
 	-------------------------------
 
 	local gameStateList = {
-		RUNNING   = "Running",
-		PAUSED    = "Paused",
-		RESUMED   = "Resumed",
-		COMPLETED = "Completed",
-		ENDED     = "Ended",
+		RUNNING    = "Running",
+		PAUSED     = "Paused",
+		RESUMED    = "Resumed",
+		COMPLETED  = "Completed",
 		TERMINATED = "Terminated",
+		ENDED      = "Ended",
 	}
 
 	local playerStateList = {
@@ -88,8 +87,7 @@ physics.setGravity( 0, 50 )
 
 	-- This loop is executed only if the game's state is RUNNING
 	local function gameRunningLoop()
-
-		-- The following block is related to jump activation and animation switching.
+		-- The following block is related to jump activation, animation switching and entity animation.
 			-- Jump controls:
 				-- Jumping is allowed only in two circumstances:
 				-- 1) The player is touching the ground (see collisions)
@@ -179,25 +177,27 @@ physics.setGravity( 0, 50 )
 			end
 
 			-- Moves the chasers
-			for i in pairs(game.chaserList) do
-				if( game.chaserList[i] 
-					and game.spawnPoint.x 
-					and game.chaserList[i].x 
-					and game.chaserList[i].species == "paper" 
-					and math.abs(game.steve.x-game.chaserList[i].x)<=230
-					and math.abs(game.steve.y-game.chaserList[i].y)<=150 ) then
-					if(game.steve.state ~= playerStateList.DEAD) then
-						game.chaserList[i]:move()
-					
-					elseif( game.steve.state == playerStateList.DEAD 
-						and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
-						game.chaserList[i].xScale=-1
-						game.chaserList[i].x =	game.chaserList[i].x+2	
-						transition.to(game.chaserList[i], {
-							time = 2000,
-							xScale = -1,
-							x = (game.chaserList[i].x + 200)
-						})
+			if (game.enemiesLoaded == true) then
+				for i in pairs(game.chaserList) do
+					if( game.chaserList[i] 
+						and game.spawnPoint.x 
+						and game.chaserList[i].x 
+						and game.chaserList[i].species == "paper" 
+						and math.abs(game.steve.x-game.chaserList[i].x)<=230
+						and math.abs(game.steve.y-game.chaserList[i].y)<=150 ) then
+						if(game.steve.state ~= playerStateList.DEAD) then
+							game.chaserList[i]:move()
+						
+						elseif( game.steve.state == playerStateList.DEAD 
+							and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
+							game.chaserList[i].xScale=-1
+							game.chaserList[i].x =	game.chaserList[i].x+2	
+							transition.to(game.chaserList[i], {
+								time = 2000,
+								xScale = -1,
+								x = (game.chaserList[i].x + 200)
+							})
+						end
 					end
 				end
 			end
@@ -336,22 +336,18 @@ physics.setGravity( 0, 50 )
 	function game:loadPlayer()
 		self.steve = player.loadPlayer( self )
 		-- From now on, game.steve.sprite and game.steve.sensorD are accessible
-		self.steve.defaultAttack = player.loadAttack( self )
-		self.steve.defaultAttack.collision = collisions.attackCollision
-		-- Collision handling is activated in controller
-
 		self.steve.sprite:setSequence("idle")
-		--self.steve.sprite:setFrame(1)
 		self.steve.sprite:play()
-		--self.steve.sprite:pause()
 
 		self.steve.direction = 1
-
 		self.steve.collision = collisions.playerCollision
 		self.steve:addEventListener( "collision", self.steve )
-
 		self.steve.preCollision = collisions.playerPreCollision
 		self.steve:addEventListener( "preCollision", self.steve )
+
+		-- Collision handling is activated in controller
+		self.steve.defaultAttack = player.loadDefaultAttack( self )
+		self.steve.defaultAttack.collision = collisions.attackCollision
 
 		self.map:setFocus( self.steve )
 	end
@@ -369,6 +365,7 @@ physics.setGravity( 0, 50 )
 	-- See enemies.lua
 	function game:loadEnemies() 
 		self.enemies, self.chaserList = enemies.loadEnemies( self )
+		game.enemiesLoaded = true
 	end
 
 	-- MAIN ENTRY POINT FOR INITIALIZATION 
@@ -381,6 +378,7 @@ physics.setGravity( 0, 50 )
 		game.currentLevel= lvl
 		print("livello"..game.currentLevel)
 		game.maxPoints = maxP
+
 		-- Instance parameters ----
 		game.score = 0
 		game.stars = 0
@@ -407,12 +405,8 @@ physics.setGravity( 0, 50 )
 -- Removes every Entity on the map when -game.stop- is triggered
 	-- [[ lavori in corso: introdurre lista di entità in game ]]
 function game:removeAllEntities()
-	self.map:getTileLayer("playerObject"):destroy()
-	self.map:getTileLayer("playerEffects"):destroy()
-	self.map:getTileLayer("items"):destroy()
-	self.map:getTileLayer("balloons"):destroy()
-	self.map:getTileLayer("sensors"):destroy()
 	self.map:getTileLayer("entities"):destroy()
+	self.map:getTileLayer("MAP_BUTTONS"):destroy()
 	self.map:getTileLayer("JUMPSCREEN"):destroy()
 end
 

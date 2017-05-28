@@ -120,7 +120,7 @@ function npcs.loadNPCs( currentGame )
 				end
 			end
 
-			currentMap:getTileLayer("balloons"):addObject(balloon)
+			currentMap:getTileLayer("MAP_BUTTONS"):addObject(balloon)
 
 			return balloon
 		end

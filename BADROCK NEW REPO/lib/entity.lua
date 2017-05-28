@@ -103,17 +103,8 @@ function entity.newEntity( options )
 	if (ent.sensorName) then ent.eName = "sensor" end
 
 	function ent:addOnMap( map )
-		local name = self.eName
 		if (map) then
-			if 	 (name == "steve" or "steveSprite") then
-				map:getTileLayer("playerObject"):addObject(self)
-			elseif (name == "item") then
-				map:getTileLayer("items"):addObject(self)
-			elseif (name == "sensor") then
-				map:getTileLayer("sensors"):addObject(self)
-			else --default
-				map:getTileLayer("entities"):addObject(self)
-			end
+			map:getTileLayer("entities"):addObject(self)
 		else
 			error("invalid or non-existent map")
 		end

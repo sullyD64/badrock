@@ -4,15 +4,14 @@
 --
 -----------------------------------------------------------------------------------------
 
-local composer = require( "composer" )
+local composer = require ( "composer"  )
+local myData   = require ( "myData"    )
+local sfx      = require ( "audio.sfx" )
+local game     = require ( "core.game" )
+lime           = require ( "lime.lime" )
+lime.enableScreenCulling()
+
 local scene = composer.newScene()
-
-lime = require("lime.lime")
-lime.disableScreenCulling() 
-local game = require ( "core.game" )
-local sfx = require ("audio.sfx")
-local myData = require ("myData")
-
 
 -- -----------------------------------------------------------------------------------
 -- SCENE-ACCESSIBLE CODE
@@ -37,6 +36,7 @@ function scene:create( event )
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 
+	util.prepareMap(map)
 	physical = lime.buildPhysical(map)
 
 	-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato

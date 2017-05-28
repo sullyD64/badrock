@@ -12,9 +12,9 @@
 -- some methods to visually manipulate the UI, like visualizing the score or other 
 -- 'system' responses for the uses.
 -----------------------------------------------------------------------------------------
-local ui        = require ( "core.ui"        )
-local sfx       = require ( "audio.sfx"      )
-local pauseMenu = require ( "menu.pauseMenu" )
+local ui         = require ( "core.ui"         )
+local sfx        = require ( "audio.sfx"       )
+local pauseMenu  = require ( "menu.pauseMenu"  )
 local gameResult = require ( "menu.gameResult" )
 
 local controller = {
@@ -228,11 +228,13 @@ local sState = {}
 						end
 						steve.attack.sprite:addEventListener("sprite", spinningPhase)
 
-						timer.performWithDelay(steve.attack.duration - 300, 
+						local endPhase = timer.performWithDelay(steve.attack.duration - 300, 
 							function()
-								steve.attack.sprite:removeEventListener( "sprite", spinningPhase )
-								steve.attack.sprite:setSequence("ending")
-								steve.attack.sprite:play()
+								if not (controller.endGameOccurring) then
+									steve.attack.sprite:removeEventListener( "sprite", spinningPhase )
+									steve.attack.sprite:setSequence("ending")
+									steve.attack.sprite:play()
+								end
 							end
 						)
 					---------------------------------------------------------
@@ -274,12 +276,7 @@ local sState = {}
 						-- Collision Handler Activation ---------------------------
 						steve.attack:removeEventListener("collision", steve.attack)
 						steve.attack = nil
-						-----------------------------------------------------------
-
-						-- if (steve.sprite.sequence ~= "idle") then
-						-- 	steve.sprite:setSequence("idle")
-						-- 	steve.sprite:play()
-						-- end
+						-----------------------------------------------------------x
 					end
 				)
 								
@@ -332,41 +329,40 @@ local sState = {}
 
 	-- Lasciata come reference durante la modifica (può ancora servire, non si sa mai) 
 	-- da eliminare alla fine di questa iterazione
-
 	-- function controller.onGameOver(outcome)
-	-- 	controller.endGameOccurring = true
-	-- 	ui.showOutcome(outcome)
-	-- 	-- Prevents pressing the action button in this phase: if not, any access 
-	-- 	-- to the player's state inside onAttack will throw a runtime error
-	-- 	ui.buttons.action.active = false
-	-- 	controller.pauseEnabled = false
-	-- 	---------------------------------------
-	-- 	-- If GameOver was triggered by onDeath
-	-- 	if (controller.deathBeingHandled == true) then
-	-- 		steve.isBodyActive = false
-	-- 		steve.sensorD.isBodyActive = false
-	-- 		steve.sensorD.isVisible = false
-	-- 		steve.sprite.alpha = 0
-	-- 	end
-	-- 	---------------------------------------
-	-- 	timer.performWithDelay( 1500,
-	-- 		function()
+		-- 	controller.endGameOccurring = true
+		-- 	ui.showOutcome(outcome)
+		-- 	-- Prevents pressing the action button in this phase: if not, any access 
+		-- 	-- to the player's state inside onAttack will throw a runtime error
+		-- 	ui.buttons.action.active = false
+		-- 	controller.pauseEnabled = false
+		-- 	---------------------------------------
+		-- 	-- If GameOver was triggered by onDeath
+		-- 	if (controller.deathBeingHandled == true) then
+		-- 		steve.isBodyActive = false
+		-- 		steve.sensorD.isBodyActive = false
+		-- 		steve.sensorD.isVisible = false
+		-- 		steve.sprite.alpha = 0
+		-- 	end
+		-- 	---------------------------------------
+		-- 	timer.performWithDelay( 1500,
+		-- 		function()
 
-	-- 			controller:pause()
-	-- 			game.map:setFocus( nil )
-	-- 			game:removeAllEntities()
-	-- 			controller.destroyUI()
-	
-	-- 			game.nextScene = "highscores"
-	-- 			if (game.state == gState.TERMINATED) then
-	-- 				game.nextScene = "mainmenu"
-	-- 			end
+		-- 			controller:pause()
+		-- 			game.map:setFocus( nil )
+		-- 			game:removeAllEntities()
+		-- 			controller.destroyUI()
+		
+		-- 			game.nextScene = "highscores"
+		-- 			if (game.state == gState.TERMINATED) then
+		-- 				game.nextScene = "mainmenu"
+		-- 			end
 
-	-- 			-- The declaration below triggers the final call in the game loop
-	-- 			game.state = gState.ENDED
-	-- 		end
-	-- 	)
-	-- end
+		-- 			-- The declaration below triggers the final call in the game loop
+		-- 			game.state = gState.ENDED
+		-- 		end
+		-- 	)
+		-- end
 
 	-- At this point, it's game over. 
 	-- This displays the outcome of the game (good or bad depending from where this function is
@@ -374,10 +370,12 @@ local sState = {}
 
 	function controller.onGameOver(outcome)
 		controller.endGameOccurring = true 	--? probabilmente non più utile e da togliere, ulteriori controlli da fare
+
 		-- Prevents pressing the action button in this phase: if not, any access 
 		-- to the player's state inside onAttack will throw a runtime error
 		ui.buttons.action.active = false
 		controller.pauseEnabled = false
+
 		---------------------------------------
 		-- If GameOver was triggered by onDeath
 		if (controller.deathBeingHandled == true) then
