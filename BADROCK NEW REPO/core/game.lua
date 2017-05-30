@@ -178,7 +178,7 @@ physics.setGravity( 0, 50 )
 					end
 			end
 		end
-
+		
 		for i in pairs(game.chaserList) do
 			if( game.chaserList[i] 
 				and game.spawnPoint.x 
@@ -186,8 +186,13 @@ physics.setGravity( 0, 50 )
 				and game.chaserList[i].species == "paper" 
 				and math.abs(game.steve.x-game.chaserList[i].x)<=230
 				and math.abs(game.steve.y-game.chaserList[i].y)<=150 ) then
+				
 				if(game.steve.state ~= playerStateList.DEAD) then
+					
 					game.chaserList[i]:move()
+					--??game.chaserList[i]:pause()	provato prima a interrompere animazione corrente e poi inizializzarne una nuova ma niente
+					game.chaserList[i]:setSequence("running")
+					game.chaserList[i]:play()	--?? perché non parte, quando è dentro questo if non parte
 				
 				elseif( game.steve.state == playerStateList.DEAD 
 					and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
@@ -198,7 +203,12 @@ physics.setGravity( 0, 50 )
 						xScale = -1,
 						x = (game.chaserList[i].x + 200)
 					})
+					game.chaserList[i]:setSequence("walking")
+					game.chaserList[i]:play()	--?? questa parte, ma appena esce fuori dalla condizione principale (vd if dopo for)
 				end
+			else
+				game.chaserList[i]:setSequence("walking")
+				game.chaserList[i]:play()		--?? perché non parte
 			end
 		end
 
@@ -387,18 +397,32 @@ function game.start()
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 	dbtimer = timer.performWithDelay(200, debug, 0)
+	-- for i in pairs(game.walkerList) do
+	-- 	game.walkerList[i]:move()
+	-- end
 end
 
 function game.pause()
 	physics.pause()
 	controller:pause()
-	--transition.pause()
+	for i in pairs(game.chaserList) do
+		transition.pause(game.chaserList[i])
+		game.chaserList[i]:pause()
+	end
+	--pausa il respawn appeso a steve, ma qualcuno ha appeso steve anche nella transizione per il menu di pausa
+	transition.pause(steve)
+	transition.pause(game.steve.sprite)
+
 end
 
 function game.resume()
 	physics.start()
 	controller:start()
-	--transition.resume()
+	for i in pairs(game.chaserList) do
+		transition.resume(game.chaserList[i])
+	end
+	transition.resume(steve)
+	transition.resume(game.steve.sprite)
 end
 
 function game.stop()
