@@ -134,6 +134,7 @@ function npcs.loadNPCs( currentGame )
 				radius = settings.sensorOpts.radius,
 				color = settings.sensorOpts.color,
 				alpha = settings.sensorOpts.alpha,
+				physicsParams = { filter = filters.sensorNFilter },
 				sensorName = "N"
 			}
 			-- Needed for sticking the sensor to the npc

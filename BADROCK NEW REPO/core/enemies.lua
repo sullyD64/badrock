@@ -245,6 +245,7 @@ function enemies.loadEnemies( currentGame )
 			error(enemy.type .. ": Enemy species not found in the EnemyDescriptions")
 		end
 		
+		desc.options.physicsParams.filter = filters.enemyHitboxFilter
 		local staticImage = entity.newEntity(desc.options)
 		staticImage.species = desc.species
 		staticImage.lives = desc.lives or 1

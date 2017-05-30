@@ -7,17 +7,14 @@
 -- Hide the status bar
 display.setStatusBar( display.HiddenStatusBar )
 
--- Include the Corona "composer" module
-local composer = require "composer"
+-- Global imports
+local composer = require ( "composer"      )
+visual         = require ( "visual.visual" ) 
+filters        = require ( "lib.filters"   )
+util           = require ( "lib.util"      )
 
--- Load the audio module for initialization
 local sfx = require( "audio.sfx" )
 sfx.init()
-
--- Globally loads the visual library
-visual = require "visual.visual"
-
-util = require "lib.util"
 
 -- Enable the multitouch 
 system.activate( "multitouch" )

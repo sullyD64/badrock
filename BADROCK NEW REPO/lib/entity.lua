@@ -53,7 +53,11 @@ function entity.newEntity( options )
 
 	if (opt.graphicType == "sensor") then 
 		opt.filePath = "bypassed"
-		opt.physicsParams = {isSensor = true, radius = opt.radius}
+		opt.physicsParams = {
+			isSensor = true, 
+			radius = opt.radius,
+			filter = customOptions.physicsParams.filter
+		}
 	end
 
 	local ent = {}

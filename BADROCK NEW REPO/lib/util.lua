@@ -70,6 +70,8 @@ function util.prepareMap(currentMap)
 
 		if (tName ~= "dynamicEnv") then
 			tile:addProperty(Property:new("bodyType", "static"))
+			tile:addProperty(Property:new("categoryBits", filters.envFilter.categoryBits))
+			tile:addProperty(Property:new("maskBits", filters.envFilter.maskBits))
 			if not tile:hasProperty("isSlippery") and tile:hasProperty("isGround") then
 				tile:addProperty(Property:new("friction", 1))
 			else
@@ -77,6 +79,8 @@ function util.prepareMap(currentMap)
 			end
 		else
 			tile:addProperty(Property:new("bodyType", "dynamic"))
+			tile:addProperty(Property:new("categoryBits", filters.dynamicEnvFilter.categoryBits))
+			tile:addProperty(Property:new("maskBits", filters.dynamicEnvFilter.maskBits))
 		end
 	end
 end

@@ -53,6 +53,7 @@ local function loadDefaultAttack()
 			radius = settings.meleeSensorOpts.radius,
 			color = settings.meleeSensorOpts.color,
 			alpha = settings.meleeSensorOpts.alpha,
+			physicsParams = { filter = filters.sensorAFilter },
 			sensorName = "A"
 		}
 	-- Loads the sprite and animation sequences
@@ -125,7 +126,7 @@ function combat.performMelee()
 	---------------------------------------------------------
 
 	-- Steve dashes forward
-	player:applyLinearImpulse( player.direction * 8, 0, player.x, player.y )
+	player:applyLinearImpulse( player.direction * 8, -5, player.x, player.y )
 	
 	-- Attack Sprite sequence ---------------------------------------------------
 		combat.animationIsPlaying = true

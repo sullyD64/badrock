@@ -55,7 +55,7 @@ local settings = {
 				filePath = visual.lifeIcon,
 				width = dim,
 				height = dim,
-				physicsParams = {density = 1, friction = 1, bounce = 0.5},
+				physicsParams = {density = 1, friction = 1, bounce = 0.5, filter = filters.parcticleFilter},
 				eName = "particle"
 			}	
 			frag.x , frag.y = playerX, playerY
@@ -93,7 +93,7 @@ function player.loadPlayer( currentGame )
 			width = 30,
 			height = 30,
 			bodyType = "dynamic",
-			physicsParams = { density=1.0, friction=0.7, bounce=0.01 },
+			physicsParams = { density=1.0, friction=0.7, bounce=0.01, },
 			alpha = 0,
 			isFixedRotation = true,
 			eName = "steve"
@@ -115,6 +115,7 @@ function player.loadPlayer( currentGame )
 			radius = settings.mainSensorOpts.radius,
 			color = settings.mainSensorOpts.color,
 			alpha = settings.mainSensorOpts.alpha,
+			physicsParams = { filter = filters.sensorDFilter },
 			sensorName = "D"
 		}
 	-- Binds the player to the starting spawn point in the current game.

@@ -71,6 +71,7 @@ function items.createItem( name )
 		error(name .. ": Item not found in the ItemDescriptions")
 	end
 
+	desc.physicsParams = { filter = filters.itemFilter }
 	desc.eName = "item"
 	local item = entity.newEntity( desc )
 	item.type = desc.type

@@ -381,11 +381,14 @@ end
 -- local i = 0
 -- Generic collision handler (now used for debugging collisions)
 function collisions.onCollision( event )
-	local o1, o2 = event.object1, event.object2
+	-- local o1, o2 = event.object1, event.object2
 
-	-- if(o1.eName and o2.eName) then
+	-- if((o1.eName or o1.tName) and (o2.eName or o2.tName)) then
 	-- 	i = i+1
-	-- 	print("["..i.."] Collision between " .. o1.eName .. " and ".. o2.eName)
+	-- 	local n1 = o1.eName or o1.tName
+	-- 	local n2 = o2.eName or o2.tName
+
+	-- 	print("["..i.."] Collision between " .. n1 .. " and ".. n2 )
 	-- 	if (o1.sensorName) then
 	-- 		print ("    - (sensor1: "..o1.sensorName..")")
 	-- 	end
