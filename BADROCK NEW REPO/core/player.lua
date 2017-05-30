@@ -8,7 +8,8 @@
 -- 2) A Sprite sequence (for the visual animations),
 -- 3) A Sensor (to be used with the npcs' sensors and other entities).
 -----------------------------------------------------------------------------------------
-local entity = require ( "lib.entity" )
+local entity  = require ( "lib.entity"   )
+local combat = require ( "core.combat" )
 
 local player = {}
 local settings = {
@@ -33,27 +34,8 @@ local settings = {
 		{name = "falling", frames = {4}, time=300, loopCount=0},
 		{name = "jumping", frames = {2}, time=300, loopCount=0}
 	},
-
-	attackSensorOpts = {
-		radius = 40,
-		alpha = 0, --0.6
-		color = {0, 0, 255},
-	},
-
-	attackSheetData = {
-		height = 80,
-		width = 80,
-		numFrames = 13,
-		sheetContentWidth = 240,
-		sheetContentHeight = 400 
-	},
-	
-	attackSequenceData = {
-		{name = "beginning", start=1, count=7, time=300, loopCount=1},
-		{name = "spinning",  start=8, count=3, time=300, loopCount=0},
-		{name = "ending",    frames = {11, 12, 13, 1}, time=300, loopCount=1}
-	},
 }
+
 
 -- PLAYER-SPECIFIC FUNCTIONS -------------------------------------------------------
 	-- (must be self-contained and not call anything outside this module)
@@ -116,7 +98,6 @@ function player.loadPlayer( currentGame )
 			isFixedRotation = true,
 			eName = "steve"
 		}
-
 	-- Loads Sprite and animation sequences
 		local sprite = entity.newEntity{
 			graphicType = "animated",
@@ -126,7 +107,6 @@ function player.loadPlayer( currentGame )
 			notPhysical = true,
 			eName = "steveSprite"
 		}
-
 	-- Loads the sensor, used to extend the player's "collision box"
 		local sensorD = entity.newEntity{
 			graphicType = "sensor",
@@ -137,13 +117,10 @@ function player.loadPlayer( currentGame )
 			alpha = settings.mainSensorOpts.alpha,
 			sensorName = "D"
 		}
-
 	-- Binds the player to the starting spawn point in the current game.
 		local spawn = currentGame.spawnPoint
 		player.x, player.y = spawn.x, spawn.y
-
 		player.deathAnimation = defaultPlayerDeathAnimation
-
 	-- Inserts the player's hitbox and sprite in the current map
 		local currentMap = currentGame.map
 		player:addOnMap ( currentMap )
@@ -153,57 +130,24 @@ function player.loadPlayer( currentGame )
 		player.sprite = sprite
 		player.sensorD = sensorD
 
-		return player
+	combat.setMap(currentMap)
+	combat.setPlayer(player)
+
+	function player:performAttack()
+		player.state = "Attacking"
+
+		if player.hasPowerUp then 
+			---[specificare i diversi metodi di combat per ciascun powerup]
+		else
+			combat.performMelee()
+		end
+	end
+
+	function player:cancelAttack()
+		combat.cancel()
+	end
+
+	return player
 end
-
--- Loads the player's default (for now) attack
--- The attack is composed of two entities:
--- 1) The sensor hitbox
--- 2) The animated sprite [da implementare]
--- @return two Entities
-function player.loadDefaultAttack( currentGame )
-	local player = currentGame.steve
-	local currentMap = currentGame.map
-
-	-- Loads the Main sensor Entity ("hitbox")
-		local defaultAttack = entity.newEntity{
-			graphicType = "sensor",
-			parentX = player.x,
-			parentY = player.y,
-			radius = settings.attackSensorOpts.radius,
-			color = settings.attackSensorOpts.color,
-			alpha = settings.attackSensorOpts.alpha,
-			sensorName = "A"
-		}
-
-	--Loads the sprite and animation sequences
-		local sprite = entity.newEntity{
-			graphicType = "animated",
-			parentX = player.x,
-			parentY = player.y,
-			filePath = visual.steveAttack,
-			spriteOptions = settings.attackSheetData,
-			spriteSequence = settings.attackSequenceData,
-			notPhysical = true,
-			eName = "steveAttack"
-		}
-
-	defaultAttack.gravityScale = 0
-
-	-- The attack is initially inactive
-	defaultAttack.isVisible = false
-	defaultAttack.isBodyActive = false
-
-	defaultAttack.sprite = sprite
-	defaultAttack.sprite.isVisible = false
-	defaultAttack.sprite.isBodyActive = false
-
-	-- Inserts the attack hitbox and sprite on the game's current map
-	defaultAttack:addOnMap( currentMap )
-	defaultAttack.sprite:addOnMap( currentMap )
-
-	return defaultAttack
-end
-
 
 return player

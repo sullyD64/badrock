@@ -182,106 +182,48 @@ local sState = {}
 
 	-- Inputs attack, depending on the current weapon equipped or other circumstances.
 	local function onAttackEvent(event)
-		local target = event.target
+		local button = event.target
 		if (controller.controlsEnabled) then
-			if (event.phase == "began" and target.active == true) then
-				display.currentStage:setFocus( target, event.id )
+			if (event.phase == "began" and button.active == true) then
+				display.currentStage:setFocus( button, event.id )
 				-- audio ----------------------------------------
 				sfx.playSound( sfx.attackSound, { channel = 4 } )
 				-------------------------------------------------
-				steve.state = sState.ATTACKING
-				steve.sprite.alpha = 0
-
+				
 				-- Button becomes temporairly inactive
-				target.active = false
-				target.alpha = 0.5
+				button.active = false
+				button.alpha = 0.5
 
-				if (steve.hasPowerUp) then
-					-- [implementazione futura]
-				else -- default attack
-					steve.attack = steve.defaultAttack
-					-- steve.attack.collision = steve.defaultAttack.collision
-					steve.attack.duration = 1000
+				-- The action to perform is decided depending on the
+				-- equipped powerup (see player), while the action itself
+				-- is performed in the combat module.
+				steve:performAttack()
 
-					-- Position linking is handled in game -> onUpdate
-					steve.attack.isVisible = true
-					steve.attack.isBodyActive = true
-					steve.attack.sprite.isVisible = true
-
-					-- Collision Handler Activation -------------------------
-					steve.attack:addEventListener("collision", steve.attack)
-					---------------------------------------------------------
-
-					-- Steve dashes forward
-					steve:applyLinearImpulse( steve.direction * 8, 0, steve.x, steve.y )
-
-					-- Attack Sprite sequence -------------------------------
-						steve.attack.sprite:setSequence("beginning")
-						steve.attack.sprite:play()
-
-						local spinningPhase = function(event)
-							local sprite = event.target
-							if(event.phase == "ended") then
-								sprite:setSequence("spinning")
-								sprite:play()
-							end
+				local searchingFlag = true 	-- flag is used to call cancelAttack only once
+				local attackValidityCheck = function()
+					if (searchingFlag) then
+						-- print("sto controllando...")
+						if (steve.state == sState.DEAD) or controller.deathBeingHandled then
+							steve:cancelAttack()
+							searchingFlag = false
+							-- print("steve è morto :(")
 						end
-						steve.attack.sprite:addEventListener("sprite", spinningPhase)
-
-						local endPhase = timer.performWithDelay(steve.attack.duration - 300, 
-							function()
-								if not (controller.endGameOccurring) then
-									steve.attack.sprite:removeEventListener( "sprite", spinningPhase )
-									steve.attack.sprite:setSequence("ending")
-									steve.attack.sprite:play()
-								end
-							end
-						)
-					---------------------------------------------------------
-				end
-
-				-- If Steve has died during the attack, the sprite remains invisible
-				local newAlpha = 1 -- default
-				local didSteveDieWhileAttacking = function()
-					--print("sto controllando...")
-					if (steve.state == sState.DEAD) then
-						newAlpha = 0
-						-------------------------------
-						steve.attack.sprite.isVisible = false
-						steve.attack.sprite:pause()
-						-------------------------------
-						--print("steve è morto :(")
 					end
 				end
-				Runtime:addEventListener("enterFrame", didSteveDieWhileAttacking) 
+				Runtime:addEventListener("enterFrame", attackValidityCheck)
 
-				-- Handles the end of the attack phase
-				timer.performWithDelay(steve.attack.duration, 
+				timer.performWithDelay(steve.attack.duration,
 					function()
-						-- Button becomes active again 
-						target.active = true
-						target.alpha = 1
-
-						if (steve.state ~= sState.DEAD) then
-							steve.state = sState.MOVING
-						end
-						
-						steve.attack.isVisible = false
-						steve.attack.isBodyActive = false
-						steve.attack.sprite:pause()
-						steve.attack.sprite.isVisible = false
-						steve.sprite.alpha = newAlpha
-						
-						Runtime:removeEventListener( "enterFrame", didSteveDieWhileAttacking)
-						-- Collision Handler Activation ---------------------------
-						steve.attack:removeEventListener("collision", steve.attack)
-						steve.attack = nil
-						-----------------------------------------------------------x
+						button.active = true
+						button.alpha = 1
+						Runtime:removeEventListener("enterFrame", attackValidityCheck)
+						searchingFlag = false
+						-- print("fine controllo")
 					end
 				)
-								
+
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
-				display.currentStage:setFocus( target, nil )
+				display.currentStage:setFocus( button, nil )
 			end
 			return true
 		end
@@ -369,12 +311,16 @@ local sState = {}
 	-- being called) and triggers the end procedure of the current game (Main exit point)
 
 	function controller.onGameOver(outcome)
-		controller.endGameOccurring = true 	--? probabilmente non più utile e da togliere, ulteriori controlli da fare
+		-- controller.endGameOccurring = true 	--? probabilmente non più utile e da togliere, ulteriori controlli da fare
 
 		-- Prevents pressing the action button in this phase: if not, any access 
 		-- to the player's state inside onAttack will throw a runtime error
 		ui.buttons.action.active = false
 		controller.pauseEnabled = false
+
+		if (steve.state == sState.ATTACKING) then 
+			steve:cancelAttack()
+		end
 
 		---------------------------------------
 		-- If GameOver was triggered by onDeath
@@ -385,21 +331,26 @@ local sState = {}
 			steve.sprite.alpha = 0
 		end
 		---------------------------------------
-		controller:pause()
 		game.map:setFocus( nil )
-		game:removeAllEntities()
+		controller:pause()
 		controller.destroyUI()
+		-- game:removeAllEntities()	-- Disabled (causes bugs)
 
-		-- Mostra il menu di fine livello
-		-- gState.Terminated accade quando l'utente decide di interrompere il gioco dal menu di pausa,
-		-- quindi il menu di fine livello non deve essere mostrato, ma la partita deve essere conclusa
-		if (game.state ~= gState.TERMINATED) then
-			gameResult.setGame(game, gState, outcome)
-			gameResult.panel:show({ y = display.actualContentHeight,})
-		else
-			-- The declaration below triggers the final call in the game loop
-			game.state = gState.ENDED
-		end
+		timer.performWithDelay( 250, 
+			function()
+				-- Mostra il menu di fine livello
+				-- gState.Terminated accade quando l'utente decide di interrompere il gioco dal menu di pausa,
+				-- quindi il menu di fine livello non deve essere mostrato, ma la partita deve essere conclusa
+				if (game.state ~= gState.TERMINATED) then
+					gameResult.setGame(game, gState, outcome)
+					gameResult.panel:show({ y = display.actualContentHeight,})
+				else
+					-- The declaration below triggers the final call in the game loop
+					game.state = gState.ENDED
+				end 
+			end
+		)
+		
 	end
 
 	-- Restores the player at the current spawn point in the current game 

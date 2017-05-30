@@ -62,9 +62,7 @@ physics.setGravity( 0, 50 )
 		-- if (game.steve.isAirborne == true) then print ("Steve is airborne")
 		-- elseif (game.steve.isAirborne == false) then print ("Steve is on the ground") end
 
-		-- if (game.steve.attack and game.steve.attack.sprite) then
-		-- 	print(game.steve.attack.sprite.isBodyActive)
-		-- end
+		-- if (game.steve.attack) then print(game.steve.attack) else print("nil") end
 
 		-- if (controller.controlsEnabled == true) then print("Controls: enabled") 
 		-- elseif (controller.controlsEnabled == false) then print ("Controls: disabled") end
@@ -344,10 +342,6 @@ physics.setGravity( 0, 50 )
 		self.steve:addEventListener( "collision", self.steve )
 		self.steve.preCollision = collisions.playerPreCollision
 		self.steve:addEventListener( "preCollision", self.steve )
-
-		-- Collision handling is activated in controller
-		self.steve.defaultAttack = player.loadDefaultAttack( self )
-		self.steve.defaultAttack.collision = collisions.attackCollision
 
 		self.map:setFocus( self.steve )
 	end
