@@ -58,8 +58,10 @@ end
 				other.isSensor = true
 				other.eName = ""
 				other.yScale = -1
-				other:setSequence("dead")
-				other:play()
+				if (other.sequence) then
+					other:setSequence("dead")
+					other:play()
+				end
 				timer.performWithDelay(1000, other:applyLinearImpulse( 0.05, -0.30, other.x, other.y ))
 				transition.to(other, {time = 5000,  -- removes it when he's off the map 
 					onComplete = function()

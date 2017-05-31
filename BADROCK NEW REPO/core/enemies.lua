@@ -33,7 +33,7 @@ local enemies = {
 			-- In a future implementation this property (as the isWalker property) will be 
 			-- appliable to single, select Enemies directly from the map file. 
 		{
-			species = "paper",
+			species = "paperVecchia",
 			lives = 1,
 			isChaser = true,
 			options = {
@@ -44,6 +44,32 @@ local enemies = {
 				eName = "enemy",
 			},
 		},
+		--- paper nuova ----
+		{	
+			species = "paper",
+			lives = 1,
+			isChaser = true,
+			options = {
+				graphicType = "animated",
+				filePath = visual.enemyPaperAnim,
+				spriteOptions={
+					height = 45,
+					width = 40,
+					numFrames = 9,
+					sheetContentWidth = 120,
+					sheetContentHeight = 135 
+				},
+				spriteSequence={
+					{name="idle", frames={1,2}, time=650, loopCount=0},
+					{name="walking", frames={1,2,3,3,2,1}, time=650, loopCount=0},
+					{name="running", start=4, count=5, time=600, loopCount=0},
+					{name="dead", frames={9}, time=500, loopCount=1}
+				},
+				physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
+				eName = "enemy"
+			}
+		},
+
 		-- 2 Chair
 		{
 			species = "chair",
@@ -114,58 +140,6 @@ local enemies = {
 	end
 ------------------------------------------------------------------------------------
 
--- GIGI WIP-------------------------------------------------------------------------
-	--[[
-		function prova()
-		for k,v in ipairs(game.enemyLevelList) do
-		transition.to(game.enemyLevelList[k], {
-				time=1500,
-				x=(game.enemyLevelList[k].x - 120),
-				onComplete=prova()
-			})
-		end
-
-		function f(object)
-			local angle= math.atan2(game.steve.x - object.y, game.steve.y - object.x) -- work out angle between target and missile
-			object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
-			object.y = object.y + (math.sin(angle) * object.speed) -- update y pos in relation to angle
-		end
-
-		-- i nemici si muovono a destra e sinistra, lista
-		function muovi(object)
-			object.isFixedRotation=true
-			function goLeft ()
-			transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
-			object.xScale=1
-			end
-
-			function goRight ()
-			transition.to( object, { time=1500, x=(object.x + 120), onComplete=goLeft } )
-			object.xScale=-1
-			end
-
-			goLeft()
-		end
-
-		-- i nemici dovrebbero seguire steve, per alcuni, liste
-		function segui(steve)
-			for i = 1, #enemiesList do
-				local distanceX = steve.x - enemiesList[i].x
-				local distanceY = steve.y - enemiesList[i].y
-
-				local angleRadians = math.atan2(distanceY, distanceX)
-				local angleDegrees = math.deg(angleRadians)
-
-				local enemySpeed = 5
-
-				local enemyMoveDistanceX = enemySpeed*math.cos(angleDegrees)
-				local enemyMoveDistanceY = enemySpeed*math.sin(angleDegrees)
-
-				enemy.x = enemy.x + enemyMoveDistanceX
-				enemy.y = enemy.y + enemyMoveDistanceY
-			end
-		end
-	]]
 
 local i = 0
 	local function salta(object,player)
@@ -280,35 +254,35 @@ function enemies.loadEnemies( currentGame )
 			error(enemy.type .. ": Enemy species not found in the EnemyDescriptions")
 		end
 		
-	--	local staticImage = entity.newEntity(desc.options)
-		local staticImage = entity.newEntity{
-				graphicType = "animated",
-				filePath = visual.enemyPaperAnim,
-				--width = 40,
-				--height = 40,
-				spriteOptions={
-					height = 45,
-					width = 40,
-					numFrames = 9,
-					sheetContentWidth = 120,
-					sheetContentHeight = 135 
-				},
-				spriteSequence={
-					{name="walking", frames={1,2,3,3,2,1}, time=650, loopCount=0},
-					{name="running", start=4, count=5, time=600, loopCount=0},
-					{name="dead", frames={9}, time=500, loopCount=1}
-				},
-				physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
-				eName = "enemy"
-		}
-		staticImage.species = "paper"
-		staticImage.lives = 1
-		staticImage.isChaser = true
+		local staticImage = entity.newEntity(desc.options)
+		-- local staticImage = entity.newEntity{
+		-- 		graphicType = "animated",
+		-- 		filePath = visual.enemyPaperAnim,
+		-- 		--width = 40,
+		-- 		--height = 40,
+		-- 		spriteOptions={
+		-- 			height = 45,
+		-- 			width = 40,
+		-- 			numFrames = 9,
+		-- 			sheetContentWidth = 120,
+		-- 			sheetContentHeight = 135 
+		-- 		},
+		-- 		spriteSequence={
+		-- 			{name="idle", frames={1,2}, time=650, loopCount=0},
+		-- 			{name="walking", frames={1,2,3,3,2,1}, time=650, loopCount=0},
+		-- 			{name="running", start=4, count=5, time=600, loopCount=0},
+		-- 			{name="dead", frames={9}, time=500, loopCount=1}
+		-- 		},
+		-- 		physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
+		-- 		eName = "enemy"
+		-- }
+		-- staticImage.species = "paper"
+		-- staticImage.lives = 1
+		-- staticImage.isChaser = true
+		-- staticImage.isFixedRotation=true
 
-		staticImage.isFixedRotation=true
-
-		--staticImage.species = desc.species
-		--staticImage.lives = desc.lives or 1
+		staticImage.species = desc.species
+		staticImage.lives = desc.lives or 1
 
 		if( enemy.drop ) then
 			staticImage.drop = enemy.drop
@@ -325,8 +299,10 @@ function enemies.loadEnemies( currentGame )
 		-- table.insert(staticImage.posIniziale, enemy.y )
 		-- print(staticImage.posIniziale)
 		staticImage:addOnMap( currentMap )
-		staticImage:setSequence("walking")
-		staticImage:play()
+		if(desc.options.graphicType == "animated") then
+			staticImage:setSequence("idle")
+			staticImage:play()
+		end
 		---------------------------------------------------------------
 		-- Temporary: assuming the species DOES determine the behavior,
 		-- this is specified in the description list.

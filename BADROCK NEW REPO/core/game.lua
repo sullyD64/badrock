@@ -51,9 +51,9 @@ physics.setGravity( 0, 50 )
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- The only purpose of this is for text debugging on the console.
 	local function debug(event)
-		print("Game is " .. game.state)
-		print("Steve is " .. game.steve.state)
-		print("Steve's sprite is " .. game.steve.sprite.sequence)
+		-- print("Game is " .. game.state)
+		-- print("Steve is " .. game.steve.state)
+		-- print("Steve's sprite is " .. game.steve.sprite.sequence)
 		-- print("Lives: " .. game.lives)
 		-- print("Score: " .. game.score)
 
@@ -83,7 +83,7 @@ physics.setGravity( 0, 50 )
 		-- end
 
 		-- print("-----------------------------") -- android debugging
-		print("") -- normal debugging
+		--print("") -- normal debugging
 	end
 
 	-- This loop is executed only if the game's state is RUNNING
@@ -189,11 +189,15 @@ physics.setGravity( 0, 50 )
 				
 				if(game.steve.state ~= playerStateList.DEAD) then
 					
+					if(game.chaserList[i].sequence ~= "running") then
+						game.chaserList[i]:setSequence("running")
+						game.chaserList[i]:play()
+					
+					end
 					game.chaserList[i]:move()
-					--??game.chaserList[i]:pause()	provato prima a interrompere animazione corrente e poi inizializzarne una nuova ma niente
-					game.chaserList[i]:setSequence("running")
-					game.chaserList[i]:play()	--?? perché non parte, quando è dentro questo if non parte
 				
+					--??game.chaserList[i]:pause()	provato prima a interrompere animazione corrente e poi inizializzarne una nuova ma niente
+					
 				elseif( game.steve.state == playerStateList.DEAD 
 					and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
 					game.chaserList[i].xScale=-1
@@ -203,12 +207,17 @@ physics.setGravity( 0, 50 )
 						xScale = -1,
 						x = (game.chaserList[i].x + 200)
 					})
-					game.chaserList[i]:setSequence("walking")
-					game.chaserList[i]:play()	--?? questa parte, ma appena esce fuori dalla condizione principale (vd if dopo for)
+					if(game.chaserList[i].sequence ~= "walking") then
+						game.chaserList[i]:setSequence("walking")
+						game.chaserList[i]:play()
+					
+					end
 				end
 			else
-				game.chaserList[i]:setSequence("walking")
-				game.chaserList[i]:play()		--?? perché non parte
+					if(game.chaserList[i].sequence ~= "idle") then
+						game.chaserList[i]:setSequence("idle")
+						game.chaserList[i]:play()
+					end
 			end
 		end
 
@@ -410,8 +419,8 @@ function game.pause()
 		game.chaserList[i]:pause()
 	end
 	--pausa il respawn appeso a steve, ma qualcuno ha appeso steve anche nella transizione per il menu di pausa
-	transition.pause(steve)
-	transition.pause(game.steve.sprite)
+	--transition.pause(steve)
+	--transition.pause(game.steve.sprite)
 
 end
 
@@ -421,8 +430,8 @@ function game.resume()
 	for i in pairs(game.chaserList) do
 		transition.resume(game.chaserList[i])
 	end
-	transition.resume(steve)
-	transition.resume(game.steve.sprite)
+	--transition.resume(steve)
+	--transition.resume(game.steve.sprite)
 end
 
 function game.stop()
