@@ -70,24 +70,46 @@ function npcs.loadNPCs( currentGame )
 			background.anchorY = 1
 			balloon:insert(background)
 
-			-- local button = display.newImageRect( visual.npcBalloonButton1, 58, 40 )
-			-- button.x, button.y = background.x, background.y -50
-			-- balloon:insert(button)
-
-			local onBalloonEvent = function(event)
+			--------------------------------------------------------------------------
+			local onBalloonButtonEvent = function(event)
 				local target = event.target
 
 				if (currentGame.state == "Running") then
 					if (event.phase == "began") then
 						display.currentStage:setFocus( target, id )
 						-- [[Work in progress]]
-						print("BOOP")
+
+						for i, v in pairs(npcList) do
+							if (v.balloon.button1 == target) then
+								transition.to(v.balloon, { time = 200, alpha = 0 })
+
+								currentGame.addScore(1000)
+								transition.to(v.staticImage, { time = 1000, y = v.y - 1000, alpha = 0, transition = easing.inCubic,
+									onComplete = function()
+										display.remove(v.staticImage)
+										display.remove(v.balloon)
+										display.remove(v.sensorN)
+										v:destroy()
+									end
+								})
+							
+								for i, npc in pairs(npcList) do
+									if v == npc then
+										table.remove(npcList, i)
+									end
+								end
+							end
+						end
+
+
+						
 					elseif (event.phase == "ended" or "cancelled" == event.phase) then
 						display.currentStage:setFocus( target, nil )
 					end
 				end
 				return true
 			end
+			--------------------------------------------------------------------------
 
 			local button = widget.newButton{
 				id = "npcButton1",
@@ -97,17 +119,14 @@ function npcs.loadNPCs( currentGame )
 				height = 40,
 				x = background.x,
 				y = background.y -50,
-				onEvent = onBalloonEvent
+				onEvent = onBalloonButtonEvent
 			}
+			balloon.button1 = button
 			balloon:insert(button)
-
 
 			balloon.x, balloon.y = npc.x, npc.y -20
 			balloon.alpha = 0
 			balloon:hide()
-			-----------------------------------------------------------------
-			-- balloon.button = button -- wip for control handler, will be removed soon
-			-----------------------------------------------------------------
 
 			-- Handles the showing/hiding event for one npc's balloon.
 			-- Params: a NPC from the NPCs list and a flag string.

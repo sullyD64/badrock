@@ -56,7 +56,7 @@ end
 
 				-- Animation: knocks the enemy AWAY and off the map -----------------------------------
 				other.isSensor = true
-				other.eName = ""
+				other.eName = "deadEnemy"
 				other.yScale = -1
 				timer.performWithDelay(1000, other:applyLinearImpulse( 0.05, -0.30, other.x, other.y ))
 				transition.to(other, {time = 5000,  -- removes it when he's off the map 
