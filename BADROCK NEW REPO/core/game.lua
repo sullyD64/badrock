@@ -51,9 +51,9 @@ physics.setGravity( 0, 50 )
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- The only purpose of this is for text debugging on the console.
 	local function debug(event)
-		print("Game is " .. game.state)
-		print("Steve is " .. game.steve.state)
-		print("Steve's sprite is " .. game.steve.sprite.sequence)
+		-- print("Game is " .. game.state)
+		-- print("Steve is " .. game.steve.state)
+		-- print("Steve's sprite is " .. game.steve.sprite.sequence)
 		-- print("Lives: " .. game.lives)
 		-- print("Score: " .. game.score)
 
@@ -83,7 +83,7 @@ physics.setGravity( 0, 50 )
 		-- end
 
 		-- print("-----------------------------") -- android debugging
-		print("") -- normal debugging
+		-- print("") -- normal debugging
 	end
 
 	-- This loop is executed only if the game's state is RUNNING
@@ -194,24 +194,39 @@ physics.setGravity( 0, 50 )
 					game.chaserList[i]:setSequence("running")
 					game.chaserList[i]:play()	--?? perché non parte, quando è dentro questo if non parte
 				
-				elseif( game.steve.state == playerStateList.DEAD 
-					and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
-					game.chaserList[i].xScale=-1
-					game.chaserList[i].x =	game.chaserList[i].x+2	
-					transition.to(game.chaserList[i], {
-						time = 2000,
-						xScale = -1,
-						x = (game.chaserList[i].x + 200)
-					})
-					game.chaserList[i]:setSequence("walking")
-					game.chaserList[i]:play()	--?? questa parte, ma appena esce fuori dalla condizione principale (vd if dopo for)
+				-- elseif( game.steve.state == playerStateList.DEAD 
+				-- 	and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
+				-- 	game.chaserList[i].xScale=-1
+				-- 	game.chaserList[i].x =	game.chaserList[i].x+2	
+				-- 	transition.to(game.chaserList[i], {
+				-- 		time = 2000,
+				-- 		xScale = -1,
+				-- 		x = (game.chaserList[i].x + 200)
+				-- 	})
+				-- 	game.chaserList[i]:setSequence("walking")
+				-- 	game.chaserList[i]:play()	--?? questa parte, ma appena esce fuori dalla condizione principale (vd if dopo for)
+
 				end
 			else
 				game.chaserList[i]:setSequence("walking")
 				game.chaserList[i]:play()		--?? perché non parte
 			end
 		end
-
+		if( game.steve.state == playerStateList.DEAD ) then
+			for i in pairs(game.chaserList) do
+				for k,v in ipairs(game.enemies) do
+				print(game.chaserList[i].x, game.enemies[i].staticImage.x,game.chaserList[i].y, game.enemies[i].staticImage.y )
+					if(game.chaserList[i]== game.enemies[i].staticImage ) then
+					--game.chaserList[i].xScale=-1					
+					transition.to(game.chaserList[i], {
+					time = 2000,
+					--xScale = -1,
+					x = (game.enemies[i].x)
+					})
+					end
+				end
+			end
+		end
 		-- Listener for the "player has died" event.
 		if ((game.steve.state == playerStateList.DEAD) and 
 			(controller.deathBeingHandled ~= true) and
