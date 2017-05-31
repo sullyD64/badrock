@@ -83,7 +83,7 @@ physics.setGravity( 0, 50 )
 		-- end
 
 		-- print("-----------------------------") -- android debugging
-		--print("") -- normal debugging
+		-- print("") -- normal debugging
 	end
 
 	-- This loop is executed only if the game's state is RUNNING
@@ -195,9 +195,7 @@ physics.setGravity( 0, 50 )
 					
 					end
 					game.chaserList[i]:move()
-				
-					--??game.chaserList[i]:pause()	provato prima a interrompere animazione corrente e poi inizializzarne una nuova ma niente
-					
+			
 				elseif( game.steve.state == playerStateList.DEAD 
 					and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
 					game.chaserList[i].xScale=-1
@@ -220,7 +218,21 @@ physics.setGravity( 0, 50 )
 					end
 			end
 		end
-
+		if( game.steve.state == playerStateList.DEAD ) then
+			for i in pairs(game.chaserList) do
+				for k,v in ipairs(game.enemies) do
+				print(game.chaserList[i].x, game.enemies[i].staticImage.x,game.chaserList[i].y, game.enemies[i].staticImage.y )
+					if(game.chaserList[i]== game.enemies[i].staticImage ) then
+					--game.chaserList[i].xScale=-1					
+					transition.to(game.chaserList[i], {
+					time = 2000,
+					--xScale = -1,
+					x = (game.enemies[i].x)
+					})
+					end
+				end
+			end
+		end
 		-- Listener for the "player has died" event.
 		if ((game.steve.state == playerStateList.DEAD) and 
 			(controller.deathBeingHandled ~= true) and
