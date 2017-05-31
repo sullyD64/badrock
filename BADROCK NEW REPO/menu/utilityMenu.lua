@@ -69,24 +69,24 @@ local utility = {}
 	-- volume slider sheet
 	local sliderOptions = {
 		frames = {
-			{ x=0, y=0, width=36, height=60 },
-			{ x=40, y=0, width=36, height=60 },
-			{ x=80, y=0, width=36, height=60 },
-			{ x=124, y=0, width=36, height=60 },
-			{ x=168, y=0, width=60, height=60 }
+			{ x=0, y=0, width=14, height=21 },
+			{ x=17, y=0, width=16, height=21 },
+			{ x=34, y=0, width=16, height=21 },
+			{ x=52, y=0, width=18, height=21 },
+			{ x=78, y=0, width=30, height=21 }
 			},
-		sheetContentWidth = 232,
-		sheetContentHeight = 60
+		sheetContentWidth = 109,
+		sheetContentHeight = 21
 		}
 	utility.sliderSheet = graphics.newImageSheet( visual.sliderSheet, sliderOptions )
 
 	-- checkbox sheet
 	local checkboxOptions = {
-			width = 62,
-			height = 64,
+			width = 21,
+			height = 21,
 			numFrames = 2,
-			sheetContentWidth = 128,
-			sheetContentHeight = 64
+			sheetContentWidth = 42,
+			sheetContentHeight = 21
 		}
 	utility.checkboxSheet = graphics.newImageSheet( visual.checkboxSheet, checkboxOptions )
 

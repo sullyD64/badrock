@@ -69,7 +69,7 @@ function result.setGame( currentGame, gameStates, outcome )
 
 	if (outcome == "Completed") then
 		-- decide che testo viene mostrato a schermo
-		result.panel.finalText.text = "Congratulations!"
+		result.panel.finalText.text = "You \n win!"
 		result.panel.finalText:setFillColor( 0.75, 0.8, 1 )
 
 		--abilita o disabilita il tasto per passare al livello successivo
@@ -162,66 +162,69 @@ end
 	-- Create the buttons ------------------------------------------------------------
 		-- Create the return to menu button
 		result.panel.menuBtn = widget.newButton {
-			label = "Menu",
+			--label = "Menu",
 			onRelease = onMenuBtnRelease,
 			emboss = false,
-			shape = "roundedRect",
-			width = 40,
-			height = 15,
-			cornerRadius = 2,
-			fillColor = { default={0.78,0.79,0.78,1}, over={1,0.1,0.7,0.4} },
-			strokeColor = { default={0,0,0,1}, over={0.8,0.8,1,1} },
-			strokeWidth = 1,
+			--shape = "roundedRect",
+			defaultFile = visual.backToMenuImg,
+			width = 26,
+			height = 27,
+			--cornerRadius = 2,
+			--fillColor = { default={0.78,0.79,0.78,1}, over={1,0.1,0.7,0.4} },
+			--strokeColor = { default={0,0,0,1}, over={0.8,0.8,1,1} },
+			--strokeWidth = 1,
 			}
-			result.panel.menuBtn.x= -60
-			result.panel.menuBtn.y = 39
+			result.panel.menuBtn.x= -50
+			result.panel.menuBtn.y = result.panel.contentCenterY
 			result.panel:insert(result.panel.menuBtn)
 			--print("livelloP "..lvl)
 
 		result.panel.retryBtn = widget.newButton {
-			label = "Retry",
-			fontSize = 10,
-			labelColor = { default={0}, over={1} },
+			--label = "Retry",
+			--fontSize = 10,
+			--labelColor = { default={0}, over={1} },
 			onRelease = onRetryBtnRelease,
+			defaultFile = visual.retryImg,
 			emboss = false,
-			shape = "roundedRect",
-			width = 30,
-			height = 15,
+			--shape = "roundedRect",
+			width = 26,
+			height = 27,
 			cornerRadius = 2,
-			fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
-			strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
-			strokeWidth = 1,
+			--fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+			--strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+			--strokeWidth = 1,
 			}
 			result.panel.retryBtn.x= -20
-			result.panel.retryBtn.y = 39
+			result.panel.retryBtn.y = result.panel.contentCenterY
 			result.panel:insert(result.panel.retryBtn)
 
 		result.panel.nextLevelBtn = widget.newButton {
-			label = "Next",
-			fontSize = 10,
-			labelColor = { default={0}, over={1} },
+			-- label = "Next",
+			-- fontSize = 10,
+			-- labelColor = { default={0}, over={1} },
 			onRelease = onNextLevelBtnRelease,
+			defaultFile = visual.nextLevelImg,
 			emboss = false,
-			shape = "roundedRect",
-			width = 30,
-			height = 15,
-			cornerRadius = 2,
-			fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
-			strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
-			strokeWidth = 1,
+			--shape = "roundedRect",
+			width = 26,
+			height = 27,
+			-- cornerRadius = 2,
+			-- fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+			-- strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+			-- strokeWidth = 1,
 			}
-			result.panel.nextLevelBtn.x= 15
-			result.panel.nextLevelBtn.y = 39
+			result.panel.nextLevelBtn.x= 10
+			result.panel.nextLevelBtn.y = result.panel.contentCenterY
 
 			result.panel:insert(result.panel.nextLevelBtn)
 	-- -------------------------------------------------------------------------------
 
 	-- Create text result, score, and stars ------------------------------------------
 		
-		result.panel.finalText= display.newText ("", 0, -50, native.systemFontBold, 20)
+		result.panel.finalText= display.newText ("", 10, -70, native.systemFontBold, 16)
 		result.panel:insert( result.panel.finalText )
 
-		result.panel.score = display.newText( "", 0, -70, "Micolas.ttf", 15 )
+		result.panel.score = display.newText( "", 0, -100, "Micolas.ttf", 15 )
 		result.panel.score:setFillColor( 1, 1, 1 )
 		result.panel:insert( result.panel.score )
 
@@ -230,7 +233,7 @@ end
 				for j = 1, 3 do --myData.settings.levels[i].stars do
 					result.panel.star[j] = display.newImageRect(visual.levelSelectStar , 30,28)
 					result.panel.star[j].x = -60 + (j * 25) + 10 --display.contentCenterX + (j * 25) + 50
-					result.panel.star[j].y = -10 --display.contentCenterY
+					result.panel.star[j].y = -30--result.panel.contentCenterY
 					result.panel.star[j].alpha = 0
 					result.panel:insert(result.panel.star[j])
 				end

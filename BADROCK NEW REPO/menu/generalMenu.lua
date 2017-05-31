@@ -21,7 +21,7 @@ local opt = {}
 	local function onAboutBtnRelease()  
 		--transition.fadeOut( opt.panel, { time=100 } )
 		aboutMenu.panel:show({
-		y = display.screenOriginY+225,
+		y = display.actualContentHeight-60,
 		time =250})
 		return true
 	end
@@ -29,7 +29,7 @@ local opt = {}
 		local function onSoundMenuBtnRelease()  
 	--transition.fadeOut( opt.panel, { time=100 } )
 	sfxMenu.panel:show({
-		y = display.screenOriginY+225,
+		y = display.actualContentHeight-60,
 		time =250})
 	return true
 	end
@@ -64,13 +64,13 @@ local opt = {}
 		opt.panel.returnMenuBtn = widget.newButton {
 			--label = "Return",
 			onRelease = onOptReturnMenuBtnRelease,
-			width = 15,
-			height = 15,
+			width = 20,--15,
+			height = 22,--15,
 			defaultFile = visual.exitOptionMenu,
 			--overFile = "buttonOver.png",
 			}
-		opt.panel.returnMenuBtn.x= 75
-		opt.panel.returnMenuBtn.y = -83
+		opt.panel.returnMenuBtn.x= 60
+		opt.panel.returnMenuBtn.y = -30
 		opt.panel:insert(opt.panel.returnMenuBtn)
 
 	-- Create the about button
@@ -88,8 +88,8 @@ local opt = {}
 		strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
 		strokeWidth = 1,
 		}
-		opt.panel.aboutBtn.x= -60
-		opt.panel.aboutBtn.y = 39
+		opt.panel.aboutBtn.x= -50
+		opt.panel.aboutBtn.y = opt.panel.contentCenterY
 		opt.panel:insert(opt.panel.aboutBtn)
 
 		-- Create the about button
@@ -107,8 +107,8 @@ local opt = {}
 			strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
 			strokeWidth = 1,
 			}
-		opt.panel.soundMenuBtn.x= -20
-		opt.panel.soundMenuBtn.y = 39
+		opt.panel.soundMenuBtn.x= -10
+		opt.panel.soundMenuBtn.y = opt.panel.contentCenterY
 		opt.panel:insert(opt.panel.soundMenuBtn)
 -- -------------------------------------------------------------------------------
 opt.group = display.newGroup()

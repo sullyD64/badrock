@@ -99,7 +99,7 @@ opt.panel:insert( opt.panel.title )
 			top = 100,
 			left= 50,
 			orientation = "horizontal",
-			width = 140,
+			width = 120,
 			value = 40,  -- Start slider at 40%
 			listener = bgVolumeListener
 		}
@@ -122,7 +122,7 @@ opt.panel:insert( opt.panel.title )
 			top = 100,
 			left= 50,
 			orientation = "horizontal",
-			width = 140,
+			width = 120,
 			value = 40,  -- Start slider at 40%
 			listener = fxVolumeListener
 		}
@@ -152,7 +152,7 @@ opt.panel:insert( opt.panel.title )
 			width = 15,
 			initialSwitchState = not myData.settings.musicOn
 		}
-		opt.panel.bgMuteBtn.x= 64
+		opt.panel.bgMuteBtn.x= 60
 		opt.panel.bgMuteBtn.y = -30
 		opt.panel:insert(opt.panel.bgMuteBtn)
 
@@ -170,7 +170,7 @@ opt.panel:insert( opt.panel.title )
 			width = 15,
 			initialSwitchState = not myData.settings.soundOn
 		}
-		opt.panel.fxMuteBtn.x= 64
+		opt.panel.fxMuteBtn.x= 60
 		opt.panel.fxMuteBtn.y = 5
 		opt.panel:insert(opt.panel.fxMuteBtn)
 

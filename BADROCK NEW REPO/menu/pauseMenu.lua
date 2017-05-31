@@ -98,19 +98,20 @@ end
 
 		-- Create the return to menu button
 		pause.panel.menuBtn = widget.newButton {
-			label = "Menu",
+			--label = "Menu",
 			onRelease = onMenuBtnRelease,
 			emboss = false,
-			shape = "roundedRect",
-			width = 40,
-			height = 15,
+			defaultFile = visual.backToMenuImg,
+			--shape = "roundedRect",
+			width = 26,
+			height = 27,
 			cornerRadius = 2,
 			fillColor = { default={0.78,0.79,0.78,1}, over={1,0.1,0.7,0.4} },
 			strokeColor = { default={0,0,0,1}, over={0.8,0.8,1,1} },
 			strokeWidth = 1,
 			}
-			pause.panel.menuBtn.x= -60
-			pause.panel.menuBtn.y = 39
+			pause.panel.menuBtn.x= -50
+			pause.panel.menuBtn.y = pause.panel.contentCenterY
 			pause.panel:insert(pause.panel.menuBtn)
 	-- -------------------------------------------------------------------------------
 

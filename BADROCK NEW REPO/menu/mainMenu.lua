@@ -47,7 +47,7 @@ local playBtn, optionBtn, shopBtn
 	local function onOptionBtnRelease()
 		-- open options panel
 		genMenu.panel:show({
-			y = display.actualContentHeight,})
+			y = display.actualContentHeight-60,})
 		return true
 	end
 
@@ -57,8 +57,8 @@ local playBtn, optionBtn, shopBtn
 			{
 				id = "optionBtn",
 				onRelease = onOptionBtnRelease,
-				width = 25,
-				height = 25,
+				width = 26,
+				height = 27,
 				defaultFile = visual.optionButtonDefault,
 				overFile = visual.optionButtonOver
 			}

@@ -4,14 +4,14 @@
 -- nope
 -----------------------------------------------------------------------------------------
 
-local composer = require( "composer" )
-local scene = composer.newScene()
+local composer = require ( "composer"  )
+local myData   = require ( "myData"    )
+local sfx      = require ( "audio.sfx" )
+local game     = require ( "core.game" )
+lime           = require ( "lime.lime" )
+lime.enableScreenCulling()
 
-lime = require("lime.lime")
-lime.disableScreenCulling() 
-local game = require ( "core.game" )
-local sfx = require ("audio.sfx")
-local myData = require ("myData")
+local scene = composer.newScene()
 
 
 -- -----------------------------------------------------------------------------------
@@ -33,16 +33,17 @@ function scene:create( event )
 		audio.pause(1)
 	end
 
-	map = lime.loadMap("testmap_new - 2.tmx")
+	map = lime.loadMap("ultimate_map.tmx")
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
-
+	
+	util.prepareMap(map)
 	physical = lime.buildPhysical(map)
 
 	-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
 	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
 	-- e due Tile Layer -vuoti-  playerObject e playerEffects.
-	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0"), 1 )
+	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0"), 2, 600 )
 end
 
 -- show()
