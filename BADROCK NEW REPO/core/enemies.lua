@@ -177,7 +177,7 @@ local i = 0
 				if (distanza <= 100) then
 					object:applyLinearImpulse( 0, -30, object.x, object.y )
 				 elseif (distanza <= 150 and distanza >= 100) then
-					object:applyLinearImpulse( 0, -40, object.x, object.y )
+					object:applyLinearImpulse( 0, -48, object.x, object.y )
 				 end
 					--transition.to( object, { time=1500, y=object.y-20 } )
 			end
