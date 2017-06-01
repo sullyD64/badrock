@@ -73,11 +73,14 @@ physics.setGravity( 0, 50 )
 		-- print("Endgame being handled in controller.onGameOver:")
 		-- print(controller.endGameOccurring)
 
-		-- for i in pairs (game.chaserList) do
-		-- 	if(game.chaserList[i] and game.chaserList[i].species=="paper") then
-		-- 		print (game.chaserList[i].species .. " " .. i ..  " is following steve")
+		-- local nextCh
+		-- for i, chaser in pairs (game.chaserList) do
+		-- 	if(chaser) then
+		-- 		print (chaser.species .. " ["..i.."] is " .. chaser.sequence)
+		-- 		nextCh = next(game.chaserList)
 		-- 	end
 		-- end
+		-- if nextCh == nil then print("nobody is following steve") end
 
 		-- print("-----------------------------") -- android debugging
 		-- print("") -- normal debugging
@@ -85,7 +88,7 @@ physics.setGravity( 0, 50 )
 
 	-- This loop is executed only if the game's state is RUNNING
 	local function gameRunningLoop()
-		-- The following block is related to jump activation, animation switching and entity animation.
+		-- The following block is related to jump activation and animation switching.
 			-- Jump controls:
 				-- Jumping is allowed only in two circumstances:
 				-- 1) The player is touching the ground (see collisions)
@@ -125,12 +128,10 @@ physics.setGravity( 0, 50 )
 								game.steve.sprite:setSequence("idle")
 								game.steve.sprite:play()
 							end
-							
 							if(controller.noMovementDetected ~= true) then
 								controller.noMovementDetected = true
 								controller.toIdle()
-							end
-						
+							end						
 						-- Horizontal speed's absolute value is significantly high, the player is walking.
 						elseif (math.abs(xv) > 10) then
 							if (game.steve.sprite.sequence ~= "walking") then
@@ -163,7 +164,7 @@ physics.setGravity( 0, 50 )
 						end
 					end
 
-				-- Jump activation is modified depending on the "isAirborne" flag.
+				-- Jump activation is modified depending on the isAirborne flag.
 					-- Thus, if the player can jump, but starts falling (although he hasn't jumped),
 					-- a jump cannot occur ("jumping in mid air").
 					if (game.steve.isAirborne == true) then 
@@ -173,35 +174,58 @@ physics.setGravity( 0, 50 )
 						game.steve.canJump = true 
 					end
 			end
-
-			-- Moves the chasers
-			if (game.enemiesLoaded == true) then
-				for i in pairs(game.chaserList) do
-					if( game.chaserList[i] 
-						and game.spawnPoint.x 
-						and game.chaserList[i].x 
-						and game.chaserList[i].species == "paper" 
-						and math.abs(game.steve.x-game.chaserList[i].x)<=230
-						and math.abs(game.steve.y-game.chaserList[i].y)<=150 ) then
-						if(game.steve.state ~= playerStateList.DEAD) then
-							game.chaserList[i]:move()
-						
-						elseif( game.steve.state == playerStateList.DEAD 
-							and math.abs(game.chaserList[i].x-game.spawnPoint.x)<=150 ) then
-							game.chaserList[i].xScale=-1
-							game.chaserList[i].x =	game.chaserList[i].x+2	
-							transition.to(game.chaserList[i], {
-								time = 2000,
-								xScale = -1,
-								x = (game.chaserList[i].x + 200)
-							})
+		end
+		
+		-- Entity animation: handles the chasers behavior
+		if (game.enemiesLoaded == true and game.lives ~= 0) then
+			-- Iterates the chaser list
+			for i, chaser in pairs(game.chaserList) do
+				-- Chasing is disabled when the player dies. It is then re-enabled only when
+				-- the respawn is complete AND the chaser has successfully returned to his 
+				-- spawn point. In this phase, even if the player comes in short range with the
+				-- chaser, it won't turn back to the player because it isn't targeting him.
+				if( chaser and not controller.deathBeingHandled and chaser.hasReturnedHome ~= false) then
+					local xDelta = math.abs(game.steve.x-chaser.x)
+					local yDelta = math.abs(game.steve.y-chaser.y)
+					-- Context: the player is alive and in range for aggro, chase him!
+					if( chaser and xDelta <= 230 and yDelta <= 150 ) then
+						------------------------
+						chaser:chase(game.steve)
+						------------------------
+						if(chaser.sequence ~= "running") then
+							chaser:setSequence("running")
+							chaser:play()							
+						end
+					-- Context: the player is alive but out of aggro range, remain still and wait.
+					else 	
+						if(chaser.sequence ~= "idle") then
+							chaser:setSequence("idle")
+							chaser:play()
+						end
+					end
+				-- Context: the player is dead, nothing to do, return to spawn position.
+				else
+					-- Each entry in enemies contains the original spawn coordinates,
+					-- while each enemySprite contains the current coordinates.
+					for k, enemy in pairs(game.enemies) do
+						if (chaser == enemy.enemySprite) then
+							------------------------------
+							chaser:chase(enemy)
+							chaser.hasReturnedHome = false
+							------------------------------
+						end
+						if(chaser.sequence ~= "walking") then
+							chaser:setSequence("walking")
+							chaser:play()
 						end
 					end
 				end
 			end
 		end
-
+	
 		-- Listener for the "player has died" event.
+			-- [Observation: de facto, the player spends very little time being 'DEAD'. Don't use this
+			-- state for any control, instead adopt controller.deathBeingHandled!]
 		if ((game.steve.state == playerStateList.DEAD) and 
 			(controller.deathBeingHandled ~= true) and
 			(controller.endGameOccurring ~= true)) then
@@ -241,20 +265,8 @@ physics.setGravity( 0, 50 )
 			if(controller.endGameOccurring ~= true) then
 				controller.endGameOccurring = true
 				game.levelHasBeenCompleted = true
-				-- -- salva il punteggio in myData nel caso sia maggiore di quello già memorizzato
-				-- if (game.score > myData.settings.levels[game.currentLevel].score) then
-				-- 	myData.settings.levels[game.currentLevel].score = game.score
-				-- 	print(game.score)
-				-- end
-				-- if (game.stars > myData.settings.levels[game.currentLevel].stars) then
-				-- 	myData.settings.levels[game.currentLevel].stars = game.stars
-
-				-- end
-				-- if (game.score/game.maxPoints*100 > )
-				-- print(game.stars.." game")
 				game.updateScoreAndStars()
 				controller.onGameOver("Completed")
-
 			end
 		elseif (state == gameStateList.TERMINATED) then
 			if(controller.endGameOccurring ~= true) then
@@ -273,7 +285,8 @@ physics.setGravity( 0, 50 )
 
 -- MISCELLANEOUS FUNCTIONS ---------------------------------------------------------
 	
-	-- salva il punteggio in myData nel caso sia maggiore di quello già memorizzato
+	-- Updates the current level's final score if the attempt's final score is higher
+	-- than the one stored in myData associated to that level
 	function game.updateScoreAndStars()
 		if (game.score > myData.settings.levels[game.currentLevel].score) then
 			myData.settings.levels[game.currentLevel].score = game.score
@@ -379,7 +392,7 @@ physics.setGravity( 0, 50 )
 		game.lives = game.MAX_LIVES
 		game.levelHasBeenCompleted = false
 		---------------------------
-
+		
 		-- Entity initialization --
 		game:loadPlayer()
 		game:loadEnemies()
@@ -414,18 +427,29 @@ function game.start()
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 	dbtimer = timer.performWithDelay(200, debug, 0)
+
+	--------------------------------------
+	-- for i in pairs(game.walkerList) do
+	-- 	game.walkerList[i]:move()
+	-- end
+	--------------------------------------
 end
 
 function game.pause()
 	physics.pause()
 	controller:pause()
-	--transition.pause()
+	for i in pairs(game.chaserList) do
+		transition.pause(game.chaserList[i])
+		game.chaserList[i]:pause()
+	end
 end
 
 function game.resume()
 	physics.start()
 	controller:start()
-	--transition.resume()
+	for i in pairs(game.chaserList) do
+		transition.resume(game.chaserList[i])
+	end
 end
 
 function game.stop()
@@ -445,28 +469,21 @@ function game.stop()
 	controller.deathBeingHandled = nil
 	controller.endGameOccurring = nil
 
-	-- non serve più, lasciato ancora per precauzione, verrà tolto nella prossima iterazione se tutto funziona bene 
-	-- if (game.nextScene == "highscores") then
-	-- 	-- Switches scene (from "levelX" to "highscores").
-	-- 	composer.setVariable( "finalScore", game.score )
-	-- 	composer.removeScene( "menu.highscores" )
-	-- 	composer.gotoScene( "menu.highscores", { time=1500, effect="crossFade" } )
 	if (game.nextScene == "mainMenu") then
 		composer.removeScene( "menu.mainMenu" )
 		composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
-		-- controlla se in nextscene è presente "level" come substring, 
-		-- poi assegna la parte numerica per la prossima scena 
+		-- Checks if nextScene has a substring containing "level", then concatenates
+		-- the number representing the next scene.
 	elseif (string.find( game.nextScene, "level" )) then 
 		composer.removeScene( "levels.level"..string.sub( game.nextScene, 6 ) )
 		composer.gotoScene( "levels.level"..string.sub( game.nextScene, 6 ), { effect="fade", time=280 } )
-	-- da tenere per precauzione (per ora)
-	-- elseif (game.nextScene == "level"..game.currentLevel) then
-	-- 	composer.removeScene( "levels.level"..game.currentLevel )
-	-- 	composer.gotoScene( "levels.level"..game.currentLevel, { effect="fade", time=280 } )
+		-- [da tenere per precauzione (per ora)]
+		-- elseif (game.nextScene == "level"..game.currentLevel) then
+		-- 	composer.removeScene( "levels.level"..game.currentLevel )
+		-- 	composer.gotoScene( "levels.level"..game.currentLevel, { effect="fade", time=280 } )
 
 	end
 	game.nextScene = nil
-
 
 	package.loaded[controller] = nil
 	package.loaded[collisions] = nil

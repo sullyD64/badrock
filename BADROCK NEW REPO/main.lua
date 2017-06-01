@@ -24,7 +24,7 @@ display.setDefault( "minTextureFilter", "nearest" )
 
 
 -- load menu screen
-composer.gotoScene( "menu.mainMenu" )
---composer.gotoScene( "levels.level1" )
+-- composer.gotoScene( "menu.mainMenu" )
+composer.gotoScene( "levels.level1" )
 
 

@@ -32,18 +32,31 @@ local enemies = {
 			-- try to follow the Player if he gets too close to their "aggro" sensor.
 			-- In a future implementation this property (as the isWalker property) will be 
 			-- appliable to single, select Enemies directly from the map file. 
-		{
+		{	
 			species = "paper",
 			lives = 1,
 			isChaser = true,
 			options = {
-				filePath = visual.enemyPaper,
-				width = 40,
-				height = 40,
+				graphicType = "animated",
+				filePath = visual.enemyPaperAnim,
+				spriteOptions = {
+					height = 45,
+					width = 40,
+					numFrames = 9,
+					sheetContentWidth = 120,
+					sheetContentHeight = 135 
+				},
+				spriteSequence = {
+					{name = "idle",    frames={1,2},         time=650, loopCount=0},
+					{name = "walking", frames={1,2,3,3,2,1}, time=650, loopCount=0},
+					{name = "running", start =4, count=5,    time=600, loopCount=0},
+					{name = "dead",    frames={9},           time=500, loopCount=1}
+				},
 				physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
-				eName = "enemy",
-			},
+				eName = "enemy"
+			}
 		},
+
 		-- 2 Chair
 		{
 			species = "chair",
@@ -59,167 +72,192 @@ local enemies = {
 	}
 }
 
--- ENEMY-SPECIFIC FUNCTIONS -------------------------------------------------------
+-- CHASER-SPECIFIC FUNCTIONS -------------------------------------------------------
 	-- (must be self-contained and not call anything outside this module)
 
-	function follow(currentGame, object, player)
-		local currentMap = currentGame.map
-		if ( (object.x ~= nil and object.y ~= nil) and (player.x ~= nil and player.y ~= nil) 
-			and currentGame.state ~= "Paused" ) then
+	-- Context: if the chaser's target is in his aggro zone, the chaser moves to reach
+	-- the target.
+	local function chaseTarget(currentGame, chaser, target)
+		local tileWidth = currentGame.map:getProperty("tilewidth"):getValue()
 
-			--il problema è che poi non richiama la transizione del disaggro
-			--per colpa del game.paused quando steve muore
-			object.isFixedRotation = true
-			object.speed = 1 --quello sopra continua a essere flash
+		if ( (chaser.x and chaser.y) and (target.x and target.y ) and chaser.lives ~= 0) then
+			-- Normal chasing is disabled when jumping a void platform or jumping to reach higher ground.
+			-- [note: this is done to overcome a double setting of the position which, if combined with 
+			-- the impulse applied by this methode, will lead to unexpected and repentine behaviors]
+			if (not chaser.isJumpingVoid and not chaser.isJumpingTo) then
 
-			if( math.abs(object.x-player.x) <= 400 ) then
+				chaser.speed = 1 
+				-- (moves faster when returning to spawn)
+				if (target.enemySprite) then chaser.speed = 2 end 
 
-				-- work out angle between target and missile
-				local angle = math.atan2 (player.y - object.y, player.x - object.x) 
-				-- update x pos in relation to angle
-				object.x = object.x + ( math.cos(angle) * object.speed ) 
-				
-				if(player.x > object.x) then
-					object.xScale = -1
-				else 
-					object.xScale = 1
-				end
-				
-				-- se steve è sopra una piattaforma non lontana dal nemico allora il nemico salta, non funziona
-				local vuoto = nil
-				local vuotoList = currentMap:getObjectLayer("cadutaVuoto").objects
+				if( math.abs(chaser.x-target.x) <= tileWidth*9 or target.enemySprite ) then --old value: 400
+					-- Works out angle between target and chaser
+					local angle = math.atan2 (target.y - chaser.y, target.x - chaser.x) 
+					-- Updates x pos in relation to angle
+					chaser.x = chaser.x + ( math.cos(angle) * chaser.speed ) 
+					
+					if(target.x > chaser.x)
+					then chaser.xScale = -1
+					else chaser.xScale =  1
+					end
 
-				for k, v in pairs(vuotoList) do
-					vuoto = vuotoList[k]
-				end
+					-- Every two seconds, the chaser checks if the target is in a higher position
+					-- compared to him. If he is close enough, he attempts to reach that height.
+					if not (chaser.isJumpingTo) and not (chaser.isCheckingVerticalProximity and not chaser.isJumpingVoid) then
+						chaser.isCheckingVerticalProximity = true
+						chaser:checkVerticalProximity(target)
+						timer.performWithDelay(2000, 
+							function()
+								chaser.isCheckingVerticalProximity = false
+							end
+						)
+					end
 
-				local direzione = math.abs( object.x - vuoto.x )
-				local distanzab = math.abs( direzione )
-				local distanzaverticalebordo = math.abs( object.y - vuoto.y )
+					-- Every frame, the chaser checks if there is a void nearby (a ledge).
+					-- If he is close enough, he attempts to reach over that void.
+					for k, void in pairs(chaser.voidList) do
+						chaser:checkVoidProximity(void)
+					end
 
-				--saltano continuamente a prescindere
-				local salto = false
-				if( distanzab <= 100 and distanzaverticalebordo <= 100 and object.lives ~= 0 ) then
+					if (chaser.hasReturnedHome == false) then
+						-- The chaser "has returned home" (literally) only when he returns
+						-- to the exact position where he spawned.
+						if (math.abs(chaser.x - target.x) <= 20) then
+							-- The chaser awaits little before returning to wait for the player
+							timer.performWithDelay(1000, 
+								function()
+									chaser.hasReturnedHome = true
+								end
+							)
+						end
 
-					if( object.xScale == -1 and salto == false ) then
-						object:applyLinearImpulse( 5, -15, object.x, object.y )
-						salto = true
-					elseif( object.xScale == 1 and salto == false) then
-						object:applyLinearImpulse( -5, -15, object.x, object.y )
-						salto = true
+						if not (chaser.isCheckingIfTooLate) then
+							chaser.isCheckingIfTooLate = true
+							chaser:checkIfTooLate(target)
+						end
 					end
 				end
 			end
 		end
 	end
-------------------------------------------------------------------------------------
 
--- GIGI WIP-------------------------------------------------------------------------
-	--[[
-		function prova()
-		for k,v in ipairs(game.enemyLevelList) do
-		transition.to(game.enemyLevelList[k], {
-				time=1500,
-				x=(game.enemyLevelList[k].x - 120),
-				onComplete=prova()
-			})
-		end
+	-- Context: if the target is on a platform higher than the chaser, and the chaser is
+	-- close enough to the target, the chaser can jump through the platform.
+	local function checkVerticalProximity(currentGame, chaser, target)
+		local tileWidth = currentGame.map:getProperty("tilewidth"):getValue()
+		local xDist = math.abs(chaser.x - target.x)
+		local yDist = math.abs(chaser.y - target.y)
 
-		function f(object)
-			local angle= math.atan2(game.steve.x - object.y, game.steve.y - object.x) -- work out angle between target and missile
-			object.x = object.x + (math.cos(angle) * object.speed) -- update x pos in relation to angle
-			object.y = object.y + (math.sin(angle) * object.speed) -- update y pos in relation to angle
-		end
-
-		-- i nemici si muovono a destra e sinistra, lista
-		function muovi(object)
-			object.isFixedRotation=true
-			function goLeft ()
-			transition.to( object, { time=1500, x=(object.x - 120), onComplete=goRight } )
-			object.xScale=1
+		local jumpTo = function(chaser) 
+			if (yDist <= tileWidth*3) then --old value: 150, 100
+				chaser:applyLinearImpulse( 0, -30, chaser.x, chaser.y )
+			elseif (yDist <= tileWidth*5 and yDist >= tileWidth*3) then
+				chaser:applyLinearImpulse( 0, -48, chaser.x, chaser.y )
 			end
-
-			function goRight ()
-			transition.to( object, { time=1500, x=(object.x + 120), onComplete=goLeft } )
-			object.xScale=-1
-			end
-
-			goLeft()
+			chaser:addEventListener("collision", chaser)
 		end
 
-		-- i nemici dovrebbero seguire steve, per alcuni, liste
-		function segui(steve)
-			for i = 1, #enemiesList do
-				local distanceX = steve.x - enemiesList[i].x
-				local distanceY = steve.y - enemiesList[i].y
-
-				local angleRadians = math.atan2(distanceY, distanceX)
-				local angleDegrees = math.deg(angleRadians)
-
-				local enemySpeed = 5
-
-				local enemyMoveDistanceX = enemySpeed*math.cos(angleDegrees)
-				local enemyMoveDistanceY = enemySpeed*math.sin(angleDegrees)
-
-				enemy.x = enemy.x + enemyMoveDistanceX
-				enemy.y = enemy.y + enemyMoveDistanceY
-			end
+		if (chaser.y > target.y and yDist <= tileWidth*4) then  --old value: 150
+			jumpTo(chaser)
+			chaser.isJumpingTo = true
 		end
-	]]
+	end
 
-local i = 0
-	local function salta(object,player)
-		-- i = i + 1
-		-- print("Salta " .. i)
-		if (object.y ~= nil) then
-			if (object.y > player.y) then
-				local distanza = object.y - player.y
-				if (distanza <= 100) then
-					object:applyLinearImpulse( 0, -30, object.x, object.y )
-				 elseif (distanza <= 150 and distanza >= 100) then
-					object:applyLinearImpulse( 0, -40, object.x, object.y )
-				 end
-					--transition.to( object, { time=1500, y=object.y-20 } )
+	-- Context: if the chaser encounters a void between him and his target, he temporairly
+	-- stops chasing the target and attempts to jump over the void.
+	local function checkVoidProximity(currentGame, chaser, void )
+		local tileWidth = currentGame.map:getProperty("tilewidth"):getValue()
+		local lBorder, rBorder = void.x + void.shape[1], void.x + void.shape[3]
+		local lDist, rDist = math.abs(lBorder-chaser.x), math.abs(rBorder-chaser.x)
+		
+		local yDist = math.abs(chaser.y - void.y)
+		local xDist
+		if (lDist > rDist) 
+		then xDist = rDist
+		else xDist = lDist
+		end
+
+		local jumpPastVoid = function(chaser)
+			if( chaser.xScale == -1) then
+				chaser:applyLinearImpulse( 10, -35, chaser.x, chaser.y )
+			elseif( chaser.xScale == 1) then
+				chaser:applyLinearImpulse( -10, -35, chaser.x, chaser.y )
+			end
+			chaser:addEventListener("collision", chaser)
+		end
+
+		if ( xDist <= tileWidth*2.5 and yDist <= tileWidth*2.5) then
+			if not (chaser.isJumpingVoid) then
+				jumpPastVoid(chaser)
+				chaser.isJumpingVoid = true
 			end
 		end
 	end
-------------------------------------------------------------------------------------
 
-
-local function loadChaser( enemy, currentGame )
-	enemy.preCollision = collisions.enemyPreCollision
-	enemy:addEventListener( "preCollision", enemy)
-
-	--deadcode, indagare malfunzionamento
-	enemy.towerCollision = collisions.enemyFormazioneATorre
-	enemy:addEventListener( "towerCollision", enemy)
-
-	local vuotoList = currentGame.map:getObjectLayer("cadutaVuoto").objects
-	-- local player = currentGame.player
-
-	-- chase
-	function enemy:move()
-		follow(currentGame, self, currentGame.steve) -- vuotolist come parametro
+	-- Context: the chaser is returning to its spawn point but it is stuck somewhere or
+	-- the operation is taking too much time: in this case, the chaser is teleported
+	-- home. During this transition, its body is unactive.
+	local function checkIfTooLate(chaser, target)
+		timer.performWithDelay( 4000, 
+			function()
+				if (chaser.hasReturnedHome == false) then
+					local teleportHome = function()
+						chaser.isBodyActive = false
+						transition.to(chaser, {time = 1000, alpha = 0, 
+							x = target.x, y = target.y, 
+							transition = easing.outExpo,
+							onComplete = function()
+								chaser.alpha = 1
+								chaser.isBodyActive = true
+								chaser.hasReturnedHome = true
+							end
+						})
+					end
+					teleportHome()
+				end
+				chaser.isCheckingIfTooLate = false
+			end
+		)
 	end
 
-	local listener = {}
-	function listener:timer( event )
-		salta( enemy, currentGame.steve )
+	-- Adds special behavior to an enemy if he isChaser
+	local function loadChaser( chaser, currentGame )
+		-- Only chasers need (and therefore will have) preCollision handling.
+		chaser.preCollision = collisions.enemyPreCollision
+		chaser:addEventListener( "preCollision", chaser)
+
+		chaser.voidList = currentGame.map:getObjectLayer("cadutaVuoto").objects
+
+		-- Used when the chaser jumps, to re-enable normal chasing.
+		chaser.collision = function(self, event)
+			if (event.other.isGround or event.other.tName) then
+				chaser.isJumpingTo = false
+				chaser.isJumpingVoid = false
+			end
+		end
+
+		-- Main function: target can be the player or the chaser's spawn point.
+		function chaser:chase( target )
+			chaseTarget(currentGame, self, target)
+		end
+
+		-- Invoked from chase(target) periodically
+		function chaser:checkVerticalProximity( target )
+			checkVerticalProximity(currentGame, self, target)
+		end
+
+		-- Invoked from chase(target) at each frame
+		function chaser:checkVoidProximity( void )
+			checkVoidProximity(currentGame, self, void)
+		end
+
+		-- Invoked from chase(target) only if target is the chaser's spawn.
+		function chaser:checkIfTooLate( target )
+			checkIfTooLate(self, target)
+		end
 	end
+-----------------------------------------------------------------------------------
 
-	-- jumpTimerClock
-	-- function s()
-	-- 	i = i + 1
-	-- 	print("s is running " .. i)
-	-- 	timer.performWithDelay( 3000, listener )
-	-- end
-	
-
-	-- jumpTimerClock
-	-----------------------------------------------------
-	timer.performWithDelay(2000, listener, -1) -- [MEMORY LEAK!]
-	-----------------------------------------------------
-end
 
 -- Loads the enemies's images (and sprites) and initializes their attributes.
 -- Visually instantiates the enemies in the current game's map.
@@ -230,7 +268,7 @@ function enemies.loadEnemies( currentGame )
 
 	local chaserList = {}
 	local walkerList = {}
-
+	
 	-- Loads the main Entity.
 	local loadEnemyEntity = function( enemy )
 		local desc
@@ -246,40 +284,45 @@ function enemies.loadEnemies( currentGame )
 		end
 		
 		desc.options.physicsParams.filter = filters.enemyHitboxFilter
-		local staticImage = entity.newEntity(desc.options)
-		staticImage.species = desc.species
-		staticImage.lives = desc.lives or 1
+		desc.options.isFixedRotation = true
+		local enemySprite = entity.newEntity(desc.options)
+
+		enemySprite.species = desc.species
+		enemySprite.lives = desc.lives or 1
 
 		if( enemy.drop ) then
-			staticImage.drop = enemy.drop
+			enemySprite.drop = enemy.drop
 		end
 
-		staticImage.isTargettable = true
+		enemySprite.isTargettable = true
+		enemySprite.x, enemySprite.y =  enemy.x, enemy.y
 
-		staticImage.x, staticImage.y =  enemy.x, enemy.y
-		staticImage:addOnMap( currentMap )
-
+		enemySprite:addOnMap( currentMap )
+		if(desc.options.graphicType == "animated") then
+			enemySprite:setSequence("idle")
+			enemySprite:play()
+		end
 		---------------------------------------------------------------
 		-- Temporary: assuming the species DOES determine the behavior,
 		-- this is specified in the description list.
 		if (desc.isChaser) then
-			loadChaser(staticImage, currentGame)
-			table.insert(chaserList, staticImage)
+			loadChaser(enemySprite, currentGame)
+			table.insert(chaserList, enemySprite)
 		end
 		---------------------------------------------------------------
 
-		return staticImage
+		return enemySprite
 	end
 
 	for i, v in ipairs(enemyList) do
-		enemyList[i].staticImage = loadEnemyEntity(enemyList[i])
+		enemyList[i].enemySprite = loadEnemyEntity(enemyList[i])
 		---------------------------------------------------------------
 		-- Temporary: assuming the species DOES NOT determine the 
 		--	behavior, this is specified in the enemy object in the map,
 		-- so appears in enemyList as an attribute.
 		-- if (enemyList[i].isChaser) then
-		-- 	loadChaser(enemyList[i].staticImage, currentGame)	
-		-- 	table.insert(chaserList, staticImage)
+		-- 	loadChaser(enemyList[i].enemySprite, currentGame)	
+		-- 	table.insert(chaserList, enemySprite)
 		-- end
 		---------------------------------------------------------------	
 	end

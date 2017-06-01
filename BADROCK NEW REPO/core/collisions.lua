@@ -38,37 +38,45 @@ end
 
 		-- Target is an enemy, targettable AND not invincible
 		if( other.eName == "enemy" and other.isTargettable == true ) then 
+			local enemy = other
 			-- Locally stores some of the enemies attributes
 			-- This is needed because they may become lost when the enemy is removed.
 			local enemyHit = {}
-			enemyHit.drop = other.drop
-			enemyHit.name = other.name 
-			enemyHit.x = other.x
-			enemyHit.y = other.y
+			enemyHit.drop = enemy.drop
+			enemyHit.name = enemy.name 
+			enemyHit.x = enemy.x
+			enemyHit.y = enemy.y
 
-			other.lives = other.lives - 1
+			enemy.lives = enemy.lives - 1
 
-			if ( other.lives == 0 ) then  -- Enemy has no lives left: he is dead	
+			if ( enemy.lives == 0 ) then  -- Enemy has no lives left: he is dead	
 				-- Forces the enemy to drop his item
 				if (enemyHit.drop) then
 					game.dropItemFrom(enemyHit) 
 				end
 
 				-- Animation: knocks the enemy AWAY and off the map -----------------------------------
-				other.isSensor = true
-				other.eName = "deadEnemy"
-				other.yScale = -1
-				timer.performWithDelay(1000, other:applyLinearImpulse( 0.05, -0.30, other.x, other.y ))
-				transition.to(other, {time = 5000,  -- removes it when he's off the map 
+				enemy.isSensor = true
+				enemy.eName = "deadEnemy"
+				enemy.yScale = -1
+
+					-- If the enemy is an animated entity, sets its sequence to dead (parametrized)
+					if (enemy.sequence) then
+						enemy:setSequence("dead")
+						enemy:play()
+					end
+
+				timer.performWithDelay(1000, enemy:applyLinearImpulse( 0.05, -0.30, enemy.x, enemy.y ))
+				transition.to(enemy, {time = 5000,  -- removes it when he's off the map 
 					onComplete = function()
-						display.remove(other)
+						display.remove(enemy)
 					end
 				})
 				----------------------------------------------------------------------------------------
-			
+
 				-- if Enemy is a Chaser, remove it from the list ----
 					for i, v in ipairs(game.chaserList) do
-						if (other == v) then
+						if (enemy == v) then
 							game.chaserList[i] = nil --[spostare altrove]
 						end
 					end
@@ -80,18 +88,18 @@ end
 
 			else 									-- Enemy is still alive
 				-- Animation: Knocks the enemy AWAY ------------------------------------------
-				if (other.x > steve.x) then other:applyLinearImpulse(1,1,other.x,other.y) 
-				elseif (other.x < steve.x) then other:applyLinearImpulse(-1,1,other.x,other.y)
+				if (enemy.x > steve.x) then enemy:applyLinearImpulse(1,1,enemy.x,enemy.y) 
+				elseif (enemy.x < steve.x) then enemy:applyLinearImpulse(-1,1,enemy.x,enemy.y)
 				end
 				------------------------------------------------------------------------------
 
 				-- Makes the enemy temporairly untargettable and reverts it short after
-				other.alpha = 0.5 
-				other.isTargettable = false
+				enemy.alpha = 0.5 
+				enemy.isTargettable = false
 				timer.performWithDelay(500, 
 					function()
-						other.alpha = 1
-						other.isTargettable = true
+						enemy.alpha = 1
+						enemy.isTargettable = true
 					end
 				)
 			end
@@ -177,23 +185,6 @@ end
 				end
 			end
 		return true
-		end
-	end
-
-	-- Per risolvere il problema della formazione a torre indesiderata dei nemici, 
-	-- in altre situazioni potremmo volerla come fight mode invece, per ora no
-	local tower = false
-	function collisions.enemyFormazioneATorre( self, event )
-		if ( event.other.eName == "enemy" and tower==false and self.x==event.other.x ) then
-			print("collisioneTorre")
-			if ( self.y+(self.height*0.5) > event.other.y-(event.other.height*0.5)+0.2 ) then
-				if event.contact then
-					event.other.x=event.other.x-100		--sposto il nemico
-				end
-			end
-		return true
-		else print ("noCollisioneTorre")
-		return false
 		end
 	end
 ------------------------------------------------------------------------------------
@@ -356,7 +347,7 @@ end
 		-- 	elseif(event.phase == "cancelled" or event.phase == "ended" ) then
 		-- 	end
 		-- end
-	
+
 	function collisions.itemCollision( self, event )
 		local o = event.other
 		if ( o.eName == "steve") then

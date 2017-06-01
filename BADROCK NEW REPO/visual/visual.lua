@@ -49,11 +49,12 @@ local visual = {
 	npcBalloonBackground   = "visual/sprites/balloons.png",
 	npcBalloonButton1      = "visual/sprites/bottonefanculo.png",
 
-	enemyPaper             = "visual/sprites/paper.png",
+	-- enemyPaper             = "visual/sprites/paper.png",
 	enemySedia             = "visual/sprites/sedia.png",
+	enemyPaperAnim         = "visual/sprites/paperAnimazione.png",
 	--enemyRobot           = "visual/sprites/robot.png",
 
-	itemCoin               = "visual/ui/coin.png",
+	-- itemCoin               = "visual/ui/coin.png",
 	itemLife               = "visual/ui/life2.png",
 	itemGun                = "visual/ui/H.png",
 	--itemImmunity         = "visual/misc/immunity.png",

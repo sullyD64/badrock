@@ -376,7 +376,7 @@ local sState = {}
 					steve.sensorD.isVisible = true
 				end
 			})
-			transition.to( steve.sprite, { time = 500,
+			transition.to( steve.sprite, { time = 1000,
 				onComplete = function()
 					-- Controls are active again
 					steve.state = sState.IDLE
@@ -392,7 +392,7 @@ local sState = {}
 		steve.sprite.alpha = 0
 		steve.sprite:setSequence("idle")
 		steve.sprite:pause()
-		transition.to(steve, { time = 2000, 
+		transition.to(steve, { time = 1000, 
 			onComplete = function()
 				respawnPlayer()
 			end

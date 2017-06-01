@@ -23,16 +23,16 @@ local settings = {
 	mainSheetData = {
 		height = 50,
 		width = 30,
-		numFrames = 4,
-		sheetContentWidth = 120,--120,
-		sheetContentHeight = 50 --40
+		numFrames = 10,
+		sheetContentWidth = 300,
+		sheetContentHeight = 50 
 	},
 
 	mainSequenceData = {
-		{name = "walking", start=1, count=4, time=300, loopCount=0},
+		{name = "walking", start=1, count=5, time=300, loopCount=0},
 		{name = "idle",    start=1, count=1, time=300, loopCount=0},
-		{name = "falling", frames = {4}, time=300, loopCount=0},
-		{name = "jumping", frames = {2}, time=300, loopCount=0}
+		{name = "falling", start=9, count=2, time=200, loopCount=0},
+		{name = "jumping", start=6, count=3, time=100, loopCount=1}
 	},
 }
 
@@ -43,7 +43,6 @@ local settings = {
 	-- Animation on Steve's death: he explodes in small rock particles.
 	-- (The particles are Entities)
 	local function defaultPlayerDeathAnimation(currentGame, playerX, playerY)
-		-- body
 		local fragments = {}
 		local numRocks = 10
 		
@@ -60,8 +59,9 @@ local settings = {
 			}	
 			frag.x , frag.y = playerX, playerY
 			frag:addOnMap(currentGame.map)
-			-- transition.to aggiunto per dare modo a entity di finire 
-			-- il suo transition.to per creare le roccette (Senza da errore)
+
+			-- Transition here is needed because we need to wait newEntity to finish
+			-- its transition to the entities' physical bodies.
 			transition.to(frag, {time = 0,
 				onComplete = function()
 					frag:applyLinearImpulse(directionX, directionY, frag.x , frag.y)
@@ -136,9 +136,10 @@ function player.loadPlayer( currentGame )
 
 	function player:performAttack()
 		player.state = "Attacking"
-
 		if player.hasPowerUp then 
+			---------------------------------------------------------------
 			---[specificare i diversi metodi di combat per ciascun powerup]
+			---------------------------------------------------------------
 		else
 			combat.performMelee()
 		end

@@ -505,7 +505,7 @@ function Object:create()
 			self.debugImage.x = self.x
 			self.debugImage.y = self.y
 			
-			self.debugImage.width = 2
+			self.debugImage.strokeWidth = 2
 				
 			self.debugImage.z = 1
 			
@@ -519,6 +519,7 @@ function Object:create()
 			
 		end
 		
+		-- self.debugImage.width = 2 -- (was deprecated)
 		self.debugImage.strokeWidth = 2
 		
 		if self.debugImage["setFillColor"] then
