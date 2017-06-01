@@ -184,7 +184,7 @@ physics.setGravity( 0, 50 )
 				-- the respawn is complete AND the chaser has successfully returned to his 
 				-- spawn point. In this phase, even if the player comes in short range with the
 				-- chaser, it won't turn back to the player because it isn't targeting him.
-				if( chaser and not controller.deathBeingHandled and chaser.hasReturnedHome ~= false) then
+				if( chaser and chaser.x and not controller.deathBeingHandled and chaser.hasReturnedHome ~= false) then
 					local xDelta = math.abs(game.steve.x-chaser.x)
 					local yDelta = math.abs(game.steve.y-chaser.y)
 					-- Context: the player is alive and in range for aggro, chase him!
