@@ -36,7 +36,7 @@ local enemies = {
 			species = "paper",
 			lives = 1,
 			isChaser = true,
-			score=250,
+			score = 250,
 			options = {
 				graphicType = "animated",
 				filePath = visual.enemyPaperAnim,
@@ -62,7 +62,7 @@ local enemies = {
 		{
 			species = "chair",
 			lives = 2,
-			score=150,
+			score = 150,
 			options = {
 				filePath = visual.enemySedia,
 				width = 70,
@@ -291,7 +291,7 @@ function enemies.loadEnemies( currentGame )
 
 		enemySprite.species = desc.species
 		enemySprite.lives = desc.lives or 1
-		enemySprite.score= desc.score
+		enemySprite.score = desc.score
 
 		if( enemy.drop ) then
 			enemySprite.drop = enemy.drop

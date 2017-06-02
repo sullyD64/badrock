@@ -46,46 +46,51 @@ physics.setGravity( 0, 50 )
 	}
 	
 --===========================================-- 
+--__________________________________________________________________________________________________ 	
+--|                                                                                                | 
+--|                                                                                                | 
+					-- The only purpose of this is for text debugging on the console.
+					local function debug(event)
+						-- print("Game is " .. game.state)
+						-- print("Steve is " .. game.steve.state)
+						-- print("Steve's sprite is " .. game.steve.sprite.sequence)
+						-- print("Lives: " .. game.lives)
+						-- print("Score: " .. game.score)
+
+						-- if (game.steve.airState) then print("AirState: " .. game.steve.airState) end
+						-- if (game.steve.canJump == true) then print ("Steve can jump")
+						-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
+						-- if (game.steve.isAirborne == true) then print ("Steve is airborne")
+						-- elseif (game.steve.isAirborne == false) then print ("Steve is on the ground") end
+
+						-- if (game.steve.attack) then print(game.steve.attack) else print("nil") end
+
+						-- if (controller.controlsEnabled == true) then print("Controls: enabled") 
+						-- elseif (controller.controlsEnabled == false) then print ("Controls: disabled") end
+						-- if (controller.SSVLaunched == true) then print("SSV is: launched") 
+						-- elseif (controller.SSVLaunched == false) then print ("SSV is: stopped") end
+						-- print("Death being handled in controller.onDeath:")
+						-- print(controller.deathBeingHandled)
+						-- print("Endgame being handled in controller.onGameOver:")
+						-- print(controller.endGameOccurring)
+
+						-- local nextCh
+						-- for i, chaser in pairs (game.chaserList) do
+						-- 	if(chaser) then
+						-- 		print (chaser.species .. " ["..i.."] is " .. chaser.sequence)
+						-- 		nextCh = next(game.chaserList)
+						-- 	end
+						-- end
+						-- if nextCh == nil then print("nobody is following steve") end
+
+						-- print("-----------------------------") -- android debugging
+						-- print("") -- normal debugging
+					end
+--|                                                                                                | 
+--|                                                                                                | 
+--\________________________________________________________________________________________________/
 
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
-	-- The only purpose of this is for text debugging on the console.
-	local function debug(event)
-		-- print("Game is " .. game.state)
-		-- print("Steve is " .. game.steve.state)
-		-- print("Steve's sprite is " .. game.steve.sprite.sequence)
-		-- print("Lives: " .. game.lives)
-		-- print("Score: " .. game.score)
-
-		-- if (game.steve.airState) then print("AirState: " .. game.steve.airState) end
-		-- if (game.steve.canJump == true) then print ("Steve can jump")
-		-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
-		-- if (game.steve.isAirborne == true) then print ("Steve is airborne")
-		-- elseif (game.steve.isAirborne == false) then print ("Steve is on the ground") end
-
-		-- if (game.steve.attack) then print(game.steve.attack) else print("nil") end
-
-		-- if (controller.controlsEnabled == true) then print("Controls: enabled") 
-		-- elseif (controller.controlsEnabled == false) then print ("Controls: disabled") end
-		-- if (controller.SSVLaunched == true) then print("SSV is: launched") 
-		-- elseif (controller.SSVLaunched == false) then print ("SSV is: stopped") end
-		-- print("Death being handled in controller.onDeath:")
-		-- print(controller.deathBeingHandled)
-		-- print("Endgame being handled in controller.onGameOver:")
-		-- print(controller.endGameOccurring)
-
-		-- local nextCh
-		-- for i, chaser in pairs (game.chaserList) do
-		-- 	if(chaser) then
-		-- 		print (chaser.species .. " ["..i.."] is " .. chaser.sequence)
-		-- 		nextCh = next(game.chaserList)
-		-- 	end
-		-- end
-		-- if nextCh == nil then print("nobody is following steve") end
-
-		-- print("-----------------------------") -- android debugging
-		-- print("") -- normal debugging
-	end
-
 	-- This loop is executed only if the game's state is RUNNING
 	local function gameRunningLoop()
 		-- The following block is related to jump activation and animation switching.
@@ -184,7 +189,8 @@ physics.setGravity( 0, 50 )
 				-- the respawn is complete AND the chaser has successfully returned to his 
 				-- spawn point. In this phase, even if the player comes in short range with the
 				-- chaser, it won't turn back to the player because it isn't targeting him.
-				if( chaser and chaser.x and not controller.deathBeingHandled and chaser.hasReturnedHome ~= false) then
+				if( chaser and chaser.x 
+					and not controller.deathBeingHandled and chaser.hasReturnedHome ~= false) then
 					local xDelta = math.abs(game.steve.x-chaser.x)
 					local yDelta = math.abs(game.steve.y-chaser.y)
 					-- Context: the player is alive and in range for aggro, chase him!
@@ -198,7 +204,7 @@ physics.setGravity( 0, 50 )
 						end
 					-- Context: the player is alive but out of aggro range, remain still and wait.
 					else 	
-						if(chaser.sequence ~= "idle") then
+						if(chaser and chaser.sequence ~= "idle") then
 							chaser:setSequence("idle")
 							chaser:play()
 						end
@@ -214,7 +220,7 @@ physics.setGravity( 0, 50 )
 							chaser.hasReturnedHome = false
 							------------------------------
 						end
-						if(chaser.sequence ~= nil and chaser.sequence ~= "walking") then
+						if(chaser and chaser.sequence ~= "walking") then
 							chaser:setSequence("walking")
 							chaser:play()
 						end
@@ -234,14 +240,6 @@ physics.setGravity( 0, 50 )
 		end
 	end
 
-	-- funzione che calcola il punteggio massimo del game corrente
-	function maxScore()
-	score=0
-		for k,v in ipairs(game.enemies) do
-			score= score + game.enemies[k].enemySprite.score
-		end
-			score= score + #game.npcs * 1000
-	end
 	-- The main game loop, every function is described as follows.
 	local function onUpdate()
 		-- Keeps the player's image, sprite and sensor all joined.
@@ -313,6 +311,17 @@ physics.setGravity( 0, 50 )
 		if (game.stars > myData.settings.levels[game.currentLevel].stars) then
 			myData.settings.levels[game.currentLevel].stars = game.stars
 		end
+	end
+
+	-- Calculates the maximum score obtainable in the current leve.
+	function game.getMaxScore()
+		local score = 0
+		for k, enemy in pairs(game.enemies) do
+			score = score + enemy.enemySprite.score
+		end
+		score = score + #game.npcs * 1000
+
+		return score
 	end
 
 	-- Adds points to the current game's score (points are fixed for now).

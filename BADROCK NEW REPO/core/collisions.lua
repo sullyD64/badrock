@@ -81,10 +81,8 @@ end
 						end
 					end
 				-----------------------------------------------------
-
-				---------------------------------------------------------
-				game.addScore(enemy.score) -- [We will modify this (but when???)]
-				---------------------------------------------------------
+				
+				game.addScore(enemy.score)
 
 			else 									-- Enemy is still alive
 				-- Animation: Knocks the enemy AWAY ------------------------------------------
