@@ -88,6 +88,8 @@ physics.setGravity( 0, 50 )
 
 	-- This loop is executed only if the game's state is RUNNING
 	local function gameRunningLoop()
+		maxscore= maxScore()
+		print(maxscore)
 		-- The following block is related to jump activation and animation switching.
 			-- Jump controls:
 				-- Jumping is allowed only in two circumstances:
