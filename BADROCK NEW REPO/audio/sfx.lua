@@ -1,8 +1,8 @@
 local myData = require( "myData" )
 local sfx = {}  --create the main Sound Effects (sfx) table.
 
-sfx.bgMenuMusic = audio.loadStream( "audio/Undertale - Bonetrousle.mp3" )     --(ovviamente cambiare il brano)
-sfx.bgLvlMusic= audio.loadStream("audio/overside8bit.wav")
+sfx.bgMenuMusic = audio.loadStream( "audio/overside8bit.wav" ) --"audio/Undertale - Bonetrousle.mp3" )
+sfx.bgLvlMusic= audio.loadStream( "audio/Highways_standard.wav" )
 sfx.jumpSound = audio.loadSound("audio/jump.wav")
 sfx.coinSound = audio.loadSound("audio/coin.wav")
 sfx.attackSound = audio.loadSound( "audio/attack.wav")

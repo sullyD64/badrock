@@ -234,14 +234,6 @@ physics.setGravity( 0, 50 )
 		end
 	end
 
-	-- funzione che calcola il punteggio massimo del game corrente
-	function maxScore()
-	score=0
-		for k,v in ipairs(game.enemies) do
-			score= score + game.enemies[k].enemySprite.score
-		end
-			score= score + #game.npcs * 1000
-	end
 	-- The main game loop, every function is described as follows.
 	local function onUpdate()
 		-- Keeps the player's image, sprite and sensor all joined.
@@ -271,9 +263,10 @@ physics.setGravity( 0, 50 )
 			game.stop() 
 		elseif (state == gameStateList.COMPLETED) then
 			if(controller.endGameOccurring ~= true) then
+				game.maxPoints = maxScore()
 				controller.endGameOccurring = true
 				game.levelHasBeenCompleted = true
-				game.updateScoreAndStars()
+				game.updateMyData()
 				controller.onGameOver("Completed")
 			end
 		elseif (state == gameStateList.TERMINATED) then
@@ -294,10 +287,12 @@ physics.setGravity( 0, 50 )
 -- MISCELLANEOUS FUNCTIONS ---------------------------------------------------------
 	
 	-- Updates the current level's final score if the attempt's final score is higher
-	-- than the one stored in myData associated to that level
-	function game.updateScoreAndStars()
-		if (game.score > myData.settings.levels[game.currentLevel].score) then
-			myData.settings.levels[game.currentLevel].score = game.score
+	-- than the one stored in myData associated to that level and set the numer of stars to display
+	function game.updateMyData()
+		local level = tonumber(myData.settings.currentLevel)
+
+		if (game.score > myData.settings.levels[level].score) then
+			myData.settings.levels[level].score = game.score
 			print("punteggio "..game.score)
 		end
 
@@ -310,9 +305,25 @@ physics.setGravity( 0, 50 )
 			game.stars = 1
 		end
 
-		if (game.stars > myData.settings.levels[game.currentLevel].stars) then
-			myData.settings.levels[game.currentLevel].stars = game.stars
+		if (game.stars > myData.settings.levels[level].stars) then
+			myData.settings.levels[level].stars = game.stars
 		end
+
+		if level == myData.settings.unlockedLevels then 
+			myData.settings.unlockedLevels = myData.settings.unlockedLevels + 1
+		end
+
+		myData.settings.currentLevel = myData.settings.currentLevel + 1
+	end
+
+	-- funzione che calcola il punteggio massimo del game corrente
+	function maxScore()
+		local score=0
+		for k,v in ipairs(game.enemies) do
+			score= score + game.enemies[k].enemySprite.score
+		end
+			score= score + #game.npcs * 1000
+		return score
 	end
 
 	-- Adds points to the current game's score (points are fixed for now).
@@ -386,13 +397,10 @@ physics.setGravity( 0, 50 )
 	-- MAIN ENTRY POINT FOR INITIALIZATION 
 	-- (must be called from the current level).
 	-- Triggers all the -game.load- functions.
-	function game.loadGame( map, spawn, lvl, maxP )
+	function game.loadGame( map, spawn )
 		-- Locally stores the current level map and spawn coordinates
 		game.map = map
 		game.spawnPoint = spawn
-		game.currentLevel= lvl
-		print("livello"..game.currentLevel)
-		game.maxPoints = maxP
 
 		-- Instance parameters ----
 		game.score = 0
@@ -480,16 +488,11 @@ function game.stop()
 	if (game.nextScene == "mainMenu") then
 		composer.removeScene( "menu.mainMenu" )
 		composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
-		-- Checks if nextScene has a substring containing "level", then concatenates
-		-- the number representing the next scene.
+		-- Checks if nextScene has a substring containing "level", then
+		-- go to the next scene.
 	elseif (string.find( game.nextScene, "level" )) then 
-		composer.removeScene( "levels.level"..string.sub( game.nextScene, 6 ) )
-		composer.gotoScene( "levels.level"..string.sub( game.nextScene, 6 ), { effect="fade", time=280 } )
-		-- [da tenere per precauzione (per ora)]
-		-- elseif (game.nextScene == "level"..game.currentLevel) then
-		-- 	composer.removeScene( "levels.level"..game.currentLevel )
-		-- 	composer.gotoScene( "levels.level"..game.currentLevel, { effect="fade", time=280 } )
-
+		composer.removeScene( "levels."..game.nextScene )
+		composer.gotoScene( "levels."..game.nextScene , { effect="fade", time=280 } )
 	end
 	game.nextScene = nil
 
