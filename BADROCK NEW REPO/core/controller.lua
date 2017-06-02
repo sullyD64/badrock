@@ -23,7 +23,6 @@ local controller = {
 	SSVEnabled,					-- SSV: "Set Steve Velocity"
 	SSVLaunched,
 	i, j, 						-- both are needed for the variable jump height
-	endGameOccurring,	
 	deathBeingHandled,
 	noMovementDetected,		-- needed for resetting the player's state to IDLE
 }
@@ -269,59 +268,17 @@ local sState = {}
 	-- For now, the special events are the player's death and the end of the current
 	-- game. Those events must be handled by the controller.
 
-	-- Lasciata come reference durante la modifica (può ancora servire, non si sa mai) 
-	-- da eliminare alla fine di questa iterazione
-	-- function controller.onGameOver(outcome)
-		-- 	controller.endGameOccurring = true
-		-- 	ui.showOutcome(outcome)
-		-- 	-- Prevents pressing the action button in this phase: if not, any access 
-		-- 	-- to the player's state inside onAttack will throw a runtime error
-		-- 	ui.buttons.action.active = false
-		-- 	controller.pauseEnabled = false
-		-- 	---------------------------------------
-		-- 	-- If GameOver was triggered by onDeath
-		-- 	if (controller.deathBeingHandled == true) then
-		-- 		steve.isBodyActive = false
-		-- 		steve.sensorD.isBodyActive = false
-		-- 		steve.sensorD.isVisible = false
-		-- 		steve.sprite.alpha = 0
-		-- 	end
-		-- 	---------------------------------------
-		-- 	timer.performWithDelay( 1500,
-		-- 		function()
-
-		-- 			controller:pause()
-		-- 			game.map:setFocus( nil )
-		-- 			game:removeAllEntities()
-		-- 			controller.destroyUI()
-		
-		-- 			game.nextScene = "highscores"
-		-- 			if (game.state == gState.TERMINATED) then
-		-- 				game.nextScene = "mainmenu"
-		-- 			end
-
-		-- 			-- The declaration below triggers the final call in the game loop
-		-- 			game.state = gState.ENDED
-		-- 		end
-		-- 	)
-		-- end
-
 	-- At this point, it's game over. 
 	-- This displays the outcome of the game (good or bad depending from where this function is
 	-- being called) and triggers the end procedure of the current game (Main exit point)
-
 	function controller.onGameOver(outcome)
-		-- controller.endGameOccurring = true 	--? probabilmente non più utile e da togliere, ulteriori controlli da fare
 
 		-- Prevents pressing the action button in this phase: if not, any access 
 		-- to the player's state inside onAttack will throw a runtime error
 		ui.buttons.action.active = false
 		controller.pauseEnabled = false
 
-		if (steve.state == sState.ATTACKING) then 
-			steve:cancelAttack()
-		end
-
+		if (steve.state == sState.ATTACKING) then steve:cancelAttack()	end
 		---------------------------------------
 		-- If GameOver was triggered by onDeath
 		if (controller.deathBeingHandled == true) then
@@ -361,7 +318,7 @@ local sState = {}
 			steve.x, steve.y = spawn.x, spawn.y
 			steve.sprite.x, steve.sprite.y = steve.x, steve.y
 			game.map:fadeToPosition(spawn.x, spawn.y, 250)
-			game.score=0
+	
 			controller.destroyUI()
 			controller.prepareUI()
 
@@ -427,6 +384,7 @@ local sState = {}
 		if (game.lives == 0) then
 			controller.onGameOver("Failed")
 		elseif ( game.lives > 0 ) then
+			game.score = 0
 			handleRespawn()
 		end
 	end
