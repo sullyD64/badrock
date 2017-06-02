@@ -83,7 +83,7 @@ end
 				-----------------------------------------------------
 
 				---------------------------------------------------------
-				game.addScore(200) -- [We will modify this (but when???)]
+				game.addScore(enemy.score) -- [We will modify this (but when???)]
 				---------------------------------------------------------
 
 			else 									-- Enemy is still alive
