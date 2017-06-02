@@ -74,14 +74,20 @@ physics.setGravity( 0, 50 )
 						-- print("Endgame being handled in controller.onGameOver:")
 						-- print(controller.endGameOccurring)
 
-						-- local nextCh
-						-- for i, chaser in pairs (game.chaserList) do
-						-- 	if(chaser) then
-						-- 		print (chaser.species .. " ["..i.."] is " .. chaser.sequence)
-						-- 		nextCh = next(game.chaserList)
-						-- 	end
-						-- end
-						-- if nextCh == nil then print("nobody is following steve") end
+						local nextCh
+						for i, chaser in pairs (game.chaserList) do
+							if(chaser) then
+								-- if (chaser.targetName) then
+								-- 	print(chaser.species.." ["..i.."] (target:"..chaser.targetName
+								-- 		..") (sequence:"..chaser.sequence..")")
+								-- else
+								-- 	print(chaser.species.." ["..i..
+								-- 		"] (target: none) (sequence:"..chaser.sequence..")")
+								-- end
+							end
+							nextCh = next(game.chaserList)
+						end
+						if nextCh == nil then print("there are no chasers alive") end
 
 						-- print("-----------------------------") -- android debugging
 						-- print("") -- normal debugging
@@ -89,6 +95,7 @@ physics.setGravity( 0, 50 )
 --|                                                                                                | 
 --|                                                                                                | 
 --\________________________________________________________________________________________________/
+
 
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- This loop is executed only if the game's state is RUNNING
@@ -181,7 +188,7 @@ physics.setGravity( 0, 50 )
 			end
 		end
 		
-		-- Entity animation: handles the chasers behavior
+		-- Entity animation: handles the chasers' behavior
 		if (game.enemiesLoaded == true and game.lives ~= 0) then
 			-- Iterates the chaser list
 			for i, chaser in pairs(game.chaserList) do
@@ -189,37 +196,64 @@ physics.setGravity( 0, 50 )
 				-- the respawn is complete AND the chaser has successfully returned to his 
 				-- spawn point. In this phase, even if the player comes in short range with the
 				-- chaser, it won't turn back to the player because it isn't targeting him.
-				if( chaser and chaser.x 
-					and not controller.deathBeingHandled and chaser.hasReturnedHome ~= false) then
-					local xDelta = math.abs(game.steve.x-chaser.x)
-					local yDelta = math.abs(game.steve.y-chaser.y)
-					-- Context: the player is alive and in range for aggro, chase him!
-					if( chaser and xDelta <= 230 and yDelta <= 150 ) then
-						------------------------
-						chaser:chase(game.steve)
-						------------------------
-						if(chaser and chaser.sequence ~= "running") then
-							chaser:setSequence("running")
-							chaser:play()							
-						end
-					-- Context: the player is alive but out of aggro range, remain still and wait.
-					else 	
-						if(chaser and chaser.sequence ~= "idle") then
-							chaser:setSequence("idle")
-							chaser:play()
+				if not(controller.deathBeingHandled) then
+					if( chaser and chaser.x ) then
+						local xDelta = math.abs(game.steve.x-chaser.x)
+						local yDelta = math.abs(game.steve.y-chaser.y)
+						-- Context: the player is alive and in range for aggro, chase him!
+						-- (also, the chaser has completed repositioning)
+						if( chaser and xDelta <= 230 and yDelta <= 150
+							and chaser.hasReturnedHome ~= false ) then
+							------------------------
+							chaser:chase(game.steve)
+							------------------------
+							if (chaser.isChasingPlayer ~= true) then
+								chaser.isChasingPlayer = true
+							end
+							if(chaser and chaser.sequence ~= "running") then
+								chaser:setSequence("running")
+								chaser:play()							
+							end
+						-- Context: the player is alive but out of aggro range, remain still and wait.
+						else
+							if (chaser.isChasingPlayer ~= false) then
+								chaser.isChasingPlayer = false
+								if ((chaser.isIdleAwayFromHome ~= true)
+									and (math.abs(chaser.x-chaser.home.x) > 0)
+									and (math.abs(chaser.y-chaser.home.y) > 0)) then
+									chaser.isIdleAwayFromHome = true
+								end
+							end
+							if(chaser and chaser.sequence ~= "idle") then
+								chaser:setSequence("idle")
+								chaser:play()
+							end
+							-- If the chaser is "idle and away from home" (has disaggroed), launch a timer:
+							-- if after the timer ends he hasn't aggroed again, he will return home.
+							
+							if (chaser.isIdleAwayFromHome == true) then
+								if (chaser.isCheckingIdleTime ~= true) then
+									chaser.isCheckingIdleTime = true
+									chaser:checkIfIdleTimeExceeded()
+								end
+							end
 						end
 					end
-				-- Context: the player is dead, nothing to do, return to spawn position.
 				else
-					-- Each entry in enemies contains the original spawn coordinates,
-					-- while each enemySprite contains the current coordinates.
-					for k, enemy in pairs(game.enemies) do
-						if (chaser == enemy.enemySprite) then
-							------------------------------
-							chaser:chase(enemy)
-							chaser.hasReturnedHome = false
-							------------------------------
-						end
+					if (chaser.isChasingPlayer ~= false) then
+						chaser.isChasingPlayer = false
+					end
+					if (chaser.hasReturnedHome ~= false) then
+						chaser.hasReturnedHome = false
+					end
+				end
+				-- Context: either the player is dead or chaser has been idle for too long:
+				-- return to spawn position ("home").
+				if (chaser.isChasingPlayer == false) then
+					if (chaser.hasReturnedHome == false) then
+						-------------------------
+						chaser:chase(chaser.home)
+						-------------------------
 						if(chaser and chaser.sequence ~= "walking") then
 							chaser:setSequence("walking")
 							chaser:play()
@@ -390,6 +424,17 @@ physics.setGravity( 0, 50 )
 	function game:loadEnemies() 
 		self.enemies, self.chaserList = enemies.loadEnemies( self )
 		game.enemiesLoaded = true
+
+		-- Each entry in game.enemies contains the original spawn coordinates of a chaser,
+		-- while each enemySprite contains the current coordinates (and equals to the chaser).
+		for i, chaser in pairs(game.chaserList) do
+			for k, enemy in pairs(game.enemies) do
+				if (chaser == enemy.enemySprite) then
+					-- Grants visibility to each chaser of its spawn coordinates.
+					chaser.home = enemy
+				end
+			end
+		end
 	end
 
 	-- MAIN ENTRY POINT FOR INITIALIZATION 

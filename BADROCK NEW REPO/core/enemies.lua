@@ -82,17 +82,20 @@ local enemies = {
 	local function chaseTarget(currentGame, chaser, target)
 		local tileWidth = currentGame.map:getProperty("tilewidth"):getValue()
 
+		if (target.eName) then chaser.targetName = target.eName 
+		elseif (target == chaser.home) then chaser.targetName = "spawn" 
+		end
+
 		if ( (chaser.x and chaser.y) and (target.x and target.y ) and chaser.lives ~= 0) then
 			-- Normal chasing is disabled when jumping a void platform or jumping to reach higher ground.
 			-- [note: this is done to overcome a double setting of the position which, if combined with 
 			-- the impulse applied by this methode, will lead to unexpected and repentine behaviors]
 			if (not chaser.isJumpingVoid and not chaser.isJumpingTo) then
+				if( math.abs(chaser.x-target.x) <= tileWidth*9 or target.enemySprite ) then --old value: 400	
+					chaser.speed = 1 
+					-- (moves faster when returning to spawn)
+					if (target.enemySprite) then chaser.speed = 2 end 
 
-				chaser.speed = 1 
-				-- (moves faster when returning to spawn)
-				if (target.enemySprite) then chaser.speed = 2 end 
-
-				if( math.abs(chaser.x-target.x) <= tileWidth*9 or target.enemySprite ) then --old value: 400
 					-- Works out angle between target and chaser
 					local angle = math.atan2 (target.y - chaser.y, target.x - chaser.x) 
 					-- Updates x pos in relation to angle
@@ -105,7 +108,8 @@ local enemies = {
 
 					-- Every two seconds, the chaser checks if the target is in a higher position
 					-- compared to him. If he is close enough, he attempts to reach that height.
-					if not (chaser.isJumpingTo) and not (chaser.isCheckingVerticalProximity and not chaser.isJumpingVoid) then
+					if not (chaser.isJumpingTo) 
+						and not (chaser.isCheckingVerticalProximity and not chaser.isJumpingVoid) then
 						chaser.isCheckingVerticalProximity = true
 						chaser:checkVerticalProximity(target)
 						timer.performWithDelay(2000, 
@@ -126,13 +130,19 @@ local enemies = {
 						-- to the exact position where he spawned.
 						if (math.abs(chaser.x - target.x) <= 20) then
 							-- The chaser awaits little before returning to wait for the player
-							timer.performWithDelay(1000, 
+							timer.performWithDelay(500, 
 								function()
-									chaser.hasReturnedHome = true
+									if (chaser.isIdleAwayFromHome ~= false) then
+										chaser.isIdleAwayFromHome = false
+									end
+									if (chaser.hasReturnedHome ~= true) then
+										chaser.hasReturnedHome = true
+									end
 								end
 							)
 						end
-
+						-- If it's taking too long to return to the spawn point, 
+						-- the chaser will teleport there immediately.
 						if not (chaser.isCheckingIfTooLate) then
 							chaser.isCheckingIfTooLate = true
 							chaser:checkIfTooLate(target)
@@ -196,11 +206,26 @@ local enemies = {
 		end
 	end
 
+	-- Context: if the chaser has left its 'home' and has disaggroed, and has been in this
+	-- state for more than a certain amount of time, the chaser begins returning home.
+	local function checkIfIdleTimeExceeded(chaser)
+		timer.performWithDelay( 2000, 
+			function()
+				if (chaser.isChasingPlayer == false) then
+					chaser.hasReturnedHome = false
+				end
+				if (chaser.isCheckingIdleTime ~= false) then
+					chaser.isCheckingIdleTime = false
+				end
+			end
+		)
+	end
+
 	-- Context: the chaser is returning to its spawn point but it is stuck somewhere or
 	-- the operation is taking too much time: in this case, the chaser is teleported
 	-- home. During this transition, its body is unactive.
 	local function checkIfTooLate(chaser, target)
-		timer.performWithDelay( 4000, 
+		timer.performWithDelay( 1500, 
 			function()
 				if (chaser.hasReturnedHome == false) then
 					local teleportHome = function()
@@ -229,6 +254,8 @@ local enemies = {
 		chaser:addEventListener( "preCollision", chaser)
 
 		chaser.voidList = currentGame.map:getObjectLayer("cadutaVuoto").objects
+		chaser.isIdleAwayFromHome = false
+		chaser.isChasingPlayer = false
 
 		-- Used when the chaser jumps, to re-enable normal chasing.
 		chaser.collision = function(self, event)
@@ -251,6 +278,11 @@ local enemies = {
 		-- Invoked from chase(target) at each frame
 		function chaser:checkVoidProximity( void )
 			checkVoidProximity(currentGame, self, void)
+		end
+
+		-- Invoked from chase(target) ONCE and only when isIdleAwayFromHome
+		function chaser:checkIfIdleTimeExceeded()
+			checkIfIdleTimeExceeded(self)
 		end
 
 		-- Invoked from chase(target) only if target is the chaser's spawn.
