@@ -214,7 +214,7 @@ physics.setGravity( 0, 50 )
 							chaser.hasReturnedHome = false
 							------------------------------
 						end
-						if(chaser.sequence ~= "walking") then
+						if(chaser.sequence ~= nil and chaser.sequence ~= "walking") then
 							chaser:setSequence("walking")
 							chaser:play()
 						end
