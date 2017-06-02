@@ -192,7 +192,7 @@ physics.setGravity( 0, 50 )
 						------------------------
 						chaser:chase(game.steve)
 						------------------------
-						if(chaser.sequence ~= "running") then
+						if(chaser and chaser.sequence ~= "running") then
 							chaser:setSequence("running")
 							chaser:play()							
 						end
@@ -234,6 +234,14 @@ physics.setGravity( 0, 50 )
 		end
 	end
 
+	-- funzione che calcola il punteggio massimo del game corrente
+	function maxScore()
+	score=0
+		for k,v in ipairs(game.enemies) do
+			score= score + game.enemies[k].enemySprite.score
+		end
+			score= score + #game.npcs * 1000
+	end
 	-- The main game loop, every function is described as follows.
 	local function onUpdate()
 		-- Keeps the player's image, sprite and sensor all joined.

@@ -361,7 +361,7 @@ local sState = {}
 			steve.x, steve.y = spawn.x, spawn.y
 			steve.sprite.x, steve.sprite.y = steve.x, steve.y
 			game.map:fadeToPosition(spawn.x, spawn.y, 250)
-
+			game.score=0
 			controller.destroyUI()
 			controller.prepareUI()
 
