@@ -43,7 +43,7 @@ function scene:create( event )
 	-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
 	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
 	-- e due Tile Layer -vuoti-  playerObject e playerEffects.
-	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0"), 1, 600 )
+	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0") )
 end
 
 -- show()

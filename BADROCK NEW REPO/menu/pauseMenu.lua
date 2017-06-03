@@ -7,6 +7,7 @@
 local widget   = require ( "widget"           )
 local sfxMenu  = require ( "menu.sfxMenu"     )
 local utility  = require ( "menu.utilityMenu" )
+local myData   = require ( "myData" )
 
 local pause = {}
 -- pause.psbutton = nil
@@ -52,6 +53,21 @@ end
 		 game.state = stateList.TERMINATED
 		-- composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
 		--------------------------------------------------------------------
+		return true
+	end
+
+	-- Try again the same level
+	local function onRetryBtnRelease()  
+		pause.panel:hide({
+			speed = 250,
+			transition = easing.outElastic
+		})
+		audio.fadeOut(1,100)
+		audio.stop(1)
+
+		-- cambiare il game state per andare di nuovo al livello
+		game.nextScene = "level"..myData.settings.currentLevel
+		game.state = stateList.ENDED
 		return true
 	end
 
@@ -113,6 +129,26 @@ end
 			pause.panel.menuBtn.x= -50
 			pause.panel.menuBtn.y = pause.panel.contentCenterY
 			pause.panel:insert(pause.panel.menuBtn)
+
+
+		pause.panel.retryBtn = widget.newButton {
+			--label = "Retry",
+			--fontSize = 10,
+			--labelColor = { default={0}, over={1} },
+			onRelease = onRetryBtnRelease,
+			defaultFile = visual.retryImg,
+			emboss = false,
+			--shape = "roundedRect",
+			width = 26,
+			height = 27,
+			cornerRadius = 2,
+			--fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+			--strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+			--strokeWidth = 1,
+			}
+			pause.panel.retryBtn.x= -20
+			pause.panel.retryBtn.y = pause.panel.contentCenterY
+			pause.panel:insert(pause.panel.retryBtn)
 	-- -------------------------------------------------------------------------------
 
 	pause.group = display.newGroup()

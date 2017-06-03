@@ -33,7 +33,7 @@ function scene:create( event )
 		audio.pause(1)
 	end
 
-	map = lime.loadMap("ultimate_map.tmx")
+	map = lime.loadMap("testMap3.tmx")
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 	
@@ -43,7 +43,7 @@ function scene:create( event )
 	-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
 	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
 	-- e due Tile Layer -vuoti-  playerObject e playerEffects.
-	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0"), 2, 600 )
+	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0"))
 end
 
 -- show()

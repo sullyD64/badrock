@@ -17,32 +17,7 @@ local stateList = {}
 --local finalText = display.newText ("", 0, -50, native.systemFontBold, 34)
 --local finalScore = display.newText( "", 0, -70, "Micolas.ttf", 15 )
 local stars = {}
-
--- function result.setStars(game, outcome)
--- 	if (outcome == "Completed") then
--- 		local nStars = 0
--- 		if (tonumber(game.score)<=200) then
--- 			nStars = 1
--- 		elseif (tonumber(game.score)<=400) then
--- 			nStars = 2
--- 		elseif (tonumber(game.score)<=600) then
--- 			nStars = 3
--- 		end
--- 		for j = 1, 3 do --myData.settings.levels[i].stars do
--- 			if j<=nStars then
--- 				result.panel.star[j].alpha = 1
--- 			else 
--- 				result.panel.star[j].alpha = 0.3
--- 			end		
--- 		end
--- 		game.stars = nStars
--- 		print(game.stars)
--- 	elseif (outcome == "Failed") then
--- 		for j = 1, 3 do
--- 			result.panel.star[j].alpha = 0
--- 		end
--- 	end
--- end
+local level = myData.settings.currentLevel
 
 function result.setStars(game, outcome)
 	if (outcome == "Completed") then
@@ -89,7 +64,6 @@ function result.setGame( currentGame, gameStates, outcome )
 		result.panel.score.text = ""
 	end
 	result.setStars(game, outcome)
-	level = game.currentLevel
 
 end
 -------------------------------------------------
@@ -133,9 +107,8 @@ end
 		})
 		audio.fadeOut(1,100)
 		audio.stop(1)
-
 		-- cambiare il game state per andare al prossimo livello
-		game.nextScene = "level"..level+1
+		game.nextScene = "level"..tonumber(level)+1
 		game.state = stateList.ENDED
 
 		return true
