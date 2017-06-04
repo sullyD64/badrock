@@ -261,6 +261,13 @@ physics.setGravity( 0, 50 )
 					end
 				end
 			end
+			for i, walker in pairs(game.walkerList) do
+						if(walker.sequence and walker.sequence ~= "walking") then
+							walker:walk()
+							walker:setSequence("walking")
+							walker:play()
+						end
+			end			
 		end
 	
 		-- Listener for the "player has died" event.
@@ -431,7 +438,7 @@ physics.setGravity( 0, 50 )
 
 	-- See enemies.lua
 	function game:loadEnemies() 
-		self.enemies, self.chaserList = enemies.loadEnemies( self )
+		self.enemies, self.chaserList, self.walkerList = enemies.loadEnemies( self )
 		game.enemiesLoaded = true
 
 		-- Each entry in game.enemies contains the original spawn coordinates of a chaser,
@@ -510,14 +517,36 @@ function game.pause()
 		transition.pause(game.chaserList[i])
 		game.chaserList[i]:pause()
 	end
+	for i in pairs(game.walkerList) do
+		--transition.pause(game.walkerList[i])
+		if(game.walkerList[i] and game.walkerList[i].sequence and game.walkerList[i]:pause()) then
+			game.walkerList[i]:pause()
+			timer.pause(tl)
+			game.walkerList[i]:setLinearVelocity(0,0)
+		end
+	end
 end
 
 function game.resume()
 	physics.start()
 	controller:start()
 	for i in pairs(game.chaserList) do
-		transition.resume(game.chaserList[i])
+		if(game.chaserList[i] and game.chaserList[i].sequence ) then
+			transition.resume(game.chaserList[i])
+			--if (not (game.chaserList[i].sequence=="running") ) then game.chaserList[i]:setSequence("running") end
+			game.chaserList[i]:play()
+		end
 	end
+	for i in pairs(game.walkerList) do
+		if(game.walkerList[i] and game.walkerList[i].sequence ) then
+			--transition.resume(game.walkerList[i])
+			game.walkerList[i]:setSequence("walking")
+			game.walkerList[i]:play()
+			if(timer._) then timer.resume(tl) end
+		end
+		
+	end
+
 end
 
 function game.stop()

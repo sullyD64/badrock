@@ -33,7 +33,7 @@ local enemies = {
 			-- In a future implementation this property (as the isWalker property) will be 
 			-- appliable to single, select Enemies directly from the map file. 
 		{	
-			species = "paper",
+			species = "paperChaser",
 			lives = 1,
 			isChaser = true,
 			score = 250,
@@ -58,6 +58,31 @@ local enemies = {
 			}
 		},
 
+		{	
+			species = "paperWalker",
+			lives = 1,
+			isWalker = true,
+			score = 150,
+			options = {
+				graphicType = "animated",
+				filePath = visual.enemyPaperAnim,
+				spriteOptions = {
+					height = 45,
+					width = 40,
+					numFrames = 9,
+					sheetContentWidth = 120,
+					sheetContentHeight = 135 
+				},
+				spriteSequence = {
+					{name = "idle",    frames={1,2},         time=650, loopCount=0},
+					{name = "walking", frames={1,2,3,3,2,1}, time=650, loopCount=0},
+					{name = "running", start =4, count=5,    time=600, loopCount=0},
+					{name = "dead",    frames={9},           time=500, loopCount=1}
+				},
+				physicsParams = { bounce = 0, friction = 0.1, density = 1.0, },
+				eName = "enemy"
+			}
+		},
 		-- 2 Chair
 		{
 			species = "chair",
@@ -246,7 +271,42 @@ local enemies = {
 			end
 		)
 	end
+		-- Main function: the walker moves left and right.
+		local function loadWalker( walker, currentGame )
 
+			local function listener2(event)
+				if(walker and walker.x) then
+					local wXV, wYV = walker:getLinearVelocity()
+					print(wXV,wYV)
+					bordoSx= walker.x-100000 -- non importa quanto vale, basta che bordoSx sia diverso da walker.x, idem per gli altri
+					bordoDx= walker.x+100000
+					if(walker.x<bordoDx and currentGame.state=="Running") then
+						walker.xScale=-1
+						walker:setLinearVelocity(320, 0 )
+					end
+					
+				end
+		end
+		local function listener1(event)
+			if(walker and walker.x) then
+				local wXV, wYV = walker:getLinearVelocity()
+				print(wXV,wYV)
+				bordoSx= walker.x-100000
+				bordoDx= walker.x+100000
+				if(walker.x>bordoSx and currentGame.state=="Running") then 
+					walker.xScale=1
+					walker:setLinearVelocity(-320, 0 )
+					t2=timer.performWithDelay( 1000, listener2 )
+				end
+					
+					
+			end
+		end
+
+		function walker:walk()
+			tl=timer.performWithDelay( 2000, listener1, -1 )
+		end
+	end
 	-- Adds special behavior to an enemy if he isChaser
 	local function loadChaser( chaser, currentGame )
 		-- Only chasers need (and therefore will have) preCollision handling.
@@ -343,6 +403,9 @@ function enemies.loadEnemies( currentGame )
 		if (desc.isChaser) then
 			loadChaser(enemySprite, currentGame)
 			table.insert(chaserList, enemySprite)
+		elseif (desc.isWalker) then
+			loadWalker(enemySprite, currentGame)
+			table.insert(walkerList, enemySprite)
 		end
 		---------------------------------------------------------------
 
