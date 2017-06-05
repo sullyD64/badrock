@@ -356,12 +356,12 @@
  </objectgroup>
  <objectgroup name="enemySpawn">
   <object id="3" name="enemy" type="chair" x="832" y="226"/>
-  <object id="11" name="enemy" type="paperChaser" x="673" y="550.5">
+  <object id="11" name="enemy" type="paper" x="673" y="550.5">
    <properties>
     <property name="drop" value="life"/>
    </properties>
   </object>
-  <object id="24" name="enemy" type="paperWalker" x="486.667" y="346.667">
+  <object id="24" name="enemy" type="robot" x="486.667" y="346.667">
    <properties>
     <property name="drop" value="gun"/>
    </properties>

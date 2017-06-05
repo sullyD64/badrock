@@ -33,7 +33,7 @@ local enemies = {
 			-- In a future implementation this property (as the isWalker property) will be 
 			-- appliable to single, select Enemies directly from the map file. 
 		{	
-			species = "paperChaser",
+			species = "paper",
 			lives = 1,
 			isChaser = true,
 			score = 250,
@@ -59,29 +59,18 @@ local enemies = {
 		},
 
 		{	
-			species = "paperWalker",
+			species = "robot",
 			lives = 1,
+			isWalking=false,
 			isWalker = true,
 			score = 150,
 			options = {
-				graphicType = "animated",
-				filePath = visual.enemyPaperAnim,
-				spriteOptions = {
-					height = 45,
-					width = 40,
-					numFrames = 9,
-					sheetContentWidth = 120,
-					sheetContentHeight = 135 
-				},
-				spriteSequence = {
-					{name = "idle",    frames={1,2},         time=650, loopCount=0},
-					{name = "walking", frames={1,2,3,3,2,1}, time=650, loopCount=0},
-					{name = "running", start =4, count=5,    time=600, loopCount=0},
-					{name = "dead",    frames={9},           time=500, loopCount=1}
-				},
-				physicsParams = { bounce = 0, friction = 0.1, density = 1.0, },
-				eName = "enemy"
-			}
+				filePath = visual.enemyRobot,
+				width = 65,
+				height = 65,
+				physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
+				eName = "enemy",
+			},
 		},
 		-- 2 Chair
 		{
@@ -282,7 +271,7 @@ local enemies = {
 					bordoDx= walker.x+100000
 					if(walker.x<bordoDx and currentGame.state=="Running") then
 						walker.xScale=-1
-						walker:setLinearVelocity(320, 0 )
+						walker:setLinearVelocity(520, 0 )
 					end
 					
 				end
@@ -295,7 +284,7 @@ local enemies = {
 				bordoDx= walker.x+100000
 				if(walker.x>bordoSx and currentGame.state=="Running") then 
 					walker.xScale=1
-					walker:setLinearVelocity(-320, 0 )
+					walker:setLinearVelocity(-520, 0 )
 					t2=timer.performWithDelay( 1000, listener2 )
 				end
 					
@@ -304,7 +293,9 @@ local enemies = {
 		end
 
 		function walker:walk()
-			tl=timer.performWithDelay( 2000, listener1, -1 )
+			--if(walker.isWalking==false) then 
+				tl=timer.performWithDelay( 2000, listener1, -1 ) 
+				--end
 		end
 	end
 	-- Adds special behavior to an enemy if he isChaser
@@ -405,6 +396,7 @@ function enemies.loadEnemies( currentGame )
 			table.insert(chaserList, enemySprite)
 		elseif (desc.isWalker) then
 			loadWalker(enemySprite, currentGame)
+			enemySprite.isWalking=false
 			table.insert(walkerList, enemySprite)
 		end
 		---------------------------------------------------------------

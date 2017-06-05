@@ -262,10 +262,9 @@ physics.setGravity( 0, 50 )
 				end
 			end
 			for i, walker in pairs(game.walkerList) do
-						if(walker.sequence and walker.sequence ~= "walking") then
+						if(walker.isWalking==false) then
 							walker:walk()
-							walker:setSequence("walking")
-							walker:play()
+							walker.isWalking=true
 						end
 			end			
 		end
@@ -519,8 +518,7 @@ function game.pause()
 	end
 	for i in pairs(game.walkerList) do
 		--transition.pause(game.walkerList[i])
-		if(game.walkerList[i] and game.walkerList[i].sequence and game.walkerList[i]:pause()) then
-			game.walkerList[i]:pause()
+		if(t1 and game.walkerList[i]) then
 			timer.pause(tl)
 			game.walkerList[i]:setLinearVelocity(0,0)
 		end
@@ -538,10 +536,7 @@ function game.resume()
 		end
 	end
 	for i in pairs(game.walkerList) do
-		if(game.walkerList[i] and game.walkerList[i].sequence ) then
-			--transition.resume(game.walkerList[i])
-			game.walkerList[i]:setSequence("walking")
-			game.walkerList[i]:play()
+		if(game.walkerList[i]) then
 			if(timer._) then timer.resume(tl) end
 		end
 		
