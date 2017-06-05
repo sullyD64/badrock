@@ -22,7 +22,7 @@ local collisions = require ( "core.collisions" )
 local game = {}
 
 physics.start()
-physics.setGravity( 0, 50 )
+physics.setGravity( 0, 10 )
 
 --===========================================-- 
 	-------------------------------

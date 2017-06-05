@@ -32,7 +32,8 @@ function scene:create( event )
 		audio.pause(1)
 	end
 
-	map = lime.loadMap("testmap_new.tmx")
+	--map = lime.loadMap("testmap_new.tmx")
+	map = lime.loadMap("tepregofunziona.tmx")
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 

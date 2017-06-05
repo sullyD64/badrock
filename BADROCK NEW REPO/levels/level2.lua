@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------------
 --
--- level2.lua
--- nope
+-- level1.lua
+--
 -----------------------------------------------------------------------------------------
 
 local composer = require( "composer" )
@@ -33,7 +33,7 @@ function scene:create( event )
 		audio.pause(1)
 	end
 
-	map = lime.loadMap("testmap_new - 2.tmx")
+	map = lime.loadMap("ultimate_map.tmx")
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 
@@ -42,7 +42,7 @@ function scene:create( event )
 	-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
 	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
 	-- e due Tile Layer -vuoti-  playerObject e playerEffects.
-	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0"), 1 )
+	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0"), 1, 600 )
 end
 
 -- show()

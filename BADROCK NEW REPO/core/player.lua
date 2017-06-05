@@ -108,11 +108,11 @@ function player.loadPlayer( currentGame )
 		local player = entity.newEntity{
 			graphicType = "static",
 			filePath = visual.steveImage,
-			width = 30,
-			height = 30,
+			width = 60,
+			height = 60,
 			bodyType = "dynamic",
 			physicsParams = { density=1.0, friction=0.7, bounce=0.01 },
-			alpha = 0,
+			alpha = 1,
 			isFixedRotation = true,
 			eName = "steve"
 		}
@@ -124,6 +124,7 @@ function player.loadPlayer( currentGame )
 			spriteOptions = settings.mainSheetData,
 			spriteSequence = settings.mainSequenceData,
 			notPhysical = true,
+			alpha = 0,
 			eName = "steveSprite"
 		}
 
