@@ -3,7 +3,7 @@
 -- level1.lua
 --
 -----------------------------------------------------------------------------------------
-
+local bossStrategy = require ("core.bossStrategy")
 local composer = require ( "composer"  )
 local myData   = require ( "myData"    )
 local sfx      = require ( "audio.sfx" )
@@ -44,6 +44,8 @@ function scene:create( event )
 	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
 	-- e due Tile Layer -vuoti-  playerObject e playerEffects.
 	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0"), 1, 600 )
+		bossStrategy.startBossFight(5) -- riga da rimuovere e sistemare come si deve
+
 end
 
 -- show()

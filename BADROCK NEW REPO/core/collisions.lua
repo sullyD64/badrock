@@ -51,6 +51,7 @@ end
 
 			if ( enemy.lives == 0 ) then  -- Enemy has no lives left: he is dead	
 				-- Forces the enemy to drop his item
+
 				if (enemyHit.drop) then
 					game.dropItemFrom(enemyHit) 
 				end
@@ -60,18 +61,23 @@ end
 				enemy.eName = "deadEnemy"
 				enemy.yScale = -1
 
-					-- If the enemy is an animated entity, sets its sequence to dead (parametrized)
-					if (enemy.sequence) then
-						enemy:setSequence("dead")
-						enemy:play()
-					end
+				-- If the enemy is an animated entity, sets its sequence to dead (parametrized)
+				if (enemy.sequence) then
+					enemy:setSequence("dead")
+					enemy:play()
+				end
 
-				timer.performWithDelay(1000, enemy:applyLinearImpulse( 0.05, -0.30, enemy.x, enemy.y ))
-				transition.to(enemy, {time = 5000,  -- removes it when he's off the map 
-					onComplete = function()
-						display.remove(enemy)
-					end
-				})
+				if(enemy.isProjectile)then
+					transition.cancel(enemy)
+					display.remove(enemy)
+				else
+					timer.performWithDelay(1000, enemy:applyLinearImpulse( 0.05, -0.30, enemy.x, enemy.y ))
+					transition.to(enemy, {time = 5000,  -- removes it when he's off the map 
+						onComplete = function()
+							display.remove(enemy)
+						end
+					})
+				end
 				----------------------------------------------------------------------------------------
 
 				-- if Enemy is a Chaser, remove it from the list ----
@@ -83,7 +89,9 @@ end
 				-----------------------------------------------------
 
 				---------------------------------------------------------
-				game.addScore(enemy.score) -- [We will modify this (but when???)]
+				if(enemy.score and enemy.score>0)then
+					game.addScore(enemy.score) -- [We will modify this (but when???)]
+				end
 				---------------------------------------------------------
 
 			else 									-- Enemy is still alive

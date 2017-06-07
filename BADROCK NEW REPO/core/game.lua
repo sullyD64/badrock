@@ -18,6 +18,8 @@ local npcs       = require ( "core.npcs"       )
 local items      = require ( "core.items"      )
 local controller = require ( "core.controller" )
 local collisions = require ( "core.collisions" )
+local bossStrategy=require ("core.bossStrategy")
+local boss       = require ( "core.boss"       )
 
 local game = {}
 
@@ -88,8 +90,7 @@ physics.setGravity( 0, 50 )
 
 	-- This loop is executed only if the game's state is RUNNING
 	local function gameRunningLoop()
-		maxscore= maxScore()
-		print(maxscore)
+		
 		-- The following block is related to jump activation and animation switching.
 			-- Jump controls:
 				-- Jumping is allowed only in two circumstances:
@@ -225,6 +226,169 @@ physics.setGravity( 0, 50 )
 			end
 		end
 	
+		----BOSS FIGHT SECTION-----------------------------------------------------------------------------------
+			--Se è in corso una boss Fight
+			if(game.bossFight and bossStrategy.activeStrategy ~= 0)then
+
+				--Gestione Boss Fight Generica--------------------
+				if(game.steve.state == playerStateList.DEAD and game.bossFight.state ~= "Terminated") then 
+					game.bossFight:terminateFight() 				
+					end
+
+				--- GESTIONE STRATEGY BOSS 1 -------------------------------------------------
+				if(bossStrategy.activeStrategy == 1)then
+					--metodi per la gestione runtime del boss n-esimo	
+					--print("------SONO DENTRO LA GESTIONE BOSS 1 --------------------")
+					local s = game.bossFight
+					
+
+					--Keeps the Boss Pieces all tied together----
+					if(s.bossEntity.spallaDx and s.bossEntity.spallaDx.lives >0)then
+						s.bossEntity.spallaDx.x= s.spawn.x +60
+						s.bossEntity.spallaDx.y = s.spawn.y
+ 					end
+ 					if(s.bossEntity.spallaSx and s.bossEntity.spallaSx.lives>0 )then
+						s.bossEntity.spallaSx.x= s.spawn.x -60
+	 					s.bossEntity.spallaSx.y = s.spawn.y
+ 					end
+ 					if(s.bossEntity.testa and s.bossEntity.testa.lives > 0)then
+ 						s.bossEntity.testa.x= s.spawn.x 
+	 					s.bossEntity.testa.y = s.spawn.y -40
+ 					end
+ 					if(s.bossEntity.corpo and s.bossEntity.corpo.lives > 0)then
+ 						s.bossEntity.corpo.x= s.spawn.x 
+	 					s.bossEntity.corpo.y = s.spawn.y +90
+ 					end
+
+ 					------------- Phase 1 --------------------------------
+ 					if(s.phase == 1) then
+
+						if(s.bossEntity.manoDx.lives==2 and s.bossEntity.manoDx.state == "bouncing")then
+							s.bossEntity.manoDx.state="alzaSchiaccia"
+							s.bossEntity.manoDx.bounce = 0
+							boss.alzaSchiaccia(s.bossEntity.manoDx , game.steve, s)
+						end
+						if(s.bossEntity.manoSx.lives==2 and s.bossEntity.manoSx.state == "bouncing")then
+							s.bossEntity.manoSx.state="alzaSchiaccia"
+							s.bossEntity.manoDx.bounce = 0
+							boss.alzaSchiaccia(s.bossEntity.manoSx , game.steve, s)
+						end
+						---------------------------------------------------------------
+						-- Le mani tornano in aria se perdono tutta la vita------------
+						if(s.bossEntity.manoDx.lives == 1 and s.bossEntity.manoDx.state == "alzaSchiaccia") then
+							s.bossEntity.manoDx.state = "sconfitta"
+							s.bossEntity.manoDx.isBodyActive=false
+							transition.to(s.bossEntity.manoDx, {time= 4000,  x = s.spawn.x +250, y = s.spawn.y})
+						end
+						if(s.bossEntity.manoSx.lives == 1 and s.bossEntity.manoSx.state == "alzaSchiaccia") then
+							s.bossEntity.manoSx.state = "sconfitta"
+							s.bossEntity.manoSx.isBodyActive=false
+							transition.to(s.bossEntity.manoSx, {time= 4000, x = s.spawn.x -250, y = s.spawn.y})
+						end
+						---------------------------------------------------------------
+						-- Se entrambe le mani sono sconfitte parte la fase 2 ---------
+						if(s.bossEntity.manoDx.state=="sconfitta" and s.bossEntity.manoSx.state=="sconfitta" and s.phase ~= 2)then
+							--timer.cancel(t)
+							timer.performWithDelay(5000, s:phase2())
+						end
+					end
+					-------------------Phase 2 -------------------------------------------------
+	
+					if(s.phase == 2)then
+						
+						local maxFireRate = 800
+						if(s.bossEntity.spallaDx.lives==1 and s.bossEntity.spallaDx.state == "normal") then
+							s.bossEntity.spallaDx.state = "rage"
+							s.bossEntity.spallaDx.isTargettable=false
+							timer.performWithDelay(2000,function() s.bossEntity.spallaDx.isTargettable=true	end)
+							s.fireRateDx= maxFireRate
+							print("Spalla DX colpita")
+							for i,t in pairs(s.bossEntity.spallaDx.timer)do
+								timer.cancel(t)
+							end
+							s:phase2()
+						end
+
+						if(s.bossEntity.spallaSx.lives==1 and s.bossEntity.spallaSx.state == "normal") then
+							s.bossEntity.spallaSx.state = "rage"
+							s.bossEntity.spallaSx.isTargettable=false
+							timer.performWithDelay(2000,function() s.bossEntity.spallaSx.isTargettable=true	end)
+							s.fireRateSx= maxFireRate
+							print("Spalla SX colpita")
+							for i,t in pairs(s.bossEntity.spallaSx.timer)do
+								timer.cancel(t)
+							end
+							s:phase2()
+						end
+
+						if(s.bossEntity.spallaSx.lives==0) then
+							for i,t in pairs(s.bossEntity.spallaSx.timer)do
+								timer.cancel(t)
+							end
+						end
+						if(s.bossEntity.spallaDx.lives==0 ) then
+							for i,t in pairs(s.bossEntity.spallaDx.timer)do
+								timer.cancel(t)
+							end
+						end
+						if((s.bossEntity.spallaDx.lives==0 and s.bossEntity.spallaSx.lives==0) or not(s.bossEntity.spallaDx and s.bossEntity.spallaSx))then
+							if(s.phase ~= 3)then
+								timer.performWithDelay(4000,s:phase3())
+							end
+						end
+
+
+					end
+
+					-------------------Phase 3 -------------------------------------------------
+					if(s.phase == 3)then
+						
+							if(s.bossEntity.manoSx.state == "insegui")then
+								s.bossEntity.manoSx.x =	30
+								s.bossEntity.manoSx.y = game.steve.y
+								print("Sx x= "..s.bossEntity.manoSx.x)
+							end
+							if(s.bossEntity.manoDx.state == "insegui") then
+								s.bossEntity.manoDx.x = game.steve.x
+								s.bossEntity.manoDx.y = 30
+							end
+
+							--Keeps the lasers in the position where they are fired------
+							for i,laser in pairs(s.bossEntity.manoSx.lasers)do
+								if(laser)then
+									laser.x = laser.fixedX
+									laser.y = laser.fixedY
+								end
+							end
+							for i,laser in pairs(s.bossEntity.manoDx.lasers)do
+								if(laser)then
+									laser.x = laser.fixedX
+									laser.y = laser.fixedY
+								end
+							end
+
+
+
+					end
+
+				end
+				--- FINE STRATEGY BOSS 1 -----------------------------------------------------
+
+				--- GESTIONE STRATEGY BOSS N-esimo -------------------------------------------
+				if(bossStrategy.activeStrategy == 2)then
+					--metodi per la gestione runtime del boss n-esimo	
+				end
+				--- FINE STRATEGY BOSS N-esimo -----------------------------------------------
+
+			end
+
+
+
+
+		----FINE BOSS FIGHT SECTION-------------------------------------------------------------------------------
+
+		
+
 		-- Listener for the "player has died" event.
 			-- [Observation: de facto, the player spends very little time being 'DEAD'. Don't use this
 			-- state for any control, instead adopt controller.deathBeingHandled!]
@@ -238,11 +402,16 @@ physics.setGravity( 0, 50 )
 
 	-- funzione che calcola il punteggio massimo del game corrente
 	function maxScore()
-	score=0
-		for k,v in ipairs(game.enemies) do
-			score= score + game.enemies[k].enemySprite.score
+		score=0
+
+		if(game.enemies)then
+			for k,v in ipairs(game.enemies) do
+				score= score + game.enemies[k].enemySprite.score
+			end
 		end
+		if(game.npcs)then
 			score= score + #game.npcs * 1000
+		end
 	end
 	-- The main game loop, every function is described as follows.
 	local function onUpdate()
@@ -381,7 +550,7 @@ physics.setGravity( 0, 50 )
 
 	-- See enemies.lua
 	function game:loadEnemies() 
-		self.enemies, self.chaserList = enemies.loadEnemies( self )
+		self.enemies, self.chaserList, self.walkerList = enemies.loadEnemies( self )
 		game.enemiesLoaded = true
 	end
 
@@ -411,9 +580,12 @@ physics.setGravity( 0, 50 )
 		-- Logic, controls and UI initialization -----------------
 		collisions.setGame( game, gameStateList, playerStateList  )
 		controller.setGame( game, gameStateList, playerStateList  )
+		--boss.setGame( game, gameStateList, playerStateList  )
+		bossStrategy.setGame(game, gameStateList, playerStateList )
 		controller.prepareUI()
 		-----------------------------------------------------------
-
+		game.maxscore= maxScore()
+		print(maxscore)
 		physics.start()
 		physics.pause()
 	end
@@ -448,6 +620,10 @@ end
 function game.pause()
 	physics.pause()
 	controller:pause()
+	if(game.bossFight and game.bossFight.state ~= "Paused")then
+		print("----BOSS PAUSE----")
+		game.bossFight:pauseFight()
+	end
 	for i in pairs(game.chaserList) do
 		transition.pause(game.chaserList[i])
 		game.chaserList[i]:pause()
@@ -457,6 +633,10 @@ end
 function game.resume()
 	physics.start()
 	controller:start()
+	if(game.bossFight and game.bossFight.state ~= "Running")then
+		print("----BOSS RESUME----")
+		game.bossFight:resumeFight()
+	end
 	for i in pairs(game.chaserList) do
 		transition.resume(game.chaserList[i])
 	end
