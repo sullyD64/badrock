@@ -75,9 +75,15 @@ end
 				----------------------------------------------------------------------------------------
 
 				-- if Enemy is a Chaser, remove it from the list ----
-					for i, v in ipairs(game.chaserList) do
-						if (enemy == v) then
-							game.chaserList[i] = nil --[spostare altrove]
+					for k, chaser in pairs(game.chaserList) do
+						if (enemy == chaser) then
+							chaser = nil --[spostare altrove]
+						end
+					end
+				-- if Enemy is a Walker, remove it from the list ----
+					for k, chaser in pairs(game.walkerList) do
+						if (enemy == walker) then
+							walker = nil --[spostare altrove]
 						end
 					end
 				-----------------------------------------------------

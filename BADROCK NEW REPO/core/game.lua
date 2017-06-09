@@ -49,49 +49,55 @@ physics.setGravity( 0, 50 )
 --__________________________________________________________________________________________________ 	
 --|                                                                                                | 
 --|                                                                                                | 
-					-- The only purpose of this is for text debugging on the console.
-					local function debug(event)
-						-- print("Game is " .. game.state)
-						-- print("Steve is " .. game.steve.state)
-						-- print("Steve's sprite is " .. game.steve.sprite.sequence)
-						-- print("Lives: " .. game.lives)
-						-- print("Score: " .. game.score)
+			-- The only purpose of this is for text debugging on the console.
+			local function debug(event)
+				-- print("Game is " .. game.state)
+				-- print("Steve is " .. game.steve.state)
+				-- print("Steve's sprite is " .. game.steve.sprite.sequence)
+				-- print("Lives: " .. game.lives)
+				-- print("Score: " .. game.score)
 
-						-- if (game.steve.airState) then print("AirState: " .. game.steve.airState) end
-						-- if (game.steve.canJump == true) then print ("Steve can jump")
-						-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
-						-- if (game.steve.isAirborne == true) then print ("Steve is airborne")
-						-- elseif (game.steve.isAirborne == false) then print ("Steve is on the ground") end
+				-- if (game.steve.airState) then print("AirState: " .. game.steve.airState) end
+				-- if (game.steve.canJump == true) then print ("Steve can jump")
+				-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
+				-- if (game.steve.isAirborne == true) then print ("Steve is airborne")
+				-- elseif (game.steve.isAirborne == false) then print ("Steve is on the ground") end
 
-						-- if (game.steve.attack) then print(game.steve.attack) else print("nil") end
+				-- if (game.steve.attack) then print(game.steve.attack) else print("nil") end
 
-						-- if (controller.controlsEnabled == true) then print("Controls: enabled") 
-						-- elseif (controller.controlsEnabled == false) then print ("Controls: disabled") end
-						-- if (controller.SSVLaunched == true) then print("SSV is: launched") 
-						-- elseif (controller.SSVLaunched == false) then print ("SSV is: stopped") end
-						-- print("Death being handled in controller.onDeath:")
-						-- print(controller.deathBeingHandled)
-						-- print("Endgame being handled in controller.onGameOver:")
-						-- print(controller.endGameOccurring)
+				-- if (controller.controlsEnabled == true) then print("Controls: enabled") 
+				-- elseif (controller.controlsEnabled == false) then print ("Controls: disabled") end
+				-- if (controller.SSVLaunched == true) then print("SSV is: launched") 
+				-- elseif (controller.SSVLaunched == false) then print ("SSV is: stopped") end
+				-- print("Death being handled in controller.onDeath:")
+				-- print(controller.deathBeingHandled)
+				-- print("Endgame being handled in controller.onGameOver:")
+				-- print(controller.endGameOccurring)
 
-						local nextCh
-						for i, chaser in pairs (game.chaserList) do
-							if(chaser) then
-								-- if (chaser.targetName) then
-								-- 	print(chaser.species.." ["..i.."] (target:"..chaser.targetName
-								-- 		..") (sequence:"..chaser.sequence..")")
-								-- else
-								-- 	print(chaser.species.." ["..i..
-								-- 		"] (target: none) (sequence:"..chaser.sequence..")")
-								-- end
-							end
-							nextCh = next(game.chaserList)
-						end
-						if nextCh == nil then print("there are no chasers alive") end
+				-- local nextCh
+				-- for i, chaser in pairs (game.chaserList) do
+				-- 	if(chaser) then
+						-- if (chaser.targetName) then
+						-- 	print(chaser.species.." ["..i.."] (target:"..chaser.targetName
+						-- 		..") (sequence:"..chaser.sequence..")")
+						-- else
+						-- 	print(chaser.species.." ["..i..
+						-- 		"] (target: none) (sequence:"..chaser.sequence..")")
+						-- end
+				-- 	end
+				-- 	nextCh = next(game.chaserList)
+				-- end
+				-- if nextCh == nil then print("there are no chasers alive") end
 
-						-- print("-----------------------------") -- android debugging
-						-- print("") -- normal debugging
-					end
+				-- for i, walker in pairs (game.walkerList) do
+				-- 	if (walker) then
+				-- 		print(walker.species.."["..i.."] xScale: "..walker.xScale)
+				-- 	end
+				-- end
+
+				-- print("-----------------------------") -- android debugging
+				-- print("") -- normal debugging
+			end
 --|                                                                                                | 
 --|                                                                                                | 
 --\________________________________________________________________________________________________/
@@ -188,7 +194,7 @@ physics.setGravity( 0, 50 )
 			end
 		end
 		
-		-- Entity animation: handles the chasers' behavior
+		-- Entity animation: handles the chasers' and walkers' behavior
 		if (game.enemiesLoaded == true and game.lives ~= 0) then
 			-- Iterates the chaser list
 			for i, chaser in pairs(game.chaserList) do
@@ -261,11 +267,14 @@ physics.setGravity( 0, 50 )
 					end
 				end
 			end
+
+			-- Iterates the walker list
 			for i, walker in pairs(game.walkerList) do
-						if(walker.isWalking==false) then
-							walker:walk()
-							walker.isWalking=true
-						end
+				if (walker.xScale == 1) then
+					walker:walkTo( walker.leftBound )
+				elseif (walker.xScale == -1) then
+					walker:walkTo( walker.rightBound )
+				end
 			end			
 		end
 	
@@ -440,21 +449,15 @@ physics.setGravity( 0, 50 )
 		self.enemies, self.chaserList, self.walkerList = enemies.loadEnemies( self )
 		game.enemiesLoaded = true
 
-		-- Each entry in game.enemies contains the original spawn coordinates of a chaser,
-		-- while each enemySprite contains the current coordinates (and equals to the chaser).
-		for i, chaser in pairs(game.chaserList) do
-			for k, enemy in pairs(game.enemies) do
-				if (chaser == enemy.enemySprite) then
-					-- Grants visibility to each chaser of its spawn coordinates.
-					chaser.home = enemy
-				end
-			end
-		end
+		-- Assigns the home to each chaser
+		enemies.assignChaserHomes(self.enemies, self.chaserList)
+
+		-- Assigns the route to each walker
+		local routes = self.map:getObjectLayer("walkerRoutes").objects
+		enemies.assignWalkerRoutes(self.enemies, self.walkerList, routes)
 	end
 
-	-- MAIN ENTRY POINT FOR INITIALIZATION 
-	-- (must be called from the current level).
-	-- Triggers all the -game.load- functions.
+	-- MAIN ENTRY POINT FOR INITIALIZATION (called from the current level).
 	function game.loadGame( map, spawn )
 		-- Locally stores the current level map and spawn coordinates
 		game.map = map
@@ -471,6 +474,7 @@ physics.setGravity( 0, 50 )
 		game:loadPlayer()
 		game:loadEnemies()
 		game:loadNPCS()
+		---------------------------
 
 		-- Logic, controls and UI initialization -----------------
 		collisions.setGame( game, gameStateList, playerStateList  )
@@ -491,9 +495,7 @@ function game:removeAllEntities()
 	self.map:getTileLayer("JUMPSCREEN"):destroy()
 end
 
-
--- MAIN ENTRY POINT 
---(must be called from the current level after -game.loadGame-).
+-- MAIN SIMULATION ENTRY POINT (called from the current level after -game.loadGame-).
 function game.start()
 	physics.start()
 	controller:start()
@@ -501,47 +503,32 @@ function game.start()
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 	dbtimer = timer.performWithDelay(200, debug, 0)
-
-	--------------------------------------
-	-- for i in pairs(game.walkerList) do
-	-- 	game.walkerList[i]:move()
-	-- end
-	--------------------------------------
 end
 
 function game.pause()
 	physics.pause()
 	controller:pause()
-	for i in pairs(game.chaserList) do
-		transition.pause(game.chaserList[i])
-		game.chaserList[i]:pause()
-	end
-	for i in pairs(game.walkerList) do
-		--transition.pause(game.walkerList[i])
-		if(t1 and game.walkerList[i]) then
-			timer.pause(tl)
-			game.walkerList[i]:setLinearVelocity(0,0)
-		end
-	end
+
+	for k, chaser in pairs(game.chaserList) do chaser:pause() end
+	-- [uncomment when walkers will have animated sprites]
+	-- for k, walker in pairs(game.walkerList) do walker:pause() end
 end
 
 function game.resume()
 	physics.start()
 	controller:start()
-	for i in pairs(game.chaserList) do
-		if(game.chaserList[i] and game.chaserList[i].sequence ) then
-			transition.resume(game.chaserList[i])
-			--if (not (game.chaserList[i].sequence=="running") ) then game.chaserList[i]:setSequence("running") end
-			game.chaserList[i]:play()
-		end
-	end
-	for i in pairs(game.walkerList) do
-		if(game.walkerList[i]) then
-			if(timer._) then timer.resume(tl) end
-		end
-		
+
+	for k, chaser in pairs(game.chaserList) do
+		-- if(chaser and chaser.sequence ) then
+			chaser:play()
+		-- end
 	end
 
+	-- for k, walker in pairs(game.walkerList) do
+		-- if(walker and walker.sequence ) then
+			-- walker:play()
+		-- end	
+	-- end
 end
 
 function game.stop()

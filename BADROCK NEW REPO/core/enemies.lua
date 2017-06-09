@@ -16,8 +16,8 @@
 -- 	for the Player to come closer again;
 -- 	There is also a "safe zone" located around the Player's spawn point, which will make
 -- 	the Chaser stop chasing the Player.
--- 3) [If the property isWalker is true, the Enemy will be a Walker.
--- 	 A Walker moves on the map following a pre-established route].
+-- 3) If the property isWalker is true, the Enemy will be a Walker.
+-- 	A Walker moves on the map following a pre-established route.
 -- 
 -- Every Enemy species and type is guessed from the properties of the objects declared in
 -- the game's current map, all of which indicate the spawn point for that selected Enemy.
@@ -28,10 +28,6 @@ local collisions = require ( "core.collisions" )
 local enemies = {
 	descriptions = {
 		-- 1 Paper
-			-- For now, ALL paper guys in the map (and only them) are Chasers, and therefore will 
-			-- try to follow the Player if he gets too close to their "aggro" sensor.
-			-- In a future implementation this property (as the isWalker property) will be 
-			-- appliable to single, select Enemies directly from the map file. 
 		{	
 			species = "paper",
 			lives = 1,
@@ -57,11 +53,10 @@ local enemies = {
 				eName = "enemy"
 			}
 		},
-
+		-- 2 Robot
 		{	
 			species = "robot",
 			lives = 1,
-			isWalking=false,
 			isWalker = true,
 			score = 150,
 			options = {
@@ -72,7 +67,7 @@ local enemies = {
 				eName = "enemy",
 			},
 		},
-		-- 2 Chair
+		-- 3 Chair
 		{
 			species = "chair",
 			lives = 2,
@@ -89,8 +84,6 @@ local enemies = {
 }
 
 -- CHASER-SPECIFIC FUNCTIONS -------------------------------------------------------
-	-- (must be self-contained and not call anything outside this module)
-
 	-- Context: if the chaser's target is in his aggro zone, the chaser moves to reach
 	-- the target.
 	local function chaseTarget(currentGame, chaser, target)
@@ -260,45 +253,8 @@ local enemies = {
 			end
 		)
 	end
-		-- Main function: the walker moves left and right.
-		local function loadWalker( walker, currentGame )
 
-			local function listener2(event)
-				if(walker and walker.x) then
-					local wXV, wYV = walker:getLinearVelocity()
-					print(wXV,wYV)
-					bordoSx= walker.x-100000 -- non importa quanto vale, basta che bordoSx sia diverso da walker.x, idem per gli altri
-					bordoDx= walker.x+100000
-					if(walker.x<bordoDx and currentGame.state=="Running") then
-						walker.xScale=-1
-						walker:setLinearVelocity(520, 0 )
-					end
-					
-				end
-		end
-		local function listener1(event)
-			if(walker and walker.x) then
-				local wXV, wYV = walker:getLinearVelocity()
-				print(wXV,wYV)
-				bordoSx= walker.x-100000
-				bordoDx= walker.x+100000
-				if(walker.x>bordoSx and currentGame.state=="Running") then 
-					walker.xScale=1
-					walker:setLinearVelocity(-520, 0 )
-					t2=timer.performWithDelay( 1000, listener2 )
-				end
-					
-					
-			end
-		end
-
-		function walker:walk()
-			--if(walker.isWalking==false) then 
-				tl=timer.performWithDelay( 2000, listener1, -1 ) 
-				--end
-		end
-	end
-	-- Adds special behavior to an enemy if he isChaser
+	-- MAIN -------------------------------------------------------------------------
 	local function loadChaser( chaser, currentGame )
 		-- Only chasers need (and therefore will have) preCollision handling.
 		chaser.preCollision = collisions.enemyPreCollision
@@ -341,15 +297,111 @@ local enemies = {
 			checkIfTooLate(self, target)
 		end
 	end
------------------------------------------------------------------------------------
+	---------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
 
+-- WALKER-SPECIFIC FUNCTIONS -------------------------------------------------------
+	
+	-- The walker's target can be either the left or the right border of its route.
+	local function walkTo(currentGame, walker, target)
+		if ( (walker.x and walker.y) and target and walker.lives ~=0) then	
+			local wXV, wYV = walker:getLinearVelocity()
+			
+			-- lBorder and rBorder are the walker's physical borders.
+			local lBorder, rBorder = walker.x - walker.width/2, walker.x + walker.width/2
+
+			-- If the target is the left bound, the algorithm considers the walker's left
+			-- physical border to calculate distance, and vice versa for the right bound.
+			if (target == walker.leftBound) then
+				if (walker.closestBorder ~= lBorder) then
+					walker.closestBorder = lBorder
+				end
+			elseif (target == walker.rightBound) then
+				if (walker.closestBorder ~= rBorder) then
+					walker.closestBorder = rBorder
+				end
+			end
+
+			if walker.closestBorder == walker.lastClosestBorder then 
+				walker.xScale = - walker.xScale
+			end
+
+			-- Moves the walker while calculasting the distance between its the target
+			-- and the walker's closest border.
+			if ( math.abs(walker.closestBorder - target) > 1 ) then
+				walker:setLinearVelocity( 100 * - walker.xScale, wYV )
+
+				walker.lastClosestBorder = walker.closestBorder
+			else
+				-- The walker has reached the target. Inverting the walker's xScale will
+				-- change its target too.
+				walker.xScale = -walker.xScale
+			end
+		end
+	end
+
+	-- MAIN -------------------------------------------------------------------------
+	local function loadWalker( walker, currentGame )
+		-- Used when the walker collides with the player
+		walker.collision = function(self, event)
+			if (event.other.eName == "steve") then
+				walker.xScale = -walker.xScale
+			end
+		end
+
+		walker:addEventListener( "collision", walker )
+
+		function walker:walkTo( target ) 
+			walkTo(currentGame, self, target)
+		end
+	end
+	---------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+
+function enemies.assignChaserHomes( enemies, chasers )
+	for i, chaser in pairs(chasers) do
+		-- Each entry in enemies contains the original spawn coordinates of a chaser,
+		-- while each enemySprite contains the current coordinates (and equals to the chaser).
+		for k, enemy in pairs(enemies) do
+			if (chaser == enemy.enemySprite) then
+				-- Grants visibility to each chaser of its spawn coordinates.
+				chaser.home = enemy
+			end
+		end
+	end
+end
+
+function enemies.assignWalkerRoutes( enemies, walkers, routes )
+	-- Each entry in enemies contains the original spawn coordinates of a walker,
+	-- while each enemySprite contains the current coordinates (and equals to the walker).
+
+	-- If the map specifies a route for the corresponding walker, then the walker's route is 
+	-- modeled after the edges of that route. Else a default route is guessed from the 
+	-- walker's spawn coordinates.
+	for i, walker in pairs(walkers) do
+		for k, enemy in pairs(enemies) do
+			if (walker == enemy.enemySprite) then
+				walker.leftBound, walker.rightBound = enemy.x - 32*3, enemy.x + 32*3
+
+				-- Overrides bounds if a route is specified
+				if (enemy.walkerID and routes) then
+					for i, rt in pairs(routes) do
+						if (enemy.walkerID == rt.walkerID) then
+							walker.leftBound, walker.rightBound = rt.x, rt.x + rt.points[3]
+						end
+					end
+				end
+			end
+		end
+	end	
+end
 
 -- Loads the enemies's images (and sprites) and initializes their attributes.
 -- Visually instantiates the enemies in the current game's map.
--- @return enemyList (a table of Enemies)
+-- @return enemyList, walkerList, chaserList
 function enemies.loadEnemies( currentGame ) 
 	local currentMap = currentGame.map
-	local enemyList = currentMap:getObjectLayer("enemySpawn"):getObjects("enemy")
+	local enemyList = currentMap:getObjectLayer("enemySpawn").objects
 
 	local chaserList = {}
 	local walkerList = {}
@@ -396,23 +448,24 @@ function enemies.loadEnemies( currentGame )
 			table.insert(chaserList, enemySprite)
 		elseif (desc.isWalker) then
 			loadWalker(enemySprite, currentGame)
-			enemySprite.isWalking=false
 			table.insert(walkerList, enemySprite)
 		end
 		---------------------------------------------------------------
-
 		return enemySprite
 	end
 
-	for i, v in ipairs(enemyList) do
-		enemyList[i].enemySprite = loadEnemyEntity(enemyList[i])
+	for k, enemy in ipairs(enemyList) do
+		enemy.enemySprite = loadEnemyEntity(enemy)
 		---------------------------------------------------------------
 		-- Temporary: assuming the species DOES NOT determine the 
 		--	behavior, this is specified in the enemy object in the map,
 		-- so appears in enemyList as an attribute.
-		-- if (enemyList[i].isChaser) then
-		-- 	loadChaser(enemyList[i].enemySprite, currentGame)	
-		-- 	table.insert(chaserList, enemySprite)
+		-- if (enemy.isChaser) then
+		-- 	loadChaser(enemy.enemySprite, currentGame)	
+		-- 	table.insert(chaserList, enemy.enemySprite)
+		-- elseif (enemy.isWalker) then
+		-- 	loadWalker(enemy.enemySprite, currentGame)	
+		-- 	table.insert(walkerList, enemy.enemySprite)
 		-- end
 		---------------------------------------------------------------	
 	end
