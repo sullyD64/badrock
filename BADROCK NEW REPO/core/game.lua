@@ -233,13 +233,14 @@ physics.setGravity( 0, 50 )
 				--Gestione Boss Fight Generica--------------------
 				if(game.steve.state == playerStateList.DEAD and game.bossFight.state ~= "Terminated") then 
 					game.bossFight:terminateFight() 				
-					end
+				end
 
+				local s = game.bossFight
 				--- GESTIONE STRATEGY BOSS 1 -------------------------------------------------
-				if(bossStrategy.activeStrategy == 1)then
+				if(bossStrategy.activeStrategy == 1 and s.state ~= "Terminated")then
 					--metodi per la gestione runtime del boss n-esimo	
 					--print("------SONO DENTRO LA GESTIONE BOSS 1 --------------------")
-					local s = game.bossFight
+					
 					
 
 					--Keeps the Boss Pieces all tied together----
@@ -302,7 +303,6 @@ physics.setGravity( 0, 50 )
 							s.bossEntity.spallaDx.isTargettable=false
 							timer.performWithDelay(2000,function() s.bossEntity.spallaDx.isTargettable=true	end)
 							s.fireRateDx= maxFireRate
-							print("Spalla DX colpita")
 							for i,t in pairs(s.bossEntity.spallaDx.timer)do
 								timer.cancel(t)
 							end
@@ -314,7 +314,6 @@ physics.setGravity( 0, 50 )
 							s.bossEntity.spallaSx.isTargettable=false
 							timer.performWithDelay(2000,function() s.bossEntity.spallaSx.isTargettable=true	end)
 							s.fireRateSx= maxFireRate
-							print("Spalla SX colpita")
 							for i,t in pairs(s.bossEntity.spallaSx.timer)do
 								timer.cancel(t)
 							end
@@ -342,30 +341,47 @@ physics.setGravity( 0, 50 )
 
 					-------------------Phase 3 -------------------------------------------------
 					if(s.phase == 3)then
-						
+						-- Move the hands based on their state during this phase----
 							if(s.bossEntity.manoSx.state == "insegui")then
-								s.bossEntity.manoSx.x =	30
+								s.bossEntity.manoSx.x =	game.steve.x -240
 								s.bossEntity.manoSx.y = game.steve.y
-								print("Sx x= "..s.bossEntity.manoSx.x)
 							end
 							if(s.bossEntity.manoDx.state == "insegui") then
 								s.bossEntity.manoDx.x = game.steve.x
-								s.bossEntity.manoDx.y = 30
+								s.bossEntity.manoDx.y =  game.steve.y -150
 							end
 
-							--Keeps the lasers in the position where they are fired------
-							for i,laser in pairs(s.bossEntity.manoSx.lasers)do
-								if(laser)then
-									laser.x = laser.fixedX
-									laser.y = laser.fixedY
+							if(s.bossEntity.manoSx.state == "firing" and s.bossEntity.manoSx.laser)then
+								if(s.bossEntity.manoSx.laser)then
+									s.bossEntity.manoSx.x =	s.bossEntity.manoSx.laser.x - (s.bossEntity.manoSx.laser.width/2) -40
+									s.bossEntity.manoSx.y = s.bossEntity.manoSx.laser.y
 								end
 							end
-							for i,laser in pairs(s.bossEntity.manoDx.lasers)do
-								if(laser)then
-									laser.x = laser.fixedX
-									laser.y = laser.fixedY
+							if(s.bossEntity.manoDx.state == "firing" and s.bossEntity.manoDx.laser) then
+								if(s.bossEntity.manoDx.laser)then
+									s.bossEntity.manoDx.x = s.bossEntity.manoDx.laser.x
+									s.bossEntity.manoDx.y = s.bossEntity.manoDx.laser.y - (s.bossEntity.manoDx.laser.width/2) -40
 								end
 							end
+						---------------------------------------------------------------
+						--Keeps the lasers in the position where they are fired------
+							local laser= s.bossEntity.manoDx.laser
+							if(laser)then
+								laser.x = laser.fixedX
+								laser.y = laser.fixedY
+							end
+							local laser = s.bossEntity.manoSx.laser
+							if(laser)then
+								laser.x = laser.fixedX
+								laser.y = laser.fixedY
+							end
+						--------------------------------------------------------------
+							if(s.bossEntity.testa.lives == 0 and s.state ~= "Completed") then
+								s.bossEntity.manoDx.state = "terminata"
+								s.bossEntity.manoSx.state = "terminata"
+								s:victory()
+							end
+
 
 
 

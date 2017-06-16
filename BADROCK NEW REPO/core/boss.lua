@@ -19,7 +19,7 @@ local boss = {
 		--commento
 		{	type = "manoDx",
 			species = "manoDx",
-			lives = 2,--3
+			lives = 3,--3
 			points = 0,
 			options = {
 			-- 	graphicType = "animated",
@@ -34,7 +34,7 @@ local boss = {
 		{	
 			type ="manoSx",
 			species = "manoSx",
-			lives = 2,--3
+			lives = 3,--3
 			points= 0,
 			options = {
 			-- 	graphicType = "animated",
@@ -50,7 +50,7 @@ local boss = {
 			type ="spallaDx",
 			species = "spallaDx",
 			bodyType="static",
-			lives = 2,
+			lives = 2,--2
 			points= 0,
 			options = {
 			-- 	graphicType = "animated",
@@ -66,7 +66,7 @@ local boss = {
 			type ="spallaSx",
 			species = "spallaSx",
 			bodyType="static",
-			lives = 2,
+			lives = 2,--2
 			points= 0,
 			options = {
 			-- 	graphicType = "animated",
@@ -238,66 +238,149 @@ local boss = {
 	end
 
 	--spara un laser in posizione x e y -- FABIO
-	function sparaLaser(generatore, strategy)
+	function boss.sparaLaser(generatore, strategy)
+		
+		--local function createLaser()
 
-		local laser= entity.newEntity{
-			graphicType="animated",
-			bodyType="static",
-			filePath = visual.bossLaser,
-			spriteOptions={
-				height = 40,
-				width = 600,
-				numFrames = 4,
-				sheetContentWidth = 600,
-				sheetContentHeight = 160 
-			},
-			spriteSequence= {
-				{name = "laser",  frame={4}, time=2000, loopCount=1},
-				{name = "ending",    frames = {4,3,2,1,2,1,2,1,2,1,2,3,4}, time=1000, loopCount=1}
-			},
-		 	physicsParams = { density = 1.0 , isSensor=true, filter = filters.enemyHitboxFilter},
-			eName = "enemy"
-		}
+			local laserParameters= {
+				graphicType="animated",
+				bodyType="dynamic",
+				filePath = visual.bossLaser,
+				spriteOptions={
+					height = 40,
+					width = 600,
+					numFrames = 4,
+					sheetContentWidth = 600,
+					sheetContentHeight = 160 
+				},
+				spriteSequence= {
+					{name = "laser",  frames={4}, time=100, loopCount=0},
+					{name = "fire",  frames = {4,3,2,1,2,1,2,1,2,1,2,3,4}, time=1000, loopCount=1}
+				},
+			 	physicsParams = { density = 1.0 , isSensor=true, filter = filters.enemyHitboxFilter},
+				eName = "enemy"
+			}
+			local laser = entity.newEntity(laserParameters)
+			laser.alpha=0
+			-- if(generatore.name == "manoDx") then
+			-- --la mano DX si occupa di fare i laser Verticali
+			-- 	posizioneX = generatore.x
+			-- 	posizioneY = generatore.y + (laser.width/2) +40
+			-- 	transition.to(laser,{time = 20, rotation = 90})
 
-		if(generatore.name == "manoDx") then
-		--la mano DX si occupa di fare i laser Verticali
-			posizioneX = 0
-			posizioneY = 0
-		elseif(generatore.name == "manoSx")then
-		--la mano DX si occupa di fare i laser Verticali
-			posizioneX = 0
-			posizioneY = 0
-		end
+			-- elseif(generatore.name == "manoSx")then
+			-- --la mano SX si occupa di fare i laser Orizzontali
+			-- 	posizioneX = generatore.x + (laser.width/2)+ 40
+			-- 	posizioneY = generatore.y	
+			-- end
 
-		laser.isBodyActive = false
-		laser.lives=1
-		laser.fixedX = posizioneX
-		laser.fixedY = posizioneY
-
-		table.insert(generatore.lasers, laser)
-		carota:addOnMap(game.map)
-
-		laser:setSequence("laser")
-		laser:play()
+			-- laser.fixedX = posizioneX
+			-- laser.fixedY = posizioneY
+			-- generatore.laser=laser
+			-- laser:addOnMap(game.map)
+		--	return laser
+		--end
 
 		local function deleteLaser(event)
+			--Distruggo il laser
 			local sprite = event.target
 			if(event.phase == "ended") then
+				generatore.state="waiting"
 				display.remove(sprite)
-				table.remove(generatore.lasers, sprite)
 				sprite=nil
+				if(generatore.name == "manoSx")then
+					posX = game.steve.x -240 
+					posY = game.steve.y
+
+				elseif(generatore.name == "manoDx")then
+					posX = game.steve.x
+					posY = game.steve.y -150
+				end
+				--la mano ritorna nella sua posizione e nello stato per inseguire
+				transition.to(generatore,{time= 500, x = posX, y=posY, onComplete= function()
+					generatore.state = "insegui"
+				end})
+				 
 			end
 		end 
 
-		--Dopo che il laser è stato puntato, faccio fuoco
-		local t = timer.performWithDelay(2000,function() 
-			transition.to(laser,{time=20, isBodyActive=true})
-			laser:setSequence("fire")
-			laser:play()
-			laser:addEventListener("sprite",deleteLaser)
+		local function spara()
+			--local lX= laser.x
+			--local lY=laser.y
 
+			transition.to(laser,{time=10, onComplete=function() 
+					laser.isBodyActive=true
+			end})
+			-- transition.to(laser,{time=5, x= 0, y=0, alpha=0, onComplete=function()
+			-- 		transition.to(laser,{time=5, x= lX, y=lY, alpha=1, onComplete=function()
+			-- 			--laser:scale(0.1, 1 )
+			-- 		end})
+			-- 	end})
+			--local laser= createLaser()
+			
+				--transition.to(laser,{time=2000, xScale= 1, onComplete=function()
+					--laser:scale(1, 1 )
+				--end})
+
+				laser:setSequence("fire")
+				laser:play()
+				--appena finisce la sequenza di fire
+				laser:addEventListener("sprite",deleteLaser)
+		end
+
+		-- Resta in Tot tempo ad iseguire Steve, poi si ferma a creare il laser
+		local t = timer.performWithDelay(3000,function()
+	
+				if(generatore.name == "manoDx") then
+			--la mano DX si occupa di fare i laser Verticali
+				posizioneX = generatore.x
+				posizioneY = generatore.y + (laser.width/2) +40
+				transition.to(laser,{time = 20, rotation = 90})
+
+			elseif(generatore.name == "manoSx")then
+			--la mano SX si occupa di fare i laser Orizzontali
+				posizioneX = generatore.x + (laser.width/2)+ 40
+				posizioneY = generatore.y	
+			end
+
+			laser.fixedX = posizioneX
+			laser.fixedY = posizioneY
+			generatore.laser=laser
+			laser:addOnMap(game.map)
+
+
+			--local laser = createLaser()
+
+			transition.to(laser,{time=10, onComplete= function()	laser.isBodyActive=false end })
+
+			laser.alpha=0
+			laser:setSequence("laser")
+			laser:play()
+			
+			generatore.state="firing"
+
+			-- in Tot secondi l'alpha del laser si riempie
+			transition.to(laser,{time=1000, alpha=1, onComplete= function()
+				--Se Steve muore prima che finisca la fase ed il laser è stato creato
+				if(strategy.state=="Terminated")then
+					transition.to(laser,{time=500, alpha=0,onComplete=function()
+						display.remove(laser)
+						laser=nil 
+					end})
+				else --Se tutto procede normalmente
+					--Dopo Tot secondi che il laser è arrivato con alpha=1, spara
+					local t1 = timer.performWithDelay(1000, spara )
+					table.insert(strategy.timers, t1)
+				end
+			end})
+
+			
 		end)
-		table.insert(s.timers, t)
+		table.insert(strategy.timers, t)
+
+		
+		--Dopo che il laser è stato puntato, faccio fuoco
+		
 		
 
 		

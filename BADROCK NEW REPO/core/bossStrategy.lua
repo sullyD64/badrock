@@ -68,7 +68,11 @@ local strategyBoss1 = {}
 			self.bossEntity.spallaSx = spallaSx
 			self.bossEntity.corpo = corpo
 			self.bossEntity.testa = testa 
+
+		print(self.bossEntity.corpo.width)
 			
+			--self.bossEntity.manoSx.isFixedRotation=false
+			--self.bossEntity.manoSx.rotation = 180
 			--self.bossEntity.corpo:setFillColor( 255,0 ,0)
 			--self.bossEntity.corpo:setFillColor(1)    --ripristina il colore originale
 
@@ -79,11 +83,12 @@ local strategyBoss1 = {}
 			self.bossEntity.spallaSx.proiettili = {}
 			self.bossEntity.spallaDx.timer = {}
 			self.bossEntity.spallaSx.timer = {}
-			self.bossEntity.manoDx.lasers = {}
-			self.bossEntity.manoSx.lasers = {}
+			self.bossEntity.manoDx.laser = nil
+			self.bossEntity.manoSx.laser = nil
 			
 			
 			print(" STA PER INIZIARE LA BOSS FIGHT")
+			--phase1
 			timer.performWithDelay(3000,self:phase1())
 		end
 
@@ -110,8 +115,8 @@ local strategyBoss1 = {}
 				
 
 				--DA RIMUOVERE, SOLO PER SEMPLIFICARE I TEST
-				self.bossEntity.manoDx.state = "alzaSchiaccia"
-				self.bossEntity.manoSx.state = "alzaSchiaccia"
+				--self.bossEntity.manoDx.state = "alzaSchiaccia"
+				--self.bossEntity.manoSx.state = "alzaSchiaccia"
 
 				--Sposta il corpo del boss con tutto il resto verso l'alto
 				transition.to(self.spawn, {time=4000, y= self.spawn.y - 200})
@@ -181,33 +186,101 @@ local strategyBoss1 = {}
 		 		table.insert(self.timers, t2)
 		 	end
 
-		 	
-		 	
-
-		 	
-
-
 		end
+
 
 		function strategyB1:phase3()
 			self.phase=3
 		 	print("PHASE = 3")
-		 	
+
+		 	--La testa del boss diventa finalmente colpibile
+		 	transition.to(self.bossEntity.testa,{time = 20, onComplete=function() self.bossEntity.testa.isBodyActive=true end })
+		 	--Sposta il corpo del boss con tutto il resto verso l'alto
+				transition.to(self.spawn, {time=4000, y= self.spawn.y - 200})
+		 	-- da togliere--
+		 	--transition.to(self.bossEntity.manoSx, {time=20, onComplete=function() self.bossEntity.manoSx.isBodyActive=false end})
+		 	--transition.to(self.bossEntity.manoDx, {time=20, onComplete=function() self.bossEntity.manoDx.isBodyActive=false end})
+		 	-------
 		 	self.bossEntity.manoDx.state = "insegui"
 			self.bossEntity.manoSx.state = "insegui"
+			transition.to(self.bossEntity.manoDx,{time = 20, rotation = 180})
+			transition.to(self.bossEntity.manoSx,{time = 20, rotation = 90})
 
+
+			--Fa sparare laser dalle mani ogni Tot secondi per tot volte-------------------------
+			local numSpari = 2
+			local fireRate = 5000 --Se si riduce più di un tot potrebbe dare problemi con la somma dei timer interni di sparaLaser()
+			local t1= timer.performWithDelay(fireRate, function() boss.sparaLaser(self.bossEntity.manoDx,self)	end, -1)
+			local t2= timer.performWithDelay(fireRate, function() boss.sparaLaser(self.bossEntity.manoSx,self)	end, -1)
+			table.insert(self.timers,t1)
+			table.insert(self.timers,t2)
+
+			--ogni num spari, le mani si "surriscaldano" e non sparano più per stopTime --------------------
+			local stopTime=  5000 
+
+			local nextStopTime= (fireRate * (numSpari+1)) --(numSpari +1) perchè do il tempo al timer di avviare il suo timer interno
+			local t3= timer.performWithDelay(nextStopTime, function()
+				--stop ai timer di sparaLaser
+				timer.pause(t1)
+				timer.pause(t2) 
+				--Sposta il corpo del boss con tutto il resto verso il basso
+				transition.to(self.spawn, {time=4000, y= self.spawn.y + 200})
+				--Rende le mani rosse
+				self.bossEntity.manoDx:setFillColor( 255,0 ,0)
+				self.bossEntity.manoSx:setFillColor( 255,0 ,0)
+
+				-- le mani ritornano al loro stato precedente dopo Tot secondi
+				local t4 = timer.performWithDelay(stopTime,function()
+					--Rende le mani normali (di colore)
+					self.bossEntity.manoDx:setFillColor(1)
+					self.bossEntity.manoSx:setFillColor(1)
+
+					timer.resume(t1)
+					timer.resume(t2)
+
+					--Sposta il corpo del boss con tutto il resto verso l'alto
+					transition.to(self.spawn, {time=4000, y= self.spawn.y - 200})
+				end)
+				table.insert(self.timers,t4)
+	
+
+			end , -1)
+			table.insert(self.timers,t3)
+
+			
 		 	
 		end
 
 			
+		function strategyB1:victory()
+			self.state = "Completed"
 
+			--pause all timers of this strategy
+			for i,t in pairs(self.timers)do
+				timer.pause(t)
+			end
+
+			timer.performWithDelay(5000,function() --dopo circa 10 sec
+				self:terminateFight()
+			end )
+		
+			print("Strategia COMPLETATA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Boss Sconfitto")
+		end
 
 
 
 		function strategyB1:terminateFight()
-			self.state = "Terminated"
+			timer.performWithDelay(4000, function()
+				self.state = "Terminated"
+			end)
+			--self.state = "Terminated"
+			self.isActive=false
 
 			for i,part in pairs(self.bossEntity)do
+				if((part.name=="manoSx" or part.name=="manoDx") and part.laser) then
+					--transition.cancel(part.laser)
+					--display.remove(part.laser)
+				end
 				transition.cancel(part)
 				display.remove(part)
 			end	
