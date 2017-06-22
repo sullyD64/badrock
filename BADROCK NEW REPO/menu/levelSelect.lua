@@ -8,63 +8,11 @@ local composer = require ( "composer"         )
 local widget   = require ( "widget"           )
 local myData   = require ( "myData"           )
 local utility  = require ( "menu.utilityMenu" )
+local skin = require ("menu.skinMenu")
 
 local scene    = composer.newScene()
 
--- -----------------------------------------------------------------------------------
--- Skins panel
--- -----------------------------------------------------------------------------------
-	local function onSkinReturnBtnRelease()  
-		skinPanel:hide()
-		return true
-	end
 
-	-- Create the skins panel (shown when the clockwork is pressed/released)
-	skinPanel = utility.newPanel{
-		location = "custom",
-		onComplete = panelTransDone,
-		width = display.contentWidth * 0.95,
-		height = display.contentHeight * 0.50,
-		speed = 220,
-		anchorX = 1.0,
-		anchorY = 0.5,
-		x = display.screenOriginX,
-		y = display.contentCenterY - 10,
-		inEasing = easing.linear,
-		outEasing = easing.outCubic
-		}
-		--skinPanel.background = display.newImageRect("misc/panel.png",skinPanel.width, skinPanel.height-20)
-		skinPanel.background = display.newRoundedRect( 0, 0, skinPanel.width, skinPanel.height-20, 10 )
-		skinPanel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
-		skinPanel:insert( skinPanel.background )
-		 
-	skinPanel.title = display.newText( "Wardrobe", 0, -70, "Micolas.ttf", 15 )
-	skinPanel.title:setFillColor( 1, 1, 1 )
-	skinPanel:insert( skinPanel.title )
-
-	-- Create the button to exit the options menu
-	skinPanel.returnBtn = widget.newButton {
-		--label = "Return",
-		onRelease = onSkinReturnBtnRelease,
-		width = 15,
-		height = 15,
-		defaultFile = visual.exitOptionMenu,
-		--overFile = "buttonOver.png",
-		}
-		skinPanel.returnBtn.x= 75
-		skinPanel.returnBtn.y = -70
-		skinPanel:insert(skinPanel.returnBtn)
-
-	skinPanel.selectGroup = widget.newScrollView({
-		width = skinPanel.width-20,
-		height = skinPanel.height,
-		scrollWidth = 460,
-		scrollHeight = 800,
-		hideBackground = true,
-		verticalScrollDisabled = true
-	})
-	skinPanel:insert(skinPanel.selectGroup)
--- -----------------------------------------------------------------------------------
 
 
 -- -----------------------------------------------------------------------------------
@@ -80,8 +28,8 @@ local scene    = composer.newScene()
 
 	local function handleSkinsButtonEvent( event )
 		if ( "ended" == event.phase ) then
-			--composer.gotoScene( "menu", { effect="fade", time=333 } )
-			skinPanel:show({
+			
+			skin.panel:show({
 			x = display.contentWidth-12,
 			})
 		end
@@ -127,11 +75,13 @@ local scene    = composer.newScene()
 			labelColor = { default={1}, over={128} },
 			onEvent = handleCancelButtonEvent
 		})
-		backButton.x = display.contentWidth - 30
-		backButton.y = display.contentHeight - 50
+		backButton.anchorX = 0
+		backButton.anchorY = 0
+		backButton.x = display.screenOriginX +10 --contentWidth - 30
+		backButton.y = display.screenOriginY +10 --contentHeight - 50
 
 		local skinButton = widget.newButton({
-			width = 170,
+			width = 70,
 			height = 38,
 			sheet = utility.buttonSheet,
 			topLeftFrame = 1,
@@ -157,8 +107,11 @@ local scene    = composer.newScene()
 			labelColor = { default={1}, over={128} },
 			onEvent = handleSkinsButtonEvent
 		})
-		skinButton.x = display.contentCenterX
-		skinButton.y = display.contentHeight - 50
+
+		skinButton.anchorX = 1
+		skinButton.anchorY = 0
+		skinButton.x = display.contentWidth - 10
+		skinButton.y = display.screenOriginY +10 --contentHeight - 50
 -- -----------------------------------------------------------------------------------
 
 -- -----------------------------------------------------------------------------------
@@ -183,6 +136,10 @@ local scene    = composer.newScene()
 
 		sceneGroup:insert( background )
 
+		local title = display.newText( "Select a level", display.contentCenterX, display.screenOriginY + 40, "Micolas.ttf", 20 )
+		title:setFillColor( 1, 1, 1 )
+    	sceneGroup:insert( title )
+
 		-- Use a scrollView to contain the level buttons (for support of more than one full screen).
 		-- Since this will only scroll horizontally, lock vertical scrolling.
 		local levelSelectGroup = widget.newScrollView({
@@ -195,7 +152,7 @@ local scene    = composer.newScene()
 		})
 
 		-- 'xOffset', 'yOffset' and 'cellCount' are used to position the buttons in the grid.
-		local xOffset = 0 + display.viewableContentWidth/20--display.screenOriginX + display.viewableContentWidth/20 --64
+		local xOffset = 0 + display.viewableContentWidth/30--display.screenOriginX + display.viewableContentWidth/20 --64
 		local yOffset = display.contentCenterY
 		local cellCount = 1
 
@@ -275,8 +232,8 @@ local scene    = composer.newScene()
 
 		-- Place the scrollView into the scene and center it.
 		sceneGroup:insert( levelSelectGroup )
-		levelSelectGroup.x = display.contentCenterX
-		levelSelectGroup.y = display.contentCenterY
+		levelSelectGroup.x = display.contentCenterX 
+		levelSelectGroup.y = display.contentCenterY + 20
 
 
 		sceneGroup:insert( backButton )

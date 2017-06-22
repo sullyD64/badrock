@@ -21,4 +21,12 @@ M.settings.levels[4].score = 0
 M.settings.levels[5] = {}
 M.settings.levels[5].stars = 0
 M.settings.levels[5].score = 0
+M.settings.good=0
+M.settings.bad=0
+M.settings.skinNumber= 3
+M.settings.selectedSkin=1
+M.settings.skins = {}
+M.settings.skins[1]=true
+M.settings.skins[2]=true
+M.settings.skins[3]=false
 return M
