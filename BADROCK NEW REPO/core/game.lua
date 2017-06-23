@@ -328,7 +328,11 @@ physics.setGravity( 0, 50 )
 			if(controller.endGameOccurring ~= true) then
 				controller.endGameOccurring = true
 				controller.onGameOver("Terminated")
-				game.nextScene = "mainMenu"
+
+				-- Prevents overriding the nextScene if replay level has been requested.
+				if (not game.nextScene) then
+					game.nextScene = "mainMenu"
+				end
 			end
 		end
 	end
@@ -547,6 +551,7 @@ function game.stop()
 	controller.setGame(nil)
 	controller.deathBeingHandled = nil
 	controller.endGameOccurring = nil
+
 
 	if (game.nextScene == "mainMenu") then
 		composer.removeScene( "menu.mainMenu" )

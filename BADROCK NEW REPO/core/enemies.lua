@@ -173,7 +173,6 @@ local enemies = {
 			elseif (yDist <= tileWidth*5 and yDist >= tileWidth*3) then
 				chaser:applyLinearImpulse( 0, -48, chaser.x, chaser.y )
 			end
-			chaser:addEventListener("collision", chaser)
 		end
 
 		if (chaser.y > target.y and yDist <= tileWidth*4) then  --old value: 150
@@ -202,7 +201,6 @@ local enemies = {
 			elseif( chaser.xScale == 1) then
 				chaser:applyLinearImpulse( -10, -35, chaser.x, chaser.y )
 			end
-			chaser:addEventListener("collision", chaser)
 		end
 
 		if ( xDist <= tileWidth*2.5 and yDist <= tileWidth*2.5) then
@@ -256,28 +254,40 @@ local enemies = {
 
 	-- MAIN -------------------------------------------------------------------------
 	local function loadChaser( chaser, currentGame )
-		-- Only chasers need (and therefore will have) preCollision handling.
-		chaser.preCollision = collisions.enemyPreCollision
-		chaser:addEventListener( "preCollision", chaser)
-
 		chaser.voidList = currentGame.map:getObjectLayer("cadutaVuoto").objects
 		chaser.isIdleAwayFromHome = false
 		chaser.isChasingPlayer = false
 
+		-- Only chasers need (and therefore will have) preCollision handling.
+		chaser.preCollision = collisions.enemyPreCollision
+		chaser:addEventListener( "preCollision", chaser)
+
 		-- Used when the chaser jumps, to re-enable normal chasing.
+		-- Used also to detect collision with dangerous environment and trigger death.
 		chaser.collision = function(self, event)
-			if (event.other.isGround or event.other.tName) then
-				chaser.isJumpingTo = false
-				chaser.isJumpingVoid = false
+			if (event.other.tName ~= "danger") then
+				if (event.other.isGround) then
+					chaser.isJumpingTo = false
+					chaser.isJumpingVoid = false
+				end
+			else
+				if (chaser.lives ~= 0) then
+					chaser.lives = 0
+					currentGame.addScore(chaser.score)
+					chaser:onDeathAnimation()
+					chaser:destroy()
+				end
 			end
 		end
+
+		chaser:addEventListener("collision", chaser)
 
 		-- Main function: target can be the player or the chaser's spawn point.
 		function chaser:chase( target )
 			chaseTarget(currentGame, self, target)
 		end
 
-		-- Invoked from chase(target) periodically
+		-- Invoked fr`om chase(target) periodically
 		function chaser:checkVerticalProximity( target )
 			checkVerticalProximity(currentGame, self, target)
 		end
@@ -451,6 +461,50 @@ function enemies.loadEnemies( currentGame )
 			table.insert(walkerList, enemySprite)
 		end
 		---------------------------------------------------------------
+
+		-- Animation: Knocks the enemy AWAY given a x position
+		function enemySprite:onHitAnimation(x)
+			if (self.x > x) then self:applyLinearImpulse(1,1,self.x,self.y) 
+			elseif (self.x < x) then self:applyLinearImpulse(-1,1,self.x,self.y)
+			end
+		end
+
+		-- Animation: knocks the enemy AWAY and off the map
+		function enemySprite:onDeathAnimation()
+			self.isSensor = true
+			self.eName = "deadEnemy"
+			self.yScale = -1
+			-- If the enemy is an animated entity, sets its sequence to dead (parametrized)
+			if (self.sequence) then
+				self:setSequence("dead")
+				self:play()
+			end
+			timer.performWithDelay(1000, self:applyLinearImpulse( 0.05, -0.30, self.x, self.y ))
+			transition.to(self, {time = 5000,  -- removes it when he's off the map 
+				onComplete = function()
+					display.remove(self)
+				end
+			})
+		end
+
+		-- Called after onDeathAnimation
+		function enemySprite:destroy()
+			print("yeah")
+			-- if Enemy is a Chaser, remove it from the list ----
+				for k, chaser in pairs(currentGame.chaserList) do
+					if (self == chaser) then
+						chaser = nil
+					end
+				end
+			-- if Enemy is a Walker, remove it from the list ----
+				for k, chaser in pairs(currentGame.walkerList) do
+					if (self == walker) then
+						walker = nil
+					end
+				end
+			self = nil
+		end
+
 		return enemySprite
 	end
 

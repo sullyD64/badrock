@@ -46,8 +46,10 @@ local visual = {
 	steveAttack            = "visual/sprites/attackSprite.png",
 
 	npcImage               = "visual/sprites/carota.png",
-	npcBalloonBackground   = "visual/sprites/balloons.png",
-	npcBalloonButton1      = "visual/sprites/bottonefanculo.png",
+	npcBalloonBackground   = "visual/sprites/balloonHD.png",
+	npcBalloonText         = "visual/sprites/aiuto.png",
+	npcBalloonButton1      = "visual/sprites/buttonyes.png",
+	npcBalloonButton2      = "visual/sprites/buttonno.png",
 
 	-- enemyPaper             = "visual/sprites/paper.png",
 	enemySedia             = "visual/sprites/sedia.png",

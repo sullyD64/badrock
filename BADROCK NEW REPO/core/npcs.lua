@@ -10,9 +10,10 @@
 -- 3) A Sensor (to be used with the player's sensor for detecting proximity for showing or
 --    hiding the balloon).
 -----------------------------------------------------------------------------------------
-local entity = require ( "lib.entity"       )
-local widget = require ( "widget"           )
-local panel  = require ( "menu.utilityMenu" )
+local entity     = require ( "lib.entity"       )
+local widget     = require ( "widget"           )
+local panel      = require ( "menu.utilityMenu" )
+local collisions = require ( "core.collisions"  )
 
 local npcs = {}
 
@@ -36,8 +37,8 @@ function npcs.loadNPCs( currentGame )
 			local staticImage = entity.newEntity{
 				graphicType = "static",
 				filePath = visual.npcImage,
-				width = 51,
-				height = 128,
+				width = 90,
+				height = 108,
 				notPhysical = true,
 				eName = "npc"
 			}		
@@ -60,49 +61,64 @@ function npcs.loadNPCs( currentGame )
 				location = "static",
 				-- onComplete = panelTransDone,
 				speed = 200,
-				x = npc.x,
-				y = npc.y,
+				x = npc.x + 60,
+				y = npc.y - 20,
 				-- anchorX = 0.5,
 				-- anchorY = 0.5
 			}
 
-			local background = display.newImageRect( visual.npcBalloonBackground, 134, 107 )
+			local background = display.newImageRect( visual.npcBalloonBackground, 182, 174 )
 			background.anchorY = 1
 			balloon:insert(background)
+
+			local text = display.newImageRect( visual.npcBalloonText, 81, 33 )
+			text.anchorY = 1
+			text.y = -100
+			balloon:insert(text)
 
 			--------------------------------------------------------------------------
 			local onBalloonButtonEvent = function(event)
 				local target = event.target
+				local scoreToAdd
 
+				-- Status check prevents from pressing the button when pause menu is overlaying.
 				if (currentGame.state == "Running") then
 					if (event.phase == "began") then
-						display.currentStage:setFocus( target, id )
-						-- [[Work in progress]]
+						display.currentStage:setFocus( target, event.id )
 
-						for i, v in pairs(npcList) do
-							if (v.balloon.button1 == target) then
-								transition.to(v.balloon, { time = 200, alpha = 0 })
+						-- Good/bad action conditional behavior --
+						if (target.id == "npcButton1") then
+							scoreToAdd = 1000
+						elseif (target.id == "npcButton2") then
+							scoreToAdd = -1000
+						end
+						currentGame.addScore(scoreToAdd)
+						-------------------------------------------
 
-								currentGame.addScore(1000)
-								transition.to(v.staticImage, { time = 1000, y = v.y - 1000, alpha = 0, transition = easing.inCubic,
+						-- Removes the associated npc from the current game
+						for i, npc in pairs(currentGame.npcs) do
+							if (npc.balloon.button1 == target or npc.balloon.button2 == target) then
+								npc.balloon:hide()
+								display.remove(npc.sensorN)
+
+								-- Resets the switch on the npcDetect
+								if (collisions.releaseEnabled) then
+									collisions.releaseEnabled = false
+								end
+
+								-- Animation: npc flies up in the sky
+								transition.to(npc.staticImage, { time = 1000, 
+									y = npc.y - 1000, alpha = 0, transition = easing.inCubic,
 									onComplete = function()
-										display.remove(v.staticImage)
-										display.remove(v.balloon)
-										display.remove(v.sensorN)
-										v:destroy()
+										display.remove(npc.staticImage)
+										display.remove(npc.balloon)
+										npc:destroy()
+										table.remove(currentGame.npcs, i)		
+										npc = nil
 									end
 								})
-							
-								for i, npc in pairs(npcList) do
-									if v == npc then
-										table.remove(npcList, i)
-									end
-								end
 							end
 						end
-
-
-						
 					elseif (event.phase == "ended" or "cancelled" == event.phase) then
 						display.currentStage:setFocus( target, nil )
 					end
@@ -111,18 +127,33 @@ function npcs.loadNPCs( currentGame )
 			end
 			--------------------------------------------------------------------------
 
-			local button = widget.newButton{
+			local button1 = widget.newButton{
 				id = "npcButton1",
 				defaultFile = visual.npcBalloonButton1,
 				--overFile = visual.npcBalloonButton1_over,
-				width = 58,
+				width = 40,
 				height = 40,
-				x = background.x,
-				y = background.y -50,
-				onEvent = onBalloonButtonEvent
+				x = background.x - background.width/9 - 10,
+				y = background.y -80,
 			}
-			balloon.button1 = button
-			balloon:insert(button)
+			local button2 = widget.newButton{
+				id = "npcButton2",
+				defaultFile = visual.npcBalloonButton2,
+				--overFile = visual.npcBalloonButton2_over,
+				width = 40,
+				height = 40,
+				x = background.x + background.width/9 + 10,
+				y = background.y -80,
+			}
+
+			button1:addEventListener( "touch", onBalloonButtonEvent )
+			button2:addEventListener( "touch", onBalloonButtonEvent )
+
+			balloon.button1 = button1
+			balloon.button2 = button2
+
+			balloon:insert(button1)
+			balloon:insert(button2)
 
 			balloon.x, balloon.y = npc.x, npc.y -20
 			balloon.alpha = 0
@@ -168,10 +199,10 @@ function npcs.loadNPCs( currentGame )
 			return sensorN
 		end
 
-	for i, v in ipairs(npcList) do
-			npcList[i].staticImage = loadNPCEntity(npcList[i])
-			npcList[i].balloon = loadBalloon(npcList[i])
-			npcList[i].sensorN = loadSensor(npcList[i])
+	for k, npc in pairs(npcList) do
+			npc.staticImage = loadNPCEntity(npc)
+			npc.balloon = loadBalloon(npc)
+			npc.sensorN = loadSensor(npc)
 	end
 
 	return npcList
