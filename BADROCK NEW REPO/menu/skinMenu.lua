@@ -72,64 +72,61 @@ local skin = {}
     
     
     for i = 1, myData.settings.skinNumber do
-        -- Create a button
-        skin.panel.skins[i] = widget.newButton({
-            
-            id = tostring( i ),
-            onRelease = onSkinSelect,
-            emboss = false,
-            --shape="roundedRect",
+        local checkboxOptions = {
+            width = 190,
+            height = 168,
+            numFrames = 2,
+            sheetContentWidth = 380,
+            sheetContentHeight = 168
+        }
+        checkboxSheet = graphics.newImageSheet( "visual/misc/sheetskin"..tostring( i )..".png", checkboxOptions )
+
+        skin.panel.skins[i] = widget.newSwitch
+        {  sheet = checkboxSheet,
+            frameOff = 1,
+            frameOn = 2,
+            style = "radio",
+            id = tostring(i),
+            onPress = onSkinSelect,
             width = skin.panel.width/4.50,--display.contentWidth - 350,
             height = skin.panel.height-60,--display.contentHeight - 200,
+            --initialSwitchState = 
+        }
 
-            defaultFile = "visual/misc/skin"..tostring( i )..".png"
-            --visual.levelIconBg, --defaultFile = "misc/"..tostring(i).."select.png",
-            --overFile= visual.levelIconBg,
-            --cornerRadius = 8,
-            --fillColor = { default={ 0, 0, 1, 1 }, over={ 0.5, 0.75, 1, 1 } },
-            --strokeColor = { default={255,253,48,0.5}, over={0} },
-            --strokeWidth = 2
-        })
         -- Position the button in the grid and add it to the scrollView
-        
-
         skin.panel.skins[i].anchorX = 0
         skin.panel.skins[i].anchorY = 0
         skin.panel.skins[i].x = xOffset
         skin.panel.skins[i].y = yOffset
         skin.panel.skinGroup:insert( skin.panel.skins[i] )
 
-        -- If the level is locked, disable the button and fade it out.      
-
-        if ( myData.settings.skins[i]==true ) then
-            skin.panel.skins[i]:setEnabled( true )
-            skin.panel.skins[i].alpha = 1.0
-        else 
-            skin.panel.skins[i]:setEnabled( false ) 
-            skin.panel.skins[i].alpha = 0.5 
-        end 
-
+        -- If the skin is locked, create a new transparent button and fade the other out.      
+        if ( myData.settings.skins[i]==false ) then
+            skin.panel.buyButton = widget.newButton{
+            id = "buy"..tostring( i ),
+            onRelease = onSkinBuy,
+            width = skin.panel.skins[i].width,
+            height = skin.panel.skins[i].height,
+            defaultFile = "visual/misc/transparent.png",            
+        }    
+        skin.panel.skins[i].alpha = 0.5
+        skin.panel.buyButton.anchorX = 0
+        skin.panel.buyButton.anchorY = 0
+        skin.panel.buyButton.x = xOffset
+        skin.panel.buyButton.y = yOffset
+        skin.panel.skinGroup:insert( skin.panel.buyButton )
+        end
+        
+        -- if ( myData.settings.skins[i]==true ) then
+        --     skin.panel.skins[i]:setEnabled( true )
+        --     skin.panel.skins[i].alpha = 1.0
+        -- else 
+        --     skin.panel.skins[i]:setEnabled( false ) 
+        --     skin.panel.skins[i].alpha = 0.5 
+        -- end 
+        
         xOffset = xOffset + skin.panel.skins[i].width*1.2--+20
     end
-    
-    
-    -- TROVARE MODO PER METTERE IMMAGINE SELEZIONATA!!!!!!
-    -- local selectedN= myData.settings.selectedSkin
-    -- local selected  = widget.newButton({
-    --         id = tostring( selectedN ),
-    --         onRelease = onSkinSelect,
-    --         emboss = false,
-    --         width = skin.panel.width/4.50,
-    --         height = skin.panel.height-60,
-    --         defaultFile = "visual/misc/skinselected"..tostring( selectedN )..".png",
-    --         anchorX = skin.panel.skins[selectedN],
-    --         anchorY = skin.panel.skins[selectedN],
-    --         x = skin.panel.skins[selectedN],
-    --         y = skin.panel.skins[selectedN],
-    --     })
-    -- skin.panel.skins[selectedN]:removeSelf()
-    -- skin.panel.skins[selectedN] = selected
-    -- skin.panel.skinGroup:insert( selected )
 
     skin.panel:insert( skin.panel.skinGroup )
     --skin.panel.skinGroup.x = skin.panel.x
