@@ -272,7 +272,6 @@ local sState = {}
 	-- This displays the outcome of the game (good or bad depending from where this function is
 	-- being called) and triggers the end procedure of the current game (Main exit point)
 	function controller.onGameOver(outcome)
-
 		-- Prevents pressing the action button in this phase: if not, any access 
 		-- to the player's state inside onAttack will throw a runtime error
 		ui.buttons.action.active = false
@@ -295,9 +294,9 @@ local sState = {}
 
 		timer.performWithDelay( 250, 
 			function()
-				-- Mostra il menu di fine livello
-				-- gState.Terminated accade quando l'utente decide di interrompere il gioco dal menu di pausa,
-				-- quindi il menu di fine livello non deve essere mostrato, ma la partita deve essere conclusa
+				-- Shows the endgame menu.
+				-- gState.TERMINATED occurs when the user interrupts or restarts the game from the pause menu,
+				-- so in these cases the endgame menu will not be shown.
 				if (game.state ~= gState.TERMINATED) then
 					gameResult.setGame(game, gState, outcome)
 					gameResult.panel:show({ y = display.actualContentHeight,})
@@ -306,8 +305,7 @@ local sState = {}
 					game.state = gState.ENDED
 				end 
 			end
-		)
-		
+		)	
 	end
 
 	-- Restores the player at the current spawn point in the current game 

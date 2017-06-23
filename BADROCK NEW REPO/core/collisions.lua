@@ -49,54 +49,17 @@ end
 
 			enemy.lives = enemy.lives - 1
 
-			if ( enemy.lives == 0 ) then  -- Enemy has no lives left: he is dead	
-				-- Forces the enemy to drop his item
-				if (enemyHit.drop) then
-					game.dropItemFrom(enemyHit) 
-				end
-
-				-- Animation: knocks the enemy AWAY and off the map -----------------------------------
-				enemy.isSensor = true
-				enemy.eName = "deadEnemy"
-				enemy.yScale = -1
-
-					-- If the enemy is an animated entity, sets its sequence to dead (parametrized)
-					if (enemy.sequence) then
-						enemy:setSequence("dead")
-						enemy:play()
-					end
-
-				timer.performWithDelay(1000, enemy:applyLinearImpulse( 0.05, -0.30, enemy.x, enemy.y ))
-				transition.to(enemy, {time = 5000,  -- removes it when he's off the map 
-					onComplete = function()
-						display.remove(enemy)
-					end
-				})
-				----------------------------------------------------------------------------------------
-
-				-- if Enemy is a Chaser, remove it from the list ----
-					for k, chaser in pairs(game.chaserList) do
-						if (enemy == chaser) then
-							chaser = nil --[spostare altrove]
-						end
-					end
-				-- if Enemy is a Walker, remove it from the list ----
-					for k, chaser in pairs(game.walkerList) do
-						if (enemy == walker) then
-							walker = nil --[spostare altrove]
-						end
-					end
-				-----------------------------------------------------
-				
+			-- Enemy has no lives left: handle death
+			if ( enemy.lives == 0 ) then 
 				game.addScore(enemy.score)
-
-			else 									-- Enemy is still alive
-				-- Animation: Knocks the enemy AWAY ------------------------------------------
-				if (enemy.x > steve.x) then enemy:applyLinearImpulse(1,1,enemy.x,enemy.y) 
-				elseif (enemy.x < steve.x) then enemy:applyLinearImpulse(-1,1,enemy.x,enemy.y)
-				end
-				------------------------------------------------------------------------------
-
+				-- Forces the enemy to drop his item
+				if (enemyHit.drop) then	game.dropItemFrom(enemyHit) end
+				enemy:onDeathAnimation()
+				enemy:destroy()
+		
+			-- Enemy is still alive: handle hit
+			else 									
+				enemy:onHitAnimation(steve.x)
 				-- Makes the enemy temporairly untargettable and reverts it short after
 				enemy.alpha = 0.5 
 				enemy.isTargettable = false
