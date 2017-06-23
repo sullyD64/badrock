@@ -287,6 +287,11 @@ physics.setGravity( 0, 50 )
 			controller.deathBeingHandled = true
 			controller.onDeath()
 		end
+
+		-- See controller.addSpecialPoints, needed for linking the text to steve
+		if (controller.alertVisible) then
+			controller.alert.x, controller.alert.y = game.steve.x, game.steve.y - 30
+		end
 	end
 
 	-- The main game loop, every function is described as follows.
@@ -372,10 +377,13 @@ physics.setGravity( 0, 50 )
 			myData.settings.unlockedLevels = myData.settings.unlockedLevels + 1
 		end
 
+		myData.settings.goodPoints = myData.settings.goodPoints + game.goodPoints
+		myData.settings.evilPoints = myData.settings.evilPoints + game.evilPoints 
+
 		myData.settings.currentLevel = myData.settings.currentLevel + 1
 	end
 
-	-- Calculates the maximum score obtainable in the current leve.
+	-- Calculates the maximum score obtainable in the current level.
 	function game.getMaxScore()
 		local score = 0
 		for k, enemy in pairs(game.enemies) do
@@ -393,6 +401,11 @@ physics.setGravity( 0, 50 )
 		-- Also, the reason why the function is implemented in game is
 		-- because it comunicates with the UI.]
 		controller.addScore(points)
+	end
+
+	-- Adds points to the current game's special points, depending on the type ("good" or "evil")
+	function game.addSpecialPoints(points, type)
+		controller.addSpecialPoints(points, type)
 	end
 	
 	-- Adds -one- life to the current game's lives.
@@ -469,6 +482,8 @@ physics.setGravity( 0, 50 )
 
 		-- Instance parameters ----
 		game.score = 0
+		game.goodPoints = 0
+		game.evilPoints = 0
 		game.stars = 0
 		game.lives = game.MAX_LIVES
 		game.levelHasBeenCompleted = false

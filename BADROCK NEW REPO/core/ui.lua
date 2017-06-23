@@ -168,6 +168,24 @@ local buttonData = {
 			aX = 0.5,
 			aY = 0.5,
 		},
+		--11
+		specialUpText = {
+			options = {
+				id = "specialUpText",
+				textOnly = true,
+				label = "",
+				font = "micolas.ttf",
+				fontSize = 14,
+				labelColor = {
+					default = { 255,255,255 },
+					over = { 255,255,255 },
+				},
+				x = 0,
+				y = 0,
+			},
+			aX = 0.5,
+			aY = 0.5,
+		},
 }
 
 
@@ -269,6 +287,10 @@ local function createButtons()
 		lifeUpText.anchorX, lifeUpText.anchorY = buttonData.lifeUpText.aX, buttonData.lifeUpText.aY
 		buttonGroup:insert( lifeUpText )
 
+	local specialUpText = widget.newButton ( buttonData.specialUpText.options )
+		specialUpText.anchorX, specialUpText.anchorY = buttonData.specialUpText.aX, buttonData.specialUpText.aY
+		--buttonGroup:insert( specialUpText )
+
 	local buttons = {
 		jump = jumpScreen,
 		dleft = dpadLeft,
@@ -280,7 +302,8 @@ local function createButtons()
 		score = scoreText,
 		scoreUp = scoreUpText,
 		lives = livesText,
-		lifeUp = lifeUpText
+		lifeUp = lifeUpText,
+		specialUp = specialUpText
 	}
 
 	buttonGroup:toFront()
@@ -304,7 +327,7 @@ function ui:setEnabled( boolean )
 	end
 end
 
--- Animates one of the two <x>UpTexts
+-- Animates one of the three <x>UpTexts
 function ui.textFade( textWidget, duration )	
 	transition.to( textWidget, { 
 		alpha = 0,
@@ -316,28 +339,5 @@ function ui.textFade( textWidget, duration )
 		end
 	})
 end
-
--- Commentata perché viene sostituita dal menu di fine livello
--- -- Shows and animates the final text when game ends.
--- function ui.showOutcome( outcome )
--- 	local finalText = display.newText ("",	display.contentCenterX, display.contentCenterY, native.systemFontBold, 34)
--- 	ui.buttonGroup:insert(finalText)
--- 	if (outcome == "Completed") then
--- 		finalText.text = "Level Completed ;)"
--- 		finalText:setFillColor( 0.75, 0.8, 1 )
--- 	elseif (outcome == "Failed") then
--- 		finalText.text = "Level Failed :("
--- 		finalText:setFillColor( 1, 0, 0 )
--- 	elseif (outcome == "Terminated") then
--- 		finalText.text = "See you soon!"
--- 		finalText:setFillColor( 0, 1, 0)
--- 	end
--- 	transition.to(finalText, { alpha = 0, time = 1000,
--- 		onComplete = function()
--- 			display.remove( finalText )
--- 		end
--- 	})
--- end
-
 	
 return ui

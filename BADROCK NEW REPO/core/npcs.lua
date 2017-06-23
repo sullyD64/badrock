@@ -79,7 +79,7 @@ function npcs.loadNPCs( currentGame )
 			--------------------------------------------------------------------------
 			local onBalloonButtonEvent = function(event)
 				local target = event.target
-				local scoreToAdd
+				local specialPointsType
 
 				-- Status check prevents from pressing the button when pause menu is overlaying.
 				if (currentGame.state == "Running") then
@@ -88,11 +88,13 @@ function npcs.loadNPCs( currentGame )
 
 						-- Good/bad action conditional behavior --
 						if (target.id == "npcButton1") then
-							scoreToAdd = 1000
+							specialPointsType = "good"
 						elseif (target.id == "npcButton2") then
-							scoreToAdd = -1000
+							specialPointsType = "evil"
 						end
-						currentGame.addScore(scoreToAdd)
+
+						currentGame.addScore(1000)
+						currentGame.addSpecialPoints(5, specialPointsType)
 						-------------------------------------------
 
 						-- Removes the associated npc from the current game

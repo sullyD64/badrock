@@ -404,7 +404,7 @@ local sState = {}
 		end
 
 		-- Visually animates the scoreUp text element
-		timer.performWithDelay(textTimer, ui.textFade(scoreUp, 250))
+		timer.performWithDelay(textTimer, ui.textFade(scoreUp, textTimer))
 	end
 
 	-- Adds a life to the lives and visually updates the lifeIcons array
@@ -423,6 +423,38 @@ local sState = {}
 		-- Visually animates the lifeUp text element
 		timer.performWithDelay(textTimer, ui.textFade(lifeUp, 750))
 		end
+	end
+
+	-- Adds special points to the current game and displays the points obtained
+	function controller.addSpecialPoints(points, type)
+		local specialUp = ui.buttons.specialUp
+		local textTimer = 1000
+
+		if (type == "good") then
+			game.goodPoints = game.goodPoints + points
+			specialUp:setFillColor(0,255,0)
+		elseif (type == "evil") then
+			game.evilPoints = game.evilPoints + points
+			specialUp:setFillColor(255,0,0)
+		end
+
+		if (specialUp.isVisible == false) then
+			specialUp:setLabel("+ "..points.." "..type)
+			specialUp.isVisible = true 
+		end
+
+		-- Links the text to the player at runtime (see gameRunningLoop)
+		controller.alert = ui.buttons.specialUp
+		controller.alertVisible = true
+		transition.to(controller.alert, {time = textTimer,
+			onComplete = function()
+				controller.alertVisible = false
+				controller.alert = nil
+			end
+		})
+
+		-- Visually animates the specialUp text element
+		timer.performWithDelay(textTimer, ui.textFade(specialUp, textTimer))
 	end
 
 	-- Called from onUpdate in game. Waits for a brief time, after which
@@ -468,6 +500,7 @@ end
 function controller.prepareUI()
 	timer.performWithDelay(1000, ui.loadUI())
 	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.jump)
+	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.specialUp)
 	------------------------------
 	ui.createLifeIcons(game.lives)	-- Prone to refactoring (see ui)
 	------------------------------
@@ -482,6 +515,7 @@ function controller.prepareUI()
 	ui.buttons.resume.isVisible = false
 	ui.buttons.scoreUp.isVisible = false
 	ui.buttons.lifeUp.isVisible = false
+	ui.buttons.specialUp.isVisible = false
 	-------------------------------
 	pauseMenu.setGame(game, gState)
 	-------------------------------
