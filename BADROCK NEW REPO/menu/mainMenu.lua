@@ -186,6 +186,7 @@ local playBtn, optionBtn, shopBtn
 		sceneGroup:insert( optionBtn )
 		sceneGroup:insert( shopBtn )
 		sceneGroup:insert( steveImage )
+		
 	end
 
 

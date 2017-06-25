@@ -1,6 +1,7 @@
 local widget    = require ( "widget"           )
 local myData    = require ( "myData"           )
 local utility   = require ( "menu.utilityMenu" )
+local buy       = require ( "menu.buyMenu"     )
 
 
 local skin = {}
@@ -11,9 +12,26 @@ local skin = {}
         return true
     end
 
-    local function onSelectSkin()
 
+    -- Risponde al tocco di una delle skin, la seleziona se è sbloccata,
+    -- richiama la finestra di acquisto se non è sbloccata
+    local function onSkinSelect(event)
+        idSkin=tonumber(event.target.id)
+        if (event.target.isOn) then
+            if (myData.settings.skins[idSkin].unlocked == true) then
+                myData.settings.selectedSkin = idSkin   
+                print ("Selezionata skin "..myData.settings.selectedSkin)      
+            end 
+        end
+        if (myData.settings.skins[idSkin].unlocked == false) then
+                buy.setSkin(idSkin, skin.panel.buyButtons[idSkin], skin.panel.skins[idSkin] ) 
+                buy.panel:show({
+                y = display.contentCenterY})
+                print ("Aperto pannello per skin "..idSkin)
+        end      
+        return true
     end
+
 
     skin.panel = utility.newPanel{
         location = "custom",
@@ -37,26 +55,22 @@ local skin = {}
     skin.panel.title:setFillColor( 1, 1, 1 )
     skin.panel:insert( skin.panel.title )
 
-    -- Create the button to exit the options menu
+    -- Create the button to exit the skin menu
     skin.panel.returnBtn = widget.newButton {
-        --label = "Return",
         onRelease = onReturnBtnRelease,
         width = 15,
         height = 15,
         defaultFile = visual.exitOptionMenu,
-        --overFile = "buttonOver.png",
         }
     skin.panel.returnBtn.x= 75
     skin.panel.returnBtn.y = -70
     skin.panel:insert(skin.panel.returnBtn)
 
     skin.panel.skinGroup = widget.newScrollView({
-        --width = display.actualContentWidth,--460,
-        --height = display.actualContentHeight/1.2,--260,
-        width = skin.panel.width-50,--display.contentWidth*0.95,
-        height = skin.panel.height-50,--display.contentHeight * 0.75,
-        scrollWidth = skin.panel.width,--460,
-        scrollHeight = skin.panel.height,--800,
+        width = skin.panel.width-50,
+        height = skin.panel.height-50,
+        scrollWidth = skin.panel.width,
+        scrollHeight = skin.panel.height,
         hideBackground = true,
         verticalScrollDisabled = true,
         x=display.screenOriginX,
@@ -68,9 +82,7 @@ local skin = {}
     -- Define the array to hold the buttons
     skin.panel.skins = {}
 
-    -- Read the nuber of skins from the 'myData' table. Loop over them and generating one button for each.
-    
-    
+    -- Read the nuber of skins from the 'myData' table. Loop over them and generating one button for each.   
     for i = 1, myData.settings.skinNumber do
         local checkboxOptions = {
             width = 190,
@@ -99,22 +111,24 @@ local skin = {}
         skin.panel.skins[i].x = xOffset
         skin.panel.skins[i].y = yOffset
         skin.panel.skinGroup:insert( skin.panel.skins[i] )
-
+        skin.panel.buyButtons = {}
         -- If the skin is locked, create a new transparent button and fade the other out.      
-        if ( myData.settings.skins[i]==false ) then
-            skin.panel.buyButton = widget.newButton{
-            id = "buy"..tostring( i ),
-            onRelease = onSkinBuy,
+        if ( myData.settings.skins[i].unlocked==false ) then
+            skin.panel.buyButtons[i] = widget.newButton{
+            id = tostring( i ),
+            
+            onRelease = onSkinSelect,
             width = skin.panel.skins[i].width,
             height = skin.panel.skins[i].height,
             defaultFile = "visual/misc/transparent.png",            
         }    
+
         skin.panel.skins[i].alpha = 0.5
-        skin.panel.buyButton.anchorX = 0
-        skin.panel.buyButton.anchorY = 0
-        skin.panel.buyButton.x = xOffset
-        skin.panel.buyButton.y = yOffset
-        skin.panel.skinGroup:insert( skin.panel.buyButton )
+        skin.panel.buyButtons[i].anchorX = 0
+        skin.panel.buyButtons[i].anchorY = 0
+        skin.panel.buyButtons[i].x = xOffset
+        skin.panel.buyButtons[i].y = yOffset
+        skin.panel.skinGroup:insert( skin.panel.buyButtons[i] )
         end
         
         -- if ( myData.settings.skins[i]==true ) then
@@ -128,8 +142,15 @@ local skin = {}
         xOffset = xOffset + skin.panel.skins[i].width*1.2--+20
     end
 
+    skin.panel.skins[myData.settings.selectedSkin]:setState({isOn=true})
     skin.panel:insert( skin.panel.skinGroup )
     --skin.panel.skinGroup.x = skin.panel.x
     --skin.panel.skinGroup.y = 0
+
+    skin.group = display.newGroup()
+    skin.group:insert(skin.panel)
+    skin.group:insert(buy.panel)
+    assert(skin.group[1] == skin.panel) -- bottom
+    assert(skin.group[2] == buy.panel) -- front
 
 return skin
