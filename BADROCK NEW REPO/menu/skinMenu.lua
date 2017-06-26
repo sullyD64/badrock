@@ -3,12 +3,24 @@ local myData    = require ( "myData"           )
 local utility   = require ( "menu.utilityMenu" )
 local buy       = require ( "menu.buyMenu"     )
 
-
+local skinBtn
+local backBtn
+local btns
 local skin = {}
-
+    
+    function skin.setToEnableButtons(skinButton, backButton, buttons)
+        skinBtn = skinButton
+        backBtn = backButton
+        btns = buttons
+    end
 
     local function onReturnBtnRelease()  
         skin.panel:hide()
+        skinBtn:setEnabled(true)
+        backBtn:setEnabled(true)
+        for i=1, myData.maxLevels do
+            btns[i]:setEnabled(true)
+        end
         return true
     end
 
@@ -25,6 +37,18 @@ local skin = {}
         end
         if (myData.settings.skins[idSkin].unlocked == false) then
                 buy.setSkin(idSkin, skin.panel.buyButtons[idSkin], skin.panel.skins[idSkin] ) 
+                buy.setToEnableButtons( skin.panel.returnBtn, skin.panel.skins,skin.panel.buyButtons  )
+                skin.panel.returnBtn:setEnabled(false)
+                    -- for i=1, myData.settings.skinNumber do
+                    --     --skin.panel.skins[i]:setEnabled(false)
+                    --     if myData.settings.skins[i].unlocked == false then
+                    --        print (i)
+                    --        print ("controllo")
+                    --        print(myData.settings.skins[i].unlocked)
+                    --        print (skin.panel.buyButtons[i].id)
+                    --        skin.panel.buyButtons[i]:setEnabled(false)
+                    --     end
+                    -- end
                 buy.panel:show({
                 y = display.contentCenterY})
                 print ("Aperto pannello per skin "..idSkin)

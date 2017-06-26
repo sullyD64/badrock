@@ -10,11 +10,22 @@ local utility   = require ( "menu.utilityMenu" )
 local sfxMenu   = require ( "menu.sfxMenu"     )
 local aboutMenu = require ( "menu.aboutMenu"   )
 
+local optBtn
+local playBtn
+
 local opt = {}
 
 -- Options menu ------------------------------------------------------------------
+	--prende i bottoni dal main menu per poi riabilitarli alla chiusura del menu
+	function opt.setToEnableButtons(optButton, playButton)
+		optBtn = optButton
+		playBtn = playButton
+	end
+
 	local function onOptReturnMenuBtnRelease()
 		opt.panel:hide()
+		optBtn:setEnabled(true)
+		playBtn:setEnabled(true)
 		return true
 	end
 

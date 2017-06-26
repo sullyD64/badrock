@@ -11,9 +11,9 @@ local utility  = require ( "menu.utilityMenu" )
 local skin = require ("menu.skinMenu")
 
 local scene    = composer.newScene()
-
-
-
+local backButton
+local skinButton
+local buttons = {}
 
 -- -----------------------------------------------------------------------------------
 -- Buttons
@@ -28,7 +28,12 @@ local scene    = composer.newScene()
 
 	local function handleSkinsButtonEvent( event )
 		if ( "ended" == event.phase ) then
-			
+			skin.setToEnableButtons(skinButton, backButton, buttons)
+			skinButton:setEnabled(false)
+			backButton:setEnabled(false)
+			for i=1, myData.maxLevels do
+				buttons[i]:setEnabled(false)
+			end
 			skin.panel:show({
 			x = display.contentWidth-12,
 			})
@@ -48,7 +53,7 @@ local scene    = composer.newScene()
 
 	-- Create buttons-----------------------------------------------------------------
 		-- Create a cancel button for return to the menu scene.
-		local backButton = widget.newButton({
+		backButton = widget.newButton({
 			width = 40,
 			height = 38,
 			sheet = utility.buttonSheet,
@@ -80,7 +85,7 @@ local scene    = composer.newScene()
 		backButton.x = display.screenOriginX +10 --contentWidth - 30
 		backButton.y = display.screenOriginY +10 --contentHeight - 50
 
-		local skinButton = widget.newButton({
+		skinButton = widget.newButton({
 			width = 70,
 			height = 38,
 			sheet = utility.buttonSheet,
@@ -157,7 +162,7 @@ local scene    = composer.newScene()
 		local cellCount = 1
 
 		-- Define the array to hold the buttons
-		local buttons = {}
+
 
 		-- Read 'maxLevels' from the 'myData' table. Loop over them and generating one button for each.
 		for i = 1, myData.maxLevels do

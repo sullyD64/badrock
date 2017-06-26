@@ -46,6 +46,9 @@ local playBtn, optionBtn, shopBtn
 
 	local function onOptionBtnRelease()
 		-- open options panel
+		genMenu.setToEnableButtons(optionBtn, playBtn)
+		optionBtn:setEnabled(false)
+		playBtn:setEnabled(false)
 		genMenu.panel:show({
 			y = display.actualContentHeight-60,})
 		return true

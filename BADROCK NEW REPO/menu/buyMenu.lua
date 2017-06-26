@@ -5,10 +5,16 @@ local utility   = require ( "menu.utilityMenu" )
 local buttonId = 0
 local skinType
 local price
-local skinBtn
-local transpBtn
+local skinBtn, transpBtn, backBtn
+local buyBtns, skins
 local buy = {}
-
+    
+    function buy.setToEnableButtons( backButton, skinsButtons, buyButtons  )
+        backBtn = backButton
+        skins = skinsButtons
+        buyBtns = buyButtons
+    end
+    
     -- cambia il menu nel caso non si abbiano abbastanza punti (disabilita tasto d'acquisto e mostra testo)
     local function cantBuy()
         buy.panel.priceText:setFillColor (1,0,0)
@@ -47,6 +53,13 @@ local buy = {}
 
     -- torna al menu delle skin
     local function onReturnBtnRelease()  
+        backBtn:setEnabled(true)
+        -- for i=1, myData.settings.skinNumber do
+        --     --skins[i]:setEnabled(true)
+        --     if myData.settings.skins[i].unlocked == false then
+        --         buyBtns[i]:setEnabled(true)
+        --     end
+        -- end
         buy.panel:hide()
         return true
     end
