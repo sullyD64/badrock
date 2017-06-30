@@ -71,12 +71,28 @@ function items.createItem( name )
 		error(name .. ": Item not found in the ItemDescriptions")
 	end
 
-	desc.physicsParams = { filter = filters.itemFilter }
+	desc.physicsParams = { filter = filters.itemFilterOff }
 	desc.eName = "item"
 	local item = entity.newEntity( desc )
 	item.type = desc.type
 	item.itemName = desc.itemName
+
+	item.alpha = 0.2
+	item.isPickable = false
+
 	return item
+end
+
+function items.enableItem ( item )
+	transition.to(item, { time = 1000, alpha = 1,
+		onComplete = function()
+			physics.removeBody( item )
+			physics.addBody( item, "static", {filter = filters.itemFilterOn, isSensor = true} )
+			item:addEventListener("collision", item)
+			item.isPickable = true
+			print("Item "..item.itemName.." is pickable")
+		end
+	})
 end
 
 --------------------------------------------------------------------------------------

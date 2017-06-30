@@ -422,20 +422,8 @@ physics.setGravity( 0, 50 )
 		item:addOnMap(game.map)
 		item.x = enemy.x
 		item.y = enemy.y
-		item.alpha = 0.2
-
-		-- item.preCollision = collisions.itemPreCollision
-		-- item:addEventListener( "preCollision", item )
-
-		transition.to(item, { time = 500, alpha = 1,
-			onComplete = function()
-				physics.removeBody( item )
-				physics.addBody( item, "static", {isSensor=true} )
-				item.collision = collisions.itemCollision
-				item:addEventListener("collision")
-				item.isPickable = true
-			end
-		})
+		item.collision = collisions.itemCollision
+		items.enableItem(item)
 	end
 ------------------------------------------------------------------------------------
 

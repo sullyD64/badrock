@@ -44,6 +44,7 @@ local settings = {
 	-- (The particles are Entities)
 	local function defaultPlayerDeathAnimation(currentGame, playerX, playerY)
 		local fragments = {}
+		local fragmentGroup = display.newGroup()
 		local numRocks = 10
 		
 		for i = 1, numRocks, 1 do
@@ -59,6 +60,7 @@ local settings = {
 			}	
 			frag.x , frag.y = playerX, playerY
 			frag:addOnMap(currentGame.map)
+			fragmentGroup:insert(frag)
 
 			-- Transition here is needed because we need to wait newEntity to finish
 			-- its transition to the entities' physical bodies.
@@ -67,18 +69,22 @@ local settings = {
 					frag:applyLinearImpulse(directionX, directionY, frag.x , frag.y)
 					end
 				})
-
 			table.insert(fragments, frag)
 		end
 
+		currentGame.map:getTileLayer("entities"):addObject(fragmentGroup)
+
 		-- Removes physics to the rock fragments after a brief delay.
-		transition.to(fragments, {time = 2000, onComplete = function()
-			for i=1, #fragments, 1 do
-				fragments[i].isBodyActive = false
-				fragments[i].alpha=0
-				if(gameStateList ~= ENDED) then fragments[i]:removeSelf() end
+		transition.to(fragmentGroup, {alpha = 0, time = 3000, transition = easing.inExpo, 
+			onComplete = function()
+				for i=1, #fragments, 1 do
+					fragments[i].isBodyActive = false
+					fragments[i].alpha = 0
+					if(gameStateList ~= ENDED) then fragments[i]:removeSelf() end
+				end
+				if (gameStateList ~= ENDED) then display.remove( fragmentGroup ) end
 			end
-		end})
+		})
 	end
 ------------------------------------------------------------------------------------
 

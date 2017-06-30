@@ -193,21 +193,16 @@ end
 
 -- ITEM-SPECIFIC COLLISIONS --------------------------------------------------------
 
-	function collisions.itemPreCollision( self, event )
-		if (event.other.eName == "steve") then
-			if (self.itemName == "life" and game.lives == game.MAX_LIVES) or
-				(self.type == "powerup" and steve.hasPowerup) then
-				event.contact.isEnabled = false
-			end
-		end
-		return true
-	end
-
 	local function lifeCollision( life, event )
 		if (event.phase == "began") then
 			if (game.lives ~= game.MAX_LIVES) then
 				display.remove(life)
 				game.addOneLife()
+			else
+				print("max lives!")
+				---------------------------------
+				-- game.maxLivesReached() --toDo
+				---------------------------------
 			end
 		end
 	end
@@ -306,10 +301,9 @@ end
 
 	function collisions.itemCollision( self, event )
 		local o = event.other
-		if ( o.eName == "steve")  then
-
-			--List of all items with relative collision handler
-			elseif (self.itemName == "life") then
+		if ( o.eName == "steve" and self.isPickable) then
+			-- Conditional handling depending on item type
+			if (self.itemName == "life") then
 				lifeCollision( self, event)
 			-- elseif (self.itemName == "coin") then
 			-- 	coinCollision( self, event)
@@ -319,7 +313,7 @@ end
 			-- 	immunityCollision( self, event)
 			-- elseif (self.itemName == "metheors") then
 			-- 	metheorsRainCollision( self, event)
-			-- end
+			end
 			item = nil -- Distruzione dell'item
 		end
 	end

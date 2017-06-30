@@ -12,7 +12,8 @@ local filters = {
 	dynamicEnvFilter  = { categoryBits = 16,  maskBits = 285 },
 	enemyHitboxFilter = { categoryBits = 32,  maskBits = 13  },
 	sensorNFilter     = { categoryBits = 64,  maskBits = 2   },
-	itemFilter        = { categoryBits = 128, maskBits = 9   },
+	itemFilterOff     = { categoryBits = 128, maskBits = 8   },
+	itemFilterOn      = { categoryBits = 128, maskBits = 9   },
 	parcticleFilter   = { categoryBits = 256, maskBits = 280 },
 }
 
