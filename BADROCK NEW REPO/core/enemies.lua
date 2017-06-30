@@ -49,7 +49,7 @@ local enemies = {
 					{name = "running", start =4, count=5,    time=600, loopCount=0},
 					{name = "dead",    frames={9},           time=500, loopCount=1}
 				},
-				physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
+				physicsParams = { bounce = 0, friction = 1.0, density = 2.0, },
 				eName = "enemy"
 			}
 		},
@@ -76,7 +76,7 @@ local enemies = {
 				filePath = visual.enemySedia,
 				width = 70,
 				height = 113,
-				physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
+				physicsParams = { bounce = 0, friction = 1.0, density = 0.5, },
 				eName = "enemy",
 			},
 		},
@@ -464,8 +464,8 @@ function enemies.loadEnemies( currentGame )
 
 		-- Animation: Knocks the enemy AWAY given a x position
 		function enemySprite:onHitAnimation(x)
-			if (self.x > x) then self:applyLinearImpulse(1,1,self.x,self.y) 
-			elseif (self.x < x) then self:applyLinearImpulse(-1,1,self.x,self.y)
+			if (self.x > x) then self:applyLinearImpulse(10,-50,self.x,self.y)
+			elseif (self.x < x) then self:applyLinearImpulse(-10,-50,self.x,self.y)
 			end
 		end
 
@@ -479,7 +479,7 @@ function enemies.loadEnemies( currentGame )
 				self:setSequence("dead")
 				self:play()
 			end
-			timer.performWithDelay(1000, self:applyLinearImpulse( 0.05, -0.30, self.x, self.y ))
+			timer.performWithDelay(1000, self:applyLinearImpulse( 0.05, -50, self.x, self.y ))
 			transition.to(self, {time = 5000,  -- removes it when he's off the map 
 				onComplete = function()
 					display.remove(self)
@@ -489,7 +489,6 @@ function enemies.loadEnemies( currentGame )
 
 		-- Called after onDeathAnimation
 		function enemySprite:destroy()
-			print("yeah")
 			-- if Enemy is a Chaser, remove it from the list ----
 				for k, chaser in pairs(currentGame.chaserList) do
 					if (self == chaser) then

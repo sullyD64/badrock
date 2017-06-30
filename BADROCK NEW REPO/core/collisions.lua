@@ -212,18 +212,7 @@ end
 		end
 	end
 
-	-- local function coinCollision( coin, event )
-		-- 	if ( event.phase == "began" ) then
-		-- 		sfx.playSound( sfx.coinSound, { channel = 3 } )
-		-- 		coin.BodyType = "dynamic"
-		-- 		display.remove( coin )
-		-- 		game.addScore(100)
-				
-		-- 	elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-		-- 	end
-		-- end
-
-		-- local function gunCollision( gun, event )
+	-- local function gunCollision( gun, event )
 		-- 	if ( event.phase == "began" ) then
 		-- 		display.remove(gun)
 		-- 		print("hai preso la Gun -- azione ancora da implementare")
@@ -317,8 +306,8 @@ end
 
 	function collisions.itemCollision( self, event )
 		local o = event.other
-		if ( o.eName == "steve") then
-			 
+		if ( o.eName == "steve")  then
+
 			--List of all items with relative collision handler
 			elseif (self.itemName == "life") then
 				lifeCollision( self, event)

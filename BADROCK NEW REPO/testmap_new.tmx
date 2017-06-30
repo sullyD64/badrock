@@ -348,7 +348,7 @@
 </data>
  </layer>
  <objectgroup name="playerSpawn">
-  <object id="1" name="spawn0" x="343.667" y="424"/>
+  <object id="1" name="spawn0" x="393" y="549.333"/>
  </objectgroup>
  <objectgroup name="npcSpawn">
   <object id="9" name="npc" x="402" y="214.333"/>
@@ -362,7 +362,7 @@
     <property name="walkerID" value="1"/>
    </properties>
   </object>
-  <object id="35" name="enemy2" type="robot" x="497.333" y="546.667">
+  <object id="35" name="enemy2" type="chair" x="497.333" y="546.667">
    <properties>
     <property name="drop" value="life"/>
    </properties>

@@ -136,7 +136,7 @@ function player.loadPlayer( currentGame )
 
 	function player:performAttack()
 		player.state = "Attacking"
-		if player.hasPowerUp then 
+		if (player.hasPowerUp) then 
 			---------------------------------------------------------------
 			---[specificare i diversi metodi di combat per ciascun powerup]
 			---------------------------------------------------------------

@@ -198,13 +198,13 @@ local sState = {}
 				-- is performed in the combat module.
 				steve:performAttack()
 
-				local searchingFlag = true 	-- flag is used to call cancelAttack only once
+				local isAttackValid = true 	-- flag is used to call cancelAttack only once
 				local attackValidityCheck = function()
-					if (searchingFlag) then
+					if (isAttackValid) then
 						-- print("sto controllando...")
 						if (steve.state == sState.DEAD) or controller.deathBeingHandled then
 							steve:cancelAttack()
-							searchingFlag = false
+							isAttackValid = false
 							-- print("steve è morto :(")
 						end
 					end
@@ -216,7 +216,7 @@ local sState = {}
 						button.active = true
 						button.alpha = 1
 						Runtime:removeEventListener("enterFrame", attackValidityCheck)
-						searchingFlag = false
+						isAttackValid = false
 						-- print("fine controllo")
 					end
 				)
