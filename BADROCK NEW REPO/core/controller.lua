@@ -320,6 +320,10 @@ local sState = {}
 			controller.destroyUI()
 			controller.prepareUI()
 
+			-- The player loses its equipped powerup.
+			steve.equip = nil
+			steve.hasPowerUp = false
+
 			steve:setLinearVelocity( 0, 0 )
 			steve.canJump = false
 			transition.to( steve.sprite, { alpha = 1, time = 1000,
@@ -531,8 +535,13 @@ function controller.destroyUI()
 		ui.destroyLifeIcons()
 		pauseMenu.setGame(nil)
 		display.remove(ui.buttonGroup)
-
 	end
+end
+
+function controller.updateActionButton( imageName )
+	ui.updateActionButton(imageName)
+	ui.buttons.action:addEventListener("touch", onAttackEvent)
+	ui.buttons.action.active = true
 end
 
 function controller:start()

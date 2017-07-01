@@ -131,7 +131,7 @@ end
 
 		if (o.tName == "env") then
 			environmentCollision( self, event )
-		elseif (o.eName == "enemy" or (o.tName =="danger")) then
+		elseif ((o.eName == "enemy") or (o.tName =="danger")) then
 			dangerCollision( self, event )
 		-- Special case for the level's ending block. Triggers -endGameScreen-
 		elseif(o.tName == "endLevel") then
@@ -207,15 +207,18 @@ end
 		end
 	end
 
-	-- local function gunCollision( gun, event )
-		-- 	if ( event.phase == "began" ) then
-		-- 		display.remove(gun)
-		-- 		print("hai preso la Gun -- azione ancora da implementare")
-		-- 		--da Implementare
-				
-		-- 	elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-		-- 	end
-		-- end
+	local function powerupCollision( powerup, event )
+		local player = event.other
+
+		-- Item can't be picked up if the player is attacking, as this action modifies
+		-- the attack itself which is a sequence of events with a duration. This is done
+		-- to avoid this situation.
+		if (not player.hasPowerUp and player.state ~= "Attacking") then
+			print("Picked "..powerup.itemName)
+			display.remove(powerup)
+			player:equip(powerup.itemName)
+		end
+	end
 
 	-- local function immunityCollision( immunityItem , event )
 		-- 	if ( event.phase == "began" ) then
@@ -303,16 +306,12 @@ end
 		local o = event.other
 		if ( o.eName == "steve" and self.isPickable) then
 			-- Conditional handling depending on item type
-			if (self.itemName == "life") then
-				lifeCollision( self, event)
-			-- elseif (self.itemName == "coin") then
-			-- 	coinCollision( self, event)
-			-- elseif (self.itemName == "gun") then
-			-- 	gunCollision( self, event)
-			-- elseif (self.itemName == "immunity") then
-			-- 	immunityCollision( self, event)
-			-- elseif (self.itemName == "metheors") then
-			-- 	metheorsRainCollision( self, event)
+			if (self.type == "bonus") then
+				if (self.itemName == "life") then
+					lifeCollision(self, event)
+				end
+			elseif (self.type == "powerup") then
+				powerupCollision(self, event)
 			end
 			item = nil -- Distruzione dell'item
 		end

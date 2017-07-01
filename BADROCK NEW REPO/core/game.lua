@@ -52,7 +52,7 @@ physics.setGravity( 0, 50 )
 			-- The only purpose of this is for text debugging on the console.
 			local function debug(event)
 				-- print("Game is " .. game.state)
-				-- print("Steve is " .. game.steve.state)
+				print("Steve is " .. game.steve.state)
 				-- print("Steve's sprite is " .. game.steve.sprite.sequence)
 				-- print("Lives: " .. game.lives)
 				-- print("Score: " .. game.score)
@@ -305,7 +305,7 @@ physics.setGravity( 0, 50 )
 			game.steve.sprite.y = game.steve.y -10
 			game.steve.sprite.xScale = game.steve.direction
 			game.steve.sensorD.x, game.steve.sensorD.y = game.steve.x, game.steve.y
-			if (game.steve.attack) then
+			if (game.steve.attack and game.steve.attack.sprite and game.steve.attack.type == "default") then
 				game.steve.attack.x, game.steve.attack.y = game.steve.x, game.steve.y
 				game.steve.attack.sprite.x, game.steve.attack.sprite.y = game.steve.x, game.steve.y
 				game.steve.attack.sprite.xScale = game.steve.direction
@@ -515,6 +515,13 @@ function game.start()
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 	dbtimer = timer.performWithDelay(200, debug, 0)
+
+
+	local pippo = {
+		x = game.spawnPoint.x + 50,
+		y = game.spawnPoint.y,
+		drop = "gun"}
+	game.dropItemFrom(pippo)
 end
 
 function game.pause()

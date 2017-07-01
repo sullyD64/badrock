@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------------------------
 local entity     = require ( "lib.entity"      )
 local collisions = require ( "core.collisions" )
+local controller = require ( "core.controller" )
 
 local combat = {
 	map = {},
@@ -14,25 +15,40 @@ local combat = {
 }
 
 local settings = {
-	meleeSensorOpts = {
-		radius = 40,
-		alpha = 0, --0.6
-		color = {0, 0, 255},
+	melee = {
+		sensorOpts = {
+			radius = 40,
+			alpha = 0, --0.6
+			color = {0, 0, 255},
+		},
+		sheetData = {
+			height = 80,
+			width = 80,
+			numFrames = 13,
+			sheetContentWidth = 240,
+			sheetContentHeight = 400 
+		},
+		sequenceData = {
+			{name = "beginning", start=1, count=7, time=300, loopCount=1},
+			{name = "spinning",  start=8, count=3, time=300, loopCount=0},
+			{name = "ending",    frames = {11, 12, 13, 1}, time=300, loopCount=1}
+		},
 	},
 
-	meleeSheetData = {
-		height = 80,
-		width = 80,
-		numFrames = 13,
-		sheetContentWidth = 240,
-		sheetContentHeight = 400 
+	gun = {
+		sensorOpts = {
+			radius = 20,
+			alpha = 0.6,
+			color = {0, 0, 255},
+		},
+		sheetData = {
+			-- FABIOOOO
+		},
+		sequenceData = {
+			-- FABIOOOO
+		}
 	},
-	
-	meleeSequenceData = {
-		{name = "beginning", start=1, count=7, time=300, loopCount=1},
-		{name = "spinning",  start=8, count=3, time=300, loopCount=0},
-		{name = "ending",    frames = {11, 12, 13, 1}, time=300, loopCount=1}
-	},
+
 }
 
 function combat.setMap( currentMap )
@@ -44,15 +60,15 @@ function combat.setPlayer( currentPlayer )
 end
 
 -- Loads the player's default attack (melee)
-local function loadDefaultAttack()
+function combat.loadDefaultAttack()
 	-- Loads the Main sensor Entity ("hitbox")
 		local atk = entity.newEntity{
 			graphicType = "sensor",
 			parentX = player.x,
 			parentY = player.y,
-			radius = settings.meleeSensorOpts.radius,
-			color = settings.meleeSensorOpts.color,
-			alpha = settings.meleeSensorOpts.alpha,
+			radius = settings.melee.sensorOpts.radius,
+			color = settings.melee.sensorOpts.color,
+			alpha = settings.melee.sensorOpts.alpha,
 			physicsParams = { filter = filters.sensorAFilter },
 			sensorName = "A"
 		}
@@ -62,12 +78,13 @@ local function loadDefaultAttack()
 			parentX = player.x,
 			parentY = player.y,
 			filePath = visual.steveAttack,
-			spriteOptions = settings.meleeSheetData,
-			spriteSequence = settings.meleeSequenceData,
+			spriteOptions = settings.melee.sheetData,
+			spriteSequence = settings.melee.sequenceData,
 			notPhysical = true,
 			eName = "steveAttack"
 		}
 
+	atk.type = "default"
 	atk.gravityScale = 0
 
 	-- The attack is initially inactive
@@ -85,6 +102,20 @@ local function loadDefaultAttack()
 	return atk
 end
 
+function combat.loadPowerUp( itemName )
+	local atk = {}
+
+	if ( itemName == "gun" ) then
+		-- Crea l'immaginina vicino allo sprite di steve e i proiettili invisibili (per ora)
+
+		-- Invoca qualcosa in controller che modifica l'immagine del tasto azione
+		controller.updateActionButton( itemName )
+	else
+		error("Invalid powerup name")
+	end
+
+	return atk
+end
 
 -- Handles the end of the attack phase
 local function handleAttackEnd()
@@ -95,7 +126,7 @@ local function handleAttackEnd()
 	player.attack.isBodyActive = false
 	player.attack.sprite:pause()
 	player.attack.sprite.isVisible = false
-	display.remove(player.attack)
+	-- display.remove(player.attack)
 
 	if (player.state ~= "Dead") then
 		player.state = "Moving"
@@ -112,7 +143,7 @@ function combat.performMelee()
 	-- The melee sprite substitutes the player's sprite.
 	player.sprite.alpha = 0
 
-	player.attack = loadDefaultAttack()
+	-- player.attack = combat.loadDefaultAttack()	-- already loaded by default.
 	player.attack.collision = collisions.attackCollision
 	player.attack.duration = 1000
 
@@ -154,6 +185,10 @@ function combat.performMelee()
 	if (combat.animationIsPlaying) then
 		timer.performWithDelay(player.attack.duration, handleAttackEnd)
 	end
+end
+
+function combat.shootGun()
+	player.attack.duration = 100
 end
 
 function combat.cancel()

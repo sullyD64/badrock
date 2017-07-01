@@ -245,45 +245,45 @@ local buttonData = {
 local function createButtons()
 	local buttonGroup = display.newGroup()
 
-	local jumpScreen = widget.newButton ( buttonData.jumpScreen.options  )
+	local jumpScreen    = widget.newButton ( buttonData.jumpScreen.options    )
 		jumpScreen:setFillColor( 0, 255, 0 )
 		jumpScreen.isVisible = false
 		jumpScreen.isHitTestable = true
 		-- buttonGroup:insert( jumpScreen )		-- NO!
 
-	local dpadLeft    = widget.newButton ( buttonData.dpadLeft.options    )
+	local dpadLeft      = widget.newButton ( buttonData.dpadLeft.options      )
 		dpadLeft.anchorX, dpadLeft.anchorY = buttonData.dpadLeft.aX, buttonData.dpadLeft.aY
 		buttonGroup:insert( dpadLeft )
 
-	local dpadRight   = widget.newButton ( buttonData.dpadRight.options   )
+	local dpadRight     = widget.newButton ( buttonData.dpadRight.options     )
 		dpadRight.anchorX, dpadRight.anchorY = buttonData.dpadRight.aX, buttonData.dpadRight.aY
 		buttonGroup:insert( dpadRight )
 
-	local actionBtn   = widget.newButton ( buttonData.actionBtn.options   )
+	local actionBtn     = widget.newButton ( buttonData.actionBtn.options     )
 		actionBtn.anchorX, actionBtn.anchorY = buttonData.actionBtn.aX, buttonData.actionBtn.aY
 		buttonGroup:insert( actionBtn )
 
-	local pauseBtn    = widget.newButton ( buttonData.pauseBtn.options    )
+	local pauseBtn      = widget.newButton ( buttonData.pauseBtn.options      )
 		pauseBtn.anchorX, pauseBtn.anchorY = buttonData.pauseBtn.aX, buttonData.pauseBtn.aY
 		buttonGroup:insert( pauseBtn )
 
-	local resumeBtn   = widget.newButton ( buttonData.resumeBtn.options   )
+	local resumeBtn     = widget.newButton ( buttonData.resumeBtn.options     )
 		resumeBtn.anchorX, resumeBtn.anchorY = buttonData.resumeBtn.aX, buttonData.resumeBtn.aY
 		buttonGroup:insert( resumeBtn )
 
-	local scoreText   = widget.newButton ( buttonData.scoreText.options   )
+	local scoreText     = widget.newButton ( buttonData.scoreText.options     )
 		scoreText.anchorX, scoreText.anchorY = buttonData.scoreText.aX, buttonData.scoreText.aY
 		buttonGroup:insert( scoreText )
 
-	local scoreUpText = widget.newButton ( buttonData.scoreUpText.options )
+	local scoreUpText   = widget.newButton ( buttonData.scoreUpText.options   )
 		scoreUpText.anchorX, scoreUpText.anchorY = buttonData.scoreUpText.aX, buttonData.scoreUpText.aY
 		buttonGroup:insert( scoreUpText )
 
-	local livesText   = widget.newButton ( buttonData.livesText.options   )
+	local livesText     = widget.newButton ( buttonData.livesText.options     )
 		livesText.anchorX, livesText.anchorY = buttonData.livesText.aX, buttonData.livesText.aY
 		buttonGroup:insert( livesText )
 
-	local lifeUpText = widget.newButton ( buttonData.lifeUpText.options )
+	local lifeUpText    = widget.newButton ( buttonData.lifeUpText.options    )
 		lifeUpText.anchorX, lifeUpText.anchorY = buttonData.lifeUpText.aX, buttonData.lifeUpText.aY
 		buttonGroup:insert( lifeUpText )
 
@@ -339,5 +339,24 @@ function ui.textFade( textWidget, duration )
 		end
 	})
 end
+
+function ui.updateActionButton(imageName)
+	ui.buttons.action:removeSelf()
+
+	local actionBtn = widget.newButton{
+		id = buttonData.actionBtn.options.id,
+		defaultFile = visual["actionBtn_"..tostring(imageName)],
+		overFile = visual["actionBtn_"..tostring(imageName).."_over"],
+		width = buttonData.actionBtn.options.width,
+		height = buttonData.actionBtn.options.height,
+		x = buttonData.actionBtn.options.x,
+		y = buttonData.actionBtn.options.y,
+	}
+	actionBtn.anchorX, actionBtn.anchorY = buttonData.actionBtn.aX, buttonData.actionBtn.aY
+
+	ui.buttonGroup:insert( actionBtn )
+	ui.buttons.action = actionBtn
+end
+
 	
 return ui

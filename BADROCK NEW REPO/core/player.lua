@@ -139,12 +139,21 @@ function player.loadPlayer( currentGame )
 
 	combat.setMap(currentMap)
 	combat.setPlayer(player)
+	player.attack = combat.loadDefaultAttack() 	-- by default, attack is already loaded in memory.
+
+	function player:equip( itemName )
+		player.attack = combat.loadPowerUp( itemName )
+		self.equipped = itemName
+		self.hasPowerUp = true
+	end
 
 	function player:performAttack()
-		player.state = "Attacking"
-		if (player.hasPowerUp) then 
+		self.state = "Attacking"
+		if (self.hasPowerUp) then 
 			---------------------------------------------------------------
-			---[specificare i diversi metodi di combat per ciascun powerup]
+			if (self.equipped == "gun") then
+				combat.shootGun()
+			end
 			---------------------------------------------------------------
 		else
 			combat.performMelee()
