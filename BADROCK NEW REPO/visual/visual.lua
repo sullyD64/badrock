@@ -46,6 +46,9 @@ local visual = {
 	steveSheetWalking      = "visual/sprites/steveAnim.png",
 	steveImage             = "visual/sprites/rock_original.png",
 	steveAttack            = "visual/sprites/attackSprite.png",
+	steveGun               = "visual/sprites/pup_gun.png",
+
+	bullet                 = "visual/sprites/bullet.png",
 
 	npcImage               = "visual/sprites/carota.png",
 	npcBalloonBackground   = "visual/sprites/balloonHD.png",
@@ -60,7 +63,7 @@ local visual = {
 
 	-- itemCoin               = "visual/ui/coin.png",
 	itemLife               = "visual/ui/life2.png",
-	itemGun                = "visual/ui/H.png",
+	itemGun                = "visual/sprites/H.png",
 	--itemImmunity         = "visual/misc/immunity.png",
 	--itemMetheor          = "visual/misc/metheor.png"
 }

@@ -102,7 +102,7 @@ function entity.newEntity( options )
 	ent.alpha = customOptions.alpha or 1
 
 	-- Each Entity has an unique name specified by the attribute "eName": 
-	-- this is used to determine in which Tile Layer it will be added.
+	-- this is used in collision detection
 	ent.eName = customOptions.eName
 	if (ent.sensorName) then ent.eName = "sensor" end
 

@@ -188,7 +188,7 @@ local sState = {}
 				-- audio ----------------------------------------
 				sfx.playSound( sfx.attackSound, { channel = 4 } )
 				-------------------------------------------------
-				
+
 				-- Button becomes temporairly inactive
 				button.active = false
 				button.alpha = 0.5
@@ -320,10 +320,6 @@ local sState = {}
 			controller.destroyUI()
 			controller.prepareUI()
 
-			-- The player loses its equipped powerup.
-			steve.equip = nil
-			steve.hasPowerUp = false
-
 			steve:setLinearVelocity( 0, 0 )
 			steve.canJump = false
 			transition.to( steve.sprite, { alpha = 1, time = 1000,
@@ -369,6 +365,15 @@ local sState = {}
 		-- animation ------------------------------------
 		steve.deathAnimation(game, steve.x , steve.y)
 		-------------------------------------------------
+
+		-- The player loses its equipped powerup.
+		if (steve.hasPowerUp) then
+			-- steve:losePowerUp() --TO-DO
+			display.remove(steve.powerUp)
+			steve.equipped = nil
+			steve.hasPowerUp = false
+			steve.attacks = nil
+		end
 
 		-- Removes the runtime event listeners if death was triggered
 		-- while still inputing a movement.

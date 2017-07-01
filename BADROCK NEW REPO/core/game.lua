@@ -52,7 +52,7 @@ physics.setGravity( 0, 50 )
 			-- The only purpose of this is for text debugging on the console.
 			local function debug(event)
 				-- print("Game is " .. game.state)
-				print("Steve is " .. game.steve.state)
+				-- print("Steve is " .. game.steve.state)
 				-- print("Steve's sprite is " .. game.steve.sprite.sequence)
 				-- print("Lives: " .. game.lives)
 				-- print("Score: " .. game.score)
@@ -305,10 +305,27 @@ physics.setGravity( 0, 50 )
 			game.steve.sprite.y = game.steve.y -10
 			game.steve.sprite.xScale = game.steve.direction
 			game.steve.sensorD.x, game.steve.sensorD.y = game.steve.x, game.steve.y
-			if (game.steve.attack and game.steve.attack.sprite and game.steve.attack.type == "default") then
-				game.steve.attack.x, game.steve.attack.y = game.steve.x, game.steve.y
-				game.steve.attack.sprite.x, game.steve.attack.sprite.y = game.steve.x, game.steve.y
-				game.steve.attack.sprite.xScale = game.steve.direction
+
+			if (game.steve.attack) then
+				local attack = game.steve.attack
+				if (attack.type == "default" and attack.sprite) then
+					attack.x, attack.y = game.steve.x, game.steve.y	
+					attack.sprite.x, attack.sprite.y = game.steve.x, game.steve.y
+					attack.sprite.xScale = game.steve.direction
+				elseif(attack.type == "bullet" and attack.sprite) then
+					attack.sprite.x, attack.sprite.y = attack.x, attack.y
+					if (game.steve.attacks) then
+						for k, attack in pairs(game.steve.attacks) do
+							attack.sprite.x, attack.sprite.y = attack.x, attack.y
+						end
+					end
+				end
+			end
+
+			if (game.steve.powerUp) then
+				local powerUp = game.steve.powerUp
+				powerUp.x, powerUp.y = game.steve.x + (game.steve.direction * 20), game.steve.y
+				powerUp.xScale = game.steve.direction
 			end
 		end
 

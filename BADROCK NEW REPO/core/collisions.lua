@@ -71,10 +71,21 @@ end
 				)
 			end
 
+			if (self.type == "bullet") then
+				self:destroy()
+			end
+
 		-- Target is a breakable item (i.e. crates, rocks..)
 		elseif( other.isBreakable ) then
 			display.remove(other)
-		end	
+
+			if (self.type == "bullet") then
+				self:destroy()
+			end
+
+		elseif((other.tName == "env") and (self.type == "bullet")) then
+			self:destroy()
+		end
 	end	
 ------------------------------------------------------------------------------------
 

@@ -1,0 +1,16 @@
+l'attacco è composto dalle seguenti fasi:
+
+1) premo il bottone della ui
+2) il controller gestisce il press e richiama steve:performAttack()
+	- viene lanciata una subroutine che dura quanto dura l'attacco di steve
+	- la subroutine controlla se steve è morto mentre stava attaccando
+	- se steve è morto richiama steve:cancelAttack()
+		> cancelAttack() non fa altro che chiamare prematuramente handleAttackEnd()
+3) in player viene richiamato performAttack() che funziona a seconda dell'item equippato, se non ho item equippati va di melee e fa combat.performMelee()
+4) in combat, performMelee() nasconde lo sprite di steve e rende visibile lo sprite di attacco. Siccome ho già caricato dall'inizio l'attacco e il suo sprite, game ne gestisce il position linking. 
+	- viene eseguita l'animazione che dipende dalla durata dell'attacco.
+	- viene lanciato un timer che alla fine della durata dell'attacco lancia handleAttackEnd()
+5) handleAttackEnd() mostra di nuovo lo sprite di steve, nasconde l'attacco e mette in pausa il suo sprite.
+
+
+Durante queste 5 fasi io potrei prendere un powerup mentre sto attaccando.
