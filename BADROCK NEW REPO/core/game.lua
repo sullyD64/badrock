@@ -19,7 +19,7 @@ local items      = require ( "core.items"      )
 local controller = require ( "core.controller" )
 local collisions = require ( "core.collisions" )
 local bossStrategy=require ("core.bossStrategy")
-local boss       = require ( "core.boss"       )
+local boss       = require ("core.boss"        )
 
 local game = {}
 
@@ -231,18 +231,16 @@ physics.setGravity( 0, 50 )
 			if(game.bossFight and bossStrategy.activeStrategy ~= 0)then
 
 				--Gestione Boss Fight Generica--------------------
-				if(game.steve.state == playerStateList.DEAD and game.bossFight.state ~= "Terminated") then 
+				-- Gestione Boss Strategy in caso di interruzione del fight
+				if((game.steve.state == playerStateList.DEAD and game.bossFight.state ~= "Terminated") or game.state == gameStateList.TERMINATED) then 	
 					game.bossFight:terminateFight() 				
 				end
 
 				local s = game.bossFight
 				--- GESTIONE STRATEGY BOSS 1 -------------------------------------------------
-				if(bossStrategy.activeStrategy == 1 and s.state ~= "Terminated")then
+				if(bossStrategy.activeStrategy == 1 and s.isActive==true )then
 					--metodi per la gestione runtime del boss n-esimo	
-					--print("------SONO DENTRO LA GESTIONE BOSS 1 --------------------")
 					
-					
-
 					--Keeps the Boss Pieces all tied together----
 					if(s.bossEntity.spallaDx and s.bossEntity.spallaDx.lives >0)then
 						s.bossEntity.spallaDx.x= s.spawn.x +60
@@ -324,10 +322,27 @@ physics.setGravity( 0, 50 )
 							for i,t in pairs(s.bossEntity.spallaSx.timer)do
 								timer.cancel(t)
 							end
+							for i,c in pairs(s.bossEntity.spallaSx.proiettili)do
+
+								if(c) then
+									transition.cancel(c)
+									transition.to(c,{time=0, alpha=0,onComplete=function()
+										display.remove(c)
+										c=nil end})
+								end
+							end
 						end
 						if(s.bossEntity.spallaDx.lives==0 ) then
 							for i,t in pairs(s.bossEntity.spallaDx.timer)do
 								timer.cancel(t)
+							end
+							for i,c in pairs(s.bossEntity.spallaDx.proiettili)do
+								if(c) then
+									transition.cancel(c)
+									transition.to(c,{time=0, alpha=0,onComplete=function()
+										display.remove(c)
+										c=nil end})
+								end
 							end
 						end
 						if((s.bossEntity.spallaDx.lives==0 and s.bossEntity.spallaSx.lives==0) or not(s.bossEntity.spallaDx and s.bossEntity.spallaSx))then
@@ -350,19 +365,6 @@ physics.setGravity( 0, 50 )
 								s.bossEntity.manoDx.x = game.steve.x
 								s.bossEntity.manoDx.y =  game.steve.y -150
 							end
-
-							if(s.bossEntity.manoSx.state == "firing" and s.bossEntity.manoSx.laser)then
-								if(s.bossEntity.manoSx.laser)then
-									s.bossEntity.manoSx.x =	s.bossEntity.manoSx.laser.x - (s.bossEntity.manoSx.laser.width/2) -40
-									s.bossEntity.manoSx.y = s.bossEntity.manoSx.laser.y
-								end
-							end
-							if(s.bossEntity.manoDx.state == "firing" and s.bossEntity.manoDx.laser) then
-								if(s.bossEntity.manoDx.laser)then
-									s.bossEntity.manoDx.x = s.bossEntity.manoDx.laser.x
-									s.bossEntity.manoDx.y = s.bossEntity.manoDx.laser.y - (s.bossEntity.manoDx.laser.width/2) -40
-								end
-							end
 						---------------------------------------------------------------
 						--Keeps the lasers in the position where they are fired------
 							local laser= s.bossEntity.manoDx.laser
@@ -376,31 +378,22 @@ physics.setGravity( 0, 50 )
 								laser.y = laser.fixedY
 							end
 						--------------------------------------------------------------
-							if(s.bossEntity.testa.lives == 0 and s.state ~= "Completed") then
+							if(s.bossEntity.testa.lives == 0 and s.state ~= "Completed" and s.win == false) then
 								s.bossEntity.manoDx.state = "terminata"
 								s.bossEntity.manoSx.state = "terminata"
 								s:victory()
 							end
-
-
-
-
 					end
-
 				end
 				--- FINE STRATEGY BOSS 1 -----------------------------------------------------
 
 				--- GESTIONE STRATEGY BOSS N-esimo -------------------------------------------
-				if(bossStrategy.activeStrategy == 2)then
-					--metodi per la gestione runtime del boss n-esimo	
-				end
+					--if(bossStrategy.activeStrategy == 2)then
+					     --metodi per la gestione runtime del boss n-esimo	
+					--end
 				--- FINE STRATEGY BOSS N-esimo -----------------------------------------------
 
 			end
-
-
-
-
 		----FINE BOSS FIGHT SECTION-------------------------------------------------------------------------------
 
 		
@@ -596,12 +589,10 @@ physics.setGravity( 0, 50 )
 		-- Logic, controls and UI initialization -----------------
 		collisions.setGame( game, gameStateList, playerStateList  )
 		controller.setGame( game, gameStateList, playerStateList  )
-		--boss.setGame( game, gameStateList, playerStateList  )
 		bossStrategy.setGame(game, gameStateList, playerStateList )
 		controller.prepareUI()
 		-----------------------------------------------------------
 		game.maxscore= maxScore()
-		print(maxscore)
 		physics.start()
 		physics.pause()
 	end
@@ -637,7 +628,6 @@ function game.pause()
 	physics.pause()
 	controller:pause()
 	if(game.bossFight and game.bossFight.state ~= "Paused")then
-		print("----BOSS PAUSE----")
 		game.bossFight:pauseFight()
 	end
 	for i in pairs(game.chaserList) do
@@ -650,7 +640,6 @@ function game.resume()
 	physics.start()
 	controller:start()
 	if(game.bossFight and game.bossFight.state ~= "Running")then
-		print("----BOSS RESUME----")
 		game.bossFight:resumeFight()
 	end
 	for i in pairs(game.chaserList) do

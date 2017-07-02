@@ -4,8 +4,6 @@
 --
 -----------------------------------------------------------------------------------------
 local boss= require("core.boss")
-local physics = require ("physics")
-local entity = require("lib.entity")
 
 local game = {}
 local steve = {}
@@ -13,32 +11,36 @@ local gState = {}
 local sState = {}
 
 local bossStrategy = {
+	-- activeStrategy se == 0 -->non c'è nessuna fight, altrimenti indica il numero della Boss Strategy attiva  
 	activeStrategy = 0
 }
 
+---------- STRATEGIA BOSS 1 --------------------------------------------------------------------------------------------------------------------
 local strategyBoss1 = {}
 
-	function strategyBoss1.createStrategy()
+	function strategyBoss1.createStrategy(trigger)
 
 		local strategyB1 = {}
+		strategyB1.trigger = trigger 
 		strategyB1.isActive = false
 		strategyB1.BossNumber= 1
  		strategyB1.bossEntity = {}
  		strategyB1.phase = 0
 		strategyB1.state = ""
-		strategyB1.timers={}
-		strategyB1.fireRateSx = 5000
-		strategyB1.fireRateDx = 5000
+		strategyB1.timers={}          --campo opzionale per altre strategy
+		strategyB1.fireRateSx = 5000  --campo opzionale per altre strategy
+		strategyB1.fireRateDx = 5000  --campo opzionale per altre strategy
 		strategyB1.spawn = game.map:getObjectLayer("bossSpawn"):getObject("spawn00")
+		strategyB1.win = false
 		
 
 	
-
+		-- funzione obbligatoriamente presente in ogni strategy
 		function strategyB1:startFight()
-		
 			self:phase0()
 		end
 		
+		------ PHASE 0 --------------------------------------------------------------------------------------------------------------------
 		function strategyB1:phase0()
 		
 			bossStrategy.activeStrategy = 1
@@ -52,6 +54,7 @@ local strategyBoss1 = {}
 			local testa = boss.loadBoss("testa")
 			local manoDx = boss.loadBoss("manoDx")
 			local manoSx = boss.loadBoss("manoSx")
+
 			corpo:toBack()
 
 			-- sposta le mani nella posizione iniziale
@@ -61,20 +64,13 @@ local strategyBoss1 = {}
 			manoDx.xScale=-1
 			spallaSx.xScale=-1
 			
-			
 			self.bossEntity.manoDx = manoDx
 			self.bossEntity.manoSx = manoSx
 			self.bossEntity.spallaDx = spallaDx
 			self.bossEntity.spallaSx = spallaSx
 			self.bossEntity.corpo = corpo
-			self.bossEntity.testa = testa 
-
-		print(self.bossEntity.corpo.width)
-			
-			--self.bossEntity.manoSx.isFixedRotation=false
-			--self.bossEntity.manoSx.rotation = 180
-			--self.bossEntity.corpo:setFillColor( 255,0 ,0)
-			--self.bossEntity.corpo:setFillColor(1)    --ripristina il colore originale
+			self.bossEntity.testa = testa
+			self.bossEntity.spawn = self.spawn
 
 			--inizializazione di componenti aggiuntive di ogni pezzo
 			self.bossEntity.spallaDx.state = "normal"
@@ -89,18 +85,18 @@ local strategyBoss1 = {}
 			
 			print(" STA PER INIZIARE LA BOSS FIGHT")
 			--phase1
-			timer.performWithDelay(3000,self:phase1())
+			local t = timer.performWithDelay(3000,self:phase1())
+			table.insert(self.timers,t)
 		end
 
 
 
+		------ PHASE 1 --------------------------------------------------------------------------------------------------------------------
 		function strategyB1:phase1()
+
 				self.state = "Running"
 				self.phase=1
 				print("PHASE = 1")
-			
-				--local manoDx = self.bossEntity.manoDx  
-				--local manoSX = self.bossEntity.manoSx
 				
 				self.bossEntity.manoDx.state = "bouncing"
 				self.bossEntity.manoSx.state = "bouncing"
@@ -108,11 +104,7 @@ local strategyBoss1 = {}
 				-- Alcune parti non possono essere toccate durante alcune fasi--------
 				self.bossEntity.spallaDx.isTargettable =false
 				self.bossEntity.spallaSx.isTargettable =false
-				self.bossEntity.spallaDx.isBodyActive = false
-				self.bossEntity.spallaSx.isBodyActive = false
 				self.bossEntity.testa.isTargettable =false
-				self.bossEntity.testa.isBodyActive = false
-				
 
 				--DA RIMUOVERE, SOLO PER SEMPLIFICARE I TEST
 				--self.bossEntity.manoDx.state = "alzaSchiaccia"
@@ -142,6 +134,7 @@ local strategyBoss1 = {}
 		end
 
 
+		------ PHASE 2 --------------------------------------------------------------------------------------------------------------------
 		function strategyB1:phase2()
 			self.phase=2
 
@@ -149,11 +142,9 @@ local strategyBoss1 = {}
 
 		 	if(self.bossEntity.spallaDx.state == "normal") then
 		 		self.bossEntity.spallaDx.isTargettable =true
-		 		self.bossEntity.spallaDx.isBodyActive = true
 		 	end
 		 	if(self.bossEntity.spallaSx.state == "normal") then
 				self.bossEntity.spallaSx.isTargettable =true
-				self.bossEntity.spallaSx.isBodyActive =true
 			end
 
 			--Sposta il corpo del boss con tutto il resto verso il basso
@@ -188,15 +179,15 @@ local strategyBoss1 = {}
 
 		end
 
-
+		------ PHASE 3 --------------------------------------------------------------------------------------------------------------------
 		function strategyB1:phase3()
 			self.phase=3
 		 	print("PHASE = 3")
 
 		 	--La testa del boss diventa finalmente colpibile
-		 	transition.to(self.bossEntity.testa,{time = 20, onComplete=function() self.bossEntity.testa.isBodyActive=true end })
+		 	transition.to(self.bossEntity.testa,{time = 5000, onComplete=function() self.bossEntity.testa.isTargettable=true end })
 		 	--Sposta il corpo del boss con tutto il resto verso l'alto
-				transition.to(self.spawn, {time=4000, y= self.spawn.y - 200})
+			transition.to(self.spawn, {time=4000, y= self.spawn.y - 200})
 		 	-- da togliere--
 		 	--transition.to(self.bossEntity.manoSx, {time=20, onComplete=function() self.bossEntity.manoSx.isBodyActive=false end})
 		 	--transition.to(self.bossEntity.manoDx, {time=20, onComplete=function() self.bossEntity.manoDx.isBodyActive=false end})
@@ -242,62 +233,67 @@ local strategyBoss1 = {}
 					transition.to(self.spawn, {time=4000, y= self.spawn.y - 200})
 				end)
 				table.insert(self.timers,t4)
-	
-
 			end , -1)
-			table.insert(self.timers,t3)
-
-			
-		 	
+			table.insert(self.timers,t3)		 	
 		end
 
-			
+		
 		function strategyB1:victory()
 			self.state = "Completed"
-
+			self.win = true
 			--pause all timers of this strategy
 			for i,t in pairs(self.timers)do
 				timer.pause(t)
 			end
 
-			timer.performWithDelay(5000,function() --dopo circa 10 sec
+			timer.performWithDelay(5000,function() --dopo circa 5 sec
 				self:terminateFight()
 			end )
-		
-			print("Strategia COMPLETATA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Boss Sconfitto")
 		end
 
 
-
+		-- TERMINATE BOSS FIGHT --------------------------(called if we: die|return to menu|after victory)----
 		function strategyB1:terminateFight()
-			timer.performWithDelay(4000, function()
-				self.state = "Terminated"
-			end)
-			--self.state = "Terminated"
-			self.isActive=false
+			self.state = "Terminated"
+		
+			timer.performWithDelay(2000, function()
+				self.isActive=false
+				bossStrategy.activeStrategy=0
 
-			for i,part in pairs(self.bossEntity)do
-				if((part.name=="manoSx" or part.name=="manoDx") and part.laser) then
-					--transition.cancel(part.laser)
-					--display.remove(part.laser)
+				--cancel all transitions and images
+				for i,part in pairs(self.bossEntity)do			
+					transition.cancel(part)
+					display.remove(part)
+				end	
+
+				--cancel all timers of this strategy
+				for i,t in pairs(self.timers)do
+					timer.cancel(t)
 				end
-				transition.cancel(part)
-				display.remove(part)
-			end	
 
-			--cancel all timers of this strategy
-			for i,t in pairs(self.timers)do
-				timer.cancel(t)
-			end
-
-
-
-			print("Strategia Terminata TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
+				-- remove the triggered wall at the beginning
+				transition.to(self.trigger,{time=0, onComplete= function() 
+					for k,tile in pairs(self.trigger.wall)do
+						if(tile)then
+							transition.to(tile,{time=0, onComplete= function() tile:destroy()	end})
+						end
+					end
+				end})
+				
+				-- if we don't defeat the Boss, reactivate the boss Trigger (usefull in case we died)
+				transition.to(self.trigger,{time=0, onComplete= function()
+					if(self.win == false)then
+					 	self.trigger.isBodyActive=true
+					end 
+				end})
+				game.bossFight=nil
+			end)
 		end
 
+		-- PAUSE BOSS FIGHT -----------------------------------------------------------------------------------
 		function strategyB1:pauseFight()
-
 			self.state = "Paused"
+
 			--pause all transitions for the boss parts
 			for i,part in pairs(self.bossEntity)do
 				transition.pause(part)
@@ -305,6 +301,8 @@ local strategyBoss1 = {}
 					for i,proiettile in pairs(part.proiettili)do
 						transition.pause(proiettile)
 					end
+				elseif(part.name=="manoSx" or part.name=="manoDx") then
+					transition.pause(part.laser)
 				end
 			end	
 
@@ -313,84 +311,56 @@ local strategyBoss1 = {}
 				timer.pause(t)
 			end	
 
-			print("Strategia in Pausa PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
-			print(self.state)
+			--pause all sprites for the boss parts
+			for i,part in pairs(self.bossEntity)do
+				--part:pause()
+				if(part.name=="manoSx" or part.name=="manoDx") then
+					if(part.laser) then	if(part.laser.isPlaying)then	part.laser:pause() end  end
+					--end
+				end
+			end
 		end
 
+		--RESUME BOSS FIGHT---------------------------------------------------------------------------------
 		function strategyB1:resumeFight()
 			self.state = "Running"
-			--pause all transitions for the boss parts
+
+			--resume all transitions for the boss parts
 			for i,part in pairs(self.bossEntity)do
 				transition.resume(part)
 				if(part.name=="spallaSx" or part.name=="spallaDx") then
 					for i,proiettile in pairs(part.proiettili)do
 						transition.resume(proiettile)
 					end
+				elseif(part.name=="manoSx" or part.name=="manoDx") then
+					transition.resume(part.laser)
 				end
 			end	
 
-			--pause all timers of this strategy
+			--resume all timers of this strategy
 			for i,t in pairs(self.timers)do
 				timer.resume(t)
 			end	
-			print("Strategia Resumata RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR")
-			print(self.state)
+
+			--resume all sprites for the boss parts
+			for i,part in pairs(self.bossEntity)do
+				--part:play()
+				if(part.name=="manoSx" or part.name=="manoDx") then
+					--for i,laser in pairs(part.laser)do
+					if(part.laser) then	if(part.laser.isPlaying == false)then	part.laser:play() end end
+					--end
+				end
+			end
 		end
 
 
 
 
+	strategyB1.__index = strategyB1
+	return strategyB1
+end
+---------FINE STRATEGIA BOSS 1 ----------------------------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-		strategyB1.__index = strategyB1
-		return strategyB1
-	end
-
-		
-
-
-		
-			
-		-- local function phase2()
-		-- 	Bphase=2
-		-- 	print("PHASE = 2")
-		-- end,
-
-
-		-- local function phase3()
-		-- 	Bphase=3
-		-- 	print("PHASE = 3")
-		-- end,
-
-
-
-
-	
-
-
-		local function phaseEnd()
-			--Runtime:removeEventListener("enterFrame",controlFlux)
-			strategyB1:terminateFight()
-			--altro
-		end
-
-		
-		
-		
-		
-		--Runtime:addEventListener("enterFrame",controlFlux)
-		--phase0()
-		
-		
-
-	
 
 
 function bossStrategy.setGame( currentGame, gameStateList, playerStateList )
@@ -403,13 +373,16 @@ function bossStrategy.setGame( currentGame, gameStateList, playerStateList )
 end
 
 
-function bossStrategy.startBossFight(num)
+function bossStrategy.startBossFight(num, trigger)
+	boss.setGame(game,gState,sState)
 
 --	in base al numero faccio partire una determinata bossFight
 --	faccio partire la funzione phase0 di quella determinata BossStrategy
-
-	boss.setGame(game,gState,sState)
-	game.bossFight = strategyBoss1.createStrategy()
+	if    (num==1) then
+		game.bossFight = strategyBoss1.createStrategy(trigger)
+	elseif(num==2) then
+	--  game.bossFight = strategyBoss2.createStrategy(trigger)
+	end
 	game.bossFight:startFight()
 end
 

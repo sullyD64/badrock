@@ -4,6 +4,7 @@
 --
 -----------------------------------------------------------------------------------------
 local bossStrategy = require ("core.bossStrategy")
+local filters = require ("lib.filters")
 local composer = require ( "composer"  )
 local myData   = require ( "myData"    )
 local sfx      = require ( "audio.sfx" )
@@ -44,7 +45,52 @@ function scene:create( event )
 	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
 	-- e due Tile Layer -vuoti-  playerObject e playerEffects.
 	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0"), 1, 600 )
-		bossStrategy.startBossFight(5) -- riga da rimuovere e sistemare come si deve
+
+
+--------- Boss Trigger Section----------------------------------------------------------------
+	local bossTriggerEvent = map:getObjectLayer("events"):getObject("bossTrigger")
+	--aggiungo le proprietà del filter dell'environment
+	bossTriggerEvent:addProperty(Property:new("categoryBits", filters.envFilter.categoryBits))
+	bossTriggerEvent:addProperty(Property:new("maskBits", filters.envFilter.maskBits))
+			
+	--fuzione che verrà richiamata quando Steve vi entrerà in contatto (da chiamare Obbligatoriamente ".listener")
+	bossTriggerEvent.listener = function(event)
+
+		local trigger = event.other
+		--Da mettere anche nei prossimi trigger per evitare un doppio contatto del trigger in breve tempo
+		transition.to(event ,{time=0, onComplete= function()
+				event.contact.isEnabled = false
+				transition.to(trigger ,{time=0, onComplete= function()	trigger.isBodyActive=false	end})
+		end})
+
+		--Trigger the Boss Fight
+		if(game.bossFight==nil and bossStrategy.activeStrategy == 0)then
+			event.contact.isEnabled = true
+			transition.to(trigger ,{time=0, onComplete= function() 
+				bossStrategy.startBossFight(1, trigger)
+			end})
+		
+			--Create a Tile to block the way back
+			trigger.wall={} --initialize the related wall objects table
+
+			local pos={}
+			pos.x, pos.y = trigger.x -100 , trigger.y-20
+			transition.to(map,{time=0, onComplete=function()		
+				local tile = map:getTileLayer("environment"):createTileAt(2,pos)
+				tile:addProperty(Property:new("HasBody", ""))
+				tile:addProperty(Property:new("bodyType", "static"))
+				tile:build()
+				table.insert(trigger.wall,tile)
+			end})
+			
+			
+
+		end
+
+	end
+------------------------------------------------------------------------------------
+
+
 
 end
 

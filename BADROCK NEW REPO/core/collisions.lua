@@ -142,11 +142,23 @@ end
 	-- Collision between the player and safe environment Tiles
 	local function environmentCollision( player, event )
 		local environment = event.other
-
 		if (event.phase == "began" and environment.isGround) then
 			player.canJump = true
 			player.isAirborne = false 
 			player.hasTouchedGround = true
+		end
+
+		if(environment.type == "event")then
+			print("Ho Colliso con l'evento")
+
+		--for k,v in pairs(environment.owner) do
+		--	print(k)
+		--	print(v)
+		--end
+
+			--if(environment.listener)then
+				environment.owner.listener(event)
+			--end
 		end
 	end
 

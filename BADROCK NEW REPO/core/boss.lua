@@ -3,7 +3,6 @@
 
 -----------------------------------------------------------------------------------------
 local filters= require ("lib.filters")
---local game = require ("core.game")
 local entity = require ("lib.entity")
 
 local game = {}
@@ -16,7 +15,7 @@ local sState = {}
 local boss = {
 
  descriptions = {
-		--commento
+		
 		{	type = "manoDx",
 			species = "manoDx",
 			lives = 3,--3
@@ -97,7 +96,7 @@ local boss = {
 			type ="corpo",
 			species = "corpo",
 			bodyType="dynamic",
-			lives = 2,
+			lives = 1,
 			points= 0,
 			options = {
 			-- 	graphicType = "animated",
@@ -176,31 +175,21 @@ local boss = {
 		end
 	end
 
-	-- local function textListener( event )
-	 
-	--     if ( event.phase == "began" ) then
-	        
-	 
-	--     elseif ( event.phase == "ended" or event.phase == "submitted" ) then
-	            
-	--     end
-	-- end
 
 	--inizia un breve dialogo con il nemico, testo da mettere in un array per poterne scorrere gli elementi
 
-
-	function presentati()
-		-- defaultBox = native.newTextBox( display.contentCenterX, display.contentCenterY, 280, 140 )
-		-- defaultBox.text = "Well.. I didn't expect you would have survived"
-		local textField = native.newTextField( display.contentCenterX, display.contentCenterY, 260, 100 )
-		textField:setTextColor( 0.8, 0.8, 0.8 )
-		textField.size=15
-		textField.text="Well.. I didn't expect you would have survived"
-		--background del textbox trasparente, non supportato da emulatore su windows
-		textField.hasBackground = false
-		--cliccando si scorre il testo più velocemente
-		--defaultBox:addEventListener( "touch", textListener )
-	end
+	-- function presentati()
+	-- 	-- defaultBox = native.newTextBox( display.contentCenterX, display.contentCenterY, 280, 140 )
+	-- 	-- defaultBox.text = "Well.. I didn't expect you would have survived"
+	-- 	local textField = native.newTextField( display.contentCenterX, display.contentCenterY, 260, 100 )
+	-- 	textField:setTextColor( 0.8, 0.8, 0.8 )
+	-- 	textField.size=15
+	-- 	textField.text="Well.. I didn't expect you would have survived"
+	-- 	--background del textbox trasparente, non supportato da emulatore su windows
+	-- 	textField.hasBackground = false
+	-- 	--cliccando si scorre il testo più velocemente
+	-- 	--defaultBox:addEventListener( "touch", textListener )
+	-- end
 
 
 	-- lanciatore spara un objectToThrow contro target
@@ -217,10 +206,7 @@ local boss = {
 		carota.isTargettable=true
 		carota.points=0
 		carota.isProjectile = true
-		--creazione.gravityScale=0.025
-		carota.x, carota.y = lanciatore.x, lanciatore.y
-		
-			
+		carota.x, carota.y = lanciatore.x, lanciatore.y			
 		carota:addOnMap(game.map)
 		table.insert(lanciatore.proiettili, carota)
 
@@ -232,15 +218,21 @@ local boss = {
 					display.remove(carota)
 					carota=nil end})
 				end
+			end,
+			onCancel=function()
+				if(carota)then
+					carota.isFixedRotation=true
+					transition.to(carota,{time=0, alpha=0,onComplete=function()
+					display.remove(carota)
+					carota=nil end})
+				end
 			end})
 			
 		end
 	end
 
-	--spara un laser in posizione x e y -- FABIO
+	--spara un laser dal Generatore, appartenente alla strategia Strategy
 	function boss.sparaLaser(generatore, strategy)
-		
-		--local function createLaser()
 
 			local laserParameters= {
 				graphicType="animated",
@@ -262,24 +254,6 @@ local boss = {
 			}
 			local laser = entity.newEntity(laserParameters)
 			laser.alpha=0
-			-- if(generatore.name == "manoDx") then
-			-- --la mano DX si occupa di fare i laser Verticali
-			-- 	posizioneX = generatore.x
-			-- 	posizioneY = generatore.y + (laser.width/2) +40
-			-- 	transition.to(laser,{time = 20, rotation = 90})
-
-			-- elseif(generatore.name == "manoSx")then
-			-- --la mano SX si occupa di fare i laser Orizzontali
-			-- 	posizioneX = generatore.x + (laser.width/2)+ 40
-			-- 	posizioneY = generatore.y	
-			-- end
-
-			-- laser.fixedX = posizioneX
-			-- laser.fixedY = posizioneY
-			-- generatore.laser=laser
-			-- laser:addOnMap(game.map)
-		--	return laser
-		--end
 
 		local function deleteLaser(event)
 			--Distruggo il laser
@@ -305,22 +279,9 @@ local boss = {
 		end 
 
 		local function spara()
-			--local lX= laser.x
-			--local lY=laser.y
-
 			transition.to(laser,{time=10, onComplete=function() 
 					laser.isBodyActive=true
 			end})
-			-- transition.to(laser,{time=5, x= 0, y=0, alpha=0, onComplete=function()
-			-- 		transition.to(laser,{time=5, x= lX, y=lY, alpha=1, onComplete=function()
-			-- 			--laser:scale(0.1, 1 )
-			-- 		end})
-			-- 	end})
-			--local laser= createLaser()
-			
-				--transition.to(laser,{time=2000, xScale= 1, onComplete=function()
-					--laser:scale(1, 1 )
-				--end})
 
 				laser:setSequence("fire")
 				laser:play()
@@ -348,9 +309,6 @@ local boss = {
 			generatore.laser=laser
 			laser:addOnMap(game.map)
 
-
-			--local laser = createLaser()
-
 			transition.to(laser,{time=10, onComplete= function()	laser.isBodyActive=false end })
 
 			laser.alpha=0
@@ -369,26 +327,15 @@ local boss = {
 					end})
 				else --Se tutto procede normalmente
 					--Dopo Tot secondi che il laser è arrivato con alpha=1, spara
-					local t1 = timer.performWithDelay(1000, spara )
+					local t1 = timer.performWithDelay(800, spara )
 					table.insert(strategy.timers, t1)
 				end
-			end})
-
-			
+			end})			
 		end)
 		table.insert(strategy.timers, t)
-
-		
-		--Dopo che il laser è stato puntato, faccio fuoco
-		
-		
-
-		
 	end
 
-	--le mani: 1. si alzano in volo, 2. cercano steve, 3. schiacciano; ripetono i passi 1, 2, 3
-
-
+	--Fase 2 boss 1: le mani: 1. si alzano in volo, 2. cercano steve, 3. schiacciano; ripetono i passi 1, 2, 3
 	function boss.alzaSchiaccia(oggetto,target,strategy)
 		local funzioni={}
 
@@ -410,7 +357,6 @@ local boss = {
 				table.insert(strategy.timers, t1)
 			end
 		end
-
 		local function insegui()
 			if( oggetto and target and strategy.state == "Running" and oggetto.lives ==2) then
 
@@ -431,7 +377,6 @@ local boss = {
 			end
 		end
 		
-
 		funzioni.alzati = alzati
 		funzioni.insegui = insegui
 		funzioni.schiaccia = schiaccia
