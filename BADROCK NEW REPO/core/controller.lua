@@ -368,11 +368,8 @@ local sState = {}
 
 		-- The player loses its equipped powerup.
 		if (steve.hasPowerUp) then
-			-- steve:losePowerUp() --TO-DO
-			display.remove(steve.powerUp)
-			steve.equipped = nil
-			steve.hasPowerUp = false
-			steve.attacks = nil
+			steve:losePowerUp()
+			controller.updateAmmo("destroy")
 		end
 
 		-- Removes the runtime event listeners if death was triggered
@@ -543,10 +540,29 @@ function controller.destroyUI()
 	end
 end
 
+-- Modifies the UI Action Button when a powerup is picked
 function controller.updateActionButton( imageName )
 	ui.updateActionButton(imageName)
 	ui.buttons.action:addEventListener("touch", onAttackEvent)
 	ui.buttons.action.active = true
+end
+
+function controller.restoreActionButton()
+	ui.restoreActionButton()
+	ui.buttons.action:addEventListener("touch", onAttackEvent)
+	ui.buttons.action.active = true
+end
+
+function controller.updateAmmo( flag, ammoNumber )
+	if (flag == "initialize") then
+		ui.createAmmoIcons(ammoNumber)
+	elseif (flag == "update") then
+		ui.updateAmmoIcons(ammoNumber)
+	elseif (flag == "destroy") then
+		ui.destroyAmmoIcons()
+		ui.emptyAmmoIcons()
+		controller.restoreActionButton()
+	end
 end
 
 function controller:start()

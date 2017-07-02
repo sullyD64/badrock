@@ -189,7 +189,7 @@ local buttonData = {
 }
 
 
----------------------------------------------------------------------------------
+-- LIVES ------------------------------------------------------------------------
 -- [This section will be likely modified in the future, we will decide next meet 
 -- if it's worth keeping an icon for every life or a simpler single-icon counter].
 	ui.lifeIcons = {}
@@ -240,6 +240,58 @@ local buttonData = {
 		end
 	end
 ---------------------------------------------------------------------------------
+
+-- AMMO -------------------------------------------------------------------------
+	ui.ammunitions = {}
+
+	local function createAmmoIconAt( index )
+		local	ammo = display.newImageRect(ui.buttonGroup, visual.bullet, 20, 20 )
+		ammo.rotation = -90
+		ammo.anchorX, ammo.anchorY = 1, 1
+		ammo.x = ui.buttons.action.x - 50 - (ammo.contentWidth * (index - 1))
+		ammo.y = ui.buttons.action.y - 20 -  ammo.contentHeight / 2
+		ammo.isVisible = true
+		table.insert(ui.ammunitions, ammo)
+	end
+
+	-- Creates the Ammunitions array initialized the powerup's ammo number.
+	function ui.createAmmoIcons( maxAmmoNumber )
+		for i = 1, maxAmmoNumber do
+			createAmmoIconAt( i )
+		end
+	end
+
+	-- Updates the Ammunitions array, either if ammo is added or removed
+	function ui.updateAmmoIcons( currentAmmoNumber )
+		for i, v in pairs(ui.ammunitions) do
+			if (i > currentAmmoNumber) then
+				display.remove(v)
+				ui.ammunitions[i] = nil
+				-- print ("Ammo reduced by 1. Remaining "..#ui.ammunitions)
+			end
+		end
+		-- if (currentAmmoNumber - #ui.ammunitions == 1) then
+		-- 	createAmmoIconAt(currentAmmoNumber)
+		-- 	print ("Ammo increaded by 1. Remaining "..#ui.ammunitions)
+		-- end
+	end
+
+	-- Empties the Ammunitions array
+	function ui.emptyAmmoIcons()
+		--print("Before: ".. #ui.ammunitions)
+		for i in pairs (ui.ammunitions) do
+			ui.ammunitions[i] = nil
+		end
+		--print("After: ".. #ui.ammunitions)
+	end
+
+	function ui.destroyAmmoIcons()
+		for i in pairs (ui.ammunitions) do
+			display.remove(ui.ammunitions[i])
+		end
+	end
+---------------------------------------------------------------------------------
+
 
 -- Contains all the calls to -widget.newButton- and adds selected buttons to the UI Group.
 local function createButtons()
@@ -340,6 +392,8 @@ function ui.textFade( textWidget, duration )
 	})
 end
 
+-- Called when a powerup is picked: this modifies the appearence of the action button 
+-- to indicate a different action depending on the powerup.
 function ui.updateActionButton(imageName)
 	ui.buttons.action:removeSelf()
 
@@ -358,5 +412,13 @@ function ui.updateActionButton(imageName)
 	ui.buttons.action = actionBtn
 end
 
-	
+-- Restores the action button to the default attack
+function ui.restoreActionButton()
+	ui.buttons.action:removeSelf()
+	local actionBtn = widget.newButton(buttonData.actionBtn.options)
+	actionBtn.anchorX, actionBtn.anchorY = buttonData.actionBtn.aX, buttonData.actionBtn.aY
+	ui.buttonGroup:insert( actionBtn )
+	ui.buttons.action = actionBtn
+end
+
 return ui

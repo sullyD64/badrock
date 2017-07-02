@@ -8,8 +8,8 @@
 -- 2) A Sprite sequence (for the visual animations),
 -- 3) A Sensor (to be used with the npcs' sensors and other entities).
 -----------------------------------------------------------------------------------------
-local entity  = require ( "lib.entity"   )
-local combat = require ( "core.combat" )
+local entity  = require ( "lib.entity"  )
+local combat  = require ( "core.combat" )
 
 local player = {}
 local settings = {
@@ -137,29 +137,39 @@ function player.loadPlayer( currentGame )
 		player.sprite = sprite
 		player.sensorD = sensorD
 
-	combat.setMap(currentMap)
-	combat.setPlayer(player)
-	player.attack = combat.loadDefaultAttack() 	-- by default, attack is already loaded in memory.
+	-- Combat functions --------------------------------------------
+		combat.setMap(currentMap)
+		combat.setPlayer(player)
+		-- Pre-loads the default attack.
+		player.attack = combat.loadDefaultAttack()
+		combat.defaultLoaded = true
 
-	function player:equip( itemName )
-		player.powerUp = combat.loadPowerUp( itemName )
-		self.equipped = itemName
-		self.hasPowerUp = true
-	end
-
-	function player:performAttack()
-		self.state = "Attacking"
-
-		if (self.hasPowerUp) then 
-			combat.usePowerUp(self.equipped)
-		else
-			combat.performMelee()
+		function player:equip( itemName )
+			self.powerUp = combat.loadPowerUp( itemName )
+			self.equipped = itemName
+			self.hasPowerUp = true
+			self.attacks = self.powerUp.attacks
 		end
-	end
 
-	function player:cancelAttack()
-		combat.cancel()
-	end
+		function player:performAttack()
+			self.state = "Attacking"
+
+			if (self.hasPowerUp) then 
+				combat.usePowerUp(self.equipped)
+			else
+				combat.performMelee()
+			end
+		end
+
+		function player:losePowerUp()
+			combat.losePowerUp()
+			self.equipped = nil
+		end
+
+		function player:cancelAttack()
+			combat.cancel()
+		end
+	----------------------------------------------------------------
 
 	return player
 end

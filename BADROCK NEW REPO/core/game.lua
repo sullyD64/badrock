@@ -306,23 +306,31 @@ physics.setGravity( 0, 50 )
 			game.steve.sprite.xScale = game.steve.direction
 			game.steve.sensorD.x, game.steve.sensorD.y = game.steve.x, game.steve.y
 
+			-- Keeps the player's attack joined with the player.
 			if (game.steve.attack) then
 				local attack = game.steve.attack
+				-- Default type is the melee attack or other bonuses
 				if (attack.type == "default" and attack.sprite) then
 					attack.x, attack.y = game.steve.x, game.steve.y	
 					attack.sprite.x, attack.sprite.y = game.steve.x, game.steve.y
 					attack.sprite.xScale = game.steve.direction
-				elseif(attack.type == "bullet" and attack.sprite) then
-					attack.sprite.x, attack.sprite.y = attack.x, attack.y
-					if (game.steve.attacks) then
-						for k, attack in pairs(game.steve.attacks) do
-							attack.sprite.x, attack.sprite.y = attack.x, attack.y
-						end
-					end
 				end
 			end
 
-			if (game.steve.powerUp) then
+			-- Keeps the player's attacks joined with the player.
+			if(game.steve.attacks) then
+				local attacks = game.steve.attacks
+				for k, bullet in pairs(attacks) do
+					if (not bullet.hasBeenShot) then
+						bullet.x, bullet.y = game.steve.powerUp.x, game.steve.powerUp.y
+						bullet.sprite.xScale = game.steve.powerUp.xScale
+					end
+					bullet.sprite.x, bullet.sprite.y = bullet.x, bullet.y
+				end
+			end
+
+			-- Keeps the player's equipped powerUp joined with the player.
+			if (game.steve.powerUp and game.steve.hasPowerUp) then
 				local powerUp = game.steve.powerUp
 				powerUp.x, powerUp.y = game.steve.x + (game.steve.direction * 20), game.steve.y
 				powerUp.xScale = game.steve.direction
