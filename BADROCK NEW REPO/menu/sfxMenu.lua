@@ -9,7 +9,6 @@ local myData  = require ( "myData"           )
 local utility = require ( "menu.utilityMenu" )
 local sfx     = require ( "audio.sfx"        )
 
-
 local opt = {}
 
 local function onOptReturnMenuBtnRelease()
@@ -78,7 +77,7 @@ opt.panel = utility.newPanel{
 	--opt.panel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
 	opt.panel:insert( opt.panel.background )
 	 
-opt.panel.title = display.newText( "Settings", 0, -70, "Micolas.ttf", 15 )
+opt.panel.title = display.newText( "Settings", 0, -70, utility.font, 15 )
 opt.panel.title:setFillColor( 1, 1, 1 )
 opt.panel:insert( opt.panel.title )
 
@@ -130,11 +129,11 @@ opt.panel:insert( opt.panel.title )
 		opt.panel.fxVolume.y = 5
 		opt.panel:insert(opt.panel.fxVolume)
 
-	opt.panel.bgVolumeText = display.newText( "Music", -20, -48,  "Micolas.ttf", 15 )
+	opt.panel.bgVolumeText = display.newText( "Music", -20, -48,   utility.font, 15 )
 	opt.panel.bgVolumeText:setFillColor( 0, 0, 0 )
 	opt.panel:insert(opt.panel.bgVolumeText)
 
-	opt.panel.fxVolumeText = display.newText( "Sound Effects", -20, -12, "Micolas.ttf", 15 )
+	opt.panel.fxVolumeText = display.newText( "Sound Effects", -20, -12,  utility.font, 15 )
 	opt.panel.fxVolumeText:setFillColor( 0, 0, 0 )
 	opt.panel:insert(opt.panel.fxVolumeText)
 

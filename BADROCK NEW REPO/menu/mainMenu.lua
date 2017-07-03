@@ -19,7 +19,7 @@ local sfx      = require ( "audio.sfx"        )
 local scene = composer.newScene()
 
 -- forward declarations and other locals
-local playBtn, optionBtn, shopBtn  
+local playBtn, optionBtn, shopBtn
 
 -- Menu Buttons ----------------------------------------------------------------------
 
@@ -96,7 +96,7 @@ local playBtn, optionBtn, shopBtn
 				bottomRightOverFrame = 18,
 
 				label = "Play",
-				font = "Micolas.ttf",
+				font = "Berlin Sans FB Regular.ttf",
 				fontSize = 20,
 				labelColor = { default={1}, over={128} },
 				onRelease = onPlayBtnRelease    
@@ -130,8 +130,8 @@ local playBtn, optionBtn, shopBtn
 				bottomLeftOverFrame = 16,
 				bottomMiddleOverFrame = 17,
 				bottomRightOverFrame = 18,
-				label = "Test",
-				font = "Micolas.ttf",
+				label = "Play",
+				font = "ITCKRIST.TTF",
 				fontSize = 20,
 				labelColor = { default={1}, over={128} },
 				onRelease = onShopBtnRelease                -- !!!!TO DO!!!!

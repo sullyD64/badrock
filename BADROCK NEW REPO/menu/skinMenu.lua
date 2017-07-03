@@ -74,7 +74,7 @@ local skin = {}
 	skin.panel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
 	skin.panel:insert( skin.panel.background )
 
-	skin.panel.title = display.newText( "Wardrobe", 0, -70, "Micolas.ttf", 15 )
+	skin.panel.title = display.newText( "Wardrobe", 0, -70,  utility.font, 15 )
 	skin.panel.title:setFillColor( 1, 1, 1 )
 	skin.panel:insert( skin.panel.title )
 

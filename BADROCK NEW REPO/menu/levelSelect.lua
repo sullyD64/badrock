@@ -13,6 +13,7 @@ local skin = require ("menu.skinMenu")
 local scene    = composer.newScene()
 local backButton
 local skinButton
+
 local buttons = {}
 
 -- -----------------------------------------------------------------------------------
@@ -109,6 +110,7 @@ local buttons = {}
 			bottomRightOverFrame = 18,
 			id = "skins",
 			label = "Skins",
+			font = utility.font,
 			labelColor = { default={1}, over={128} },
 			onEvent = handleSkinsButtonEvent
 		})
@@ -141,7 +143,7 @@ local buttons = {}
 
 		sceneGroup:insert( background )
 
-		local title = display.newText( "Select a level", display.contentCenterX, display.screenOriginY + 40, "Micolas.ttf", 20 )
+		local title = display.newText( "Select a level", display.contentCenterX, display.screenOriginY + 40, utility.font, 20 )
 		title:setFillColor( 1, 1, 1 )
     	sceneGroup:insert( title )
 
@@ -177,7 +179,7 @@ local buttons = {}
 				height = display.viewableContentWidth/3.5,--display.contentHeight - 200,
 				defaultFile = "visual/misc/levelIcon"..tostring( i )..".png",--visual.levelIconBg, --defaultFile = "misc/"..tostring(i).."select.png",
 				--overFile= visual.levelIconBg,
-				font = native.systemFontBold,
+				font = utility.font,
 				fontSize = 30,
 				labelColor = { default = { 1, 1, 1 }, over = { 0.5, 0.5, 0.5 } },
 				--cornerRadius = 8,

@@ -18,10 +18,13 @@ local pause = {}
 -- game's state (see onMenuBtnRelease)
 local game = {}
 local stateList = {}
-function pause.setGame( currentGame, gameStates )
+
+function pause.setGame( currentGame, gameStates)
 	game = currentGame
 	stateList = gameStates
 end
+
+
 -------------------------------------------------
 
 -- PAUSE MENU ---------------------------------------------------------------------
@@ -87,7 +90,7 @@ end
 			pause.panel.background = display.newImageRect(visual.panel,pause.panel.width, pause.panel.height-20)
 			pause.panel:insert( pause.panel.background )
 			 
-			pause.panel.title = display.newText( "Pause", 0, -70, "Micolas.ttf", 15 )
+			pause.panel.title = display.newText( "Pause", 0, -70, utility.font, 15 )
 			pause.panel.title:setFillColor( 1, 1, 1 )
 			pause.panel:insert( pause.panel.title )
 

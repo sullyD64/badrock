@@ -35,7 +35,7 @@ local abt = {}
 		abt.panel.background = display.newImageRect(visual.panel,abt.panel.width, abt.panel.height-20)
 		abt.panel:insert( abt.panel.background )
 
-	abt.panel.title = display.newText( "About", 0, -70, "Micolas.ttf", 15 )
+	abt.panel.title = display.newText( "About", 0, -70, utility.font, 15 )
 	abt.panel.title:setFillColor( 1, 1, 1 )
 	abt.panel:insert( abt.panel.title )
 

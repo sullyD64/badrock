@@ -194,10 +194,10 @@ end
 
 	-- Create text result, score, and stars ------------------------------------------
 		
-		result.panel.finalText= display.newText ("", 10, -70, native.systemFontBold, 16)
+		result.panel.finalText= display.newText ("", 10, -70, utility.font, 16)
 		result.panel:insert( result.panel.finalText )
 
-		result.panel.score = display.newText( "", 0, -100, "Micolas.ttf", 15 )
+		result.panel.score = display.newText( "", 0, -100, utility.font, 15 )
 		result.panel.score:setFillColor( 1, 1, 1 )
 		result.panel:insert( result.panel.score )
 

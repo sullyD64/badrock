@@ -7,6 +7,7 @@ local skinType
 local price
 local skinBtn, transpBtn, backBtn
 local buyBtns, skins
+
 local buy = {}
     
     function buy.setToEnableButtons( backButton, skinsButtons, buyButtons  )
@@ -102,15 +103,15 @@ local buy = {}
     buy.panel.background:setFillColor( 0.5, 0.28, 0.6)
     buy.panel:insert( buy.panel.background )
 
-    buy.panel.title = display.newText( "Want to buy?", 0, -50, "Micolas.ttf", 15 )
+    buy.panel.title = display.newText( "Want to buy?", 0, -50, utility.font, 15 )
     buy.panel.title:setFillColor( 1, 1, 1 )
     buy.panel:insert( buy.panel.title )
 
-    buy.panel.priceText = display.newText( "", 0, -30, "Micolas.ttf", 15 )
+    buy.panel.priceText = display.newText( "", 0, -30, utility.font, 15 )
     buy.panel.priceText:setFillColor( 1, 1, 1 )
     buy.panel:insert( buy.panel.priceText )
 
-    buy.panel.cantBuyText = display.newText( "", 0, -10, "Micolas.ttf", 15 )
+    buy.panel.cantBuyText = display.newText( "", 0, -10, utility.font, 15 )
     buy.panel.cantBuyText:setFillColor( 1, 1, 1 )
     buy.panel:insert( buy.panel.cantBuyText )
 

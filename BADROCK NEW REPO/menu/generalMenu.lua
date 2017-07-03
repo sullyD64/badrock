@@ -65,7 +65,7 @@ local opt = {}
 	--optPanel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
 	opt.panel:insert( opt.panel.background )
 
-	opt.panel.title = display.newText( "Settings", 0, -70, "Micolas.ttf", 15 )
+	opt.panel.title = display.newText( "Settings", 0, -70, utility.font, 15 )
 	opt.panel.title:setFillColor( 1, 1, 1 )
 	opt.panel:insert( opt.panel.title )
 
@@ -95,9 +95,10 @@ local opt = {}
 			width = 30,
 			height = 15,
 			cornerRadius = 2,
-		fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
-		strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
-		strokeWidth = 1,
+			font = utility.font,
+			fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+			strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+			strokeWidth = 1,
 		}
 		opt.panel.aboutBtn.x= -50
 		opt.panel.aboutBtn.y = opt.panel.contentCenterY
@@ -114,6 +115,7 @@ local opt = {}
 			width = 30,
 			height = 15,
 			cornerRadius = 2,
+			font = utility.font,
 			fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
 			strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
 			strokeWidth = 1,

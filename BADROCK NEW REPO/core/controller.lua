@@ -16,6 +16,7 @@ local ui         = require ( "core.ui"         )
 local sfx        = require ( "audio.sfx"       )
 local pauseMenu  = require ( "menu.pauseMenu"  )
 local gameResult = require ( "menu.gameResult" )
+local sfxMenu    = require ( "menu.sfxMenu"    )
 
 local controller = {
 	controlsEnabled,
@@ -252,6 +253,7 @@ local sState = {}
 					ui.buttons.resume.isEnabled = false
 					-----------------------------------------------------
 					pauseMenu.panel:hide()
+					sfxMenu.panel:hide()
 					-----------------------------------------------------
 				end
 
