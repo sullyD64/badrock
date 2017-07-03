@@ -61,10 +61,10 @@ local visual = {
 	--itemMetheor          = "visual/misc/metheor.png"
 
 
-	bossHand           = "visual/sprites/hand.png",
-	bossSpalla        = "visual/sprites/spalla.png",
-	bossTesta          = "visual/sprites/head.png",
-	bossCorpo         = "visual/sprites/body.png",
+	bossHand           = "visual/sprites/manoBoss.png",
+	bossSpalla        = "visual/sprites/bossSpalla.png",
+	bossTesta          = "visual/sprites/testaBoss.png",
+	bossCorpo         = "visual/sprites/corpoBoss.png",
 	bossLaser          = "visual/sprites/laserSprite.png"
 
 }

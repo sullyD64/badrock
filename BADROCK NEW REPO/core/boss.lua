@@ -23,8 +23,8 @@ local boss = {
 			options = {
 			-- 	graphicType = "animated",
 				filePath = visual.bossHand,
-				width = 40,
-				height = 65,
+				width = 45,
+				height = 75,
 			 	physicsParams = { bounce = 1, friction = 1.0, density = 1.0, },
 			--	sarà un sensor
 				eName = "enemy"
@@ -38,8 +38,8 @@ local boss = {
 			options = {
 			-- 	graphicType = "animated",
 				filePath = visual.bossHand,
-				width = 40,
-				height = 65,
+				width = 45,
+				height = 75,
 			 	physicsParams = { bounce = 1, friction = 1.0, density = 1.0, },
 			--	sarà un sensor
 				eName = "enemy"
@@ -54,8 +54,8 @@ local boss = {
 			options = {
 			-- 	graphicType = "animated",
 				filePath = visual.bossSpalla,
-				width = 50,
-				height = 65,
+				width = 60,
+				height = 60,
 			 	physicsParams = {  },
 			--	sarà un sensor
 				eName = "enemy"
@@ -70,8 +70,8 @@ local boss = {
 			options = {
 			-- 	graphicType = "animated",
 				filePath = visual.bossSpalla,
-				width = 50,
-				height = 65,
+				width = 60,
+				height = 60,
 			 	physicsParams = { },
 			--	sarà un sensor
 				eName = "enemy"
@@ -86,8 +86,8 @@ local boss = {
 			options = {
 			-- 	graphicType = "animated",
 				filePath = visual.bossTesta,
-				width = 80,
-				height = 100,
+				width = 92,
+				height = 112,
 			 	physicsParams = { },
 			--	sarà un sensor
 				eName = "enemy"
@@ -101,8 +101,8 @@ local boss = {
 			options = {
 			-- 	graphicType = "animated",
 				filePath = visual.bossCorpo,
-				width = 200,
-				height = 250,
+				width = 215,
+				height = 180,
 			 	physicsParams = { isSensor = true },
 				eName = "visual"
 			}

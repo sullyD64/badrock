@@ -243,16 +243,16 @@ physics.setGravity( 0, 50 )
 					
 					--Keeps the Boss Pieces all tied together----
 					if(s.bossEntity.spallaDx and s.bossEntity.spallaDx.lives >0)then
-						s.bossEntity.spallaDx.x= s.spawn.x +60
-						s.bossEntity.spallaDx.y = s.spawn.y
+						s.bossEntity.spallaDx.x= s.spawn.x +73
+						s.bossEntity.spallaDx.y = s.spawn.y-17
  					end
  					if(s.bossEntity.spallaSx and s.bossEntity.spallaSx.lives>0 )then
-						s.bossEntity.spallaSx.x= s.spawn.x -60
-	 					s.bossEntity.spallaSx.y = s.spawn.y
+						s.bossEntity.spallaSx.x= s.spawn.x -73
+	 					s.bossEntity.spallaSx.y = s.spawn.y-17
  					end
  					if(s.bossEntity.testa and s.bossEntity.testa.lives > 0)then
  						s.bossEntity.testa.x= s.spawn.x 
-	 					s.bossEntity.testa.y = s.spawn.y -40
+	 					s.bossEntity.testa.y = s.spawn.y -35
  					end
  					if(s.bossEntity.corpo and s.bossEntity.corpo.lives > 0)then
  						s.bossEntity.corpo.x= s.spawn.x 
