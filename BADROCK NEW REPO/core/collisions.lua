@@ -47,7 +47,12 @@ end
 			enemyHit.x = enemy.x
 			enemyHit.y = enemy.y
 
-			enemy.lives = enemy.lives - 1
+			-- Enemy is insta-killed if the player is using the bonus "immunity"
+			if (steve.isImmune) then
+				enemy.lives = 0
+			else
+				enemy.lives = enemy.lives - 1
+			end
 
 			-- Enemy has no lives left: handle death
 			if ( enemy.lives == 0 ) then 
@@ -219,16 +224,19 @@ end
 	end
 
 	local function bonusCollision( bonus, event )
-		print("Picked "..bonus.itemName)
-		display.remove(bonus)
-		steve:useBonus(bonus.itemName)
+		-- The bonus can't be picked up if the player is attacking, as this action MAY
+		-- modify the attack itself wich is a sequence of timed events.
+		if (not steve:isPerformingAttack()) then
+			print("Picked "..bonus.itemName)
+			display.remove(bonus)
+			steve:useBonus(bonus.itemName)
+		end
 	end
 
 	local function powerupCollision( powerup, event )
-		-- The can't be picked up if the player is attacking, as this action modifies
-		-- the attack itself which is a sequence of events with a duration. This is done
-		-- to avoid this situation.
-		if (not steve.hasPowerUp and steve.state ~= "Attacking") then
+		-- The powerUp can't be picked up if the player is attacking, as this action modifies
+		-- the attack itself which is a sequence of timed events.
+		if (not steve.hasPowerUp and steve.state ~= "Attacking" and (not steve.isImmune)) then
 			print("Picked "..powerup.itemName)
 			display.remove(powerup)
 			steve:equipPowerUp(powerup.itemName)

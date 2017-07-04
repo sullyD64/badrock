@@ -20,8 +20,9 @@ local controller = require ( "core.controller" )
 local combat = {
 	map = {},
 	player = {},
-	stopAnimation,
 	ammo,
+	stopAnimation = false,
+	performingAttack = false,
 }
 
 local settings = {
@@ -97,9 +98,9 @@ end
 
 -- Handles the end of the attack phase
 local function handleAttackEnd()
-	-- The default attack and otherd are destroyed at the end of the attack phase, 
+	-- The default attack and others are destroyed at the end of the attack phase, 
 	-- as they don't depend on ammo but on time.
-	if (player.attack.type == "default") then 
+	if (player.attack and player.attack.type == "default") then 
 		player.attack.isVisible = false
 		player.attack.isBodyActive = false
 		player.attack.sprite:pause()
@@ -121,117 +122,76 @@ local function handleAttackEnd()
 	if (player.state ~= "Dead") then
 		player.state = "Moving"
 		-- Brings the player's sprite up again (if attack was melee)
-		if (player.sprite.alpha == 0) then
+		if (player.sprite.alpha == 0 and not combat.stopAnimation) then
 			player.sprite.alpha = 1
 		end
 	end
+	combat.performingAttack = false
 end
 
 -- Prematurely cancels the attack phase.
 -- This happens when the player dies while in the attack phase.
 function combat.cancel()
 	combat.stopAnimation = true
+	combat.performingAttack = false
 
 	player.attack.isVisible = false
 	player.attack.isBodyActive = false
 	player.attack.sprite:pause()
 	player.attack.sprite.isVisible = false
+
+	player.isImmune = false
+	player.immunityDuration = nil
+
 	display.remove(player.attack)
 end
 
--- DEFAULT ATTACK ------------------------------------------------------------------
-	-- Loads the player's default attack (melee)
-	function combat.loadDefaultAttack()
-		-- Loads the Main sensor Entity ("hitbox")
-			local atk = entity.newEntity{
-				graphicType = "sensor",
-				parentX = player.x,
-				parentY = player.y,
-				radius = settings.melee.sensorOpts.radius,
-				color = settings.melee.sensorOpts.color,
-				alpha = settings.melee.sensorOpts.alpha,
-				physicsParams = { filter = filters.sensorAFilter },
-				sensorName = "A"
-			}
-		-- Loads the sprite and animation sequences
-			local sprite = entity.newEntity{
-				graphicType = "animated",
-				filePath = visual.steveAttack,
-				spriteOptions = settings.melee.sheetData,
-				spriteSequence = settings.melee.sequenceData,
-				notPhysical = true,
-				eName = "steveAttack"
-			}
+-- BONUSES  ------------------------------------------------------------------------
+	
+	-- IMMUNITY ---------------------------------------------------------------------
+		-- Immunity causes the player to immediately drop whatever powerup he is using
+		-- and perform a melee attack which is much longer than usual.
+		-- Enemies hit while in this state will be instantly killed regarding how many 
+		-- lives they have.
+		local function useImmunity()
+			player.isImmune = true
+			player.immunityDuration = 7000
 
-		atk.type = "default"
-		atk.sprite = sprite
+			transition.to(player, {time = 0, 
+					onComplete = function()
+						if (player.hasPowerUp) then
+							player:losePowerUp()
+							controller.updateAmmo("destroy")
+						end
+						-- Simulates the press of the action button to begin the rampage.
+						controller.pressActionButton()
+					end
+				})
 
-		-- The attack is initially inactive
-		atk.isVisible = false
-		atk.isBodyActive = false
-		atk.sprite.isVisible = false
-
-		-- Inserts the attack hitbox and sprite on the game's current map
-		atk:addOnMap( map )
-		atk.sprite:addOnMap( map )
-
-		return atk
-	end
-
-	-- Performs a default, melee attack. The player rolls and dashes forward while dealing
-	-- damage to everything he comes in touch with.
-	function combat.performMelee()
-		-- The melee sprite substitutes the player's sprite.
-		player.sprite.alpha = 0
-
-		if (not combat.defaultLoaded) then
-			player.attack = combat.loadDefaultAttack()
-		end
-		player.attack.collision = collisions.attackCollision
-		player.attack.duration = 1000
-
-		-- Collision Handler Activation -------------------------
-		player.attack:addEventListener("collision", player.attack)
-		---------------------------------------------------------
-
-		-- Position linking is handled in game -> onUpdate
-		player.attack.isVisible = true
-		player.attack.isBodyActive = true
-		player.attack.sprite.isVisible = true
-
-		-- The player dashes forward
-		player:applyLinearImpulse( player.direction * 8, -5, player.x, player.y )
-		
-		-- Attack Sprite sequence ---------------------------------------------------
-			combat.stopAnimation = false
-			player.attack.sprite:setSequence("beginning")
-			player.attack.sprite:play()
-
-			spinningPhase = function(event)
-				local sprite = event.target
-				if(event.phase == "ended") then
-					sprite:setSequence("spinning")
-					sprite:play()
-				end
-			end
-			player.attack.sprite:addEventListener("sprite", spinningPhase)
-
-			local endPhase = timer.performWithDelay(player.attack.duration - 300, 
+			timer.performWithDelay(player.immunityDuration,
 				function()
-					player.attack.sprite:removeEventListener( "sprite", spinningPhase )
-					player.attack.sprite:setSequence("ending")
-					player.attack.sprite:play()
+				 	player.isImmune = false
+				 	player.immunityDuration = nil
 				end
 			)
-		-----------------------------------------------------------------------------
+		end
 
-		if (combat.stopAnimation) then
-			player.attack.sprite:removeEventListener( "sprite", spinningPhase )
-			timer.cancel(endPhase)
-		else
-			timer.performWithDelay(player.attack.duration, handleAttackEnd)
+		-- Applies a "godly" effect to the player's attack sprite.
+		local function applyImmunityEffect()
+			player.attack.sprite.fill.effect = "filter.invert"
+			-- player.attack.sprite.fill.effect = "filter.sobel"
+			-- player.attack.sprite.fill.effect.intensity = 0.6
+		end
+	---------------------------------------------------------------------------------
+
+	-- Uses (consumes) the bonus
+	function combat.useBonus( name )
+		-- Case switch depending on the item's name
+		if (name == "immunity") then
+			useImmunity()
 		end
 	end
+
 ------------------------------------------------------------------------------------
 
 -- POWERUPS ------------------------------------------------------------------------
@@ -341,16 +301,17 @@ end
 		end
 
 		-- Shoots one bullet.
-		function combat.useGun()
+		local function useGun()
+			combat.performingAttack = true
 			player.powerUp.attacks[combat.ammo]:shoot()
 
 			-- Attack duration is needed here for re-enabling the action button,
 			-- managing the gun animation and triggering handleAttackEnd.
 			player.attack = {}
 			player.attack.type = "bullet"
-			player.attack.duration = 100
+			player.attackDuration = 100
 
-			timer.performWithDelay(player.attack.duration, handleAttackEnd)
+			timer.performWithDelay(player.attackDuration, handleAttackEnd)
 		end
 	---------------------------------------------------------------------------------
 
@@ -379,7 +340,7 @@ end
 	function combat.usePowerUp( name )
 		-- Case switch depending on the item's name
 		if (name == "gun") then
-			combat.useGun()
+			useGun()
 			combat.ammo = combat.ammo - 1
 			controller.updateAmmo("update", combat.ammo)
 		end
@@ -409,6 +370,108 @@ end
 			if (bullet.hasBeenShot == false) then
 				bullet:destroy()
 			end
+		end
+	end
+------------------------------------------------------------------------------------
+
+-- DEFAULT ATTACK ------------------------------------------------------------------
+	-- Loads the player's default attack (melee)
+	function combat.loadDefaultAttack()
+		-- Loads the Main sensor Entity ("hitbox")
+			local atk = entity.newEntity{
+				graphicType = "sensor",
+				parentX = player.x,
+				parentY = player.y,
+				radius = settings.melee.sensorOpts.radius,
+				color = settings.melee.sensorOpts.color,
+				alpha = settings.melee.sensorOpts.alpha,
+				physicsParams = { filter = filters.sensorAFilter },
+				sensorName = "A"
+			}
+		-- Loads the sprite and animation sequences
+			local sprite = entity.newEntity{
+				graphicType = "animated",
+				filePath = visual.steveAttack,
+				spriteOptions = settings.melee.sheetData,
+				spriteSequence = settings.melee.sequenceData,
+				notPhysical = true,
+				eName = "steveAttack"
+			}
+
+		atk.type = "default"
+		atk.sprite = sprite
+
+		-- The attack is initially inactive
+		atk.isVisible = false
+		atk.isBodyActive = false
+		atk.sprite.isVisible = false
+
+		-- Inserts the attack hitbox and sprite on the game's current map
+		atk:addOnMap( map )
+		atk.sprite:addOnMap( map )
+
+		return atk
+	end
+
+	-- Performs a default, melee attack. The player rolls and dashes forward while dealing
+	-- damage to everything he comes in touch with.
+	function combat.performMelee()
+		combat.performingAttack = true
+		-- The melee sprite substitutes the player's sprite.
+		player.sprite.alpha = 0
+
+		if (not combat.defaultLoaded) then
+			player.attack = combat.loadDefaultAttack()
+		end
+		player.attack.collision = collisions.attackCollision
+
+		-- Collision Handler Activation -------------------------
+		player.attack:addEventListener("collision", player.attack)
+		---------------------------------------------------------
+
+		-- Position linking is handled in game -> onUpdate
+		player.attack.isVisible = true
+		player.attack.isBodyActive = true
+		player.attack.sprite.isVisible = true
+
+		if (player.isImmune) then
+			applyImmunityEffect()
+			player.attackDuration = player.immunityDuration
+		else
+			player.attackDuration = 1000
+		end
+
+		-- The player dashes forward
+		player:applyLinearImpulse( player.direction * 8, -5, player.x, player.y )
+		
+		-- Attack Sprite sequence ---------------------------------------------------
+			combat.stopAnimation = false
+			player.attack.sprite:setSequence("beginning")
+			player.attack.sprite:play()
+
+			spinningPhase = function(event)
+				local sprite = event.target
+				if(event.phase == "ended") then
+					sprite:setSequence("spinning")
+					sprite:play()
+				end
+			end
+			player.attack.sprite:addEventListener("sprite", spinningPhase)
+
+			local endPhase = timer.performWithDelay(player.attackDuration - 300, 
+				function()
+					player.attack.sprite:removeEventListener( "sprite", spinningPhase )
+					player.attack.sprite:setSequence("ending")
+					player.attack.sprite:play()
+				end
+			)
+		-----------------------------------------------------------------------------
+
+		if (combat.stopAnimation) then
+			player.attack.sprite:removeEventListener( "sprite", spinningPhase )
+			timer.cancel(endPhase)
+		else
+			timer.performWithDelay(player.attackDuration, handleAttackEnd)
 		end
 	end
 ------------------------------------------------------------------------------------

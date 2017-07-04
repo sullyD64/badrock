@@ -212,7 +212,7 @@ local sState = {}
 				end
 				Runtime:addEventListener("enterFrame", attackValidityCheck)
 
-				timer.performWithDelay(steve.attack.duration,
+				timer.performWithDelay(steve.attackDuration,
 					function()
 						button.active = true
 						button.alpha = 1
@@ -321,6 +321,9 @@ local sState = {}
 	
 			controller.destroyUI()
 			controller.prepareUI()
+
+			-- Reloads the default attack
+			steve:loadDefaultAttack()
 
 			steve:setLinearVelocity( 0, 0 )
 			steve.canJump = false
@@ -494,6 +497,86 @@ local sState = {}
 	end
 ------------------------------------------------------------------------------------
 
+-- UI FUNCTIONS --------------------------------------------------------------------
+-- Calls the UI initialization and prepares the event listeners
+	function controller.prepareUI()
+		timer.performWithDelay(1000, ui.loadUI())
+		game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.jump)
+		game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.specialUp)
+		------------------------------
+		ui.createLifeIcons(game.lives)	-- Prone to refactoring (see ui)
+		------------------------------
+		ui.buttons.jump:  addEventListener( "touch", onJumpEvent )
+		ui.buttons.dleft: addEventListener( "touch", onDpadEvent )
+		ui.buttons.dright:addEventListener( "touch", onDpadEvent )
+		ui.buttons.action:addEventListener( "touch", onAttackEvent )
+		ui.buttons.pause: addEventListener( "touch", onPauseResumeEvent )
+		ui.buttons.resume:addEventListener( "touch", onPauseResumeEvent )
+
+		ui.buttons.action.active = true
+		ui.buttons.resume.isVisible = false
+		ui.buttons.scoreUp.isVisible = false
+		ui.buttons.lifeUp.isVisible = false
+		ui.buttons.specialUp.isVisible = false
+		-------------------------------
+		pauseMenu.setGame(game, gState)
+		-------------------------------
+	end
+
+	-- Destroys the UI
+	function controller.destroyUI()
+		if (ui.buttons and ui.buttonGroup) then
+			ui.buttons.scoreUp:setLabel("")
+			ui.buttons.lifeUp:setLabel("")
+			ui.buttons = nil
+			ui.emptyLifeIcons()
+			ui.destroyLifeIcons()
+			pauseMenu.setGame(nil)
+			display.remove(ui.buttonGroup)
+		end
+	end
+
+	-- Modifies the UI Action Button when a powerup is picked
+	function controller.updateActionButton( imageName )
+		ui.updateActionButton(imageName)
+		ui.buttons.action:addEventListener("touch", onAttackEvent)
+		ui.buttons.action.active = true
+	end
+
+	-- Restores the UI Action Button to its default image
+	function controller.restoreActionButton()
+		ui.restoreActionButton()
+		ui.buttons.action:addEventListener("touch", onAttackEvent)
+		ui.buttons.action.active = true
+	end
+
+	-- Triggers a touch event on the UI Action Button
+	function controller.pressActionButton()
+		local event = {}
+		event.name = "touch"
+		event.phase = "began"
+		event.x = ui.buttons.action.x
+		event.y = ui.buttons.action.y
+		event.target = ui.buttons.action
+
+		ui.buttons.action.active = true
+		ui.buttons.action:dispatchEvent( event )
+	end
+
+	-- Manages the the UI Ammo Icons
+	function controller.updateAmmo( flag, ammoNumber )
+		if (flag == "initialize") then
+			ui.createAmmoIcons(ammoNumber)
+		elseif (flag == "update") then
+			ui.updateAmmoIcons(ammoNumber)
+		elseif (flag == "destroy") then
+			ui.destroyAmmoIcons()
+			ui.emptyAmmoIcons()
+			controller.restoreActionButton()
+		end
+	end
+------------------------------------------------------------------------------------
+
 -- Main entry point for Controller (accessed from -game.loadGame-).
 function controller.setGame ( currentGame, gameStateList, playerStateList )
 	game = currentGame
@@ -502,69 +585,6 @@ function controller.setGame ( currentGame, gameStateList, playerStateList )
 	end
 	gState = gameStateList
 	sState = playerStateList
-end
-
--- Calls the UI initialization and prepares the event listeners
-function controller.prepareUI()
-	timer.performWithDelay(1000, ui.loadUI())
-	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.jump)
-	game.map:getTileLayer("JUMPSCREEN"):addObject(ui.buttons.specialUp)
-	------------------------------
-	ui.createLifeIcons(game.lives)	-- Prone to refactoring (see ui)
-	------------------------------
-	ui.buttons.jump:  addEventListener( "touch", onJumpEvent )
-	ui.buttons.dleft: addEventListener( "touch", onDpadEvent )
-	ui.buttons.dright:addEventListener( "touch", onDpadEvent )
-	ui.buttons.action:addEventListener( "touch", onAttackEvent )
-	ui.buttons.pause: addEventListener( "touch", onPauseResumeEvent )
-	ui.buttons.resume:addEventListener( "touch", onPauseResumeEvent )
-
-	ui.buttons.action.active = true
-	ui.buttons.resume.isVisible = false
-	ui.buttons.scoreUp.isVisible = false
-	ui.buttons.lifeUp.isVisible = false
-	ui.buttons.specialUp.isVisible = false
-	-------------------------------
-	pauseMenu.setGame(game, gState)
-	-------------------------------
-end
-
--- Destroys the UI
-function controller.destroyUI()
-	if (ui.buttons and ui.buttonGroup) then
-		ui.buttons.scoreUp:setLabel("")
-		ui.buttons.lifeUp:setLabel("")
-		ui.buttons = nil
-		ui.emptyLifeIcons()
-		ui.destroyLifeIcons()
-		pauseMenu.setGame(nil)
-		display.remove(ui.buttonGroup)
-	end
-end
-
--- Modifies the UI Action Button when a powerup is picked
-function controller.updateActionButton( imageName )
-	ui.updateActionButton(imageName)
-	ui.buttons.action:addEventListener("touch", onAttackEvent)
-	ui.buttons.action.active = true
-end
-
-function controller.restoreActionButton()
-	ui.restoreActionButton()
-	ui.buttons.action:addEventListener("touch", onAttackEvent)
-	ui.buttons.action.active = true
-end
-
-function controller.updateAmmo( flag, ammoNumber )
-	if (flag == "initialize") then
-		ui.createAmmoIcons(ammoNumber)
-	elseif (flag == "update") then
-		ui.updateAmmoIcons(ammoNumber)
-	elseif (flag == "destroy") then
-		ui.destroyAmmoIcons()
-		ui.emptyAmmoIcons()
-		controller.restoreActionButton()
-	end
 end
 
 function controller:start()

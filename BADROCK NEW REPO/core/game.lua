@@ -56,7 +56,7 @@ physics.setGravity( 0, 50 )
 				-- print("Steve's sprite is " .. game.steve.sprite.sequence)
 				-- print("Lives: " .. game.lives)
 				-- print("Score: " .. game.score)
-
+				
 				-- if (game.steve.airState) then print("AirState: " .. game.steve.airState) end
 				-- if (game.steve.canJump == true) then print ("Steve can jump")
 				-- elseif (game.steve.canJump == false) then print ("Steve can't jump now") end
@@ -545,12 +545,16 @@ function game.start()
 	Runtime:addEventListener("enterFrame", onUpdate)
 	dbtimer = timer.performWithDelay(200, debug, 0)
 
-
 	local pippo = {
 		x = game.spawnPoint.x + 50,
 		y = game.spawnPoint.y,
-		drop = "immunity"}
+		drop = "gun"}
 	game.dropItemFrom(pippo)
+	local pluto = {
+		x = game.spawnPoint.x + 100,
+		y = game.spawnPoint.y,
+		drop = "immunity"}
+	game.dropItemFrom(pluto)
 end
 
 function game.pause()

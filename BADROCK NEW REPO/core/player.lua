@@ -140,9 +140,13 @@ function player.loadPlayer( currentGame )
 	-- Combat functions --------------------------------------------
 		combat.setMap(currentMap)
 		combat.setPlayer(player)
+
 		-- Pre-loads the default attack.
-		player.attack = combat.loadDefaultAttack()
-		combat.defaultLoaded = true
+		function player:loadDefaultAttack()
+			self.attack = combat.loadDefaultAttack()
+			combat.defaultLoaded = true
+		end
+		player:loadDefaultAttack()
 
 		function player:performAttack()
 			self.state = "Attacking"
@@ -152,6 +156,10 @@ function player.loadPlayer( currentGame )
 			else
 				combat.performMelee()
 			end
+		end
+
+		function player:isPerformingAttack()
+			return combat.performingAttack
 		end
 
 		function player:cancelAttack()
@@ -171,7 +179,7 @@ function player.loadPlayer( currentGame )
 		end
 
 		function player:useBonus( itemName ) 
-			-- self.bonus = combat.
+			combat.useBonus(itemName)
 		end
 	----------------------------------------------------------------
 
