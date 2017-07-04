@@ -218,36 +218,22 @@ end
 		end
 	end
 
-	local function powerupCollision( powerup, event )
-		local player = event.other
-
-		-- Item can't be picked up if the player is attacking, as this action modifies
-		-- the attack itself which is a sequence of events with a duration. This is done
-		-- to avoid this situation.
-		if (not player.hasPowerUp and player.state ~= "Attacking") then
-			print("Picked "..powerup.itemName)
-			display.remove(powerup)
-			player:equip(powerup.itemName)
-		end
+	local function bonusCollision( bonus, event )
+		print("Picked "..bonus.itemName)
+		display.remove(bonus)
+		steve:useBonus(bonus.itemName)
 	end
 
-	-- local function immunityCollision( immunityItem , event )
-		-- 	if ( event.phase == "began" ) then
-		-- 	--[[	display.remove(immunityItem)
-		-- 		sfx.playSound( sfx.coinSound, { channel = 3 } )
-				
-		-- 		local duration = 3000
-		-- 		--per far capire che l'effetto è attivo riduco momentaneamente l'alpha di steve
-		-- 		steve.sprite.alpha = 0.5 
-		-- 		steve.immunity = true
-		-- 		transition.to(steve , { time = duration , onComplete = function()
-		-- 			steve.immunity = nil	
-		-- 			steve.sprite.alpha = 1
-		-- 		end})			
-		-- 	]]
-		-- 	elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-		-- 	end
-		-- end
+	local function powerupCollision( powerup, event )
+		-- The can't be picked up if the player is attacking, as this action modifies
+		-- the attack itself which is a sequence of events with a duration. This is done
+		-- to avoid this situation.
+		if (not steve.hasPowerUp and steve.state ~= "Attacking") then
+			print("Picked "..powerup.itemName)
+			display.remove(powerup)
+			steve:equipPowerUp(powerup.itemName)
+		end
+	end
 
 	-- local function metheorsRainCollision( metheorsItem, event )
 		-- 	if ( event.phase == "began" ) then
@@ -317,10 +303,10 @@ end
 		local o = event.other
 		if ( o.eName == "steve" and self.isPickable) then
 			-- Conditional handling depending on item type
-			if (self.type == "bonus") then
-				if (self.itemName == "life") then
-					lifeCollision(self, event)
-				end
+			if (self.type == "life" and self.itemName == "life") then
+				lifeCollision(self, event)
+			elseif (self.type == "bonus") then
+				bonusCollision(self, event)
 			elseif (self.type == "powerup") then
 				powerupCollision(self, event)
 			end

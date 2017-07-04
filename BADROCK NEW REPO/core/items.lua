@@ -2,21 +2,21 @@
 --
 -- items.lua
 --
+-- This class describes the items that are placed on the map when specified events occur,
+-- the most common being death of enemies. Enemies can carry one item and drop it when 
+-- they die. 
+-- Items are divided in two categories, plus pickable lives which are on their own:
+-- 1) Powerups: they are usable items and act as weapons. They modify the action performed
+-- 	by the press of the Action Button (see combat for more)
+-- 2) Bonuses: they are immediatly consumed by the player and produce varying effects.
 -----------------------------------------------------------------------------------------
 local entity = require ( "lib.entity" )
 
 local items = {
 	descriptions = {
-		-- {	
-		-- 	type = "bonus",
-		-- 	itemName = "coin",
-		-- 	filePath = visual.itemCoin,
-		-- 	width = 25,
-		-- 	height = 25
-		-- },
 		-- 1 LIFE
 		{
-			type = "bonus",
+			type = "life",
 			itemName = "life",
 			filePath = visual.itemLife,
 			width = 25,
@@ -31,13 +31,13 @@ local items = {
 			height = 25
 		},
 		-- -- 3 IMMUNITY
-		-- {
-		-- 	type = "powerup",
-		-- 	itemName = "immunity",
-		-- 	filePath = visual.itemImmunity,
-		-- 	width = 25,
-		-- 	height = 25
-		-- },
+		{
+			type = "bonus",
+			itemName = "immunity",
+			filePath = visual.itemImmunity,
+			width = 25,
+			height = 25
+		},
 		-- -- 4 METHEORS RAIN
 		-- {
 		-- 	type = "powerup",

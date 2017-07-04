@@ -6,7 +6,8 @@
 -- This module is tied to the controller which is the only class that uses it, while
 -- additional functions provide easy shortcuts for toggling the enablement for the whole ui.
 -----------------------------------------------------------------------------------------
-local widget = require ( "widget" )
+local widget  = require ( "widget"           )
+local utility = require ( "menu.utilityMenu" )
 
 local ui = {
 	buttons = {},
@@ -102,7 +103,7 @@ local buttonData = {
 				id = "scoreText",
 				textOnly = true,
 				label = "Score: 0",
-				font = "micolas.ttf",
+				font = utility.font,
 				fontSize = 20,
 				labelColor = {
 					default = { 0,220,255 },
@@ -120,7 +121,7 @@ local buttonData = {
 				id = "scoreUpText",
 				textOnly = true,
 				label = "",
-				font = "micolas.ttf",
+				font = utility.font,
 				fontSize = 14,
 				labelColor = {
 					default = { 0,210,255 },
@@ -138,7 +139,7 @@ local buttonData = {
 				id = "livesText",
 				textOnly = true,
 				label = "",
-				font = "micolas.ttf",
+				font = utility.font,
 				fontSize = 14,
 				labelColor = {
 					default = { 255,210,0 },
@@ -156,7 +157,7 @@ local buttonData = {
 				id = "lifeUpText",
 				textOnly = true,
 				label = "",
-				font = "micolas.ttf",
+				font = utility.font,
 				fontSize = 20,
 				labelColor = {
 					default = { 0,210,255 },
@@ -174,7 +175,7 @@ local buttonData = {
 				id = "specialUpText",
 				textOnly = true,
 				label = "",
-				font = "micolas.ttf",
+				font = utility.font,
 				fontSize = 14,
 				labelColor = {
 					default = { 255,255,255 },

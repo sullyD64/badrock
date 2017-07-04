@@ -56,15 +56,14 @@ local visual = {
 	npcBalloonButton1      = "visual/sprites/buttonyes.png",
 	npcBalloonButton2      = "visual/sprites/buttonno.png",
 
-	-- enemyPaper             = "visual/sprites/paper.png",
+	-- enemyPaper          = "visual/sprites/paper.png",
 	enemySedia             = "visual/sprites/sedia.png",
 	enemyPaperAnim         = "visual/sprites/paperAnimazione.png",
 	enemyRobot             = "visual/sprites/robot.png",
 
-	-- itemCoin               = "visual/ui/coin.png",
-	itemLife               = "visual/ui/life2.png",
+	itemLife               = "visual/sprites/bonus_life.png",
 	itemGun                = "visual/sprites/H.png",
-	--itemImmunity         = "visual/misc/immunity.png",
+	itemImmunity           = "visual/sprites/bonus_immunity.png",
 	--itemMetheor          = "visual/misc/metheor.png"
 }
 

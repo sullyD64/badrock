@@ -144,13 +144,6 @@ function player.loadPlayer( currentGame )
 		player.attack = combat.loadDefaultAttack()
 		combat.defaultLoaded = true
 
-		function player:equip( itemName )
-			self.powerUp = combat.loadPowerUp( itemName )
-			self.equipped = itemName
-			self.hasPowerUp = true
-			self.attacks = self.powerUp.attacks
-		end
-
 		function player:performAttack()
 			self.state = "Attacking"
 
@@ -161,13 +154,24 @@ function player.loadPlayer( currentGame )
 			end
 		end
 
+		function player:cancelAttack()
+			combat.cancel()
+		end
+
+		function player:equipPowerUp( itemName )
+			self.powerUp = combat.loadPowerUp( itemName )
+			self.equipped = itemName
+			self.hasPowerUp = true
+			self.attacks = self.powerUp.attacks
+		end
+
 		function player:losePowerUp()
 			combat.losePowerUp()
 			self.equipped = nil
 		end
 
-		function player:cancelAttack()
-			combat.cancel()
+		function player:useBonus( itemName ) 
+			-- self.bonus = combat.
 		end
 	----------------------------------------------------------------
 

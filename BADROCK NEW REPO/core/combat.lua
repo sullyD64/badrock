@@ -20,8 +20,7 @@ local controller = require ( "core.controller" )
 local combat = {
 	map = {},
 	player = {},
-	animationIsPlaying,
-	endPhase,
+	stopAnimation,
 	ammo,
 }
 
@@ -128,13 +127,16 @@ local function handleAttackEnd()
 	end
 end
 
--- Prematurely cancels the attack phase and invokes handleAttackEnd.
+-- Prematurely cancels the attack phase.
 -- This happens when the player dies while in the attack phase.
 function combat.cancel()
-	combat.animationIsPlaying = false
-	timer.cancel(combat.endPhase)
-	player.attack.sprite:removeEventListener( "sprite", spinningPhase )
-	handleAttackEnd()
+	combat.stopAnimation = true
+
+	player.attack.isVisible = false
+	player.attack.isBodyActive = false
+	player.attack.sprite:pause()
+	player.attack.sprite.isVisible = false
+	display.remove(player.attack)
 end
 
 -- DEFAULT ATTACK ------------------------------------------------------------------
@@ -201,7 +203,7 @@ end
 		player:applyLinearImpulse( player.direction * 8, -5, player.x, player.y )
 		
 		-- Attack Sprite sequence ---------------------------------------------------
-			combat.animationIsPlaying = true
+			combat.stopAnimation = false
 			player.attack.sprite:setSequence("beginning")
 			player.attack.sprite:play()
 
@@ -214,7 +216,7 @@ end
 			end
 			player.attack.sprite:addEventListener("sprite", spinningPhase)
 
-			combat.endPhase = timer.performWithDelay(player.attack.duration - 300, 
+			local endPhase = timer.performWithDelay(player.attack.duration - 300, 
 				function()
 					player.attack.sprite:removeEventListener( "sprite", spinningPhase )
 					player.attack.sprite:setSequence("ending")
@@ -223,7 +225,10 @@ end
 			)
 		-----------------------------------------------------------------------------
 
-		if (combat.animationIsPlaying) then
+		if (combat.stopAnimation) then
+			player.attack.sprite:removeEventListener( "sprite", spinningPhase )
+			timer.cancel(endPhase)
+		else
 			timer.performWithDelay(player.attack.duration, handleAttackEnd)
 		end
 	end

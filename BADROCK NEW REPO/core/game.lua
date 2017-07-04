@@ -344,6 +344,10 @@ physics.setGravity( 0, 50 )
 			gameRunningLoop()
 		elseif (state == gameStateList.RESUMED) then
 			game.resume()
+			if (game.steve.sprite.sequence ~= "idle") then
+				game.steve.sprite:setSequence("idle")
+				game.steve.sprite:play()
+			end
 		elseif (state == gameStateList.PAUSED) then
 			game.pause()
 		elseif (state == gameStateList.ENDED) then
@@ -545,7 +549,7 @@ function game.start()
 	local pippo = {
 		x = game.spawnPoint.x + 50,
 		y = game.spawnPoint.y,
-		drop = "gun"}
+		drop = "immunity"}
 	game.dropItemFrom(pippo)
 end
 
