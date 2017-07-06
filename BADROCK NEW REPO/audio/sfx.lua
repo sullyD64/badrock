@@ -1,12 +1,18 @@
 local myData = require( "myData" )
 local sfx = {}  --create the main Sound Effects (sfx) table.
 
-sfx.bgMenuMusic = audio.loadStream( "audio/overside8bit.wav" ) --"audio/Undertale - Bonetrousle.mp3" )
-sfx.bgLvlMusic= audio.loadStream( "audio/Level1BGM/Highways_standard.wav" )
-sfx.jumpSound = audio.loadSound("audio/jump.wav")
-sfx.coinSound = audio.loadSound("audio/coin.wav")
-sfx.attackSound = audio.loadSound( "audio/attack.wav")
-sfx.dangerSound = audio.loadSound( "audio/danger3.wav")
+sfx.bgMenuMusic  = audio.loadStream( "audio/overside8bit.wav" )
+sfx.bgLvlMusic   = audio.loadStream( "audio/Level1BGM/Highways_standard.mp3" )
+sfx.jumpSound     = audio.loadSound( "audio/jump.wav"     )
+sfx.coinSound     = audio.loadSound( "audio/coin.wav"     )
+sfx.attackSound   = audio.loadSound( "audio/attack.wav"   )
+sfx.dangerSound   = audio.loadSound( "audio/danger3.wav"  )
+sfx.lifeupSound   = audio.loadSound( "audio/lifeup.wav"   )
+sfx.enemyDefSound = audio.loadSound( "audio/enemyDef.wav" )
+sfx.gunSound      = audio.loadSound( "audio/gun.wav"      )
+sfx.npcGoodSound  = audio.loadSound( "audio/npc_good.wav" )
+sfx.npcEvilSound  = audio.loadSound( "audio/npc_evil.wav" )
+
 
 -- inizializzare i volumi e i canali dei diversi suoni
 sfx.init = function()
