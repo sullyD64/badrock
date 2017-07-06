@@ -263,23 +263,39 @@ physics.setGravity( 0, 50 )
  					if(s.phase == 1) then
 
 						if(s.bossEntity.manoDx.lives==2 and s.bossEntity.manoDx.state == "bouncing")then
+							s.bossEntity.manoDx:setFillColor( 255,0 ,0)
+							local t=timer.performWithDelay(250, function()	s.bossEntity.manoDx:setFillColor(1) end)
+							table.insert(s.timers , t)
+
 							s.bossEntity.manoDx.state="alzaSchiaccia"
 							s.bossEntity.manoDx.bounce = 0
 							boss.alzaSchiaccia(s.bossEntity.manoDx , game.steve, s)
 						end
 						if(s.bossEntity.manoSx.lives==2 and s.bossEntity.manoSx.state == "bouncing")then
+							s.bossEntity.manoSx:setFillColor( 255,0 ,0)
+							local t= timer.performWithDelay(250, function()	s.bossEntity.manoSx:setFillColor(1) end)
+							table.insert(s.timers , t)
+
 							s.bossEntity.manoSx.state="alzaSchiaccia"
-							s.bossEntity.manoDx.bounce = 0
+							s.bossEntity.manoSx.bounce = 0
 							boss.alzaSchiaccia(s.bossEntity.manoSx , game.steve, s)
 						end
 						---------------------------------------------------------------
 						-- Le mani tornano in aria se perdono tutta la vita------------
 						if(s.bossEntity.manoDx.lives == 1 and s.bossEntity.manoDx.state == "alzaSchiaccia") then
+							s.bossEntity.manoDx:setFillColor( 255,0 ,0)
+							local t=timer.performWithDelay(250, function()	s.bossEntity.manoDx:setFillColor(1) end)
+							table.insert(s.timers , t)
+
 							s.bossEntity.manoDx.state = "sconfitta"
 							s.bossEntity.manoDx.isBodyActive=false
 							transition.to(s.bossEntity.manoDx, {time= 4000,  x = s.spawn.x +250, y = s.spawn.y})
 						end
 						if(s.bossEntity.manoSx.lives == 1 and s.bossEntity.manoSx.state == "alzaSchiaccia") then
+							s.bossEntity.manoSx:setFillColor( 255,0 ,0)
+							local t= timer.performWithDelay(250, function()	s.bossEntity.manoSx:setFillColor(1) end)
+							table.insert(s.timers , t)
+
 							s.bossEntity.manoSx.state = "sconfitta"
 							s.bossEntity.manoSx.isBodyActive=false
 							transition.to(s.bossEntity.manoSx, {time= 4000, x = s.spawn.x -250, y = s.spawn.y})
@@ -297,6 +313,10 @@ physics.setGravity( 0, 50 )
 						
 						local maxFireRate = 800
 						if(s.bossEntity.spallaDx.lives==1 and s.bossEntity.spallaDx.state == "normal") then
+							s.bossEntity.spallaDx:setFillColor( 255,0 ,0)
+							local t= timer.performWithDelay(250, function()	s.bossEntity.spallaDx:setFillColor(1) end)
+							table.insert(s.timers , t)
+
 							s.bossEntity.spallaDx.state = "rage"
 							s.bossEntity.spallaDx.isTargettable=false
 							timer.performWithDelay(2000,function() s.bossEntity.spallaDx.isTargettable=true	end)
@@ -308,6 +328,10 @@ physics.setGravity( 0, 50 )
 						end
 
 						if(s.bossEntity.spallaSx.lives==1 and s.bossEntity.spallaSx.state == "normal") then
+							s.bossEntity.spallaSx:setFillColor( 255,0 ,0)
+							local t= timer.performWithDelay(250, function()	s.bossEntity.spallaSx:setFillColor(1) end)
+							table.insert(s.timers , t)
+							
 							s.bossEntity.spallaSx.state = "rage"
 							s.bossEntity.spallaSx.isTargettable=false
 							timer.performWithDelay(2000,function() s.bossEntity.spallaSx.isTargettable=true	end)

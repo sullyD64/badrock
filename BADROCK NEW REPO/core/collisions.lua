@@ -149,16 +149,9 @@ end
 		end
 
 		if(environment.type == "event")then
-			print("Ho Colliso con l'evento")
-
-		--for k,v in pairs(environment.owner) do
-		--	print(k)
-		--	print(v)
-		--end
-
-			--if(environment.listener)then
-				environment.owner.listener(event)
-			--end
+			--print("Ho Colliso con un evento")
+			environment.owner.listener(event)
+			
 		end
 	end
 

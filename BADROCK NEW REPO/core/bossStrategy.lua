@@ -30,7 +30,7 @@ local strategyBoss1 = {}
 		strategyB1.timers={}          --campo opzionale per altre strategy
 		strategyB1.fireRateSx = 5000  --campo opzionale per altre strategy
 		strategyB1.fireRateDx = 5000  --campo opzionale per altre strategy
-		strategyB1.spawn = game.map:getObjectLayer("bossSpawn"):getObject("spawn00")
+		strategyB1.spawn = game.map:getObjectLayer("bossSpawn"):getObject("bossSpawn")
 		strategyB1.win = false
 		
 
@@ -111,7 +111,7 @@ local strategyBoss1 = {}
 				--self.bossEntity.manoSx.state = "alzaSchiaccia"
 
 				--Sposta il corpo del boss con tutto il resto verso l'alto
-				transition.to(self.spawn, {time=4000, y= self.spawn.y - 200})
+				transition.to(self.spawn, {time=4000, y= self.spawn.y - 150})
 
 				-- Funzione che fa muovere le mani ogni tot secondi----------
 				local t1
@@ -149,7 +149,7 @@ local strategyBoss1 = {}
 
 			--Sposta il corpo del boss con tutto il resto verso il basso
 			if(self.bossEntity.spallaSx.state == "normal" and self.bossEntity.spallaDx.state == "normal") then
-				transition.to(self.spawn, {time=4000, y= self.spawn.y + 200})
+				transition.to(self.spawn, {time=4000, y= self.spawn.y + 150})
 			end
 
 		 	local function sparaSx()
@@ -255,8 +255,8 @@ local strategyBoss1 = {}
 		-- TERMINATE BOSS FIGHT --------------------------(called if we: die|return to menu|after victory)----
 		function strategyB1:terminateFight()
 			self.state = "Terminated"
-		
-			timer.performWithDelay(2000, function()
+			--IL DELAY DEVE ESSERE CIRCA UGUALE AL TEMPO DI RESPAWN DI STEVE
+			timer.performWithDelay(1000, function()
 				self.isActive=false
 				bossStrategy.activeStrategy=0
 

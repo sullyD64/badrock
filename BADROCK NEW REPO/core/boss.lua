@@ -145,8 +145,9 @@ local boss = {
 
 		bossSprite.lives = desc.lives or 1
 		bossSprite.isTargettable = true
-			
-		local spawn = game.map:getObjectLayer("bossSpawn"):getObject("spawn00")
+		
+		--Ogni futuro boss Deve avere lo spawn chiamato bossSpawn e trovarsi nel Object layer bossSpawn
+		local spawn = game.map:getObjectLayer("bossSpawn"):getObject("bossSpawn")
 		bossSprite.x, bossSprite.y =  spawn.x, spawn.y
 
 		bossSprite:addOnMap( game.map )
