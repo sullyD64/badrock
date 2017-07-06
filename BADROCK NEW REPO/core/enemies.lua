@@ -412,6 +412,7 @@ end
 function enemies.loadEnemies( currentGame ) 
 	local currentMap = currentGame.map
 	local enemyList = currentMap:getObjectLayer("enemySpawn").objects
+	if not (enemyList) then return end
 
 	local chaserList = {}
 	local walkerList = {}

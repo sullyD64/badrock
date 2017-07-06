@@ -63,6 +63,11 @@ function util.prepareMap(currentMap)
 	}
 	map:setClampingBounds( bounds.xMin, bounds.yMin, bounds.xMax, bounds.yMax )
 
+	local walls = map:getTileLayer("blockingWalls")
+	if (walls) then 
+		walls:hide()
+	end
+
 	for k, tile in pairs(map:getTileLayer("environment"):getTilesWithProperty("tName")) do
 		tName = tile:getProperty("tName"):getValue()
 
@@ -85,5 +90,53 @@ function util.prepareMap(currentMap)
 	end
 end
 
+function util.getBossTrigger(currentMap)
+	local map = currentMap
+	if not map then return end
+
+	local events = map:getObjectLayer("events")
+	if (events) then
+		return events:getObject("bossTrigger")
+	end
+end
+
+function util.createWalls(currentMap)
+	local map = currentMap
+	if not map then return end
+
+	local walls = map:getTileLayer("blockingWalls")
+	local tiles = walls:getTilesWithProperty("tName")
+
+	for k, tile in pairs(tiles) do
+		tile:addProperty(Property:new("HasBody", ""))
+		tile:addProperty(Property:new("bodyType", "static"))
+		tile:addProperty(Property:new("categoryBits", filters.envFilter.categoryBits))
+		tile:addProperty(Property:new("maskBits", filters.envFilter.maskBits))
+		tile:addProperty(Property:new("friction", 0))
+		transition.to(tile, {time = 0,
+			onComplete = function()
+				tile:build()
+			end
+		})
+	end
+	walls:show()
+end
+
+function util.destroyWalls(currentMap)
+	local map = currentMap
+	if not map then return end
+
+	local walls = map:getTileLayer("blockingWalls")
+	local tiles = walls:getTilesWithProperty("tName")
+
+	for k, tile in pairs(tiles) do
+		transition.to(tile, {time = 0,
+			onComplete = function()
+				tile.isSensor = true
+			end
+		})
+	end
+	walls:hide()
+end
 
 return util

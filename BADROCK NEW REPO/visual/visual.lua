@@ -65,6 +65,14 @@ local visual = {
 	itemGun                = "visual/sprites/H.png",
 	itemImmunity           = "visual/sprites/bonus_immunity.png",
 	--itemMetheor          = "visual/misc/metheor.png"
+
+
+	bossHand           = "visual/sprites/manoBoss.png",
+	bossSpalla        = "visual/sprites/bossSpalla.png",
+	bossTesta          = "visual/sprites/testaBoss.png",
+	bossCorpo         = "visual/sprites/corpoBoss.png",
+	bossLaser          = "visual/sprites/laserSprite.png"
+
 }
 
 return visual

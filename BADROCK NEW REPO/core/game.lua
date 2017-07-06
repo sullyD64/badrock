@@ -9,15 +9,16 @@
 -- methods contained in the "core" modules.
 -----------------------------------------------------------------------------------------
 
-local composer   = require ( "composer"        )
-local myData     = require ( "myData"          )
-local physics    = require ( "physics"         )
-local player     = require ( "core.player"     )
-local enemies    = require ( "core.enemies"    )
-local npcs       = require ( "core.npcs"       )
-local items      = require ( "core.items"      )
-local controller = require ( "core.controller" )
-local collisions = require ( "core.collisions" )
+local composer     = require ( "composer"          )
+local myData       = require ( "myData"            )
+local physics      = require ( "physics"           )
+local player       = require ( "core.player"       )
+local enemies      = require ( "core.enemies"      )
+local npcs         = require ( "core.npcs"         )
+local items        = require ( "core.items"        )
+local controller   = require ( "core.controller"   )
+local collisions   = require ( "core.collisions"   )
+local bossStrategy = require ( "core.bossStrategy" )
 
 local game = {}
 
@@ -106,6 +107,7 @@ physics.setGravity( 0, 50 )
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- This loop is executed only if the game's state is RUNNING
 	local function gameRunningLoop()
+		
 		-- The following block is related to jump activation and animation switching.
 			-- Jump controls:
 				-- Jumping is allowed only in two circumstances:
@@ -280,6 +282,18 @@ physics.setGravity( 0, 50 )
 			end			
 		end
 	
+		--Se è in corso una boss Fight
+		if(game.bossFight and bossStrategy.activeStrategy ~= 0) then
+			-- Gestione Boss Strategy in caso di interruzione del fight
+			if((game.steve.state == playerStateList.DEAD and game.bossFight.state ~= "Terminated")
+				or game.state == gameStateList.TERMINATED) then 	
+				game.bossFight:terminateFight() 				
+			end
+			-----------------------------------
+			game.bossFight:executeRuntimeLoop()
+			-----------------------------------
+		end		
+
 		-- Listener for the "player has died" event.
 			-- [Observation: de facto, the player spends very little time being 'DEAD'. Don't use this
 			-- state for any control, instead adopt controller.deathBeingHandled!]
@@ -476,6 +490,12 @@ physics.setGravity( 0, 50 )
 	-- See npcs.lua
 	function game:loadNPCS() 
 		self.npcs = npcs.loadNPCs( self )
+		if (#(self.npcs) == 0) then 
+			game.npcsLoaded = false
+			return
+		else 
+			game.npcsLoaded = true
+		end
 
 		for i in pairs(self.npcs) do
 			self.npcs[i].sensorN.collision = collisions.npcDetectByCollision
@@ -486,7 +506,12 @@ physics.setGravity( 0, 50 )
 	-- See enemies.lua
 	function game:loadEnemies() 
 		self.enemies, self.chaserList, self.walkerList = enemies.loadEnemies( self )
-		game.enemiesLoaded = true
+		if (#(self.enemies) == 0) then 
+			game.enemiesLoaded = false
+			return
+		else 
+			game.enemiesLoaded = true
+		end
 
 		-- Assigns the home to each chaser
 		enemies.assignChaserHomes(self.enemies, self.chaserList)
@@ -494,6 +519,12 @@ physics.setGravity( 0, 50 )
 		-- Assigns the route to each walker
 		local routes = self.map:getObjectLayer("walkerRoutes").objects
 		enemies.assignWalkerRoutes(self.enemies, self.walkerList, routes)
+	end
+
+	-- See bossStrategy.lua
+	function game:loadBoss( trigger )
+		if (not trigger) then return end
+		self.bossFight = bossStrategy.loadBoss(trigger)
 	end
 
 	-- MAIN ENTRY POINT FOR INITIALIZATION (called from the current level).
@@ -520,8 +551,11 @@ physics.setGravity( 0, 50 )
 		-- Logic, controls and UI initialization -----------------
 		collisions.setGame( game, gameStateList, playerStateList  )
 		controller.setGame( game, gameStateList, playerStateList  )
+		bossStrategy.setGame(game, gameStateList, playerStateList )
 		controller.prepareUI()
 		-----------------------------------------------------------
+
+		game:loadBoss(util.getBossTrigger(game.map))
 
 		physics.start()
 		physics.pause()
@@ -561,26 +595,42 @@ function game.pause()
 	physics.pause()
 	controller:pause()
 
-	for k, chaser in pairs(game.chaserList) do chaser:pause() end
-	-- [uncomment when walkers will have animated sprites]
-	-- for k, walker in pairs(game.walkerList) do walker:pause() end
+	if (game.chaserList) then
+		for k, chaser in pairs(game.chaserList) do chaser:pause() end
+	end
+	if (game.walkerList) then
+		-- [uncomment when walkers will have animated sprites]
+		-- for k, walker in pairs(game.walkerList) do walker:pause() end
+	end
+
+	if(game.bossFight and game.bossFight.state ~= "Paused") then
+		game.bossFight:pauseFight()
+	end
 end
 
 function game.resume()
 	physics.start()
 	controller:start()
 
-	for k, chaser in pairs(game.chaserList) do
+	if (game.chaserList) then
+		for k, chaser in pairs(game.chaserList) do
 		-- if(chaser and chaser.sequence ) then
 			chaser:play()
 		-- end
+		end
 	end
 
-	-- for k, walker in pairs(game.walkerList) do
-		-- if(walker and walker.sequence ) then
-			-- walker:play()
-		-- end	
-	-- end
+	if (game.walkerList) then
+		-- for k, walker in pairs(game.walkerList) do
+			-- if(walker and walker.sequence ) then
+				-- walker:play()
+			-- end	
+		-- end
+	end
+
+	if(game.bossFight and game.bossFight.state ~= "Running")then
+		game.bossFight:resumeFight()
+	end
 end
 
 function game.stop()
@@ -595,6 +645,7 @@ function game.stop()
 	package.loaded[enemies] = nil
 	package.loaded[npcs] = nil
 	package.loaded[items] = nil
+	package.loaded[bossStrategy] = nil
 	collisions.setGame(nil)
 	controller.setGame(nil)
 	controller.deathBeingHandled = nil

@@ -31,6 +31,7 @@ local settings = {
 function npcs.loadNPCs( currentGame ) 
 	local currentMap = currentGame.map
 	local npcList = currentMap:getObjectLayer("npcSpawn"):getObjects("npc")
+	if not (npcList) then return end
 
 	-- Loads the main Entity.
 		local loadNPCEntity = function( npc )

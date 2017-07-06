@@ -59,12 +59,14 @@ end
 				game.addScore(enemy.score)
 				-- Forces the enemy to drop his item
 				if (enemyHit.drop) then	game.dropItemFrom(enemyHit) end
+				
 				enemy:onDeathAnimation()
 				enemy:destroy()
-		
+
 			-- Enemy is still alive: handle hit
 			else 									
 				enemy:onHitAnimation(steve.x)
+
 				-- Makes the enemy temporairly untargettable and reverts it short after
 				enemy.alpha = 0.5 
 				enemy.isTargettable = false
@@ -72,6 +74,47 @@ end
 					function()
 						enemy.alpha = 1
 						enemy.isTargettable = true
+					end
+				)
+			end
+
+			if (self.type == "bullet") then
+				self:destroy()
+			end
+
+		elseif( (other.eName == "boss") and other.isTargettable == true ) then
+			local boss = other
+			boss.lives = boss.lives-1
+
+			if (boss.lives == 0) then
+				transition.cancel(boss)
+
+				if (boss.isProjectile) then
+					display.remove(boss)
+				else
+				 -- Animation: knocks the boss AWAY and off the map----
+					boss.isSensor = true
+					boss.eName = "deadBossPart"
+					boss.yScale = -1
+					if (boss.sequence) then
+						boss:setSequence("dead")
+						boss:play()
+					end
+					timer.performWithDelay(1000, boss:applyLinearImpulse( 0.05, -50, boss.x, boss.y ))
+					transition.to(boss, {time = 5000,  -- removes it when he's off the map 
+						onComplete = function()
+							display.remove(boss)
+						end
+					})
+				end	
+
+			else --Se ha almeno una vita	
+				boss.alpha = 0.5 
+				boss.isTargettable = false
+				timer.performWithDelay(500, 
+					function()
+						boss.alpha = 1
+						boss.isTargettable = true
 					end
 				)
 			end
@@ -117,11 +160,14 @@ end
 	-- Collision between the player and safe environment Tiles
 	local function environmentCollision( player, event )
 		local environment = event.other
-
 		if (event.phase == "began" and environment.isGround) then
 			player.canJump = true
 			player.isAirborne = false 
 			player.hasTouchedGround = true
+		end
+
+		if(environment.type == "event") then
+			environment.owner.listener(event)
 		end
 	end
 
@@ -147,7 +193,7 @@ end
 
 		if (o.tName == "env") then
 			environmentCollision( self, event )
-		elseif ((o.eName == "enemy") or (o.tName =="danger")) then
+		elseif ((o.eName == "enemy") or (o.eName == "boss") or (o.tName =="danger")) then
 			dangerCollision( self, event )
 		-- Special case for the level's ending block. Triggers -endGameScreen-
 		elseif(o.tName == "endLevel") then
