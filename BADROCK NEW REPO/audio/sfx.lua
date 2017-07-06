@@ -1,29 +1,38 @@
 local myData = require( "myData" )
-local sfx = {}  --create the main Sound Effects (sfx) table.
-
-sfx.bgMenuMusic  = audio.loadStream( "audio/overside8bit.wav" )
-sfx.bgLvlMusic   = audio.loadStream( "audio/Level1BGM/Highways_standard.mp3" )
-sfx.jumpSound     = audio.loadSound( "audio/jump.wav"     )
-sfx.coinSound     = audio.loadSound( "audio/coin.wav"     )
-sfx.attackSound   = audio.loadSound( "audio/attack.wav"   )
-sfx.dangerSound   = audio.loadSound( "audio/danger3.wav"  )
-sfx.lifeupSound   = audio.loadSound( "audio/lifeup.wav"   )
-sfx.enemyDefSound = audio.loadSound( "audio/enemyDef.wav" )
-sfx.gunSound      = audio.loadSound( "audio/gun.wav"      )
-sfx.npcGoodSound  = audio.loadSound( "audio/npc_good.wav" )
-sfx.npcEvilSound  = audio.loadSound( "audio/npc_evil.wav" )
+--create the main Sound Effects (sfx) table.
+local sfx = { 
+  bgMenuMusic  = audio.loadStream( "audio/overside8bit.wav" ),
+  bgLvlMusic   = audio.loadStream( "audio/Level1BGM/Highways_standard.mp3" ),
+  bgLvLMusicUP = audio.loadStream( "audio/Level1BGM/Highways_G_faster.mp3" ),
+  jumpSound     = audio.loadSound( "audio/jump.wav"       ),
+  coinSound     = audio.loadSound( "audio/coin.wav"       ),
+  lifeupSound   = audio.loadSound( "audio/lifeup.wav"     ),
+  gunSound      = audio.loadSound( "audio/gun.wav"        ),
+  boom1Sound    = audio.loadSound( "audio/boom_small.wav" ),
+  boom2Sound    = audio.loadSound( "audio/boom_big.wav"   ),
+  noAmmoSound   = audio.loadSound( "audio/noAmmo.wav"     ),
+  attackSound   = audio.loadSound( "audio/attack.wav"     ),
+  dangerSound   = audio.loadSound( "audio/danger3.wav"    ),
+  enemyDefSound = audio.loadSound( "audio/enemyDef.wav"   ),
+  npcGoodSound  = audio.loadSound( "audio/npc_good.wav"   ),
+  npcEvilSound  = audio.loadSound( "audio/npc_evil.wav"   ),
+  levelEndSound = audio.loadSound( "audio/level_ended.wav"),
+  gameOverSound = audio.loadSound( "audio/game_over.wav"  ),
+}
 
 
 -- inizializzare i volumi e i canali dei diversi suoni
 sfx.init = function()
 	-- riserva 5 canali audio
-   audio.reserveChannels(5)
+   audio.reserveChannels(7)
    --sfx.masterVolume = audio.getVolume()  --print( "volume "..masterVolume )
    audio.setVolume( 0.40, { channel = 1 } )  --background music
    audio.setVolume( 0.66, { channel = 2 } )  --jump sound
    audio.setVolume( 1.0,  { channel = 3 } )  --coin sound
    audio.setVolume( 1.0,  { channel = 4 } )  --attack sound
-   audio.setVolume( 0.25, { channel = 5 } )  --danger sound
+   audio.setVolume( 0.50, { channel = 5 } )  --danger sound
+   audio.setVolume( 0.8,  { channel = 6 } )  --boom sounds
+   audio.setVolume( 2.80, { channel = 7 } )  --louder sounds
 end
 
 sfx.playSound = function( handle, options )
@@ -50,6 +59,9 @@ sfx.pauseSound = function()
     audio.setVolume( 0, { channel=3 } )    
     audio.setVolume( 0, { channel=4 } )
     audio.setVolume( 0, { channel=5 } )
+    audio.setVolume( 0, { channel=6 } )
+    audio.setVolume( 0, { channel=7 } )
+
 end
 
 
@@ -58,6 +70,8 @@ sfx.setVolumeSound = function(level)
     audio.setVolume( level, { channel=3 } )
     audio.setVolume( level, { channel=4 } )
     audio.setVolume( level, { channel=5 } )
+    audio.setVolume( level, { channel=6 } )
+    audio.setVolume( level, { channel=7 } )
 end
 
 -- sfx.pauseMusic = function(channel)

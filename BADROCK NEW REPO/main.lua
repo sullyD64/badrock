@@ -12,8 +12,8 @@ local composer = require ( "composer"      )
 visual         = require ( "visual.visual" ) 
 filters        = require ( "lib.filters"   )
 util           = require ( "lib.util"      )
+sfx            = require ( "audio.sfx"     )
 
-local sfx = require( "audio.sfx" )
 sfx.init()
 
 -- Enable the multitouch 

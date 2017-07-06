@@ -538,7 +538,7 @@ physics.setGravity( 0, 50 )
 		game.goodPoints = 0
 		game.evilPoints = 0
 		game.stars = 0
-		game.lives = game.MAX_LIVES
+		game.lives = game.MAX_LIVES - 1 
 		game.levelHasBeenCompleted = false
 		---------------------------
 		

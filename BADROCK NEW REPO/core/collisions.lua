@@ -38,6 +38,16 @@ end
 
 		-- Target is an enemy, targettable AND not invincible
 		if( other.eName == "enemy" and other.isTargettable == true ) then 
+			-- audio ----------------------------------------
+			if (steve.isImmune) then
+				audio.stop(3)
+				sfx.playSound( sfx.boom2Sound, { channel = 3 } )
+			else
+				audio.stop(3)
+				sfx.playSound( sfx.enemyDefSound, { channel = 3 } )
+			end
+			-------------------------------------------------
+
 			local enemy = other
 			-- Locally stores some of the enemies attributes
 			-- This is needed because they may become lost when the enemy is removed.
@@ -197,6 +207,10 @@ end
 			dangerCollision( self, event )
 		-- Special case for the level's ending block. Triggers -endGameScreen-
 		elseif(o.tName == "endLevel") then
+			-- audio ----------------------------------------
+			sfx.playSound( sfx.levelEndSound, { channel = 7 } )
+			-------------------------------------------------
+
 			-- The whole end phase is handled in the controller
 			-- the declaration below triggers a call in the game loop
 			-- (see game and controller)
@@ -258,6 +272,10 @@ end
 	local function lifeCollision( life, event )
 		if (event.phase == "began") then
 			if (game.lives ~= game.MAX_LIVES) then
+				-- audio ----------------------------------------
+				audio.stop(5)
+				sfx.playSound( sfx.lifeupSound, { channel = 5 } )
+				-------------------------------------------------
 				display.remove(life)
 				game.addOneLife()
 			else

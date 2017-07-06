@@ -113,6 +113,10 @@ local function handleAttackEnd()
 	-- If powerUp has run out of ammo, it is destroyed and default attack is
 	-- loaded again.
 	if (player.hasPowerUp and combat.ammo == 0) then
+		-- audio ----------------------------------------
+		audio.stop(7)
+		sfx.playSound( sfx.noAmmoSound, { channel = 7 } )
+		-------------------------------------------------
 		player:losePowerUp()
 		controller.updateAmmo("destroy")
 		player.attack = combat.loadDefaultAttack()
@@ -268,6 +272,10 @@ end
 
 				-- The bullet is destroyed when it collides with enemies or the environment.
 				function bullet:destroy()
+					-- audio ----------------------------------------
+					audio.stop(6)
+					sfx.playSound( sfx.boom1Sound, { channel = 6 } )
+					-------------------------------------------------
 					display.remove(bullet.sprite)
 					display.remove(bullet)
 					-- The relative entry in the bullet table is freed
@@ -289,6 +297,11 @@ end
 		-- Loads the gun Entity, which is nothing but an animated sprite
 		-- near the player which visually represents the equipped powerup.
 		local function loadGun()
+			-- audio ----------------------------------------
+			audio.stop(4)
+			sfx.playSound( sfx.coinSound, { channel = 4 } )
+			-------------------------------------------------
+
 			-- Loads the gun sprite and animation sequences
 			local gun = entity.newEntity(settings.gun.staticOptions)
 			gun:addOnMap( map )
@@ -303,6 +316,10 @@ end
 		-- Shoots one bullet.
 		local function useGun()
 			combat.performingAttack = true
+			-- audio ----------------------------------------
+			audio.stop(4)
+			sfx.playSound( sfx.gunSound, { channel = 4 } )
+			-------------------------------------------------
 			player.powerUp.attacks[combat.ammo]:shoot()
 
 			-- Attack duration is needed here for re-enabling the action button,
@@ -417,6 +434,11 @@ end
 	-- damage to everything he comes in touch with.
 	function combat.performMelee()
 		combat.performingAttack = true
+		-- audio ----------------------------------------
+		audio.stop(4)
+		sfx.playSound( sfx.attackSound, { channel = 4 } )
+		-------------------------------------------------
+
 		-- The melee sprite substitutes the player's sprite.
 		player.sprite.alpha = 0
 

@@ -89,8 +89,14 @@ function npcs.loadNPCs( currentGame )
 
 						-- Good/bad action conditional behavior --
 						if (target.id == "npcButton1") then
+							-- audio ----------------------------------------
+							sfx.playSound( sfx.npcGoodSound, { channel = 6 } )
+							-------------------------------------------------
 							specialPointsType = "good"
 						elseif (target.id == "npcButton2") then
+							-- audio ----------------------------------------
+							sfx.playSound( sfx.npcEvilSound, { channel = 6 } )
+							-------------------------------------------------
 							specialPointsType = "evil"
 						end
 

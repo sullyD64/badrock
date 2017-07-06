@@ -13,7 +13,6 @@
 -- 'system' responses for the uses.
 -----------------------------------------------------------------------------------------
 local ui         = require ( "core.ui"         )
-local sfx        = require ( "audio.sfx"       )
 local pauseMenu  = require ( "menu.pauseMenu"  )
 local gameResult = require ( "menu.gameResult" )
 local sfxMenu    = require ( "menu.sfxMenu"    )
@@ -186,10 +185,6 @@ local sState = {}
 		if (controller.controlsEnabled) then
 			if (event.phase == "began" and button.active == true) then
 				display.currentStage:setFocus( button, event.id )
-				-- audio ----------------------------------------
-				sfx.playSound( sfx.attackSound, { channel = 4 } )
-				-------------------------------------------------
-
 				-- Button becomes temporairly inactive
 				button.active = false
 				button.alpha = 0.5
@@ -391,6 +386,9 @@ local sState = {}
 		ui.updateLifeIcons(game.lives)
 
 		if (game.lives == 0) then
+			-- audio ----------------------------------------
+			sfx.playSound( sfx.gameOverSound, { channel = 7 } )
+			-------------------------------------------------
 			controller.onGameOver("Failed")
 		elseif ( game.lives > 0 ) then
 			game.score = 0
