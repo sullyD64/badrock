@@ -25,6 +25,7 @@ local controller = {
 	i, j, 						-- both are needed for the variable jump height
 	deathBeingHandled,
 	noMovementDetected,		-- needed for resetting the player's state to IDLE
+	pauseBeingHandled = false,  -- needed for calling game.pause() only once
 }
 
 local game = {}

@@ -13,6 +13,7 @@ local composer     = require ( "composer"          )
 local myData       = require ( "myData"            )
 local physics      = require ( "physics"           )
 local player       = require ( "core.player"       )
+local combat       = require ( "core.combat"       )
 local enemies      = require ( "core.enemies"      )
 local npcs         = require ( "core.npcs"         )
 local items        = require ( "core.items"        )
@@ -282,7 +283,8 @@ physics.setGravity( 0, 50 )
 			end			
 		end
 	
-		--Se è in corso una boss Fight
+		-- Handles the runtime events associated with the boss fight
+		-- (if the current level has a boss).
 		if(game.bossFight and bossStrategy.activeStrategy ~= 0) then
 			-- Gestione Boss Strategy in caso di interruzione del fight
 			if((game.steve.state == playerStateList.DEAD and game.bossFight.state ~= "Terminated")
@@ -304,7 +306,7 @@ physics.setGravity( 0, 50 )
 			controller.onDeath()
 		end
 
-		-- See controller.addSpecialPoints, needed for linking the text to steve
+		-- See controller.addSpecialPoints, needed for linking popup texts to steve
 		if (controller.alertVisible) then
 			controller.alert.x, controller.alert.y = game.steve.x, game.steve.y - 30
 		end
@@ -354,18 +356,21 @@ physics.setGravity( 0, 50 )
 		-- If the game's state is changed by any event or trigger, 
 		-- this invokes the corresponding method (for unification purposes).
 		local state = game.state
+
 		if (state == gameStateList.RUNNING) then
 			gameRunningLoop()
 		elseif (state == gameStateList.RESUMED) then
 			game.resume()
+			controller.pauseBeingHandled = false
 			if (game.steve.sprite.sequence ~= "idle") then
 				game.steve.sprite:setSequence("idle")
 				game.steve.sprite:play()
 			end
-		elseif (state == gameStateList.PAUSED) then
+		elseif (state == gameStateList.PAUSED and controller.pauseBeingHandled == false) then
 			game.pause()
+			controller.pauseBeingHandled = true
 		elseif (state == gameStateList.ENDED) then
-			game.stop() 
+			game.stop()
 		elseif (state == gameStateList.COMPLETED) then
 			if(controller.endGameOccurring ~= true) then
 				game.maxPoints = game.getMaxScore()
@@ -595,6 +600,21 @@ function game.pause()
 	physics.pause()
 	controller:pause()
 
+	if (game.steve.attack and game.steve.attack.sprite) then
+		game.steve.attack.sprite:pause()
+	end
+	if (game.steve.powerUp and game.steve.powerUp.sprite) then
+		game.steve.powerUp.sprite:pause()
+	end
+
+	if (combat.timers) then
+		for k, combatTimer in pairs(combat.timers) do
+		 	if (not combatTimer._expired) then
+				timer.pause(combatTimer)
+			end
+		end
+	end
+
 	if (game.chaserList) then
 		for k, chaser in pairs(game.chaserList) do chaser:pause() end
 	end
@@ -611,6 +631,21 @@ end
 function game.resume()
 	physics.start()
 	controller:start()
+
+	if (game.steve.attack and game.steve.attack.sprite) then
+		game.steve.attack.sprite:play()
+	end
+	if (game.steve.powerUp and game.steve.powerUp.sprite) then
+		game.steve.powerUp.sprite:play()
+	end
+
+	if (combat.timers) then
+		for k, combatTimer in pairs(combat.timers) do
+			if (not combatTimer._expired) then
+				timer.resume(combatTimer)
+			end
+		end
+	end
 
 	if (game.chaserList) then
 		for k, chaser in pairs(game.chaserList) do
