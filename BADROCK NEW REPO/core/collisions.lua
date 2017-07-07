@@ -135,6 +135,10 @@ end
 
 		-- Target is a breakable item (i.e. crates, rocks..)
 		elseif( other.isBreakable ) then
+			-- audio ----------------------------------------
+			audio.stop(6)
+			sfx.playSound( sfx.boom1Sound, { channel = 6 } )
+			-------------------------------------------------
 			display.remove(other)
 
 			if (self.type == "bullet") then

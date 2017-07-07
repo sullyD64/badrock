@@ -28,6 +28,7 @@ function scene:create( event )
 
 	if myData.settings.musicOn == false then
 		audio.play(sfx.bgLvlMusic, {channel = 1 , loops=-1})
+		-- sfx.playMusic(sfx.bgLvlMusic, {channel = 1, loops = -1}) ?
 		audio.pause(1)
 	end
 
@@ -51,6 +52,9 @@ function scene:show( event )
 	
 	if (phase == "will") then
 		sfx.playMusic(sfx.bgLvlMusic, {channel = 1 , loops=-1})
+		-- A second audio source is started too but with no volume.
+		-- (needed for syncing the two when we want to swap them)
+		sfx.playMusic(sfx.bgLvlMusicUP, {channel = 8, loops=-1})
 	elseif (phase == "did") then
 		game.start()	
 	end

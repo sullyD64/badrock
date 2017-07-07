@@ -3,7 +3,7 @@ local myData = require( "myData" )
 local sfx = { 
   bgMenuMusic  = audio.loadStream( "audio/overside8bit.wav" ),
   bgLvlMusic   = audio.loadStream( "audio/Level1BGM/Highways_standard.mp3" ),
-  bgLvLMusicUP = audio.loadStream( "audio/Level1BGM/Highways_G_faster.mp3" ),
+  bgLvlMusicUP = audio.loadStream( "audio/Level1BGM/Highways_G_faster.mp3" ),
   jumpSound     = audio.loadSound( "audio/jump.wav"       ),
   coinSound     = audio.loadSound( "audio/coin.wav"       ),
   lifeupSound   = audio.loadSound( "audio/lifeup.wav"     ),
@@ -20,11 +20,10 @@ local sfx = {
   gameOverSound = audio.loadSound( "audio/game_over.wav"  ),
 }
 
-
 -- inizializzare i volumi e i canali dei diversi suoni
 sfx.init = function()
 	-- riserva 5 canali audio
-   audio.reserveChannels(7)
+   audio.reserveChannels(8)
    --sfx.masterVolume = audio.getVolume()  --print( "volume "..masterVolume )
    audio.setVolume( 0.40, { channel = 1 } )  --background music
    audio.setVolume( 0.66, { channel = 2 } )  --jump sound
@@ -33,6 +32,7 @@ sfx.init = function()
    audio.setVolume( 0.50, { channel = 5 } )  --danger sound
    audio.setVolume( 0.8,  { channel = 6 } )  --boom sounds
    audio.setVolume( 2.80, { channel = 7 } )  --louder sounds
+   audio.setVolume( 0,    { channel = 8 } )  --powerup music
 end
 
 sfx.playSound = function( handle, options )
@@ -61,7 +61,6 @@ sfx.pauseSound = function()
     audio.setVolume( 0, { channel=5 } )
     audio.setVolume( 0, { channel=6 } )
     audio.setVolume( 0, { channel=7 } )
-
 end
 
 
@@ -72,6 +71,18 @@ sfx.setVolumeSound = function(level)
     audio.setVolume( level, { channel=5 } )
     audio.setVolume( level, { channel=6 } )
     audio.setVolume( level, { channel=7 } )
+end
+
+sfx.toggleAlternativeBgm = function( flag )
+  if (flag == "on") then
+    sfx.altBgmIsPlaying = true
+    audio.setVolume( audio.getVolume({channel=1}), {channel = 8} )
+    audio.setVolume( 0, {channel = 1} )
+  elseif (flag == "off") then
+    sfx.altBgmIsPlaying = false
+    audio.setVolume( audio.getVolume({channel=8}), {channel = 1} )
+    audio.setVolume( 0, {channel = 8} )
+  end
 end
 
 -- sfx.pauseMusic = function(channel)

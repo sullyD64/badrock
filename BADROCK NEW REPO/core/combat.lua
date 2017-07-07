@@ -141,11 +141,19 @@ function combat.cancel()
 
 	player.attack.isVisible = false
 	player.attack.isBodyActive = false
-	player.attack.sprite:pause()
+	if (player.attack.sprite.sequence) then
+		player.attack.sprite:pause()
+	end
 	player.attack.sprite.isVisible = false
 
-	player.isImmune = false
-	player.immunityDuration = nil
+	if (player.isImmune) then
+		timer.cancel(combat.immunityTimer)
+		-- audio ----------------------------------------
+		sfx.toggleAlternativeBgm("off")
+		-------------------------------------------------
+		player.isImmune = false
+		player.immunityDuration = nil
+	end
 
 	display.remove(player.attack)
 end
@@ -160,7 +168,9 @@ end
 		local function useImmunity()
 			player.isImmune = true
 			player.immunityDuration = 7000
-
+			-- audio ----------------------------------------
+			sfx.toggleAlternativeBgm("on")
+			-------------------------------------------------
 			transition.to(player, {time = 0, 
 					onComplete = function()
 						if (player.hasPowerUp) then
@@ -172,8 +182,11 @@ end
 					end
 				})
 
-			timer.performWithDelay(player.immunityDuration,
+			combat.immunityTimer = timer.performWithDelay(player.immunityDuration,
 				function()
+					-- audio ----------------------------------------
+					sfx.toggleAlternativeBgm("off")
+					-------------------------------------------------
 				 	player.isImmune = false
 				 	player.immunityDuration = nil
 				end

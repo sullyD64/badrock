@@ -7,7 +7,6 @@
 local widget  = require ( "widget"           )
 local myData  = require ( "myData"           )
 local utility = require ( "menu.utilityMenu" )
-local sfx     = require ( "audio.sfx"        )
 
 local opt = {}
 
@@ -20,7 +19,12 @@ end
 --Background Volume slider listener
 local function bgVolumeListener( event )
 	print( "Slider at " .. event.value .. "%" )
-	audio.setVolume( event.value/100, { channel=1 } )
+
+	if (sfx.altBgmIsPlaying) then
+		audio.setVolume( event.value/100, { channel=8 } )
+	else
+		audio.setVolume( event.value/100, { channel=1 } )
+	end
 end
 
 -- Effects Volume slider listener
@@ -36,12 +40,14 @@ local function onBgMuteSwitchPress( event )
 	if (switch.isOn) then 
 		myData.settings.musicOn=false
 		audio.pause({channel =1})
+		audio.pause({channel =8})
 		-- --audio.setVolume( 0, { channel=1 } )
 		-- --else audio.setVolume (opt.panel.bgVolume.value)
 		-- audio.pause({channel =1})
 		-- else audio.resume({channel =1})
 	 else myData.settings.musicOn=true
 		  audio.resume({channel =1})
+		  audio.resume({channel =8})
 	end
 	
 end
