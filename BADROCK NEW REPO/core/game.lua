@@ -281,12 +281,10 @@ physics.setGravity( 0, 50 )
 				end
 			end			
 		end
-	
 		--Se è in corso una boss Fight
 		if(game.bossFight and bossStrategy.activeStrategy ~= 0) then
 			-- Gestione Boss Strategy in caso di interruzione del fight
-			if((game.steve.state == playerStateList.DEAD and game.bossFight.state ~= "Terminated")
-				or game.state == gameStateList.TERMINATED) then 	
+			if(game.steve.state == playerStateList.DEAD and game.bossFight.state ~= "Terminated") then 	
 				game.bossFight:terminateFight() 				
 			end
 			-----------------------------------
@@ -378,6 +376,10 @@ physics.setGravity( 0, 50 )
 			if(controller.endGameOccurring ~= true) then
 				controller.endGameOccurring = true
 				controller.onGameOver("Terminated")
+				if(game.bossFight and game.bossFight.state ~= "Terminated" and bossStrategy.activeStrategy ~= 0)then
+					print("GAME TERMINATO Da Motivi diversi dalla morte di Steve")
+					game.bossFight:terminateFight()
+				end
 
 				-- Prevents overriding the nextScene if replay level has been requested.
 				if (not game.nextScene) then
@@ -603,7 +605,7 @@ function game.pause()
 		-- for k, walker in pairs(game.walkerList) do walker:pause() end
 	end
 
-	if(game.bossFight and game.bossFight.state ~= "Paused") then
+	if(game.bossFight and game.bossFight.state ~= "Paused" and bossStrategy.activeStrategy ~= 0) then
 		game.bossFight:pauseFight()
 	end
 end
@@ -628,7 +630,7 @@ function game.resume()
 		-- end
 	end
 
-	if(game.bossFight and game.bossFight.state ~= "Running")then
+	if(game.bossFight and game.bossFight.state ~= "Running" and bossStrategy.activeStrategy ~= 0)then
 		game.bossFight:resumeFight()
 	end
 end

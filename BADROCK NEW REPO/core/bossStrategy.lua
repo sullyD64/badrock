@@ -30,7 +30,9 @@ local strategyBoss1 = {}
 		strategyB1.timers={}          --campo opzionale per altre strategy
 		strategyB1.fireRateSx = 5000  --campo opzionale per altre strategy
 		strategyB1.fireRateDx = 5000  --campo opzionale per altre strategy
+		strategyB1.maxFireRate = 800
 		strategyB1.spawn = game.map:getObjectLayer("bossSpawn"):getObject("bossSpawn")
+		strategyB1.spawnOriginalPosition= {x=strategyB1.spawn.x , y= strategyB1.spawn.y}
 		strategyB1.win = false
 		
 
@@ -116,7 +118,7 @@ local strategyBoss1 = {}
 				-- Funzione che fa muovere le mani ogni tot secondi----------
 				local t1
 				local muoviMani = function()
-					if(self.phase==1 and self.state ~= "Terminated") then
+					if(self.phase==1 and self.state == "Running") then
 						local d1 = math.random(-50,50)
 						local d2 = math.random(-50,50)
 						if(self.bossEntity.manoDx and self.bossEntity.manoDx.lives > 1)then 
@@ -130,7 +132,7 @@ local strategyBoss1 = {}
 					end
 				end
 				t1 = timer.performWithDelay(5000, muoviMani, -1)
-				table.insert(self.timers,t)
+				table.insert(self.timers,t1)
 		end
 
 
@@ -254,33 +256,56 @@ local strategyBoss1 = {}
 
 		-- TERMINATE BOSS FIGHT --------------------------(called if we: die|return to menu|after victory)----
 		function strategyB1:terminateFight()
+		
 			self.state = "Terminated"
 			--IL DELAY DEVE ESSERE CIRCA UGUALE AL TEMPO DI RESPAWN DI STEVE
+
 			timer.performWithDelay(1000, function()
 				self.isActive=false
 				bossStrategy.activeStrategy=0
 
 				--cancel all transitions and images
-				for i,part in pairs(self.bossEntity)do			
+				for i,part in pairs(self.bossEntity)do
+				 	if(part.name=="spallaSx" or part.name=="spallaDx") then
+				 		for i,proiettile in pairs(part.proiettili)do
+				 			if(proiettile)then
+				 				transition.cancel(proiettile)
+				 				display.remove(proiettile)
+				 			end
+				 		end
+				 	elseif(part.name=="manoSx" or part.name=="manoDx") then
+				 		if(part.laser)then
+				 			transition.cancel(part.laser)
+				 			display.remove(part.laser)
+				 		end
+					end
 					transition.cancel(part)
-					display.remove(part)
-				end	
+				 	display.remove(part)
+				 end	
 
 				--cancel all timers of this strategy
-				for i,t in pairs(self.timers)do
-					timer.cancel(t)
+				if(self.timers)then
+					for i,t in pairs(self.timers)do
+						if(not t._expired) then
+						timer.cancel(t)
+						end
+					end
 				end
 
+				-- replace the boss Spawn in the original position
+				self.spawn.x = self.spawnOriginalPosition.x
+				self.spawn.y = self.spawnOriginalPosition.y
+
 				-- remove the triggered wall at the beginning
+				if(game.map)then
 				util.destroyWalls(game.map)
-				
+				end
 				-- if we don't defeat the Boss, reactivate the boss Trigger (usefull in case we died)
 				transition.to(self.trigger,{time=0, onComplete= function()
 					if(self.win == false)then
 					 	self.trigger.isBodyActive=true
 					end 
 				end})
-				game.bossFight=nil
 			end)
 		end
 
@@ -289,22 +314,29 @@ local strategyBoss1 = {}
 			self.state = "Paused"
 
 			--pause all transitions for the boss parts
-			for i,part in pairs(self.bossEntity)do
-				transition.pause(part)
-				if(part.name=="spallaSx" or part.name=="spallaDx") then
-					for i,proiettile in pairs(part.proiettili)do
-						transition.pause(proiettile)
-					end
-				elseif(part.name=="manoSx" or part.name=="manoDx") then
-					transition.pause(part.laser)
+			 for i,part in pairs(self.bossEntity)do
+			 	transition.pause(part)
+			 	if(part.name=="spallaSx" or part.name=="spallaDx") then
+			 		for i,proiettile in pairs(part.proiettili)do
+			 			if(proiettile)then
+			 				transition.pause(proiettile)
+			 			end
+			 		end
+			 	elseif(part.name=="manoSx" or part.name=="manoDx") then
+			 		if(part.laser)then
+			 			transition.pause(part.laser)
+			 		end
 				end
-			end	
+			 end	
 
 			--pause all timers of this strategy
-			for i,t in pairs(self.timers)do
-				timer.pause(t)
-			end	
-
+			if(self.timers)then
+				for i,t in pairs(self.timers)do
+					if(not t._expired) then
+						timer.pause(t)
+					end
+				end
+			end
 			--pause all sprites for the boss parts
 			for i,part in pairs(self.bossEntity)do
 				--part:pause()
@@ -324,17 +356,25 @@ local strategyBoss1 = {}
 				transition.resume(part)
 				if(part.name=="spallaSx" or part.name=="spallaDx") then
 					for i,proiettile in pairs(part.proiettili)do
-						transition.resume(proiettile)
+						if(proiettile)then
+							transition.resume(proiettile)
+						end
 					end
 				elseif(part.name=="manoSx" or part.name=="manoDx") then
-					transition.resume(part.laser)
+					if(part.laser)then
+						transition.resume(part.laser)
+					end
 				end
 			end	
 
 			--resume all timers of this strategy
-			for i,t in pairs(self.timers)do
-				timer.resume(t)
-			end	
+				if(self.timers)then
+					for i,t in pairs(self.timers)do
+						if(not t._expired) then
+						timer.resume(t)
+						end
+					end
+				end
 
 			--resume all sprites for the boss parts
 			for i,part in pairs(self.bossEntity)do
@@ -422,9 +462,6 @@ local strategyBoss1 = {}
 
 				-- Phase 2 -------------------------------------------------
 				if(self.phase == 2) then
-					----------------------------
-					local maxFireRate = 800		-- viene inizializzato ad ogni frame : cambiare
-					----------------------------
 
 					if(bossEntity.spallaDx.lives==1 and bossEntity.spallaDx.state == "normal") then
 						bossEntity.spallaDx:setFillColor( 255,0 ,0)
@@ -434,7 +471,7 @@ local strategyBoss1 = {}
 						bossEntity.spallaDx.state = "rage"
 						bossEntity.spallaDx.isTargettable=false
 						timer.performWithDelay(2000,function() bossEntity.spallaDx.isTargettable=true	end)
-						self.fireRateDx= maxFireRate
+						self.fireRateDx= self.maxFireRate
 						for i,t in pairs(bossEntity.spallaDx.timer)do
 							timer.cancel(t)
 						end
@@ -449,7 +486,7 @@ local strategyBoss1 = {}
 						bossEntity.spallaSx.state = "rage"
 						bossEntity.spallaSx.isTargettable=false
 						timer.performWithDelay(2000,function() bossEntity.spallaSx.isTargettable=true	end)
-						self.fireRateSx= maxFireRate
+						self.fireRateSx= self.maxFireRate
 						for i,t in pairs(bossEntity.spallaSx.timer)do
 							timer.cancel(t)
 						end

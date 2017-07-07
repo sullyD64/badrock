@@ -108,6 +108,9 @@ function util.createWalls(currentMap)
 	local tiles = walls:getTilesWithProperty("tName")
 
 	for k, tile in pairs(tiles) do
+		if(tile:hasProperty("isSensor"))then
+			tile:removeProperty("isSensor")
+		end
 		tile:addProperty(Property:new("HasBody", ""))
 		tile:addProperty(Property:new("bodyType", "static"))
 		tile:addProperty(Property:new("categoryBits", filters.envFilter.categoryBits))
@@ -127,14 +130,17 @@ function util.destroyWalls(currentMap)
 	if not map then return end
 
 	local walls = map:getTileLayer("blockingWalls")
-	local tiles = walls:getTilesWithProperty("tName")
-
-	for k, tile in pairs(tiles) do
-		transition.to(tile, {time = 0,
-			onComplete = function()
-				tile.isSensor = true
-			end
-		})
+	
+	if(walls.tiles)then
+		local tiles = walls:getTilesWithProperty("tName")
+		for k, tile in pairs(tiles) do
+			transition.to(tile, {time = 0,
+				onComplete = function()
+				tile:addProperty(Property:new("isSensor", true))
+					tile:build()
+				end
+			})
+		end
 	end
 	walls:hide()
 end
