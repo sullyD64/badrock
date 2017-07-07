@@ -561,6 +561,7 @@ physics.setGravity( 0, 50 )
 		-----------------------------------------------------------
 
 		game:loadBoss(util.getBossTrigger(game.map))
+		-- util.preparePlatforms(game.map)
 
 		physics.start()
 		physics.pause()
@@ -583,22 +584,24 @@ function game.start()
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 	dbtimer = timer.performWithDelay(200, debug, 0)
+	-- util.movePlatforms(game.map, "on")
 
-	local pippo = {
-		x = game.spawnPoint.x + 50,
-		y = game.spawnPoint.y,
-		drop = "gun"}
-	game.dropItemFrom(pippo)
-	local pluto = {
-		x = game.spawnPoint.x + 100,
-		y = game.spawnPoint.y,
-		drop = "immunity"}
-	game.dropItemFrom(pluto)
+	-- local pippo = {
+	-- 	x = game.spawnPoint.x + 50,
+	-- 	y = game.spawnPoint.y,
+	-- 	drop = "gun"}
+	-- game.dropItemFrom(pippo)
+	-- local pluto = {
+	-- 	x = game.spawnPoint.x + 100,
+	-- 	y = game.spawnPoint.y,
+	-- 	drop = "immunity"}
+	-- game.dropItemFrom(pluto)
 end
 
 function game.pause()
 	physics.pause()
 	controller:pause()
+	-- util.movePlatforms(game.map, "off")
 
 	if (game.steve.attack and game.steve.attack.sprite) then
 		game.steve.attack.sprite:pause()
@@ -631,6 +634,7 @@ end
 function game.resume()
 	physics.start()
 	controller:start()
+	-- util.movePlatforms(game.map, "on")
 
 	if (game.steve.attack and game.steve.attack.sprite) then
 		game.steve.attack.sprite:play()
