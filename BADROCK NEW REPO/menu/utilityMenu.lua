@@ -14,59 +14,11 @@ local widget = require ("widget")
 
 local utility = {}
 
-utility.font = "Micolas.ttf"
+utility.font = "Berlin Sans FB Regular.ttf"--"ITCKRIST.TTF"--"Micolas.ttf"
 
 -- -----------------------------------------------------------------------------------
 -- ImageSheets
 -- -----------------------------------------------------------------------------------
-	-- violet button sheet
-	local buttonOptions =
-		{
-			frames =
-			{
-				{   -- frame 1 = UpperSX Corner
-					x = 0, y = 0, width = 20, height = 16 },
-				{   -- frame 2 = Upper Side
-					x = 20, y = 0, width = 110 , height = 16 },
-				{   -- frame 3 = UpperDX Corner 
-					x = 130, y = 0, width = 20, height = 16 },
-				{   -- frame 4 = Left Side 
-					x = 0, y = 16, width = 20, height = 10 },
-				{   -- frame 5 = LowerSX Corner 
-					x = 0, y = 26, width = 20, height = 24 },
-				{   -- frame 6 = Lower Side 
-					x = 20, y = 26, width = 110, height = 24 },
-				{   -- frame 7 = LowerDX Corner 
-					x = 130, y = 26, width = 20, height = 24 },
-				{   -- frame 8 = Right Side 
-					x = 130, y = 16, width = 20, height = 10 },
-				{   -- frame 9 = Center
-					x = 20, y = 16, width = 110, height = 10 },
-				
-				{   -- frame 10 = UpperSX Corner Over
-					x = 150, y = 0, width = 20, height = 16 },
-				{   -- frame 11 = Upper Side Over
-					x = 166, y = 0, width = 110, height = 16 },
-				{   -- frame 12 = UpperDX Corner Over
-					x = 280, y = 0, width = 20, height = 16 },
-				{   -- frame 13 = SX Side Over
-					x = 150, y = 16, width = 20, height = 10 },
-				{   -- frame 18 = Center Over
-					x = 166, y = 16, width = 110, height = 10 },
-				{   -- frame 17 = DX Side Over
-					x = 280, y = 16, width = 20, height = 10 },
-				{   -- frame 14 = LowerSX Corner Over 
-					x = 150, y = 23, width = 20 , height = 24 },
-				{   -- frame 15 = Lower Side Over
-					x = 166, y = 23, width = 110, height = 24 },
-				{   -- frame 16 = LowerDX Corner Over
-					x = 280, y = 23, width = 20, height = 24 }
-			},
-			sheetContentWidth = 300,
-			sheetContentHeight = 46
-		}
-		
-	utility.buttonSheet = graphics.newImageSheet( visual.buttonSheet, buttonOptions )
 
 	-- volume slider sheet
 	local sliderOptions = {

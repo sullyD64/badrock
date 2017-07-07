@@ -79,6 +79,7 @@ local buy = {}
         print ("Ho sbloccato la skin "..buttonId.."?")
         print (myData.settings.skins[buttonId].unlocked)
         transpBtn:removeSelf()
+        backBtn:setEnabled(true)
         skinBtn.alpha = 1
         buy.panel:hide()
         return true

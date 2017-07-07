@@ -8,19 +8,17 @@ local visual = {
 	
 	panel                  = "visual/misc/panel.png",
 	exitOptionMenu         = "visual/misc/x.png",
-	--exitOptionMenu         = "visual/misc/exitOptionMenu.png",
 	optionButtonDefault    = "visual/misc/settings.png",
 	optionButtonOver       = "visual/misc/settings.png",
-	-- optionButtonDefault    = "visual/misc/ingranaggio.png",
-	-- optionButtonOver       = "visual/misc/ingranaggio.png",
+	menuButtonDefault      = "visual/misc/buttonDefault.png",
+	menuButtonOver         = "visual/misc/buttonOver.png",
 
-	buttonSheet            = "visual/misc/ButtonSpazi.png",
 	sliderSheet            = "visual/misc/volumeSlider.png",
 	checkboxSheet          = "visual/misc/checkbox.png",
-	confirmImg				  = "visual/misc/ok.png",
-	retryImg					  = "visual/misc/retry.png",
-	nextLevelImg			  = "visual/misc/nextLevel.png",		
-	backToMenuImg			  = "visual/misc/menuLink.png",
+	confirmImg			   = "visual/misc/ok.png",
+	retryImg			   = "visual/misc/retry.png",
+	nextLevelImg		   = "visual/misc/nextLevel.png",		
+	backToMenuImg		   = "visual/misc/menuLink.png",
 
 	menuBackground         = "visual/misc/MenuBackground.jpg",
 	titleLogo              = "visual/misc/LogoShadow.png",
@@ -28,7 +26,6 @@ local visual = {
 
 	levelSelectBackground  = "visual/misc/LevelBG.png",
 	levelSelectStar        = "visual/misc/star.png",
-	--levelIconBg            = "visual/misc/levelIconBg.png",
 
 	dpadLeft               = "visual/ui/dpadLeft2unpressed.png",
 	dpadLeft_over          = "visual/ui/dpadLeft2.png",

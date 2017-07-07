@@ -22,8 +22,8 @@ local abt = {}
 	abt.panel = utility.newPanel{
 		location = "custom",
 		onComplete = panelTransDone,
-		width = display.contentWidth * 0.35,
-		height = display.contentHeight * 0.65,
+		width = 250,--display.contentWidth * 0.35,
+		height = 260,--display.contentHeight * 0.65,
 		speed = 250,
 		anchorX = 0.5,
 		anchorY = 1.0,
@@ -36,6 +36,10 @@ local abt = {}
 		abt.panel:insert( abt.panel.background )
 
 	abt.panel.title = display.newText( "About", 0, -70, utility.font, 15 )
+	abt.panel.title:setFillColor( 1, 1, 1 )
+	abt.panel:insert( abt.panel.title )
+
+	abt.panel.title = display.newText( "Creato da:", 0, -40, utility.font, 15 ) --che scriviamo qui?
 	abt.panel.title:setFillColor( 1, 1, 1 )
 	abt.panel:insert( abt.panel.title )
 
