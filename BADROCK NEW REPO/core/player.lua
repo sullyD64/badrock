@@ -96,7 +96,7 @@ function player.loadPlayer( currentGame )
 		local player = entity.newEntity{
 			graphicType = "static",
 			filePath = visual.steveImage,
-			width = 30,
+			width = 20,
 			height = 30,
 			bodyType = "dynamic",
 			physicsParams = { density=1.0, friction=0.7, bounce=0.01, },

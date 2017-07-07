@@ -44,15 +44,15 @@ function result.setGame( currentGame, gameStates, outcome )
 
 	if (outcome == "Completed") then
 		-- decide che testo viene mostrato a schermo
-		result.panel.finalText.text = "You \n win!"
-		result.panel.finalText:setFillColor( 0.75, 0.8, 1 )
+		result.panel.finalText.text = "You win!"
+		result.panel.finalText:setFillColor( 0, 0.7, 0)--0.75, 0.8, 1 )
 
 		--abilita o disabilita il tasto per passare al livello successivo
 		-- meglio se outcome è completed o mydata.score già esiste?
 		result.panel.nextLevelBtn.alpha = 1,
 		result.panel.nextLevelBtn:setEnabled( true )
 
-		result.panel.score.text = game.score --myData.settings.levels[game.currentLevel].score
+		--result.panel.score.text = game.score --myData.settings.levels[game.currentLevel].score  --QUA
 		
 	elseif (outcome == "Failed") then
 		result.panel.finalText.text = "Level Failed"
@@ -119,8 +119,8 @@ end
 	result.panel = utility.newPanel{
 			location = "custom",
 			onComplete = panelTransDone,
-			width = display.contentWidth * 0.35,
-			height = display.contentHeight * 0.65,
+			width = 220,--display.contentWidth * 0.35,
+			height = 260,--display.contentHeight * 0.65,
 			speed = 250,
 			anchorX = 0.5,
 			anchorY = 1.0,
@@ -133,19 +133,14 @@ end
 			result.panel:insert( result.panel.background )
 
 	-- Create the buttons ------------------------------------------------------------
+		
 		-- Create the return to menu button
 		result.panel.menuBtn = widget.newButton {
-			--label = "Menu",
 			onRelease = onMenuBtnRelease,
 			emboss = false,
-			--shape = "roundedRect",
 			defaultFile = visual.backToMenuImg,
-			width = 26,
-			height = 27,
-			--cornerRadius = 2,
-			--fillColor = { default={0.78,0.79,0.78,1}, over={1,0.1,0.7,0.4} },
-			--strokeColor = { default={0,0,0,1}, over={0.8,0.8,1,1} },
-			--strokeWidth = 1,
+			width = 35,
+			height = 37,
 			}
 			result.panel.menuBtn.x= -50
 			result.panel.menuBtn.y = result.panel.contentCenterY
@@ -153,38 +148,23 @@ end
 			--print("livelloP "..lvl)
 
 		result.panel.retryBtn = widget.newButton {
-			--label = "Retry",
-			--fontSize = 10,
-			--labelColor = { default={0}, over={1} },
 			onRelease = onRetryBtnRelease,
 			defaultFile = visual.retryImg,
 			emboss = false,
-			--shape = "roundedRect",
 			width = 26,
 			height = 27,
 			cornerRadius = 2,
-			--fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
-			--strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
-			--strokeWidth = 1,
 			}
 			result.panel.retryBtn.x= -20
 			result.panel.retryBtn.y = result.panel.contentCenterY
 			result.panel:insert(result.panel.retryBtn)
 
 		result.panel.nextLevelBtn = widget.newButton {
-			-- label = "Next",
-			-- fontSize = 10,
-			-- labelColor = { default={0}, over={1} },
 			onRelease = onNextLevelBtnRelease,
 			defaultFile = visual.nextLevelImg,
 			emboss = false,
-			--shape = "roundedRect",
 			width = 26,
 			height = 27,
-			-- cornerRadius = 2,
-			-- fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
-			-- strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
-			-- strokeWidth = 1,
 			}
 			result.panel.nextLevelBtn.x= 10
 			result.panel.nextLevelBtn.y = result.panel.contentCenterY
@@ -194,12 +174,12 @@ end
 
 	-- Create text result, score, and stars ------------------------------------------
 		
-		result.panel.finalText= display.newText ("", 10, -70, utility.font, 16)
+		result.panel.finalText= display.newText ("", 5, -92, utility.font, 17)
 		result.panel:insert( result.panel.finalText )
 
-		result.panel.score = display.newText( "", 0, -100, utility.font, 15 )
-		result.panel.score:setFillColor( 1, 1, 1 )
-		result.panel:insert( result.panel.score )
+		-- result.panel.score = display.newText( "", 0, -100, utility.font, 15 )  -- QUA
+		-- result.panel.score:setFillColor( 1, 1, 1 )
+		-- result.panel:insert( result.panel.score )
 
 		-- Generate the star
 		result.panel.star = {}

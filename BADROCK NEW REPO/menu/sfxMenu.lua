@@ -68,8 +68,8 @@ end
 opt.panel = utility.newPanel{
 	location = "custom",
 	onComplete = panelTransDone,
-	width = display.contentWidth * 0.35,
-	height = display.contentHeight * 0.65,
+	width = 250,--display.contentWidth * 0.35,
+	height = 260, --display.contentHeight * 0.65,
 	speed = 250,
 	anchorX = 0.5,
 	anchorY = 1.0,

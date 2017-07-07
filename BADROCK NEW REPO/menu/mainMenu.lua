@@ -19,7 +19,7 @@ local sfx      = require ( "audio.sfx"        )
 local scene = composer.newScene()
 
 -- forward declarations and other locals
-local playBtn, optionBtn, shopBtn
+local playBtn, optionBtn
 
 -- Menu Buttons ----------------------------------------------------------------------
 
@@ -35,22 +35,13 @@ local playBtn, optionBtn, shopBtn
 		return true
 	end
 
-	local function onShopBtnRelease()
-		-- go to level1.lua scene
-		--audio.stop()
-		composer.removeScene( "levels.level1" )
-		audio.fadeOut(1,140)
-		composer.gotoScene( "levels.level1", "fade", 280 )
-		return true
-	end
-
 	local function onOptionBtnRelease()
 		-- open options panel
 		genMenu.setToEnableButtons(optionBtn, playBtn)
 		optionBtn:setEnabled(false)
 		playBtn:setEnabled(false)
 		genMenu.panel:show({
-			y = display.actualContentHeight-60,})
+			y = display.actualContentHeight - 30,})
 		return true
 	end
 
@@ -63,7 +54,7 @@ local playBtn, optionBtn, shopBtn
 				width = 26,
 				height = 27,
 				defaultFile = visual.optionButtonDefault,
-				overFile = visual.optionButtonOver
+				overFile = visual.optionButtonOver,
 			}
 			optionBtn.anchorX = 0
 			optionBtn.anchorY = 0
@@ -73,74 +64,23 @@ local playBtn, optionBtn, shopBtn
 		-- Play button (go to level select)
 		playBtn = widget.newButton 
 			{
-				width = 150,
+				width = 135,
 				height = 38,
-				sheet = utility.buttonSheet,
-				topLeftFrame = 1,
-				topMiddleFrame = 2,
-				topRightFrame = 3,
-				middleLeftFrame = 4,
-				bottomLeftFrame = 5,
-				bottomMiddleFrame = 6,
-				bottomRightFrame = 7,
-				middleRightFrame = 8,
-				middleFrame = 9,
-				topLeftOverFrame = 10,
-				topMiddleOverFrame = 11,
-				topRightOverFrame = 12,
-				middleLeftOverFrame = 13,
-				middleOverFrame = 14,
-				middleRightOverFrame = 15,
-				bottomLeftOverFrame = 16,
-				bottomMiddleOverFrame = 17,
-				bottomRightOverFrame = 18,
+				defaultFile = visual.menuButtonDefault,
+				overFile = visual.menuButtonOver,
 
 				label = "Play",
-				font = "Berlin Sans FB Regular.ttf",
+				font = utility.font,
 				fontSize = 20,
 				labelColor = { default={1}, over={128} },
 				onRelease = onPlayBtnRelease    
 			}
-			playBtn.anchorX = 0
-			playBtn.anchorY = 0
-			playBtn.x =  display.screenOriginX -20 
-			playBtn.y = display.contentHeight - 90
+			playBtn.anchorX = 0.5
+			playBtn.anchorY = 0.5
+			playBtn.x =  display.contentCenterX --display.screenOriginX -20 
+			playBtn.y = display.contentHeight - 40 --90
 
-		-- Shop button, go to the shop scene, for now it goes to the test level
-		shopBtn = widget.newButton 
-			{
-				width = 150,
-				height = 38,
-				sheet = utility.buttonSheet,
-				topLeftFrame = 1,
-				topMiddleFrame = 2,
-				topRightFrame = 3,
-				middleLeftFrame = 4,
-				bottomLeftFrame = 5,
-				bottomMiddleFrame = 6,
-				bottomRightFrame = 7,
-				middleRightFrame = 8,
-				middleFrame = 9,
-				topLeftOverFrame = 10,
-				topMiddleOverFrame = 11,
-				topRightOverFrame = 12,
-				middleLeftOverFrame = 13,
-				middleOverFrame = 14,
-				middleRightOverFrame = 15,
-				bottomLeftOverFrame = 16,
-				bottomMiddleOverFrame = 17,
-				bottomRightOverFrame = 18,
-				label = "Play",
-				font = "ITCKRIST.TTF",
-				fontSize = 20,
-				labelColor = { default={1}, over={128} },
-				onRelease = onShopBtnRelease                -- !!!!TO DO!!!!
-			}
 
-			shopBtn.anchorX = 0
-			shopBtn.anchorY = 0
-			shopBtn.x =  display.contentWidth -130
-			shopBtn.y = display.contentHeight - 90
 	-- -------------------------------------------------------------------------------
 -- -----------------------------------------------------------------------------------
 
@@ -162,12 +102,12 @@ local playBtn, optionBtn, shopBtn
 		-- Load the logo
 		local titleLogo = display.newImageRect( visual.titleLogo, 343, 123 )
 		titleLogo.x = display.contentCenterX
-		titleLogo.y = 100
+		titleLogo.y = 70
 
 		-- Load menuSteveImage 																	!!!!!!!!!!!
 		local steveImage = display.newImageRect( visual.menuSteveImage, display.actualContentWidth/4.4, display.actualContentWidth/4.3)--115, 113)
 		steveImage.x = display.contentCenterX
-		steveImage.y = display.contentCenterY + 25
+		steveImage.y = display.contentCenterY +10
 		steveImage.direction = 1
 
 		-- Loop Steve image
@@ -187,7 +127,6 @@ local playBtn, optionBtn, shopBtn
 		sceneGroup:insert( titleLogo )
 		sceneGroup:insert( playBtn )
 		sceneGroup:insert( optionBtn )
-		sceneGroup:insert( shopBtn )
 		sceneGroup:insert( steveImage )
 		
 	end
@@ -224,7 +163,6 @@ local playBtn, optionBtn, shopBtn
 		playBtn:removeSelf()    -- widgets must be manually removed
 		playBtn = nil
 		optionBtn:removeSelf()
-		shopBtn:removeSelf()
 
 		-----------------------------------------------------------------------------
 		-- The reason to prefer the latter here is because, while having the the same

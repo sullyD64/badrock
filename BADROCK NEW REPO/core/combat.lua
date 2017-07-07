@@ -21,6 +21,7 @@ local combat = {
 	map = {},
 	player = {},
 	ammo,
+	timers = {}, -- stores all the timers for allowing game to control them
 	stopAnimation = false,
 	performingAttack = false,
 }
@@ -147,7 +148,7 @@ function combat.cancel()
 	player.attack.sprite.isVisible = false
 
 	if (player.isImmune) then
-		timer.cancel(combat.immunityTimer)
+		timer.cancel(combat.timers.immunityTimer)
 		-- audio ----------------------------------------
 		sfx.toggleAlternativeBgm("off")
 		-------------------------------------------------
@@ -182,7 +183,7 @@ end
 					end
 				})
 
-			combat.immunityTimer = timer.performWithDelay(player.immunityDuration,
+			combat.timers.immunityTimer = timer.performWithDelay(player.immunityDuration,
 				function()
 					-- audio ----------------------------------------
 					sfx.toggleAlternativeBgm("off")
@@ -341,7 +342,7 @@ end
 			player.attack.type = "bullet"
 			player.attackDuration = 100
 
-			timer.performWithDelay(player.attackDuration, handleAttackEnd)
+			combat.timers.endTimer = timer.performWithDelay(player.attackDuration, handleAttackEnd)
 		end
 	---------------------------------------------------------------------------------
 
@@ -493,7 +494,7 @@ end
 			end
 			player.attack.sprite:addEventListener("sprite", spinningPhase)
 
-			local endPhase = timer.performWithDelay(player.attackDuration - 300, 
+			combat.timers.endPhaseTimer = timer.performWithDelay(player.attackDuration - 300, 
 				function()
 					player.attack.sprite:removeEventListener( "sprite", spinningPhase )
 					player.attack.sprite:setSequence("ending")
@@ -504,9 +505,9 @@ end
 
 		if (combat.stopAnimation) then
 			player.attack.sprite:removeEventListener( "sprite", spinningPhase )
-			timer.cancel(endPhase)
+			timer.cancel(combat.timers.endPhaseTimer)
 		else
-			timer.performWithDelay(player.attackDuration, handleAttackEnd)
+			combat.timers.endTimer = timer.performWithDelay(player.attackDuration, handleAttackEnd)
 		end
 	end
 ------------------------------------------------------------------------------------

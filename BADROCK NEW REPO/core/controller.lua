@@ -25,6 +25,7 @@ local controller = {
 	i, j, 						-- both are needed for the variable jump height
 	deathBeingHandled,
 	noMovementDetected,		-- needed for resetting the player's state to IDLE
+	pauseBeingHandled = false,  -- needed for calling game.pause() only once
 }
 
 local game = {}
@@ -238,7 +239,7 @@ local sState = {}
 					ui.buttons.pause.isVisible = false
 					ui.buttons.resume.isVisible = true
 					-----------------------------------------------------
-					pauseMenu.panel:show({y = display.screenOriginY+225})
+					pauseMenu.panel:show({ y = display.actualContentHeight - 30})--y=display.screenOriginY+225})
 					-----------------------------------------------------
 				elseif (event.target.id == "resumeBtn") then
 					game.state = gState.RESUMED
@@ -274,7 +275,7 @@ local sState = {}
 		ui.buttons.action.active = false
 		controller.pauseEnabled = false
 
-		if (steve.state == sState.ATTACKING) then steve:cancelAttack()	end
+		steve:cancelAttack()
 		---------------------------------------
 		-- If GameOver was triggered by onDeath
 		if (controller.deathBeingHandled == true) then
@@ -296,7 +297,7 @@ local sState = {}
 				-- so in these cases the endgame menu will not be shown.
 				if (game.state ~= gState.TERMINATED) then
 					gameResult.setGame(game, gState, outcome)
-					gameResult.panel:show({ y = display.actualContentHeight,})
+					gameResult.panel:show({ y = display.actualContentHeight - 30,})
 				else
 					-- The declaration below triggers the final call in the game loop
 					game.state = gState.ENDED

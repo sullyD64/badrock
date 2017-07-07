@@ -31,7 +31,7 @@ end
 	local function onSoundMenuBtnRelease()  
 		--transition.fadeOut( pause.panel, { time=100 } )
 		sfxMenu.panel:show({
-			 y = display.screenOriginY+225,
+			 y = display.actualContentHeight - 30,--y = display.screenOriginY+225,
 			 time =250})
 		return true
 	end
@@ -77,8 +77,8 @@ end
 	pause.panel = utility.newPanel{
 			location = "custom",
 			onComplete = panelTransDone,
-			width = display.contentWidth * 0.35,
-			height = display.contentHeight * 0.65,
+			width = 250,--display.contentWidth * 0.35,
+			height = 260,--display.contentHeight * 0.65,
 			speed = 250,
 			anchorX = 0.5,
 			anchorY = 1.0,

@@ -32,7 +32,7 @@ local opt = {}
 	local function onAboutBtnRelease()  
 		--transition.fadeOut( opt.panel, { time=100 } )
 		aboutMenu.panel:show({
-		y = display.actualContentHeight-60,
+		y = display.actualContentHeight-30,
 		time =250})
 		return true
 	end
@@ -40,7 +40,7 @@ local opt = {}
 		local function onSoundMenuBtnRelease()  
 	--transition.fadeOut( opt.panel, { time=100 } )
 	sfxMenu.panel:show({
-		y = display.actualContentHeight-60,
+		y = display.actualContentHeight-30,
 		time =250})
 	return true
 	end
@@ -49,8 +49,8 @@ local opt = {}
 	opt.panel = utility.newPanel{
 		location = "custom",
 		onComplete = panelTransDone,
-		width = display.contentWidth * 0.35,
-		height = display.contentHeight * 0.65,
+		width = 220,--display.contentWidth * 0.35,
+		height = 260,--display.contentHeight * 0.65,
 		speed = 250,
 		anchorX = 0.5,
 		anchorY = 1.0,
@@ -65,9 +65,12 @@ local opt = {}
 	--optPanel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
 	opt.panel:insert( opt.panel.background )
 
-	opt.panel.title = display.newText( "Settings", 0, -70, utility.font, 15 )
-	opt.panel.title:setFillColor( 1, 1, 1 )
+	opt.panel.title = display.newText( "Settings", 5, -93, utility.font, 20 )
+	opt.panel.title:setFillColor( 0, 0, 0 )
 	opt.panel:insert( opt.panel.title )
+	opt.panel.titleShadow = display.newText( "Settings", 5, -93, utility.font, 21 )
+	opt.panel.titleShadow:setFillColor( 1, 1, 1 )
+	opt.panel:insert( opt.panel.titleShadow )
 
 -- Create the buttons ------------------------------------------------------------
 
@@ -80,8 +83,8 @@ local opt = {}
 			defaultFile = visual.exitOptionMenu,
 			--overFile = "buttonOver.png",
 			}
-		opt.panel.returnMenuBtn.x= 60
-		opt.panel.returnMenuBtn.y = -30
+		opt.panel.returnMenuBtn.x= 100
+		opt.panel.returnMenuBtn.y = -75
 		opt.panel:insert(opt.panel.returnMenuBtn)
 
 	-- Create the about button

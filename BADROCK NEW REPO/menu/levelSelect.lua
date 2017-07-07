@@ -57,25 +57,8 @@ local buttons = {}
 		backButton = widget.newButton({
 			width = 40,
 			height = 38,
-			sheet = utility.buttonSheet,
-			topLeftFrame = 1,
-			topMiddleFrame = 2,
-			topRightFrame = 3,
-			middleLeftFrame = 4,
-			bottomLeftFrame = 5,
-			bottomMiddleFrame = 6,
-			bottomRightFrame = 7,
-			middleRightFrame = 8,
-			middleFrame = 9,
-			topLeftOverFrame = 10,
-			topMiddleOverFrame = 11,
-			topRightOverFrame = 12,
-			middleLeftOverFrame = 13,
-			middleOverFrame = 14,
-			middleRightOverFrame = 15,
-			bottomLeftOverFrame = 16,
-			bottomMiddleOverFrame = 17,
-			bottomRightOverFrame = 18,
+			defaultFile = visual.menuButtonDefault,
+			overFile = visual.menuButtonOver,
 			id = "back",
 			label = "B",
 			labelColor = { default={1}, over={128} },
@@ -89,25 +72,8 @@ local buttons = {}
 		skinButton = widget.newButton({
 			width = 70,
 			height = 38,
-			sheet = utility.buttonSheet,
-			topLeftFrame = 1,
-			topMiddleFrame = 2,
-			topRightFrame = 3,
-			middleLeftFrame = 4,
-			bottomLeftFrame = 5,
-			bottomMiddleFrame = 6,
-			bottomRightFrame = 7,
-			middleRightFrame = 8,
-			middleFrame = 9,
-			topLeftOverFrame = 10,
-			topMiddleOverFrame = 11,
-			topRightOverFrame = 12,
-			middleLeftOverFrame = 13,
-			middleOverFrame = 14,
-			middleRightOverFrame = 15,
-			bottomLeftOverFrame = 16,
-			bottomMiddleOverFrame = 17,
-			bottomRightOverFrame = 18,
+			defaultFile = visual.menuButtonDefault,
+			overFile = visual.menuButtonOver,
 			id = "skins",
 			label = "Skins",
 			font = utility.font,
@@ -143,7 +109,7 @@ local buttons = {}
 
 		sceneGroup:insert( background )
 
-		local title = display.newText( "Select a level", display.contentCenterX, display.screenOriginY + 40, utility.font, 20 )
+		local title = display.newText( "Select a level", display.contentCenterX, display.screenOriginY + 40, utility.font, 25 )
 		title:setFillColor( 1, 1, 1 )
     	sceneGroup:insert( title )
 
