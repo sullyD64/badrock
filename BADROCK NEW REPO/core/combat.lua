@@ -422,7 +422,7 @@ end
 		-- Loads the sprite and animation sequences
 			local sprite = entity.newEntity{
 				graphicType = "animated",
-				filePath = visual.darkSteveAttack, --visual.steveAttack
+				filePath = visual.darkSteveAttack, --visual.steveAttack --visual.superSteveAttack
 				spriteOptions = settings.melee.sheetData,
 				spriteSequence = settings.melee.sequenceData,
 				notPhysical = true,
