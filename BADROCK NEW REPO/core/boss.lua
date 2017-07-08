@@ -183,7 +183,7 @@ local boss = {
 	
 		local carota = entity.newEntity{
 			filePath = visual.npcImage,
-			width = 15,
+			width = 25,
 			height = 40,
 		 	physicsParams = { bounce = 1, friction = 1.0, density = 1.0 , filter = filters.enemyHitboxFilter},
 			eName = "boss"
@@ -327,9 +327,11 @@ local boss = {
 
 		local function removePhysicBody(oggetto)
 			oggetto.isBodyActive=false
+			oggetto:setFillColor(50,50,0)
 		end
 		local function addPhysicBody(oggetto)
 			oggetto.isBodyActive=true
+			oggetto:setFillColor(1)
 		end
 
 		local function schiaccia(targetX)

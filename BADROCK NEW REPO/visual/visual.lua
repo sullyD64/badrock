@@ -44,6 +44,9 @@ local visual = {
 	steveImage             = "visual/sprites/rock_original.png",
 	steveAttack            = "visual/sprites/attackSprite.png",
 	steveGun               = "visual/sprites/pup_gun.png",
+	-- Steve Dark Skin
+	darkSteveAttack        = "visual/sprites/darkSkinAttack.png",
+	darkSteveSheetWalking  = "visual/sprites/darkSkinAnim.png",
 
 	bullet                 = "visual/sprites/bullet.png",
 
