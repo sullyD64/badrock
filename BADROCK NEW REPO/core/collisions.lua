@@ -178,6 +178,12 @@ end
 			player.canJump = true
 			player.isAirborne = false 
 			player.hasTouchedGround = true
+
+			if (environment.isMovingPlatform and event.contact.isEnabled) then
+				player.isOnMovingPlatform = true
+			else
+				player.isOnMovingPlatform = false
+			end
 		end
 
 		if(environment.type == "event") then

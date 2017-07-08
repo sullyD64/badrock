@@ -61,7 +61,7 @@ function result.setGame( currentGame, gameStates, outcome )
 		result.panel.nextLevelBtn.alpha = 0.3, -- possibile mettere anche un'immagine diversa, da decidere
 		result.panel.nextLevelBtn:setEnabled( false )
 
-		result.panel.score.text = ""
+		-- result.panel.score.text = ""   -- [L'ho commentato io, dava problemi]
 	end
 	result.setStars(game, outcome)
 

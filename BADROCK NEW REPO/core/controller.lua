@@ -120,6 +120,7 @@ local sState = {}
 					steve.canJump = false
 					steve.isAirborne = true
 					steve.hasTouchedGround = false
+					steve.isOnMovingPlatform = false
 				--------------------------------------------------------		
 			
 			elseif (event.phase == "ended" or "cancelled" == event.phase) then
@@ -275,7 +276,9 @@ local sState = {}
 		ui.buttons.action.active = false
 		controller.pauseEnabled = false
 
-		steve:cancelAttack()
+		if (steve.attack) then
+			steve:cancelAttack()
+		end
 		---------------------------------------
 		-- If GameOver was triggered by onDeath
 		if (controller.deathBeingHandled == true) then

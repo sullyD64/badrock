@@ -34,6 +34,7 @@ function scene:create( event )
 
 	map = lime.loadMap("testmap_new.tmx")
 	-- map = lime.loadMap("BossMapTest.tmx")
+	-- map = lime.loadMap("level_1.tmx")
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 

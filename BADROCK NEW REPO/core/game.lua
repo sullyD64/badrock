@@ -185,6 +185,20 @@ physics.setGravity( 0, 50 )
 						end
 					end
 
+				-- Overrides the previous logic elapsed if the player is on a moving platform.
+					if (game.steve.isOnMovingPlatform and not controller.SSVLaunched) then
+						if (game.steve.sprite.sequence ~= "idle") then
+							game.steve.sprite:setSequence("idle")
+							game.steve.sprite:play()
+						end
+						if (game.steve.airState ~= "idle") then
+							game.steve.airState = "idle"
+						end
+						if (game.steve.isAirborne ~= false) then
+							game.steve.isAirborne = false
+						end
+					end
+
 				-- Jump activation is modified depending on the isAirborne flag.
 					-- Thus, if the player can jump, but starts falling (although he hasn't jumped),
 					-- a jump cannot occur ("jumping in mid air").
@@ -561,7 +575,6 @@ physics.setGravity( 0, 50 )
 		-----------------------------------------------------------
 
 		game:loadBoss(util.getBossTrigger(game.map))
-		-- util.preparePlatforms(game.map)
 
 		physics.start()
 		physics.pause()
@@ -584,7 +597,6 @@ function game.start()
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 	dbtimer = timer.performWithDelay(200, debug, 0)
-	-- util.movePlatforms(game.map, "on")
 
 	-- local pippo = {
 	-- 	x = game.spawnPoint.x + 50,
@@ -601,7 +613,6 @@ end
 function game.pause()
 	physics.pause()
 	controller:pause()
-	-- util.movePlatforms(game.map, "off")
 
 	if (game.steve.attack and game.steve.attack.sprite) then
 		game.steve.attack.sprite:pause()
@@ -634,7 +645,6 @@ end
 function game.resume()
 	physics.start()
 	controller:start()
-	-- util.movePlatforms(game.map, "on")
 
 	if (game.steve.attack and game.steve.attack.sprite) then
 		game.steve.attack.sprite:play()

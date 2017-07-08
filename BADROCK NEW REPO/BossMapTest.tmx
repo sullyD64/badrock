@@ -385,12 +385,6 @@
   <object id="25" name="bossSpawn" x="1167" y="372"/>
  </objectgroup>
  <objectgroup name="events">
-  <object id="33" name="wall" x="384" y="512">
-   <polyline points="0,0 0,64 32,64 32,0 0,0 0,-0.666667 0,1.33333"/>
-  </object>
-  <object id="36" name="wall" x="672" y="480">
-   <polyline points="0,0 0,96 32,96 32,0 0,0"/>
-  </object>
   <object id="37" name="bossTrigger" type="event" x="611" y="510">
    <properties>
     <property name="BodyType" value="static"/>
