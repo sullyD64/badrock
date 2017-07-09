@@ -44,7 +44,7 @@ local visual = {
 	steveImage             = "visual/sprites/rock_original.png",
 	steveAttack            = "visual/sprites/attackSprite.png",
 	steveGun               = "visual/sprites/equipped_gun.png",
-	gun                    = "visual/sprites/gun.png"
+	gun                    = "visual/sprites/gun.png",
 
 	-- Steve Dark Skin
 	darkSteveAttack        = "visual/sprites/darkSkinAttack.png",
@@ -73,10 +73,15 @@ local visual = {
 	itemImmunity           = "visual/sprites/bonus_immunity.png",
 	--itemMetheor          = "visual/misc/metheor.png"
 
-	bossHand               = "visual/sprites/manoBoss.png",
-	bossSpalla             = "visual/sprites/bossSpalla.png",
-	bossTesta              = "visual/sprites/testaBoss.png",
-	bossCorpo              = "visual/sprites/corpoBoss.png",
+	-- bossHand               = "visual/sprites/manoBoss.png",
+	-- bossSpalla             = "visual/sprites/bossSpalla.png",
+	-- bossTesta              = "visual/sprites/testaBoss.png",
+	-- bossCorpo              = "visual/sprites/corpoBoss.png",
+	-- bossLaser              = "visual/sprites/laserSprite.png"
+	bossHand               = "visual/sprites/manoBossAnim.png",
+	bossSpalla             = "visual/sprites/spallaBossSprite.png",
+	bossTesta              = "visual/sprites/testaBossAnim.png",
+	bossCorpo              = "visual/sprites/corpoBossAnim.png",
 	bossLaser              = "visual/sprites/laserSprite.png"
 
 }
