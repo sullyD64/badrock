@@ -211,7 +211,7 @@ physics.setGravity( 0, 80 )
 			end
 		end
 		
-		-- Entity animation: handles the chasers' and walkers' behavior
+		-- Entity animation: handles the chasers' behavior
 		if (game.enemiesLoaded == true and game.lives ~= 0) then
 			-- Iterates the chaser list
 			for i, chaser in pairs(game.chaserList) do
@@ -285,16 +285,7 @@ physics.setGravity( 0, 80 )
 						end
 					end
 				end
-			end
-
-			-- Iterates the walker list [DEPRECATED]
-			-- for i, walker in pairs(game.walkerList) do
-			-- 	if (walker.xScale == 1) then
-			-- 		walker:walkTo( walker.leftBound )
-			-- 	elseif (walker.xScale == -1) then
-			-- 		walker:walkTo( walker.rightBound )
-			-- 	end
-			-- end			
+			end	
 		end
 		-- Handles the runtime events associated with the boss fight
 		-- (if the current level has a boss).
@@ -536,10 +527,6 @@ physics.setGravity( 0, 80 )
 
 		-- Assigns the home to each chaser
 		enemies.assignChaserHomes(self.enemies, self.chaserList)
-
-		-- Assigns the route to each walker [DEPRECATED]
-		-- local routes = self.map:getObjectLayer("walkerRoutes").objects
-		-- enemies.assignWalkerRoutes(self.map, self.walkerList)
 	end
 
 	-- See bossStrategy.lua

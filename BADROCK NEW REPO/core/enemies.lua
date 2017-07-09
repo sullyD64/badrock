@@ -37,8 +37,8 @@ local enemies = {
 				graphicType = "animated",
 				filePath = visual.enemyPaper,
 				spriteOptions = {
-					height = 90,
 					width = 80,
+					height = 90,
 					numFrames = 9,
 					sheetContentWidth = 240,
 					sheetContentHeight = 270 
@@ -49,7 +49,7 @@ local enemies = {
 					{name = "running", start =4, count=5,    time=600, loopCount=0},
 					{name = "dead",    frames={9},           time=500, loopCount=1}
 				},
-				physicsParams = { bounce = 0, friction = 1.0, density = 2.0, },
+				physicsParams = { bounce = 0, friction = 1.0, density = 0.8 },
 				eName = "enemy"
 			}
 		},
@@ -60,10 +60,20 @@ local enemies = {
 			isWalker = true,
 			score = 150,
 			options = {
+				graphicType = "animated",
 				filePath = visual.enemyRobot,
-				width = 130,
-				height = 130,
-				physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
+				spriteOptions = {
+					width = 164,
+					height = 153,
+					numFrames = 3,
+					sheetContentWidth = 493,
+					sheetContentHeight = 153,
+				},
+				spriteSequence = {
+					{name = "walking", frames={1,2}, time=400, loopCount=0},
+					{name = "dead",    frames={3},   time=300, loopCount=1},
+				},
+				physicsParams = { bounce = 0, friction = 1.0, density = 0.5, },
 				eName = "enemy",
 			},
 		},
@@ -325,46 +335,6 @@ local enemies = {
 ------------------------------------------------------------------------------------
 
 -- WALKER-SPECIFIC FUNCTIONS -------------------------------------------------------
-	
-	--[DEPRECATED]
-	-- The walker's target can be either the left or the right border of its route.
-	-- local function walkTo(currentGame, walker, target)
-	-- 	-- if ( (walker.x and walker.y) and target and walker.lives ~=0) then	
-	-- 	-- 	local wXV, wYV = walker:getLinearVelocity()
-			
-	-- 	-- 	-- lBorder and rBorder are the walker's physical borders.
-	-- 	-- 	local lBorder, rBorder = walker.x - walker.width/2, walker.x + walker.width/2
-
-	-- 	-- 	-- If the target is the left bound, the algorithm considers the walker's left
-	-- 	-- 	-- physical border to calculate distance, and vice versa for the right bound.
-	-- 	-- 	if (target == walker.leftBound) then
-	-- 	-- 		if (walker.closestBorder ~= lBorder) then
-	-- 	-- 			walker.closestBorder = lBorder
-	-- 	-- 		end
-	-- 	-- 	elseif (target == walker.rightBound) then
-	-- 	-- 		if (walker.closestBorder ~= rBorder) then
-	-- 	-- 			walker.closestBorder = rBorder
-	-- 	-- 		end
-	-- 	-- 	end
-
-	-- 	-- 	if walker.closestBorder == walker.lastClosestBorder then 
-	-- 	-- 		walker.xScale = - walker.xScale
-	-- 	-- 	end
-
-	-- 	-- 	-- Moves the walker while calculasting the distance between its the target
-	-- 	-- 	-- and the walker's closest border.
-	-- 	-- 	if ( math.abs(walker.closestBorder - target) > 1 ) then
-	-- 	-- 		walker:setLinearVelocity( 180 * - walker.xScale, wYV )
-
-	-- 	-- 		walker.lastClosestBorder = walker.closestBorder
-	-- 	-- 	else
-	-- 	-- 		-- The walker has reached the target. Inverting the walker's xScale will
-	-- 	-- 		-- change its target too.
-	-- 	-- 		walker.xScale = -walker.xScale
-	-- 	-- 	end
-	-- 	-- end
-	-- end
-
 	-- MAIN -------------------------------------------------------------------------
 	local function loadWalker( walker, currentGame, enemy )
 		walker.id = enemy.id
@@ -386,14 +356,12 @@ local enemies = {
 		end
 		walker:addEventListener( "collision", walker )
 
-		-- function walker:walkTo( target )  [DEPRECATED]
-		-- 	-- walkTo(currentGame, self, target)
-		-- end
-
 		transition.to(walker, {time = 500,
 			onComplete = function()
 				walker.bodyType = "kinematic"
 				walker:setLinearVelocity( -walker.speed, 0 )
+				walker:setSequence("walking")
+				walker:play()
 			end
 		})
 	end
@@ -412,32 +380,6 @@ function enemies.assignChaserHomes( enemies, chasers )
 		end
 	end
 end
-
--- [DEPRECATED]
--- function enemies.assignWalkerRoutes( walkers, currentMap )
--- 	-- Each entry in enemies contains the original spawn coordinates of a walker,
--- 	-- while each enemySprite contains the current coordinates (and equals to the walker).
-
--- 	-- If the map specifies a route for the corresponding walker, then the walker's route is 
--- 	-- modeled after the edges of that route. Else a default route is guessed from the 
--- 	-- walker's spawn coordinates.
--- 	-- for i, walker in pairs(walkers) do
--- 	-- 	for k, enemy in pairs(enemies) do
--- 	-- 		if (walker == enemy.enemySprite) then
--- 	-- 			walker.leftBound, walker.rightBound = enemy.x - 64*3, enemy.x + 64*3
-
--- 	-- 			-- Overrides bounds if a route is specified
--- 	-- 			if (enemy.walkerID and routes) then
--- 	-- 				for i, rt in pairs(routes) do
--- 	-- 					if (enemy.walkerID == rt.walkerID) then
--- 	-- 						walker.leftBound, walker.rightBound = rt.x, rt.x + rt.points[5]
--- 	-- 					end
--- 	-- 				end
--- 	-- 			end
--- 	-- 		end
--- 	-- 	end
--- 	-- end
--- end
 
 -- Loads the enemies's images (and sprites) and initializes their attributes.
 -- Visually instantiates the enemies in the current game's map.

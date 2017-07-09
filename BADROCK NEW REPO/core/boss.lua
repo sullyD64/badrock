@@ -246,7 +246,7 @@ local boss = {
 	function boss.spara(lanciatore,target)
 	
 		local carota = entity.newEntity{
-			filePath = visual.npcImage,
+			filePath = visual.bossProjectile,
 			width = 40,
 			height = 60,
 		 	physicsParams = { bounce = 1, friction = 1.0, density = 1.0 , filter = filters.enemyHitboxFilter},
