@@ -23,6 +23,23 @@ local settings = {
 		alpha = 0,	-- 0.5
 		color = {100, 100, 0},
 	},
+	options = {
+		graphicType = "animated",
+		filePath = visual.npcSprite,
+		notPhysical = true,
+		spriteOptions = {
+			height = 152,
+			width = 110,
+			numFrames = 3,
+			sheetContentWidth = 330,
+			sheetContentHeight = 152,
+		},
+		spriteSequence = {
+			{name = "idle",  frames={1}, time=650, loopCount=0},
+			{name = "happy", frames={2}, time=300, loopCount=0},
+			{name = "sad",   frames={3}, time=300, loopCount=0},
+		},
+	},
 }
 
 -- Loads the npcs's images, speech balloons and initializes their attributes.
@@ -33,20 +50,12 @@ function npcs.loadNPCs( currentGame )
 	local npcList = currentMap:getObjectLayer("npcSpawn"):getObjects("npc")
 	if not (npcList) then return end
 
-	-- Loads the main Entity.
+	-- Loads the main animated Entity.
 		local loadNPCEntity = function( npc )
-			local staticImage = entity.newEntity{
-				graphicType = "static",
-				filePath = visual.npcImage,
-				width = 180,
-				height = 216,
-				notPhysical = true,
-				eName = "npc"
-			}		
-			staticImage.x, staticImage.y = npc.x, npc.y
-			staticImage:addOnMap( currentMap )
-
-			return staticImage
+			local sprite = entity.newEntity(settings.options)
+			sprite.x, sprite.y = npc.x, npc.y
+			sprite:addOnMap( currentMap )
+			return sprite
 		end
 
 	-- Loads the speech balloon, the text and the buttons.
@@ -64,10 +73,8 @@ function npcs.loadNPCs( currentGame )
 				speed = 200,
 				x = npc.x - 60,
 				y = npc.y - 40,
-				width = npc.staticImage.width * 3,
-				height = npc.staticImage.height * 3,
-				-- anchorX = 0.5,
-				-- anchorY = 0.5
+				width = npc.sprite.width * 3,
+				height = npc.sprite.height * 3,
 			}
 
 			local background = display.newImageRect( visual.npcBalloonBackground, 279, 197 )
@@ -86,7 +93,7 @@ function npcs.loadNPCs( currentGame )
 			--------------------------------------------------------------------------
 			local onBalloonButtonEvent = function(event)
 				local target = event.target
-				local specialPointsType
+				local choice
 
 				-- Status check prevents from pressing the button when pause menu is overlaying.
 				if (currentGame.state == "Running" and target.active) then
@@ -99,16 +106,21 @@ function npcs.loadNPCs( currentGame )
 							-- audio ----------------------------------------
 							sfx.playSound( sfx.npcGoodSound, { channel = 6 } )
 							-------------------------------------------------
-							specialPointsType = "good"
+							choice = "good"
+							npc.sprite:setSequence("happy")
+							npc.sprite:play()
 						elseif (target.id == "npcButton2") then
 							-- audio ----------------------------------------
 							sfx.playSound( sfx.npcEvilSound, { channel = 6 } )
 							-------------------------------------------------
-							specialPointsType = "evil"
-						end
+							choice = "evil"
 
+							npc.sprite:setSequence("sad")
+							npc.sprite:play()
+						end
+						-------------------------------------------
 						currentGame.addScore(1000)
-						currentGame.addSpecialPoints(5, specialPointsType)
+						currentGame.addSpecialPoints(5, choice)
 						-------------------------------------------
 
 						-- Removes the associated npc from the current game
@@ -123,16 +135,36 @@ function npcs.loadNPCs( currentGame )
 								end
 
 								-- Animation: npc flies up in the sky
-								transition.to(npc.staticImage, { time = 1000, 
-									y = npc.y - 1000, alpha = 0, transition = easing.inCubic,
-									onComplete = function()
-										display.remove(npc.staticImage)
-										display.remove(npc.balloon)
-										npc:destroy()
-										table.remove(currentGame.npcs, i)		
-										npc = nil
-									end
-								})
+								if (choice == "good") then
+									transition.to(npc.sprite, { time = 1000, 
+										y = npc.y - 1000, alpha = 0, transition = easing.inQuart,
+										onComplete = function()
+											display.remove(npc.sprite)
+											display.remove(npc.balloon)
+											npc:destroy()
+											table.remove(currentGame.npcs, i)		
+											npc = nil
+										end
+									})
+								-- Animation: npc falls off the map
+								elseif (choice == "evil") then
+									transition.to(npc.sprite, { time = 0,
+										onComplete = function()
+											physics.addBody( npc.sprite, "dynamic", {isSensor = true, density = 0.1} )
+											npc.sprite:applyLinearImpulse( 0, -40, npc.sprite.x, npc.sprite.y )
+											npc.sprite:applyTorque( - 2000 )
+										end
+									})
+									transition.to(npc.sprite, { time = 1000, 
+										onComplete = function()
+											display.remove(npc.sprite)
+											display.remove(npc.balloon)
+											npc:destroy()
+											table.remove(currentGame.npcs, i)		
+											npc = nil
+										end
+									})
+								end
 							end
 						end
 					elseif (event.phase == "ended" or "cancelled" == event.phase) then
@@ -164,16 +196,13 @@ function npcs.loadNPCs( currentGame )
 
 			button1.active = true
 			button2.active = true
-
 			button1:addEventListener( "touch", onBalloonButtonEvent )
 			button2:addEventListener( "touch", onBalloonButtonEvent )
 
 			balloon.button1 = button1
 			balloon.button2 = button2
-
 			balloon:insert(button1)
 			balloon:insert(button2)
-
 			balloon.x, balloon.y = npc.x, npc.y -20
 			balloon.alpha = 0
 			balloon:hide()
@@ -219,7 +248,7 @@ function npcs.loadNPCs( currentGame )
 		end
 
 	for k, npc in pairs(npcList) do
-			npc.staticImage = loadNPCEntity(npc)
+			npc.sprite = loadNPCEntity(npc)
 			npc.balloon = loadBalloon(npc)
 			npc.sensorN = loadSensor(npc)
 	end
