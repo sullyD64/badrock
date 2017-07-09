@@ -52,7 +52,7 @@ local sState = {}
 		-----------------------------
 		local steveXV, steveYV = steve:getLinearVelocity()
 			
-		if (steve.jumpForce > -400 and controller.j ~= 0) then
+		if (steve.jumpForce > -800 and controller.j ~= 0) then
 			-- In both cases (x-movement or y-movement), we set the character's linear velocity 
 			-- at each frame, overriding one of the two linear velocities when a movement is input.
 			if (steve.actualspeedX ~= 0) then
@@ -113,10 +113,10 @@ local sState = {}
 				--------------------------------------------------------
 
 				-- physics ---------------------------------------------
-					steve.jumpForce = - 200
+					steve.jumpForce = - 400
 					Runtime:addEventListener("enterFrame", makeSteveJump)
 					controller.i = 0
-					controller.j = 16
+					controller.j = 22
 					steve.canJump = false
 					steve.isAirborne = true
 					steve.hasTouchedGround = false
@@ -160,7 +160,7 @@ local sState = {}
 						steve.direction = 1
 					end
 					--controller.SSVEnabled = true
-					steve.walkForce = 150
+					steve.walkForce = 300
 					controller.SSVType = "walk"
 					Runtime:addEventListener("enterFrame", makeSteveMove)
 					steve.actualSpeedX = steve.direction * steve.walkForce
@@ -408,7 +408,7 @@ local sState = {}
 	function controller.addScore(points)
 		game.score = game.score + points
 		ui.buttons.score:setLabel("Score: "..game.score)
-		local textTimer = 250
+		local textTimer = 500
 		local scoreUp = ui.buttons.scoreUp
 
 		if (scoreUp.isVisible == false) then
@@ -425,7 +425,7 @@ local sState = {}
 		if(game.lives < game.MAX_LIVES ) then
 			game.lives = game.lives + 1
 			ui.updateLifeIcons(game.lives)
-			local textTimer = 250
+			local textTimer = 500
 			local lifeUp = ui.buttons.lifeUp
 
 			if (lifeUp.isVisible == false) then

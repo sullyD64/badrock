@@ -15,17 +15,17 @@ local player = {}
 local settings = {
 
 	mainSensorOpts = {
-		radius = 50,
+		radius = 100,
 		alpha = 0, --0.5
 		color = {20, 50, 200},
 	},
 
 	mainSheetData = {
-		height = 50,
-		width = 30,
+		height = 100,
+		width = 60,
 		numFrames = 10,
-		sheetContentWidth = 300,
-		sheetContentHeight = 50 
+		sheetContentWidth = 600,
+		sheetContentHeight = 100 
 	},
 
 	mainSequenceData = {
@@ -48,9 +48,9 @@ local settings = {
 		local numRocks = 10
 		
 		for i = 1, numRocks, 1 do
-			local dim = math.random (2, 10)
-			local directionX = math.random(-1, 1)
-			local directionY = math.random(-1, 1)
+			local dim = math.random (4, 20)
+			local directionX = math.random(-5, 5)
+			local directionY = math.random(-5, 5)
 			local frag = entity.newEntity{
 				filePath = visual.lifeIcon,
 				width = dim,
@@ -96,18 +96,18 @@ function player.loadPlayer( currentGame )
 		local player = entity.newEntity{
 			graphicType = "static",
 			filePath = visual.steveImage,
-			width = 20,
-			height = 30,
+			width = 40,
+			height = 60,
 			bodyType = "dynamic",
 			physicsParams = { density=1.0, friction=0.7, bounce=0.01, },
-			alpha = 0,
+			alpha = 0, 					-- Raise it for hitbox debugging
 			isFixedRotation = true,
 			eName = "steve"
 		}
 	-- Loads Sprite and animation sequences
 		local sprite = entity.newEntity{
 			graphicType = "animated",
-			filePath = visual.darkSteveSheetWalking, --visual.steveSheetWalking
+			filePath = visual.steveSheetWalking, --visual.steveSheetWalking
 			spriteOptions = settings.mainSheetData,
 			spriteSequence = settings.mainSequenceData,
 			notPhysical = true,

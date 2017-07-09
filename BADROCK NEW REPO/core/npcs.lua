@@ -19,7 +19,7 @@ local npcs = {}
 
 local settings = {
 	sensorOpts = {
-		radius = 40,
+		radius = 80,
 		alpha = 0,	-- 0.5
 		color = {100, 100, 0},
 	},
@@ -38,8 +38,8 @@ function npcs.loadNPCs( currentGame )
 			local staticImage = entity.newEntity{
 				graphicType = "static",
 				filePath = visual.npcImage,
-				width = 90,
-				height = 108,
+				width = 180,
+				height = 216,
 				notPhysical = true,
 				eName = "npc"
 			}		
@@ -62,19 +62,25 @@ function npcs.loadNPCs( currentGame )
 				location = "static",
 				-- onComplete = panelTransDone,
 				speed = 200,
-				x = npc.x + 60,
-				y = npc.y - 20,
+				x = npc.x - 60,
+				y = npc.y - 40,
+				width = npc.staticImage.width * 3,
+				height = npc.staticImage.height * 3,
 				-- anchorX = 0.5,
 				-- anchorY = 0.5
 			}
 
-			local background = display.newImageRect( visual.npcBalloonBackground, 182, 174 )
+			local background = display.newImageRect( visual.npcBalloonBackground, 279, 197 )
+			background:scale(1.1, 1.2)
 			background.anchorY = 1
+			background.alpha = 0.7
 			balloon:insert(background)
 
-			local text = display.newImageRect( visual.npcBalloonText, 81, 33 )
+			local text = display.newImageRect( visual.npcBalloonText, 245, 101 )
+			text:scale(0.9,0.9)
 			text.anchorY = 1
-			text.y = -100
+			text.x = background.x - 10
+			text.y = background.y - background.height + 70
 			balloon:insert(text)
 
 			--------------------------------------------------------------------------
@@ -83,9 +89,10 @@ function npcs.loadNPCs( currentGame )
 				local specialPointsType
 
 				-- Status check prevents from pressing the button when pause menu is overlaying.
-				if (currentGame.state == "Running") then
+				if (currentGame.state == "Running" and target.active) then
 					if (event.phase == "began") then
 						display.currentStage:setFocus( target, event.id )
+						target.active = false
 
 						-- Good/bad action conditional behavior --
 						if (target.id == "npcButton1") then
@@ -140,20 +147,23 @@ function npcs.loadNPCs( currentGame )
 				id = "npcButton1",
 				defaultFile = visual.npcBalloonButton1,
 				--overFile = visual.npcBalloonButton1_over,
-				width = 40,
-				height = 40,
-				x = background.x - background.width/9 - 10,
-				y = background.y -80,
+				width = 70,
+				height = 70,
+				x = background.x - background.width/9 - 20,
+				y = background.y -90,
 			}
 			local button2 = widget.newButton{
 				id = "npcButton2",
 				defaultFile = visual.npcBalloonButton2,
 				--overFile = visual.npcBalloonButton2_over,
-				width = 40,
-				height = 40,
-				x = background.x + background.width/9 + 10,
-				y = background.y -80,
+				width = 70,
+				height = 70,
+				x = background.x + background.width/9 + 20,
+				y = background.y -90,
 			}
+
+			button1.active = true
+			button2.active = true
 
 			button1:addEventListener( "touch", onBalloonButtonEvent )
 			button2:addEventListener( "touch", onBalloonButtonEvent )

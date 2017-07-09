@@ -139,7 +139,7 @@ end
 			audio.stop(6)
 			sfx.playSound( sfx.boom1Sound, { channel = 6 } )
 			-------------------------------------------------
-			display.remove(other)
+			util.generateParticles( game, other )
 
 			if (self.type == "bullet") then
 				self:destroy()

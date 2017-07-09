@@ -118,8 +118,4 @@ function entity.newEntity( options )
 	return ent
 end
 
--- function entity:isOnMap()
-
--- function entity:removeFromMap()
-
 return entity

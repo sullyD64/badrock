@@ -19,41 +19,25 @@ local items = {
 			type = "life",
 			itemName = "life",
 			filePath = visual.itemLife,
-			width = 25,
-			height = 25
+			width = 50,
+			height = 50
 		},
 		-- 2 GUN
 		{
 			type = "powerup",
 			itemName = "gun",
 			filePath = visual.itemGun,
-			width = 25,
-			height = 25
+			width = 60,
+			height = 60
 		},
 		-- -- 3 IMMUNITY
 		{
 			type = "bonus",
 			itemName = "immunity",
 			filePath = visual.itemImmunity,
-			width = 25,
-			height = 25
+			width = 60,
+			height = 60
 		},
-		-- -- 4 METHEORS RAIN
-		-- {
-		-- 	type = "powerup",
-		-- 	itemName = "metheors",
-		-- 	filePath = visual.itemMetheor,
-		-- 	width = 25,
-		-- 	height = 25
-		-- },
-		-- -- 5 SUMMON GUARDIAN
-		-- {
-		-- 	type = "powerup",
-		-- 	itemName = "summon",
-		-- 	filePath = visual.itemGun,
-		-- 	width = 25,
-		-- 	height = 25
-		-- }
 	}
 }
 
@@ -94,24 +78,5 @@ function items.enableItem ( item )
 		end
 	})
 end
-
---------------------------------------------------------------------------------------
-
--- local function findItemByName( name )
--- 	local item = nil
--- 	for k, v in pairs(items.list) do
--- 		if (v.name == name) then
--- 			item = v
--- 			break
--- 		end
--- 	end
--- 	return item
--- end
-
--- function addDropTo( enemy, itemName )
--- 	--Add an item drop to an enemy (MAX 1 Drop per Enemy, for now )
--- 	local item = items.findItemByName (itemName)
--- 	enemy.drop = item
--- end
 
 return items

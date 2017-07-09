@@ -15,10 +15,10 @@ local visual = {
 
 	sliderSheet            = "visual/misc/volumeSlider.png",
 	checkboxSheet          = "visual/misc/checkbox.png",
-	confirmImg			   = "visual/misc/ok.png",
-	retryImg			   = "visual/misc/retry.png",
-	nextLevelImg		   = "visual/misc/nextLevel.png",		
-	backToMenuImg		   = "visual/misc/menuLink.png",
+	confirmImg			     = "visual/misc/ok.png",
+	retryImg			        = "visual/misc/retry.png",
+	nextLevelImg		     = "visual/misc/nextLevel.png",		
+	backToMenuImg		     = "visual/misc/menuLink.png",
 
 	menuBackground         = "visual/misc/MenuBackground.jpg",
 	titleLogo              = "visual/misc/LogoShadow.png",
@@ -43,15 +43,17 @@ local visual = {
 	steveSheetWalking      = "visual/sprites/steveAnim.png",
 	steveImage             = "visual/sprites/rock_original.png",
 	steveAttack            = "visual/sprites/attackSprite.png",
-	steveGun               = "visual/sprites/pup_gun.png",
+	steveGun               = "visual/sprites/equipped_gun.png",
 	-- Steve Dark Skin
 	darkSteveAttack        = "visual/sprites/darkSkinAttack.png",
 	darkSteveSheetWalking  = "visual/sprites/darkSkinAnim.png",
 
 	bullet                 = "visual/sprites/bullet.png",
 
+	platform               = "visual/tilesets/platform.png",
+
 	npcImage               = "visual/sprites/carota.png",
-	npcBalloonBackground   = "visual/sprites/balloonHD.png",
+	npcBalloonBackground   = "visual/sprites/balloon.png",
 	npcBalloonText         = "visual/sprites/aiuto.png",
 	npcBalloonButton1      = "visual/sprites/buttonyes.png",
 	npcBalloonButton2      = "visual/sprites/buttonno.png",
@@ -62,16 +64,15 @@ local visual = {
 	enemyRobot             = "visual/sprites/robot.png",
 
 	itemLife               = "visual/sprites/bonus_life.png",
-	itemGun                = "visual/sprites/H.png",
+	itemGun                = "visual/sprites/pup_gun.png",
 	itemImmunity           = "visual/sprites/bonus_immunity.png",
 	--itemMetheor          = "visual/misc/metheor.png"
 
-
-	bossHand           = "visual/sprites/manoBoss.png",
-	bossSpalla        = "visual/sprites/bossSpalla.png",
-	bossTesta          = "visual/sprites/testaBoss.png",
-	bossCorpo         = "visual/sprites/corpoBoss.png",
-	bossLaser          = "visual/sprites/laserSprite.png"
+	bossHand               = "visual/sprites/manoBoss.png",
+	bossSpalla             = "visual/sprites/bossSpalla.png",
+	bossTesta              = "visual/sprites/testaBoss.png",
+	bossCorpo              = "visual/sprites/corpoBoss.png",
+	bossLaser              = "visual/sprites/laserSprite.png"
 
 }
 

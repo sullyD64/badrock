@@ -8,7 +8,7 @@ local myData   = require ( "myData"    )
 local sfx      = require ( "audio.sfx" )
 local game     = require ( "core.game" )
 lime           = require ( "lime.lime" )
-lime.enableScreenCulling()
+lime.disableScreenCulling()
 
 local scene = composer.newScene()
 
@@ -32,9 +32,8 @@ function scene:create( event )
 		audio.pause(1)
 	end
 
-	map = lime.loadMap("testmap_new.tmx")
-	-- map = lime.loadMap("BossMapTest.tmx")
-	-- map = lime.loadMap("level_1.tmx")
+	-- map = lime.loadMap("bossTest_HD.tmx")
+	map = lime.loadMap("level_1.tmx")
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 

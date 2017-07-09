@@ -104,7 +104,7 @@ local buttonData = {
 				textOnly = true,
 				label = "Score: 0",
 				font = utility.font,
-				fontSize = 20,
+				fontSize = 30,
 				labelColor = {
 					default = { 0,220,255 },
 					over = { 0,220,255 },
@@ -176,7 +176,7 @@ local buttonData = {
 				textOnly = true,
 				label = "",
 				font = utility.font,
-				fontSize = 14,
+				fontSize = 35,
 				labelColor = {
 					default = { 255,255,255 },
 					over = { 255,255,255 },
@@ -246,11 +246,11 @@ local buttonData = {
 	ui.ammunitions = {}
 
 	local function createAmmoIconAt( index )
-		local	ammo = display.newImageRect(ui.buttonGroup, visual.bullet, 20, 20 )
+		local	ammo = display.newImageRect(ui.buttonGroup, visual.bullet, 23,23 )
 		ammo.rotation = -90
 		ammo.anchorX, ammo.anchorY = 1, 1
-		ammo.x = ui.buttons.action.x - 50 - (ammo.contentWidth * (index - 1))
-		ammo.y = ui.buttons.action.y - 20 -  ammo.contentHeight / 2
+		ammo.x = ui.buttons.action.x - ui.buttons.action.contentWidth - (ammo.contentWidth * 0.7 * (index - 1))
+		ammo.y = ui.buttons.action.y - ui.buttons.action.contentHeight/2 -  ammo.contentHeight / 2
 		ammo.isVisible = true
 		table.insert(ui.ammunitions, ammo)
 	end

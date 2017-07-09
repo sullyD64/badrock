@@ -24,7 +24,7 @@ local bossStrategy = require ( "core.bossStrategy" )
 local game = {}
 
 physics.start()
-physics.setGravity( 0, 50 )
+physics.setGravity( 0, 80 )
 
 --===========================================-- 
 	-------------------------------
@@ -226,7 +226,7 @@ physics.setGravity( 0, 50 )
 							local yDelta = math.abs(game.steve.y-chaser.y)
 							-- Context: the player is alive and in range for aggro, chase him!
 							-- (also, the chaser has completed repositioning)
-							if( chaser and xDelta <= 230 and yDelta <= 150
+							if( chaser and xDelta <= 460 and yDelta <= 300
 								and chaser.hasReturnedHome ~= false ) then
 								------------------------
 								chaser:chase(game.steve)
@@ -287,14 +287,14 @@ physics.setGravity( 0, 50 )
 				end
 			end
 
-			-- Iterates the walker list
-			for i, walker in pairs(game.walkerList) do
-				if (walker.xScale == 1) then
-					walker:walkTo( walker.leftBound )
-				elseif (walker.xScale == -1) then
-					walker:walkTo( walker.rightBound )
-				end
-			end			
+			-- Iterates the walker list [DEPRECATED]
+			-- for i, walker in pairs(game.walkerList) do
+			-- 	if (walker.xScale == 1) then
+			-- 		walker:walkTo( walker.leftBound )
+			-- 	elseif (walker.xScale == -1) then
+			-- 		walker:walkTo( walker.rightBound )
+			-- 	end
+			-- end			
 		end
 		-- Handles the runtime events associated with the boss fight
 		-- (if the current level has a boss).
@@ -320,7 +320,7 @@ physics.setGravity( 0, 50 )
 
 		-- See controller.addSpecialPoints, needed for linking popup texts to steve
 		if (controller.alertVisible) then
-			controller.alert.x, controller.alert.y = game.steve.x, game.steve.y - 30
+			controller.alert.x, controller.alert.y = game.steve.x + game.steve.width + 45, game.steve.y - 20
 		end
 	end
 
@@ -330,7 +330,7 @@ physics.setGravity( 0, 50 )
 		-- (remember that ONLY the image "steve" acts as the hitbox)
 		if(game.steve.x and game.steve.y) then
 			game.steve.sprite.x = game.steve.x
-			game.steve.sprite.y = game.steve.y -10
+			game.steve.sprite.y = game.steve.y - 20
 			game.steve.sprite.xScale = game.steve.direction
 			game.steve.sensorD.x, game.steve.sensorD.y = game.steve.x, game.steve.y
 
@@ -360,7 +360,7 @@ physics.setGravity( 0, 50 )
 			-- Keeps the player's equipped powerUp joined with the player.
 			if (game.steve.powerUp and game.steve.hasPowerUp) then
 				local powerUp = game.steve.powerUp
-				powerUp.x, powerUp.y = game.steve.x + (game.steve.direction * 20), game.steve.y
+				powerUp.x, powerUp.y = game.steve.x + (game.steve.direction * 42), game.steve.y
 				powerUp.xScale = game.steve.direction
 			end
 		end
@@ -505,7 +505,7 @@ physics.setGravity( 0, 50 )
 		self.steve.preCollision = collisions.playerPreCollision
 		self.steve:addEventListener( "preCollision", self.steve )
 
-		self.map:setFocus( self.steve )
+		self.map:setFocus( self.steve, -185, -100 )
 	end
 
 	-- See npcs.lua
@@ -537,9 +537,9 @@ physics.setGravity( 0, 50 )
 		-- Assigns the home to each chaser
 		enemies.assignChaserHomes(self.enemies, self.chaserList)
 
-		-- Assigns the route to each walker
-		local routes = self.map:getObjectLayer("walkerRoutes").objects
-		enemies.assignWalkerRoutes(self.enemies, self.walkerList, routes)
+		-- Assigns the route to each walker [DEPRECATED]
+		-- local routes = self.map:getObjectLayer("walkerRoutes").objects
+		-- enemies.assignWalkerRoutes(self.map, self.walkerList)
 	end
 
 	-- See bossStrategy.lua
@@ -564,9 +564,9 @@ physics.setGravity( 0, 50 )
 		---------------------------
 		
 		-- Entity initialization --
-		game:loadPlayer()
 		game:loadEnemies()
 		game:loadNPCS()
+		game:loadPlayer()
 		---------------------------
 
 		-- Logic, controls and UI initialization -----------------
@@ -600,16 +600,16 @@ function game.start()
 	Runtime:addEventListener("enterFrame", onUpdate)
 	dbtimer = timer.performWithDelay(200, debug, 0)
 
-	-- local pippo = {
-	-- 	x = game.spawnPoint.x + 50,
-	-- 	y = game.spawnPoint.y,
-	-- 	drop = "gun"}
-	-- game.dropItemFrom(pippo)
-	-- local pluto = {
-	-- 	x = game.spawnPoint.x + 100,
-	-- 	y = game.spawnPoint.y,
-	-- 	drop = "immunity"}
-	-- game.dropItemFrom(pluto)
+	local pippo = {
+		x = game.spawnPoint.x - 100,
+		y = game.spawnPoint.y,
+		drop = "gun"}
+	game.dropItemFrom(pippo)
+	local pluto = {
+		x = game.spawnPoint.x - 200,
+		y = game.spawnPoint.y,
+		drop = "immunity"}
+	game.dropItemFrom(pluto)
 end
 
 function game.pause()

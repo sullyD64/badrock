@@ -34,11 +34,11 @@ local settings = {
 			color = {0, 0, 255},
 		},
 		sheetData = {
-			height = 80,
-			width = 80,
+			height = 160,
+			width = 160,
 			numFrames = 13,
-			sheetContentWidth = 240,
-			sheetContentHeight = 400 
+			sheetContentWidth = 480,
+			sheetContentHeight = 800 
 		},
 		sequenceData = {
 			{name = "beginning", start=1, count=7, time=300, loopCount=1},
@@ -50,8 +50,8 @@ local settings = {
 	gun = {
 		ammo = 5,
 		staticOptions = { 			-- provvisorie
-			width = 20,
-			height = 20,
+			width = 40,
+			height = 40,
 			filePath = visual.steveGun,
 			notPhysical = true,
 			eName = "stevePowerUp",
@@ -66,14 +66,14 @@ local settings = {
 
 	bullet = {
 		staticOptions = { 			-- provvisorie
-			width = 20,
-			height = 20,
+			width = 40,
+			height = 40,
 			filePath = visual.bullet,
 			notPhysical = true,
 			eName = "steveAttack",
 		},
 		sensorOpts = {
-			radius = 10,
+			radius = 20,
 			alpha = 0, -- 0.6
 			color = {255, 0, 255},
 		},
@@ -179,7 +179,12 @@ end
 							controller.updateAmmo("destroy")
 						end
 						-- Simulates the press of the action button to begin the rampage.
-						controller.pressActionButton()
+						transition.to(player, {time=200,
+							onComplete = function()
+								print(player.attack)
+								controller.pressActionButton()
+							end
+						})
 					end
 				})
 
@@ -273,7 +278,7 @@ end
 
 					-- Shoots the bullet horizontally
 						self.hasBeenShot = true
-						self:applyLinearImpulse( player.direction * 0.05, 0, 
+						self:applyLinearImpulse( player.direction * 0.3, 0, 
 							self.x, self.y )
 
 					-- The bullet will collide with environment and enemies.
@@ -383,12 +388,12 @@ end
 		player.hasPowerUp = false
 
 		-- Animation: the powerup is knocked away from the player and off the map.
-			physics.addBody( powerUp, {isSensor = true, density = 2.0})
+			physics.addBody( powerUp, {isSensor = true, density = 1.0})
 			powerUp.eName = "lostPowerUp"
 
 			-- if (powerUp.sequence) then powerUp:pause() end
-			powerUp:applyLinearImpulse( player.direction * 0.5, -10, powerUp.x, powerUp.y )
-			powerUp:applyTorque( -player.direction * 50 )
+			powerUp:applyLinearImpulse( player.direction * 3, -25, powerUp.x, powerUp.y )
+			powerUp:applyTorque( -player.direction * 250 )
 			transition.to(powerUp, {time = 2000,  -- removes it when he's off the map 
 				onComplete = function()
 					display.remove(powerUp)
@@ -422,7 +427,7 @@ end
 		-- Loads the sprite and animation sequences
 			local sprite = entity.newEntity{
 				graphicType = "animated",
-				filePath = visual.darkSteveAttack, --visual.steveAttack
+				filePath = visual.steveAttack, --visual.steveAttack
 				spriteOptions = settings.melee.sheetData,
 				spriteSequence = settings.melee.sequenceData,
 				notPhysical = true,
@@ -478,7 +483,7 @@ end
 		end
 
 		-- The player dashes forward
-		player:applyLinearImpulse( player.direction * 8, -5, player.x, player.y )
+		player:applyLinearImpulse( player.direction * 35, -20, player.x, player.y )
 		
 		-- Attack Sprite sequence ---------------------------------------------------
 			combat.stopAnimation = false

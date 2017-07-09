@@ -37,11 +37,11 @@ local enemies = {
 				graphicType = "animated",
 				filePath = visual.enemyPaperAnim,
 				spriteOptions = {
-					height = 45,
-					width = 40,
+					height = 90,
+					width = 80,
 					numFrames = 9,
-					sheetContentWidth = 120,
-					sheetContentHeight = 135 
+					sheetContentWidth = 240,
+					sheetContentHeight = 270 
 				},
 				spriteSequence = {
 					{name = "idle",    frames={1,2},         time=650, loopCount=0},
@@ -61,8 +61,8 @@ local enemies = {
 			score = 150,
 			options = {
 				filePath = visual.enemyRobot,
-				width = 65,
-				height = 65,
+				width = 130,
+				height = 130,
 				physicsParams = { bounce = 0, friction = 1.0, density = 1.0, },
 				eName = "enemy",
 			},
@@ -74,8 +74,8 @@ local enemies = {
 			score = 150,
 			options = {
 				filePath = visual.enemySedia,
-				width = 70,
-				height = 113,
+				width = 140,
+				height = 226,
 				physicsParams = { bounce = 0, friction = 1.0, density = 0.5, },
 				eName = "enemy",
 			},
@@ -98,8 +98,8 @@ local enemies = {
 			-- [note: this is done to overcome a double setting of the position which, if combined with 
 			-- the impulse applied by this methode, will lead to unexpected and repentine behaviors]
 			if (not chaser.isJumpingVoid and not chaser.isJumpingTo) then
-				if( math.abs(chaser.x-target.x) <= tileWidth*9 or target.enemySprite ) then --old value: 400	
-					chaser.speed = 1 
+				if( math.abs(chaser.x-target.x) <= tileWidth*9 or target.enemySprite ) then
+					chaser.speed = 1.5 
 					-- (moves faster when returning to spawn)
 					if (target.enemySprite) then chaser.speed = 2 end 
 
@@ -131,6 +131,19 @@ local enemies = {
 					for k, void in pairs(chaser.voidList) do
 						chaser:checkVoidProximity(void)
 					end
+
+					-- The chaser must wait one second to jump past a void again, the count starts
+					-- from when he jumps the first time.
+					if not (chaser.isCheckingIfJumpedVoid) and (chaser.isJumpingVoid) then
+						chaser.isCheckingIfJumpedVoid = true
+						timer.performWithDelay(1000,
+							function()
+								chaser.canJumpVoid = true
+							end
+						)
+						chaser.isCheckingIfJumpedVoid = false
+					end
+
 
 					if (chaser.hasReturnedHome == false) then
 						-- The chaser "has returned home" (literally) only when he returns
@@ -167,17 +180,20 @@ local enemies = {
 		local xDist = math.abs(chaser.x - target.x)
 		local yDist = math.abs(chaser.y - target.y)
 
+		-- Chasers can reach a platforms which are 4 tiles higher than them
 		local jumpTo = function(chaser) 
-			if (yDist <= tileWidth*3) then --old value: 150, 100
-				chaser:applyLinearImpulse( 0, -30, chaser.x, chaser.y )
+			if (yDist <= tileWidth*3) then
+				chaser:applyLinearImpulse( 0, -450, chaser.x, chaser.y )
 			elseif (yDist <= tileWidth*5 and yDist >= tileWidth*3) then
-				chaser:applyLinearImpulse( 0, -48, chaser.x, chaser.y )
+				chaser:applyLinearImpulse( 0, -620, chaser.x, chaser.y )
 			end
 		end
 
-		if (chaser.y > target.y and yDist <= tileWidth*4) then  --old value: 150
-			jumpTo(chaser)
-			chaser.isJumpingTo = true
+		if (chaser.y > target.y and xDist <= tileWidth*5 and yDist <= tileWidth*5) then
+			if (chaser.canJumpVoid) then
+				jumpTo(chaser)
+				chaser.isJumpingTo = true
+			end
 		end
 	end
 
@@ -185,7 +201,7 @@ local enemies = {
 	-- stops chasing the target and attempts to jump over the void.
 	local function checkVoidProximity(currentGame, chaser, void )
 		local tileWidth = currentGame.map:getProperty("tilewidth"):getValue()
-		local lBorder, rBorder = void.x + void.shape[1], void.x + void.shape[3]
+		local lBorder, rBorder = void.x, void.x + void.shape[5]
 		local lDist, rDist = math.abs(lBorder-chaser.x), math.abs(rBorder-chaser.x)
 		
 		local yDist = math.abs(chaser.y - void.y)
@@ -196,17 +212,14 @@ local enemies = {
 		end
 
 		local jumpPastVoid = function(chaser)
-			if( chaser.xScale == -1) then
-				chaser:applyLinearImpulse( 10, -35, chaser.x, chaser.y )
-			elseif( chaser.xScale == 1) then
-				chaser:applyLinearImpulse( -10, -35, chaser.x, chaser.y )
-			end
+			chaser:applyLinearImpulse( 180 * -chaser.xScale, -250, chaser.x, chaser.y )
 		end
 
-		if ( xDist <= tileWidth*2.5 and yDist <= tileWidth*2.5) then
-			if not (chaser.isJumpingVoid) then
+		if ( xDist <= tileWidth*0.3 and yDist <= tileWidth*2.8) then
+			if not (chaser.isJumpingVoid) and (chaser.canJumpVoid) then
 				jumpPastVoid(chaser)
 				chaser.isJumpingVoid = true
+				chaser.canJumpVoid = false
 			end
 		end
 	end
@@ -257,6 +270,7 @@ local enemies = {
 		chaser.voidList = currentGame.map:getObjectLayer("cadutaVuoto").objects
 		chaser.isIdleAwayFromHome = false
 		chaser.isChasingPlayer = false
+		chaser.canJumpVoid = true
 
 		-- Only chasers need (and therefore will have) preCollision handling.
 		chaser.preCollision = collisions.enemyPreCollision
@@ -312,58 +326,76 @@ local enemies = {
 
 -- WALKER-SPECIFIC FUNCTIONS -------------------------------------------------------
 	
+	--[DEPRECATED]
 	-- The walker's target can be either the left or the right border of its route.
-	local function walkTo(currentGame, walker, target)
-		if ( (walker.x and walker.y) and target and walker.lives ~=0) then	
-			local wXV, wYV = walker:getLinearVelocity()
+	-- local function walkTo(currentGame, walker, target)
+	-- 	-- if ( (walker.x and walker.y) and target and walker.lives ~=0) then	
+	-- 	-- 	local wXV, wYV = walker:getLinearVelocity()
 			
-			-- lBorder and rBorder are the walker's physical borders.
-			local lBorder, rBorder = walker.x - walker.width/2, walker.x + walker.width/2
+	-- 	-- 	-- lBorder and rBorder are the walker's physical borders.
+	-- 	-- 	local lBorder, rBorder = walker.x - walker.width/2, walker.x + walker.width/2
 
-			-- If the target is the left bound, the algorithm considers the walker's left
-			-- physical border to calculate distance, and vice versa for the right bound.
-			if (target == walker.leftBound) then
-				if (walker.closestBorder ~= lBorder) then
-					walker.closestBorder = lBorder
-				end
-			elseif (target == walker.rightBound) then
-				if (walker.closestBorder ~= rBorder) then
-					walker.closestBorder = rBorder
-				end
-			end
+	-- 	-- 	-- If the target is the left bound, the algorithm considers the walker's left
+	-- 	-- 	-- physical border to calculate distance, and vice versa for the right bound.
+	-- 	-- 	if (target == walker.leftBound) then
+	-- 	-- 		if (walker.closestBorder ~= lBorder) then
+	-- 	-- 			walker.closestBorder = lBorder
+	-- 	-- 		end
+	-- 	-- 	elseif (target == walker.rightBound) then
+	-- 	-- 		if (walker.closestBorder ~= rBorder) then
+	-- 	-- 			walker.closestBorder = rBorder
+	-- 	-- 		end
+	-- 	-- 	end
 
-			if walker.closestBorder == walker.lastClosestBorder then 
-				walker.xScale = - walker.xScale
-			end
+	-- 	-- 	if walker.closestBorder == walker.lastClosestBorder then 
+	-- 	-- 		walker.xScale = - walker.xScale
+	-- 	-- 	end
 
-			-- Moves the walker while calculasting the distance between its the target
-			-- and the walker's closest border.
-			if ( math.abs(walker.closestBorder - target) > 1 ) then
-				walker:setLinearVelocity( 100 * - walker.xScale, wYV )
+	-- 	-- 	-- Moves the walker while calculasting the distance between its the target
+	-- 	-- 	-- and the walker's closest border.
+	-- 	-- 	if ( math.abs(walker.closestBorder - target) > 1 ) then
+	-- 	-- 		walker:setLinearVelocity( 180 * - walker.xScale, wYV )
 
-				walker.lastClosestBorder = walker.closestBorder
-			else
-				-- The walker has reached the target. Inverting the walker's xScale will
-				-- change its target too.
-				walker.xScale = -walker.xScale
-			end
-		end
-	end
+	-- 	-- 		walker.lastClosestBorder = walker.closestBorder
+	-- 	-- 	else
+	-- 	-- 		-- The walker has reached the target. Inverting the walker's xScale will
+	-- 	-- 		-- change its target too.
+	-- 	-- 		walker.xScale = -walker.xScale
+	-- 	-- 	end
+	-- 	-- end
+	-- end
 
 	-- MAIN -------------------------------------------------------------------------
-	local function loadWalker( walker, currentGame )
-		-- Used when the walker collides with the player
-		walker.collision = function(self, event)
-			if (event.other.eName == "steve") then
-				walker.xScale = -walker.xScale
+	local function loadWalker( walker, currentGame, enemy )
+		walker.id = enemy.id
+		walker.speed = enemy.speed
+		walker.travelDistance = enemy.travelDistance
+		walker.sensors = util.createObjectSensors(currentGame.map, walker)
+
+		-- Handles the collision when a walker collides with one of its sensors.
+		-- When that happens, bounces the walker in the opposite direction.
+		-- Used also when the walker collides with the player
+		walker.collision = function( self, event )
+			if ( event.phase == "began") then
+				if ( self.id == event.other.id or event.other.eName == "steve") then
+					local vx,vy = self:getLinearVelocity()
+					self:setLinearVelocity( -vx, -vy )
+					self.xScale = - self.xScale
+				end
 			end
 		end
-
 		walker:addEventListener( "collision", walker )
 
-		function walker:walkTo( target ) 
-			walkTo(currentGame, self, target)
-		end
+		-- function walker:walkTo( target )  [DEPRECATED]
+		-- 	-- walkTo(currentGame, self, target)
+		-- end
+
+		transition.to(walker, {time = 500,
+			onComplete = function()
+				walker.bodyType = "kinematic"
+				walker:setLinearVelocity( -walker.speed, 0 )
+			end
+		})
 	end
 	---------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
@@ -381,30 +413,31 @@ function enemies.assignChaserHomes( enemies, chasers )
 	end
 end
 
-function enemies.assignWalkerRoutes( enemies, walkers, routes )
-	-- Each entry in enemies contains the original spawn coordinates of a walker,
-	-- while each enemySprite contains the current coordinates (and equals to the walker).
+-- [DEPRECATED]
+-- function enemies.assignWalkerRoutes( walkers, currentMap )
+-- 	-- Each entry in enemies contains the original spawn coordinates of a walker,
+-- 	-- while each enemySprite contains the current coordinates (and equals to the walker).
 
-	-- If the map specifies a route for the corresponding walker, then the walker's route is 
-	-- modeled after the edges of that route. Else a default route is guessed from the 
-	-- walker's spawn coordinates.
-	for i, walker in pairs(walkers) do
-		for k, enemy in pairs(enemies) do
-			if (walker == enemy.enemySprite) then
-				walker.leftBound, walker.rightBound = enemy.x - 32*3, enemy.x + 32*3
+-- 	-- If the map specifies a route for the corresponding walker, then the walker's route is 
+-- 	-- modeled after the edges of that route. Else a default route is guessed from the 
+-- 	-- walker's spawn coordinates.
+-- 	-- for i, walker in pairs(walkers) do
+-- 	-- 	for k, enemy in pairs(enemies) do
+-- 	-- 		if (walker == enemy.enemySprite) then
+-- 	-- 			walker.leftBound, walker.rightBound = enemy.x - 64*3, enemy.x + 64*3
 
-				-- Overrides bounds if a route is specified
-				if (enemy.walkerID and routes) then
-					for i, rt in pairs(routes) do
-						if (enemy.walkerID == rt.walkerID) then
-							walker.leftBound, walker.rightBound = rt.x, rt.x + rt.points[3]
-						end
-					end
-				end
-			end
-		end
-	end	
-end
+-- 	-- 			-- Overrides bounds if a route is specified
+-- 	-- 			if (enemy.walkerID and routes) then
+-- 	-- 				for i, rt in pairs(routes) do
+-- 	-- 					if (enemy.walkerID == rt.walkerID) then
+-- 	-- 						walker.leftBound, walker.rightBound = rt.x, rt.x + rt.points[5]
+-- 	-- 					end
+-- 	-- 				end
+-- 	-- 			end
+-- 	-- 		end
+-- 	-- 	end
+-- 	-- end
+-- end
 
 -- Loads the enemies's images (and sprites) and initializes their attributes.
 -- Visually instantiates the enemies in the current game's map.
@@ -444,7 +477,7 @@ function enemies.loadEnemies( currentGame )
 		end
 
 		enemySprite.isTargettable = true
-		enemySprite.x, enemySprite.y =  enemy.x, enemy.y
+		enemySprite.x, enemySprite.y = enemy.x, enemy.y
 
 		enemySprite:addOnMap( currentMap )
 		if(desc.options.graphicType == "animated") then
@@ -458,20 +491,28 @@ function enemies.loadEnemies( currentGame )
 			loadChaser(enemySprite, currentGame)
 			table.insert(chaserList, enemySprite)
 		elseif (desc.isWalker) then
-			loadWalker(enemySprite, currentGame)
+			loadWalker(enemySprite, currentGame, enemy)
 			table.insert(walkerList, enemySprite)
 		end
 		---------------------------------------------------------------
 
 		-- Animation: Knocks the enemy AWAY given a x position
 		function enemySprite:onHitAnimation(x)
-			if (self.x > x) then self:applyLinearImpulse(10,-50,self.x,self.y)
-			elseif (self.x < x) then self:applyLinearImpulse(-10,-50,self.x,self.y)
+			if (self.x > x) then self:applyLinearImpulse(40,-200,self.x,self.y)
+			elseif (self.x < x) then self:applyLinearImpulse(-40,-200,self.x,self.y)
 			end
 		end
 
 		-- Animation: knocks the enemy AWAY and off the map
 		function enemySprite:onDeathAnimation()
+			if (self.bodyType ~= "dynamic") then 
+				transition.to (self, {time = 0, 
+					onComplete = function()
+						self.bodyType = "dynamic" 
+						self:removeEventListener( "collision", self )
+					end
+				})
+			end
 			self.isSensor = true
 			self.eName = "deadEnemy"
 			self.yScale = -1
@@ -480,7 +521,7 @@ function enemies.loadEnemies( currentGame )
 				self:setSequence("dead")
 				self:play()
 			end
-			timer.performWithDelay(1000, self:applyLinearImpulse( 0.05, -50, self.x, self.y ))
+			timer.performWithDelay(1000, self:applyLinearImpulse( 0.05, -200, self.x, self.y ))
 			transition.to(self, {time = 5000,  -- removes it when he's off the map 
 				onComplete = function()
 					display.remove(self)
