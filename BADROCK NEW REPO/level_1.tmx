@@ -465,13 +465,13 @@
 </data>
  </layer>
  <objectgroup name="playerSpawn">
-  <object id="25" name="spawn0" x="619.03" y="642.152"/>
+  <object id="25" name="spawn0" x="557.03" y="664.152"/>
  </objectgroup>
  <objectgroup name="npcSpawn">
-  <object id="16" name="npc" x="1422.67" y="202.667"/>
+  <object id="16" name="npc" x="600.67" y="398.667"/>
  </objectgroup>
  <objectgroup name="enemySpawn">
-  <object id="22" name="enemy3" type="paper" x="1230" y="212">
+  <object id="22" name="enemy3" type="paper" x="1254" y="226">
    <properties>
     <property name="drop" value="life"/>
    </properties>

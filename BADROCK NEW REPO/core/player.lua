@@ -107,7 +107,7 @@ function player.loadPlayer( currentGame )
 	-- Loads Sprite and animation sequences
 		local sprite = entity.newEntity{
 			graphicType = "animated",
-			filePath = visual.steveSuperSprite, --visual.steveDefaultSprite / visual.steveDarkSprite 
+			filePath = visual.steveDarkSprite, --visual.steveDefaultSprite / visual.steveDarkSprite 
 			spriteOptions = settings.mainSheetData,
 			spriteSequence = settings.mainSequenceData,
 			notPhysical = true,

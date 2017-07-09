@@ -56,11 +56,11 @@ local visual = {
 	bullet                 = "visual/sprites/bullet.png",
 	platform               = "visual/tilesets/platform.png",
 
-	npcImage               = "visual/sprites/carota.png",
-	npcBalloonBackground   = "visual/sprites/balloon.png",
-	npcBalloonText         = "visual/sprites/aiuto.png",
-	npcBalloonButton1      = "visual/sprites/buttonyes.png",
-	npcBalloonButton2      = "visual/sprites/buttonno.png",
+	npcSprite              = "visual/sprites/npc_carrot.png",
+	npcBalloonBackground   = "visual/sprites/npc_balloon.png",
+	npcBalloonText         = "visual/sprites/npc_text.png",
+	npcBalloonButton1      = "visual/sprites/npc_buttonyes.png",
+	npcBalloonButton2      = "visual/sprites/npc_buttonno.png",
 
 	-- enemyPaper          = "visual/sprites/paper.png",
 	enemyChair             = "visual/sprites/enemy_chair.png",

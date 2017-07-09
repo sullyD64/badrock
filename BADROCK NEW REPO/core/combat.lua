@@ -51,13 +51,6 @@ local settings = {
 
 	gun = {
 		ammo = 5,
-		-- staticOptions = { 			-- provvisorie
-		-- 	width = 40,
-		-- 	height = 40,
-		-- 	filePath = visual.equipped_gun,
-		-- 	notPhysical = true,
-		-- 	eName = "stevePowerUp",
-		-- },
 		options = {
 			graphicType = "animated",
 			filePath = visual.equipped_gun,
@@ -195,7 +188,6 @@ end
 						-- Simulates the press of the action button to begin the rampage.
 						transition.to(player, {time=200,
 							onComplete = function()
-								print(player.attack)
 								controller.pressActionButton()
 							end
 						})
@@ -357,6 +349,8 @@ end
 
 			player.powerUp:setSequence("shooting")
 			player.powerUp:play()
+			transition.to(player.powerUp, {time = 100, rotation = - player.direction * 30,
+				transition = easing.continuousLoop})
 
 			-- Attack duration is needed here for re-enabling the action button,
 			-- managing the gun animation and triggering handleAttackEnd.
@@ -444,7 +438,7 @@ end
 		-- Loads the sprite and animation sequences
 			local sprite = entity.newEntity{
 				graphicType = "animated",
-				filePath = visual.steveSuperAttack, --visual.steveDefaultAttack / visual.steveDarkAttack
+				filePath = visual.steveDarkAttack, --visual.steveDefaultAttack / visual.steveDarkAttack
 				spriteOptions = settings.melee.options.spriteOptions,
 				spriteSequence = settings.melee.options.spriteSequence,
 				notPhysical = true,
