@@ -38,6 +38,9 @@ local buttons = {}
 			skin.panel:show({
 			x = display.contentWidth-12,
 			})
+			skin.pointsPanel:show({
+			x = display.contentWidth - 150,
+			})
 		end
 	end
 

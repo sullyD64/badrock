@@ -19,24 +19,38 @@ utility.font = "Berlin Sans FB Regular.ttf"--"ITCKRIST.TTF"--"Micolas.ttf"
 -- -----------------------------------------------------------------------------------
 -- ImageSheets
 -- -----------------------------------------------------------------------------------
+	-- vecchio slider
+	-- -- volume slider sheet
+	-- local sliderOptions = {
+	-- 	frames = {
+	-- 		{ x=0, y=0, width=14, height=21 },
+	-- 		{ x=17, y=0, width=16, height=21 },
+	-- 		{ x=34, y=0, width=16, height=21 },
+	-- 		{ x=52, y=0, width=18, height=21 },
+	-- 		{ x=78, y=0, width=30, height=21 }
+	-- 		},
+	-- 	sheetContentWidth = 109,
+	-- 	sheetContentHeight = 21
+	-- 	}
+	-- utility.sliderSheet = graphics.newImageSheet( visual.sliderSheet, sliderOptions )
 
 	-- volume slider sheet
 	local sliderOptions = {
 		frames = {
-			{ x=0, y=0, width=14, height=21 },
-			{ x=17, y=0, width=16, height=21 },
-			{ x=34, y=0, width=16, height=21 },
-			{ x=52, y=0, width=18, height=21 },
-			{ x=78, y=0, width=30, height=21 }
+			{ x=0, y=0, width=48, height=107 },
+			{ x=70, y=0, width=230, height=107 },
+			{ x=320, y=0, width=55, height=107 },
+			{ x=385, y=0, width=75, height=107 },
+			{ x=497, y=0, width=100, height=107 }
 			},
-		sheetContentWidth = 109,
-		sheetContentHeight = 21
+		sheetContentWidth = 597,--577,
+		sheetContentHeight = 107--87
 		}
 	utility.sliderSheet = graphics.newImageSheet( visual.sliderSheet, sliderOptions )
 
 	-- checkbox sheet
 	local checkboxOptions = {
-			width = 21,
+			width = 20,
 			height = 21,
 			numFrames = 2,
 			sheetContentWidth = 42,

@@ -51,8 +51,8 @@ local playBtn, optionBtn
 			{
 				id = "optionBtn",
 				onRelease = onOptionBtnRelease,
-				width = 26,
-				height = 27,
+				width = 43,
+				height = 40,
 				defaultFile = visual.optionButtonDefault,
 				overFile = visual.optionButtonOver,
 			}

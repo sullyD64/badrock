@@ -7,7 +7,7 @@
 local visual = {
 	
 	panel                  = "visual/misc/panel.png",
-	exitOptionMenu         = "visual/misc/x.png",
+	exitOptionMenu         = "visual/misc/xRed.png",
 	optionButtonDefault    = "visual/misc/settings.png",
 	optionButtonOver       = "visual/misc/settings.png",
 	menuButtonDefault      = "visual/misc/buttonDefault.png",
@@ -16,9 +16,13 @@ local visual = {
 	sliderSheet            = "visual/misc/volumeSlider.png",
 	checkboxSheet          = "visual/misc/checkbox.png",
 	confirmImg			     = "visual/misc/ok.png",
+	cancelImg			   = "visual/misc/xGrey.png",
 	retryImg			        = "visual/misc/retry.png",
 	nextLevelImg		     = "visual/misc/nextLevel.png",		
 	backToMenuImg		     = "visual/misc/menuLink.png",
+	blankButtonMenu			   = "visual/misc/blankMenu.png",
+	audioSettingsImg	   = "visual/misc/audioSettings.png",
+
 
 	menuBackground         = "visual/misc/MenuBackground.jpg",
 	titleLogo              = "visual/misc/LogoShadow.png",

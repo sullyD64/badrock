@@ -43,6 +43,16 @@ function result.setGame( currentGame, gameStates, outcome )
 	stateList = gameStates
 
 	if (outcome == "Completed") then
+		result.panel.menuBtn.x= -47
+		result.panel.menuBtn.y = 5
+
+		result.panel.retryBtn.x= 3
+		result.panel.retryBtn.y = 5
+
+		result.panel.nextLevelBtn.x= 53
+		result.panel.nextLevelBtn.y = 5
+
+
 		-- decide che testo viene mostrato a schermo
 		result.panel.finalText.text = "You win!"
 		result.panel.finalText:setFillColor( 0, 0.7, 0)--0.75, 0.8, 1 )
@@ -52,16 +62,25 @@ function result.setGame( currentGame, gameStates, outcome )
 		result.panel.nextLevelBtn.alpha = 1,
 		result.panel.nextLevelBtn:setEnabled( true )
 
-		--result.panel.score.text = game.score --myData.settings.levels[game.currentLevel].score  --QUA
+		result.panel.score.text = "Score: "..game.score --myData.settings.levels[game.currentLevel].score
 		
 	elseif (outcome == "Failed") then
-		result.panel.finalText.text = "Level Failed"
+		result.panel.menuBtn.x= -47
+		result.panel.menuBtn.y = -10--result.panel.contentCenterY
+
+		result.panel.retryBtn.x= 3
+		result.panel.retryBtn.y = -10 --result.panel.contentCenterY
+
+		result.panel.nextLevelBtn.x= 53
+		result.panel.nextLevelBtn.y = -10 --result.panel.contentCenterY
+
+		result.panel.finalText.text = "Game \n  over"
 		result.panel.finalText:setFillColor( 1, 0, 0 )
 
 		result.panel.nextLevelBtn.alpha = 0.3, -- possibile mettere anche un'immagine diversa, da decidere
 		result.panel.nextLevelBtn:setEnabled( false )
 
-		-- result.panel.score.text = ""   -- [L'ho commentato io, dava problemi]
+		result.panel.score.text = ""  
 	end
 	result.setStars(game, outcome)
 
@@ -125,7 +144,7 @@ end
 			anchorX = 0.5,
 			anchorY = 1.0,
 			x = display.contentCenterX,
-			y = display.screenOriginY,
+			y = -600,--display.screenOriginY,
 			inEasing = easing.outBack,
 			outEasing = easing.outCubic
 			}
@@ -137,55 +156,43 @@ end
 		-- Create the return to menu button
 		result.panel.menuBtn = widget.newButton {
 			onRelease = onMenuBtnRelease,
-			emboss = false,
 			defaultFile = visual.backToMenuImg,
-			width = 35,
+			width = 38,
 			height = 37,
 			}
-			result.panel.menuBtn.x= -50
-			result.panel.menuBtn.y = result.panel.contentCenterY
 			result.panel:insert(result.panel.menuBtn)
 			--print("livelloP "..lvl)
 
 		result.panel.retryBtn = widget.newButton {
 			onRelease = onRetryBtnRelease,
 			defaultFile = visual.retryImg,
-			emboss = false,
-			width = 26,
-			height = 27,
-			cornerRadius = 2,
+			width = 38,
+			height = 37,
 			}
-			result.panel.retryBtn.x= -20
-			result.panel.retryBtn.y = result.panel.contentCenterY
 			result.panel:insert(result.panel.retryBtn)
 
 		result.panel.nextLevelBtn = widget.newButton {
 			onRelease = onNextLevelBtnRelease,
 			defaultFile = visual.nextLevelImg,
-			emboss = false,
-			width = 26,
-			height = 27,
+			width = 38,
+			height = 37,
 			}
-			result.panel.nextLevelBtn.x= 10
-			result.panel.nextLevelBtn.y = result.panel.contentCenterY
-
 			result.panel:insert(result.panel.nextLevelBtn)
 	-- -------------------------------------------------------------------------------
 
 	-- Create text result, score, and stars ------------------------------------------
-		
 		result.panel.finalText= display.newText ("", 5, -92, utility.font, 17)
 		result.panel:insert( result.panel.finalText )
 
-		-- result.panel.score = display.newText( "", 0, -100, utility.font, 15 )  -- QUA
-		-- result.panel.score:setFillColor( 1, 1, 1 )
-		-- result.panel:insert( result.panel.score )
+		result.panel.score = display.newText( "", 0, -50, utility.font, 15 )
+		result.panel.score:setFillColor( 1, 1, 1 )
+		result.panel:insert( result.panel.score )
 
 		-- Generate the star
 		result.panel.star = {}
 				for j = 1, 3 do --myData.settings.levels[i].stars do
-					result.panel.star[j] = display.newImageRect(visual.levelSelectStar , 30,28)
-					result.panel.star[j].x = -60 + (j * 25) + 10 --display.contentCenterX + (j * 25) + 50
+					result.panel.star[j] = display.newImageRect(visual.levelSelectStar , 28, 26)--30,28)
+					result.panel.star[j].x = -60 + (j * 28) + 5 --display.contentCenterX + (j * 25) + 50
 					result.panel.star[j].y = -30--result.panel.contentCenterY
 					result.panel.star[j].alpha = 0
 					result.panel:insert(result.panel.star[j])

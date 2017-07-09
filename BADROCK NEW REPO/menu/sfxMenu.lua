@@ -82,8 +82,11 @@ opt.panel = utility.newPanel{
 	--opt.panel.background = display.newRoundedRect( 0, 0, opt.panel.width-10, opt.panel.height-50, 10 )
 	--opt.panel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
 	opt.panel:insert( opt.panel.background )
-	 
-opt.panel.title = display.newText( "Settings", 0, -70, utility.font, 15 )
+
+opt.panel.titleShadow = display.newText( "Audio", 5, -93, utility.font, 20 )
+opt.panel.titleShadow:setFillColor( 0, 0, 0 )
+opt.panel:insert( opt.panel.titleShadow )	 
+opt.panel.title = display.newText( "Audio", 5, -93, utility.font, 21 )
 opt.panel.title:setFillColor( 1, 1, 1 )
 opt.panel:insert( opt.panel.title )
 
@@ -96,20 +99,20 @@ opt.panel:insert( opt.panel.title )
 			middleFrame = 2,
 			rightFrame = 3,
 			fillFrame = 4,
-			frameWidth = 18,
-			frameHeight = 16,
+			frameWidth = 10,
+			frameHeight = 20,
 			handleFrame = 5,
-			handleWidth = 18,
-			handleHeight = 18,
-			top = 100,
-			left= 50,
+			handleWidth = 22,
+			handleHeight = 22,
+			--top = 100,
+			--left= 50,
 			orientation = "horizontal",
-			width = 120,
+			width = 130,
 			value = 40,  -- Start slider at 40%
 			listener = bgVolumeListener
 		}
-		opt.panel.bgVolume.x= -10
-		opt.panel.bgVolume.y = -30
+		opt.panel.bgVolume.x= -85
+		opt.panel.bgVolume.y = -40
 		opt.panel:insert(opt.panel.bgVolume)
 
 	-- Create the effects volume slider
@@ -119,20 +122,20 @@ opt.panel:insert( opt.panel.title )
 			middleFrame = 2,
 			rightFrame = 3,
 			fillFrame = 4,
-			frameWidth = 18,
-			frameHeight = 16,
+			frameWidth = 10,
+			frameHeight = 20,
 			handleFrame = 5,
-			handleWidth = 18,
-			handleHeight = 18,
-			top = 100,
-			left= 50,
+			handleWidth = 22,
+			handleHeight = 22,
+			--top = 300,--100,
+			--left= 50,
 			orientation = "horizontal",
-			width = 120,
+			width = 130,
 			value = 40,  -- Start slider at 40%
 			listener = fxVolumeListener
 		}
-		opt.panel.fxVolume.x= -10
-		opt.panel.fxVolume.y = 5
+		opt.panel.fxVolume.x= -85
+		opt.panel.fxVolume.y = -3
 		opt.panel:insert(opt.panel.fxVolume)
 
 	opt.panel.bgVolumeText = display.newText( "Music", -20, -48,   utility.font, 15 )
@@ -181,15 +184,13 @@ opt.panel:insert( opt.panel.title )
 
 	-- Create the button to exit the options menu
 	opt.panel.returnMenuBtn = widget.newButton {
-		--label = "Return",
 		onRelease = onOptReturnMenuBtnRelease,
-		width = 15,
-		height = 15,
+		width = 25,
+		height = 25,
 		defaultFile = visual.exitOptionMenu,
-		--overFile = "buttonOver.png",
 		}
-		opt.panel.returnMenuBtn.x= 75
-		opt.panel.returnMenuBtn.y = -83
+		opt.panel.returnMenuBtn.x= 112--98
+		opt.panel.returnMenuBtn.y = -80
 		opt.panel:insert(opt.panel.returnMenuBtn)
 -- -------------------------------------------------------------------------------
 

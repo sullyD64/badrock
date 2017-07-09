@@ -121,7 +121,7 @@ local buy = {}
         onRelease = onReturnBtnRelease,
         width = 30,
         height = 30,
-        defaultFile = visual.exitOptionMenu,
+        defaultFile = visual.cancelImg,
         }
     buy.panel.returnBtn.x= 30
     buy.panel.returnBtn.y = 40

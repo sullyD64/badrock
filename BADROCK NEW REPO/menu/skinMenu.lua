@@ -16,6 +16,7 @@ local skin = {}
 
 	local function onReturnBtnRelease()  
 		skin.panel:hide()
+		skin.pointsPanel:hide()
 		skinBtn:setEnabled(true)
 		backBtn:setEnabled(true)
 		for i=1, myData.maxLevels do
@@ -169,5 +170,35 @@ local skin = {}
 	skin.group:insert(buy.panel)
 	assert(skin.group[1] == skin.panel) -- bottom
 	assert(skin.group[2] == buy.panel) -- front
+
+	skin.pointsPanel = utility.newPanel{
+		location = "custom",
+		onComplete = panelTransDone,
+		width = 100,
+		height = 100,
+		speed = 220,
+		anchorX = 0,
+		anchorY = 0,
+		x =  display.contentWidth + 300,
+		y = display.screenOriginY + 5 ,
+		inEasing = easing.linear,
+		outEasing = easing.outCubic
+	}	
+	--skin.pointsPanel.background = display.newRoundedRect( 0, 0, skin.pointsPanel.width, skin.pointsPanel.height, 10 )
+	--skin.pointsPanel.background:setFillColor( 0,0,0)
+	--skin.pointsPanel:insert( skin.pointsPanel.background )
+
+	skin.pointsPanel.title = display.newText( "Points", -20, -35,  utility.font, 15 )
+	skin.pointsPanel.title:setFillColor( 1, 1, 1 )
+	skin.pointsPanel:insert(skin.pointsPanel.title)
+
+	skin.pointsPanel.goodPointsText = display.newText( "Good: "..myData.settings.goodPoints, -18, -20,  utility.font, 15 )
+	skin.pointsPanel.goodPointsText:setFillColor(0, 0.7, 0)
+	skin.pointsPanel:insert(skin.pointsPanel.goodPointsText)
+
+	skin.pointsPanel.evilPointsText = display.newText( "Evil: "..myData.settings.evilPoints, -18, -5,  utility.font, 15 )
+	skin.pointsPanel.evilPointsText:setFillColor( 0.8,0,0 )
+	skin.pointsPanel:insert(skin.pointsPanel.evilPointsText)
+
 
 return skin

@@ -89,67 +89,46 @@ end
 			}
 			pause.panel.background = display.newImageRect(visual.panel,pause.panel.width, pause.panel.height-20)
 			pause.panel:insert( pause.panel.background )
-			 
-			pause.panel.title = display.newText( "Pause", 0, -70, utility.font, 15 )
+			
+			pause.panel.title = display.newText( "Pause", 5, -93, utility.font, 20 )
+			pause.panel.title:setFillColor( 0, 0, 0 )
+			pause.panel:insert( pause.panel.title )			 
+			pause.panel.title = display.newText( "Pause", 5, -93, utility.font, 21 )
 			pause.panel.title:setFillColor( 1, 1, 1 )
 			pause.panel:insert( pause.panel.title )
 
 	-- Create the buttons ------------------------------------------------------------
 
 		pause.panel.soundMenuBtn = widget.newButton {
-			label = "Options",
-			fontSize = 10,
-			labelColor = { default={0}, over={1} },
-			onRelease = onSoundMenuBtnRelease,
-			emboss = false,
-			shape = "roundedRect",
-			width = 30,
-			height = 15,
-			cornerRadius = 2,
-			fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
-			strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
-			strokeWidth = 1,
+			width = 45,
+			height = 42,
+			onRelease = onSoundMenuBtnRelease,		
+			defaultFile = visual.audioSettingsImg,	
 			}
-			pause.panel.soundMenuBtn.x= -20
-			pause.panel.soundMenuBtn.y = 39
+			pause.panel.soundMenuBtn.x= 53---47
+			pause.panel.soundMenuBtn.y = -20--pause.panel.contentCenterY
 			pause.panel:insert(pause.panel.soundMenuBtn)
 
 		-- Create the return to menu button
 		pause.panel.menuBtn = widget.newButton {
-			--label = "Menu",
 			onRelease = onMenuBtnRelease,
-			emboss = false,
 			defaultFile = visual.backToMenuImg,
-			--shape = "roundedRect",
-			width = 26,
-			height = 27,
-			cornerRadius = 2,
-			fillColor = { default={0.78,0.79,0.78,1}, over={1,0.1,0.7,0.4} },
-			strokeColor = { default={0,0,0,1}, over={0.8,0.8,1,1} },
-			strokeWidth = 1,
+			width = 45,--40,
+			height = 42,--38,
 			}
-			pause.panel.menuBtn.x= -50
-			pause.panel.menuBtn.y = pause.panel.contentCenterY
+			pause.panel.menuBtn.x= -53--47
+			pause.panel.menuBtn.y = -20--pause.panel.contentCenterY
 			pause.panel:insert(pause.panel.menuBtn)
 
 
 		pause.panel.retryBtn = widget.newButton {
-			--label = "Retry",
-			--fontSize = 10,
-			--labelColor = { default={0}, over={1} },
 			onRelease = onRetryBtnRelease,
 			defaultFile = visual.retryImg,
-			emboss = false,
-			--shape = "roundedRect",
-			width = 26,
-			height = 27,
-			cornerRadius = 2,
-			--fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
-			--strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
-			--strokeWidth = 1,
+			width = 45,
+			height = 42,
 			}
-			pause.panel.retryBtn.x= -20
-			pause.panel.retryBtn.y = pause.panel.contentCenterY
+			pause.panel.retryBtn.x= 0
+			pause.panel.retryBtn.y = -20 --pause.panel.contentCenterY
 			pause.panel:insert(pause.panel.retryBtn)
 	-- -------------------------------------------------------------------------------
 

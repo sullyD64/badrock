@@ -49,7 +49,7 @@ local opt = {}
 	opt.panel = utility.newPanel{
 		location = "custom",
 		onComplete = panelTransDone,
-		width = 220,--display.contentWidth * 0.35,
+		width = 250,--display.contentWidth * 0.35,
 		height = 260,--display.contentHeight * 0.65,
 		speed = 250,
 		anchorX = 0.5,
@@ -65,12 +65,12 @@ local opt = {}
 	--optPanel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
 	opt.panel:insert( opt.panel.background )
 
-	opt.panel.title = display.newText( "Settings", 5, -93, utility.font, 20 )
-	opt.panel.title:setFillColor( 0, 0, 0 )
-	opt.panel:insert( opt.panel.title )
-	opt.panel.titleShadow = display.newText( "Settings", 5, -93, utility.font, 21 )
-	opt.panel.titleShadow:setFillColor( 1, 1, 1 )
+	opt.panel.titleShadow = display.newText( "Settings", 5, -93, utility.font, 20 )
+	opt.panel.titleShadow:setFillColor( 0, 0, 0 )
 	opt.panel:insert( opt.panel.titleShadow )
+	opt.panel.title = display.newText( "Settings", 5, -93, utility.font, 21 )
+	opt.panel.title:setFillColor( 1, 1, 1 )
+	opt.panel:insert( opt.panel.title )
 
 -- Create the buttons ------------------------------------------------------------
 
@@ -78,53 +78,40 @@ local opt = {}
 		opt.panel.returnMenuBtn = widget.newButton {
 			--label = "Return",
 			onRelease = onOptReturnMenuBtnRelease,
-			width = 20,--15,
-			height = 22,--15,
+			width = 25,--15,
+			height = 25,--15,
 			defaultFile = visual.exitOptionMenu,
 			--overFile = "buttonOver.png",
 			}
-		opt.panel.returnMenuBtn.x= 100
-		opt.panel.returnMenuBtn.y = -75
+		opt.panel.returnMenuBtn.x= 112
+		opt.panel.returnMenuBtn.y = -80---75
 		opt.panel:insert(opt.panel.returnMenuBtn)
 
 	-- Create the about button
 		opt.panel.aboutBtn = widget.newButton {
 			label = "About",
-			fontSize = 10,
-			labelColor = { default={0}, over={1} },
+			fontSize = 14,
 			onRelease = onAboutBtnRelease,
-			emboss = false,
-			shape = "roundedRect",
-			width = 30,
-			height = 15,
-			cornerRadius = 2,
+			width = 65,
+			height = 42,
+			defaultFile = visual.blankButtonMenu,
 			font = utility.font,
-			fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
-			strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
-			strokeWidth = 1,
+			emboss = false,
+			labelColor = { default={1}, },--over={1} },
 		}
-		opt.panel.aboutBtn.x= -50
-		opt.panel.aboutBtn.y = opt.panel.contentCenterY
+		opt.panel.aboutBtn.x= 3---50
+		opt.panel.aboutBtn.y = -30--opt.panel.contentCenterY
 		opt.panel:insert(opt.panel.aboutBtn)
 
 		-- Create the about button
 		opt.panel.soundMenuBtn = widget.newButton {
-			label = "Sounds",
-			fontSize = 10,
-			labelColor = { default={0}, over={1} },
-			onRelease = onSoundMenuBtnRelease,
-			emboss = false,
-			shape = "roundedRect",
-			width = 30,
-			height = 15,
-			cornerRadius = 2,
-			font = utility.font,
-			fillColor = { default={0.78,0.79,0.78,1}, over={0.2,0.2,0.3,0.4} },--default={0.26,0.17,0.53,1}, over={1,0.1,0.7,0.4} },--{ default={1,0,0,1}, over={1,0.1,0.7,0.4} },
-			strokeColor = { default={0,0,0,1}, over={1,1,1,1} },--default={1,0.4,0,1}, over={0.8,0.8,1,1} },
-			strokeWidth = 1,
+			width = 45,
+			height = 42,
+			onRelease = onSoundMenuBtnRelease,		
+			defaultFile = visual.audioSettingsImg,	
 			}
-		opt.panel.soundMenuBtn.x= -10
-		opt.panel.soundMenuBtn.y = opt.panel.contentCenterY
+		opt.panel.soundMenuBtn.x= -63---10
+		opt.panel.soundMenuBtn.y = -30--opt.panel.contentCenterY
 		opt.panel:insert(opt.panel.soundMenuBtn)
 -- -------------------------------------------------------------------------------
 opt.group = display.newGroup()
