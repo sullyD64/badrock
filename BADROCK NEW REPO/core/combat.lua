@@ -33,35 +33,49 @@ local settings = {
 			alpha = 0, --0.6
 			color = {0, 0, 255},
 		},
-		sheetData = {
-			height = 160,
-			width = 160,
-			numFrames = 13,
-			sheetContentWidth = 480,
-			sheetContentHeight = 800 
-		},
-		sequenceData = {
-			{name = "beginning", start=1, count=7, time=300, loopCount=1},
-			{name = "spinning",  start=8, count=3, time=300, loopCount=0},
-			{name = "ending",    frames = {11, 12, 13, 1}, time=300, loopCount=1}
-		},
+		options = {
+			spriteOptions = {
+				height = 160,
+				width = 160,
+				numFrames = 13,
+				sheetContentWidth = 480,
+				sheetContentHeight = 800 
+			},
+			spriteSequence = {
+				{name = "beginning", start=1, count=7, time=300, loopCount=1},
+				{name = "spinning",  start=8, count=3, time=300, loopCount=0},
+				{name = "ending",    frames = {11, 12, 13, 1}, time=300, loopCount=1}
+			},
+		}
 	},
 
 	gun = {
 		ammo = 5,
-		staticOptions = { 			-- provvisorie
-			width = 40,
-			height = 40,
-			filePath = visual.steveGun,
+		-- staticOptions = { 			-- provvisorie
+		-- 	width = 40,
+		-- 	height = 40,
+		-- 	filePath = visual.equipped_gun,
+		-- 	notPhysical = true,
+		-- 	eName = "stevePowerUp",
+		-- },
+		options = {
+			graphicType = "animated",
+			filePath = visual.equipped_gun,
 			notPhysical = true,
 			eName = "stevePowerUp",
+			spriteOptions = {
+				height = 40,
+				width = 60,
+				numFrames = 4,
+				sheetContentWidth = 240,
+				sheetContentHeight = 40,
+			},
+			spriteSequence = {
+				{name = "shooting", frames = {1,2,3,4,1}, time=300, loopCount=1},
+			},
 		},
-		sheetData = {
-			-- FABIOOOO
-		},
-		sequenceData = {
-			-- FABIOOOO
-		}
+
+		
 	},
 
 	bullet = {
@@ -77,10 +91,10 @@ local settings = {
 			alpha = 0, -- 0.6
 			color = {255, 0, 255},
 		},
-		sheetData = {
+		spriteOptions = {
 			-- FABIOOOO
 		},
-		sequenceData = {
+		spriteSequence = {
 			-- FABIOOOO
 		}
 	}
@@ -322,7 +336,7 @@ end
 			-------------------------------------------------
 
 			-- Loads the gun sprite and animation sequences
-			local gun = entity.newEntity(settings.gun.staticOptions)
+			local gun = entity.newEntity(settings.gun.options)
 			gun:addOnMap( map )
 
 			-- Ammo and Bullets------------
@@ -340,6 +354,9 @@ end
 			sfx.playSound( sfx.gunSound, { channel = 4 } )
 			-------------------------------------------------
 			player.powerUp.attacks[combat.ammo]:shoot()
+
+			player.powerUp:setSequence("shooting")
+			player.powerUp:play()
 
 			-- Attack duration is needed here for re-enabling the action button,
 			-- managing the gun animation and triggering handleAttackEnd.
@@ -388,7 +405,7 @@ end
 		player.hasPowerUp = false
 
 		-- Animation: the powerup is knocked away from the player and off the map.
-			physics.addBody( powerUp, {isSensor = true, density = 1.0})
+			physics.addBody( powerUp, {isSensor = true, density = 0.4})
 			powerUp.eName = "lostPowerUp"
 
 			-- if (powerUp.sequence) then powerUp:pause() end
@@ -427,9 +444,9 @@ end
 		-- Loads the sprite and animation sequences
 			local sprite = entity.newEntity{
 				graphicType = "animated",
-				filePath = visual.darkSteveAttack, --visual.steveAttack --visual.superSteveAttack
-				spriteOptions = settings.melee.sheetData,
-				spriteSequence = settings.melee.sequenceData,
+				filePath = visual.steveSuperAttack, --visual.steveDefaultAttack / visual.steveDarkAttack
+				spriteOptions = settings.melee.options.spriteOptions,
+				spriteSequence = settings.melee.options.spriteSequence,
 				notPhysical = true,
 				eName = "steveAttack"
 			}

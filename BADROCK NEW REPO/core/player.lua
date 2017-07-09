@@ -95,7 +95,7 @@ function player.loadPlayer( currentGame )
 	-- Loads the Main Entity ("hitbox")
 		local player = entity.newEntity{
 			graphicType = "static",
-			filePath = visual.steveImage,
+			filePath = visual.steveDebugImage,
 			width = 40,
 			height = 60,
 			bodyType = "dynamic",
@@ -107,7 +107,7 @@ function player.loadPlayer( currentGame )
 	-- Loads Sprite and animation sequences
 		local sprite = entity.newEntity{
 			graphicType = "animated",
-			filePath = visual.darkSteveSheetWalking, --visual.steveSheetWalking  --visual.superSteveSheetWalking
+			filePath = visual.steveSuperSprite, --visual.steveDefaultSprite / visual.steveDarkSprite 
 			spriteOptions = settings.mainSheetData,
 			spriteSequence = settings.mainSequenceData,
 			notPhysical = true,

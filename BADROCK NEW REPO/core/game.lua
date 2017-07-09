@@ -360,7 +360,7 @@ physics.setGravity( 0, 80 )
 			-- Keeps the player's equipped powerUp joined with the player.
 			if (game.steve.powerUp and game.steve.hasPowerUp) then
 				local powerUp = game.steve.powerUp
-				powerUp.x, powerUp.y = game.steve.x + (game.steve.direction * 42), game.steve.y
+				powerUp.x, powerUp.y = game.steve.x + (game.steve.direction * 48), game.steve.y
 				powerUp.xScale = game.steve.direction
 			end
 		end

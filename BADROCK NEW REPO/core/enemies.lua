@@ -35,7 +35,7 @@ local enemies = {
 			score = 250,
 			options = {
 				graphicType = "animated",
-				filePath = visual.enemyPaperAnim,
+				filePath = visual.enemyPaper,
 				spriteOptions = {
 					height = 90,
 					width = 80,
@@ -73,7 +73,7 @@ local enemies = {
 			lives = 2,
 			score = 150,
 			options = {
-				filePath = visual.enemySedia,
+				filePath = visual.enemyChair,
 				width = 140,
 				height = 226,
 				physicsParams = { bounce = 0, friction = 1.0, density = 0.5, },
