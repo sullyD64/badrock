@@ -84,6 +84,19 @@ local strategyBoss1 = {}
 			self.bossEntity.manoDx.laser = nil
 			self.bossEntity.manoSx.laser = nil
 			
+			--play all the sprites
+			self.bossEntity.manoDx:setSequence("idle")
+			self.bossEntity.manoDx:play()
+			self.bossEntity.manoSx:setSequence("idle")
+			self.bossEntity.manoSx:play()
+			self.bossEntity.spallaDx:setSequence("idle")
+			self.bossEntity.spallaDx:play()
+			self.bossEntity.spallaSx:setSequence("idle")
+			self.bossEntity.spallaSx:play()
+			self.bossEntity.corpo:setSequence("idle")
+			self.bossEntity.corpo:play()
+			self.bossEntity.testa:setSequence("idle")
+			self.bossEntity.testa:play()
 			
 			print(" STA PER INIZIARE LA BOSS FIGHT")
 			--phase1
@@ -113,19 +126,19 @@ local strategyBoss1 = {}
 				--self.bossEntity.manoSx.state = "alzaSchiaccia"
 
 				--Sposta il corpo del boss con tutto il resto verso l'alto
-				transition.to(self.spawn, {time=4000, y= self.spawn.y - 150})
+				transition.to(self.spawn, {time=4000, y= self.spawn.y - 220})
 
 				-- Funzione che fa muovere le mani ogni tot secondi----------
 				local t1
 				local muoviMani = function()
 					if(self.phase==1 and self.state == "Running") then
-						local d1 = math.random(-50,50)
-						local d2 = math.random(-50,50)
+						local d1 = math.random(-200,200)
+						local d2 = math.random(-200,200)
 						if(self.bossEntity.manoDx and self.bossEntity.manoDx.lives > 1)then 
-							self.bossEntity.manoDx:applyLinearImpulse(d1,-20,self.bossEntity.manoDx.x,self.bossEntity.manoDx.y) 
+							self.bossEntity.manoDx:applyLinearImpulse(d1,-100,self.bossEntity.manoDx.x,self.bossEntity.manoDx.y) 
 						end
 						if(self.bossEntity.manoSx and self.bossEntity.manoSx.lives > 1)then
-							self.bossEntity.manoSx:applyLinearImpulse(d2,-20,self.bossEntity.manoSx.x,self.bossEntity.manoSx.y)
+							self.bossEntity.manoSx:applyLinearImpulse(d2,-100,self.bossEntity.manoSx.x,self.bossEntity.manoSx.y)
 						end
 					else
 						timer.cancel(t1)
@@ -151,7 +164,7 @@ local strategyBoss1 = {}
 
 			--Sposta il corpo del boss con tutto il resto verso il basso
 			if(self.bossEntity.spallaSx.state == "normal" and self.bossEntity.spallaDx.state == "normal") then
-				transition.to(self.spawn, {time=4000, y= self.spawn.y + 150})
+				transition.to(self.spawn, {time=4000, y= self.spawn.y + 70})
 			end
 
 		 	local function sparaSx()
@@ -194,6 +207,9 @@ local strategyBoss1 = {}
 		 	--transition.to(self.bossEntity.manoSx, {time=20, onComplete=function() self.bossEntity.manoSx.isBodyActive=false end})
 		 	--transition.to(self.bossEntity.manoDx, {time=20, onComplete=function() self.bossEntity.manoDx.isBodyActive=false end})
 		 	-------
+		 	self.bossEntity.manoSx:setFillColor(1)
+		 	self.bossEntity.manoDx:setFillColor(1)
+
 		 	self.bossEntity.manoDx.state = "insegui"
 			self.bossEntity.manoSx.state = "insegui"
 			transition.to(self.bossEntity.manoDx,{time = 20, rotation = 180})
@@ -243,9 +259,17 @@ local strategyBoss1 = {}
 		function strategyB1:victory()
 			self.state = "Completed"
 			self.win = true
+
+			self.bossEntity.corpo:setSequence("destroy")
+			self.bossEntity.corpo:play()
+
 			--pause all timers of this strategy
-			for i,t in pairs(self.timers)do
-				timer.pause(t)
+			if(self.timers)then
+				for i,t in pairs(self.timers)do
+					if(not t._expired) then
+						timer.pause(t)
+					end
+				end
 			end
 
 			timer.performWithDelay(5000,function() --dopo circa 5 sec
@@ -300,12 +324,7 @@ local strategyBoss1 = {}
 				if(game.map)then
 				util.destroyWalls(game.map)
 				end
-				-- if we don't defeat the Boss, reactivate the boss Trigger (usefull in case we died)
-				transition.to(self.trigger,{time=0, onComplete= function()
-					if(self.win == false)then
-					 	self.trigger.isBodyActive=true
-					end 
-				end})
+				 
 			end)
 		end
 
@@ -339,10 +358,13 @@ local strategyBoss1 = {}
 			end
 			--pause all sprites for the boss parts
 			for i,part in pairs(self.bossEntity)do
-				--part:pause()
-				if(part.name=="manoSx" or part.name=="manoDx") then
-					if(part.laser) then	if(part.laser.isPlaying)then	part.laser:pause() end  end
-					--end
+				if(part and part.isPlaying)then
+					part:pause()
+					if(part.name=="manoSx" or part.name=="manoDx") then
+						if(part.laser) then
+							if(part.laser.isPlaying)then part.laser:pause() end
+						end
+					end
 				end
 			end
 		end
@@ -378,11 +400,13 @@ local strategyBoss1 = {}
 
 			--resume all sprites for the boss parts
 			for i,part in pairs(self.bossEntity)do
-				--part:play()
-				if(part.name=="manoSx" or part.name=="manoDx") then
-					--for i,laser in pairs(part.laser)do
-					if(part.laser) then	if(part.laser.isPlaying == false)then	part.laser:play() end end
-					--end
+				if(part and (part.isPlaying == false))then
+					part:play()
+					if(part.name=="manoSx" or part.name=="manoDx") then
+						if(part.laser) then
+							if(part.laser.isPlaying == false)then part.laser:play() end
+						end
+					end
 				end
 			end
 		end
@@ -395,20 +419,20 @@ local strategyBoss1 = {}
 
 				-- Keeps the Boss Pieces all tied together ----
 				if(bossEntity.spallaDx and bossEntity.spallaDx.lives >0) then
-					bossEntity.spallaDx.x = self.spawn.x +73
-					bossEntity.spallaDx.y = self.spawn.y-17
+					bossEntity.spallaDx.x = self.spawn.x +146
+					bossEntity.spallaDx.y = self.spawn.y-34
 				end
 				if(bossEntity.spallaSx and bossEntity.spallaSx.lives>0 ) then
-					bossEntity.spallaSx.x = self.spawn.x -73
-					bossEntity.spallaSx.y = self.spawn.y-17
+					bossEntity.spallaSx.x = self.spawn.x -146
+					bossEntity.spallaSx.y = self.spawn.y-34
 				end
 				if(bossEntity.testa and bossEntity.testa.lives > 0) then
 					bossEntity.testa.x = self.spawn.x 
-					bossEntity.testa.y = self.spawn.y -35
+					bossEntity.testa.y = self.spawn.y -70
 				end
 				if(bossEntity.corpo and bossEntity.corpo.lives > 0) then
 					bossEntity.corpo.x = self.spawn.x 
-					bossEntity.corpo.y = self.spawn.y +90
+					bossEntity.corpo.y = self.spawn.y +180
 				end
 
 				-- Phase 1 -------------------------------------------------
@@ -436,21 +460,21 @@ local strategyBoss1 = {}
 					-- Le mani tornano in aria se perdono tutta la vita------------
 					if(bossEntity.manoDx.lives == 1 and bossEntity.manoDx.state == "alzaSchiaccia") then
 						bossEntity.manoDx:setFillColor( 255,0 ,0)
-						local t=timer.performWithDelay(250, function()	bossEntity.manoDx:setFillColor(1) end)
+						--local t=timer.performWithDelay(250, function()	bossEntity.manoDx:setFillColor(1) end)
 						table.insert(self.timers , t)
 
 						bossEntity.manoDx.state = "sconfitta"
 						bossEntity.manoDx.isBodyActive=false
-						transition.to(bossEntity.manoDx, {time= 4000,  x = self.spawn.x +250, y = self.spawn.y})
+						transition.to(bossEntity.manoDx, {time= 4000,  x = self.spawn.x +500, y = self.spawn.y})
 					end
 					if(bossEntity.manoSx.lives == 1 and bossEntity.manoSx.state == "alzaSchiaccia") then
 						bossEntity.manoSx:setFillColor( 255,0 ,0)
-						local t= timer.performWithDelay(250, function()	bossEntity.manoSx:setFillColor(1) end)
+						--local t= timer.performWithDelay(250, function()	bossEntity.manoSx:setFillColor(1) end)
 						table.insert(self.timers , t)
 
 						bossEntity.manoSx.state = "sconfitta"
 						bossEntity.manoSx.isBodyActive=false
-						transition.to(bossEntity.manoSx, {time= 4000, x = self.spawn.x -250, y = self.spawn.y})
+						transition.to(bossEntity.manoSx, {time= 4000, x = self.spawn.x -500, y = self.spawn.y})
 					end
 					---------------------------------------------------------------
 					-- Se entrambe le mani sono sconfitte parte la fase 2 ---------
@@ -531,12 +555,12 @@ local strategyBoss1 = {}
 				if(self.phase == 3)then
 					-- Move the hands based on their state during this phase----
 						if(bossEntity.manoSx.state == "insegui")then
-							bossEntity.manoSx.x =	game.steve.x -240
+							bossEntity.manoSx.x =	game.steve.x -480
 							bossEntity.manoSx.y = game.steve.y
 						end
 						if(bossEntity.manoDx.state == "insegui") then
 							bossEntity.manoDx.x = game.steve.x
-							bossEntity.manoDx.y =  game.steve.y -150
+							bossEntity.manoDx.y =  game.steve.y -300
 						end
 					---------------------------------------------------------------
 					--Keeps the lasers in the position where they are fired------
@@ -590,27 +614,10 @@ function bossStrategy.loadBoss( trigger )
 	trigger:addProperty(Property:new("maskBits", filters.envFilter.maskBits))
 				
 	trigger.listener = function(event)
-		--Da mettere anche nei prossimi trigger per evitare un doppio contatto del trigger in breve tempo
-		-- transition.to(event, {time = 0, 
-		-- 	onComplete = function()
-		-- 		event.contact.isEnabled = false
-		-- 		transition.to(trigger, {time = 0, 
-		-- 			onComplete = function()	
-		-- 				trigger.isBodyActive = false
-		-- 			end
-		-- 		})
-		-- 	end
-		-- })
 
 		--Triggers the Boss Fight
-		if (bossStrategy.activeStrategy == 0) then
-			event.contact.isEnabled = true
-			transition.to(trigger, {time = 0, 
-				onComplete = function()
-					strategy:startFight()
-				end
-			})
-			
+		if (bossStrategy.activeStrategy == 0 and strategy.win == false) then
+			strategy:startFight()
 			-- Closes the area of the fight
 			trigger.walls = util.createWalls(game.map)
 		end

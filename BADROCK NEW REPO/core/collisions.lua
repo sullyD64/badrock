@@ -118,7 +118,16 @@ end
 					})
 				end	
 
-			else --Se ha almeno una vita	
+			else --Se ha almeno una vita
+				if(boss.name=="testa")then
+					boss:setSequence("damage")
+					boss:play()
+					transition.to(boss,{time=1500, onComplete=function()
+						boss:setSequence("idle")
+						boss:play()
+					end})
+				end
+
 				boss.alpha = 0.5 
 				boss.isTargettable = false
 				timer.performWithDelay(500, 

@@ -40,6 +40,12 @@ local visual = {
 	resumeBtn_over         = "visual/ui/RESUME3.png",
 	lifeIcon               = "visual/ui/life.png",
 
+	steveSheetWalking      = "visual/sprites/steveAnim.png",
+	steveImage             = "visual/sprites/rock_original.png",
+	steveAttack            = "visual/sprites/attackSprite.png",
+	steveGun               = "visual/sprites/equipped_gun.png",
+	gun                    = "visual/sprites/gun.png",
+
 	steveDebugImage        = "visual/sprites/rock_original.png",
 	steveDefaultSprite     = "visual/sprites/steve_default_sprite.png",
 	steveDefaultAttack     = "visual/sprites/steve_default_attack.png",
@@ -72,10 +78,10 @@ local visual = {
 	itemImmunity           = "visual/sprites/bonus_immunity.png",
 	--itemMetheor          = "visual/misc/metheor.png"
 
-	bossHand               = "visual/sprites/manoBoss.png",
-	bossSpalla             = "visual/sprites/bossSpalla.png",
-	bossTesta              = "visual/sprites/testaBoss.png",
-	bossCorpo              = "visual/sprites/corpoBoss.png",
+	bossHand               = "visual/sprites/manoBossAnim.png",
+	bossSpalla             = "visual/sprites/spallaBossSprite.png",
+	bossTesta              = "visual/sprites/testaBossAnim.png",
+	bossCorpo              = "visual/sprites/corpoBossAnim.png",
 	bossLaser              = "visual/sprites/laserSprite.png"
 
 }

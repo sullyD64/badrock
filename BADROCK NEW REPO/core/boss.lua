@@ -18,10 +18,20 @@ local boss = {
 			lives = 3,--3
 			score  = 0,
 			options = {
-			-- 	graphicType = "animated",
+			 	graphicType = "animated",
 				filePath = visual.bossHand,
-				width = 45,
-				height = 75,
+				spriteOptions = {
+					height = 150,
+					width = 90,
+					numFrames = 3,
+					sheetContentWidth = 270,
+					sheetContentHeight = 150 
+				},
+				spriteSequence = {
+					{name = "idle", start =1, count=3,    time=600, loopCount=0}
+				},
+				--width = 45,
+				--height = 75,
 			 	physicsParams = { bounce = 1, friction = 1.0, density = 1.0, },
 				eName = "boss"
 			}
@@ -31,10 +41,20 @@ local boss = {
 			lives = 3,--3
 			score = 0,
 			options = {
-			-- 	graphicType = "animated",
+			 	graphicType = "animated",
 				filePath = visual.bossHand,
-				width = 45,
-				height = 75,
+				spriteOptions = {
+					height = 150,
+					width = 90,
+					numFrames = 3,
+					sheetContentWidth = 270,
+					sheetContentHeight = 150 
+				},
+				spriteSequence = {
+					{name = "idle", start =1, count=3, time=300, loopCount=0}
+				},
+				--width = 45,
+				--height = 75,
 			 	physicsParams = { bounce = 1, friction = 1.0, density = 1.0, },
 				eName = "boss"
 			}
@@ -45,10 +65,21 @@ local boss = {
 			lives = 2,--2
 			score = 0,
 			options = {
-			-- 	graphicType = "animated",
+			 	graphicType = "animated",
 				filePath = visual.bossSpalla,
-				width = 60,
-				height = 60,
+				spriteOptions = {
+					height = 120,
+					width = 140,
+					numFrames = 6,
+					sheetContentWidth = 420,
+					sheetContentHeight = 240 
+				},
+				spriteSequence = {
+					{name = "idle", start =1, count=3,  time=400, loopCount=0},
+					{name = "fire", frames={4,5,6,1},  time=400, loopCount=1},	
+				},
+				--width = 60,
+				--height = 60,
 			 	physicsParams = {  },
 				eName = "boss"
 			}
@@ -59,10 +90,21 @@ local boss = {
 			lives = 2,--2
 			score = 0,
 			options = {
-			-- 	graphicType = "animated",
+				graphicType = "animated",
 				filePath = visual.bossSpalla,
-				width = 60,
-				height = 60,
+				spriteOptions = {
+					height = 120,
+					width = 140,
+					numFrames = 6,
+					sheetContentWidth = 420,
+					sheetContentHeight = 240 
+				},
+				spriteSequence = {
+					{name = "idle", start =1, count=3,  time=400, loopCount=0},
+					{name = "fire", frames={4,5,6,1},  time=400, loopCount=1},	
+				},
+				--width = 60,
+				--height = 60,
 			 	physicsParams = { },
 				eName = "boss"
 			}
@@ -73,10 +115,21 @@ local boss = {
 			lives = 2,
 			score = 0,
 			options = {
-			-- 	graphicType = "animated",
+			 	graphicType = "animated",
 				filePath = visual.bossTesta,
-				width = 92,
-				height = 112,
+				spriteOptions = {
+					height = 224,
+					width = 184,
+					numFrames = 9,
+					sheetContentWidth = 552,
+					sheetContentHeight = 672 
+				},
+				spriteSequence = {
+					{name = "idle", frames={1,2,3,4,5},  time=800, loopCount=0},
+					{name = "damage", frames={6,6,7,8,9,1},  time=1000, loopCount=1},	
+				},
+				--width = 92,
+				--height = 112,
 			 	physicsParams = { },
 				eName = "boss"
 			}
@@ -86,10 +139,21 @@ local boss = {
 			lives = 1,
 			score = 0,
 			options = {
-			-- 	graphicType = "animated",
+			 	graphicType = "animated",
 				filePath = visual.bossCorpo,
-				width = 215,
-				height = 180,
+				spriteOptions = {
+					height = 360,
+					width = 430,
+					numFrames = 14,
+					sheetContentWidth = 1290,
+					sheetContentHeight = 1800 
+				},
+				spriteSequence = {
+					{name = "idle", frames={1,2,3,4,5},  time=600, loopCount=0},
+					{name = "destroy", frames={1,2,3,4,5,6,6,7,7,8,8,9,10,11,12,13,14},  time=1800, loopCount=1},	
+				},
+				--width = 215,
+				--height = 180,
 			 	physicsParams = { isSensor = true },
 				eName = "visual"
 			}
@@ -183,8 +247,8 @@ local boss = {
 	
 		local carota = entity.newEntity{
 			filePath = visual.npcImage,
-			width = 25,
-			height = 40,
+			width = 40,
+			height = 60,
 		 	physicsParams = { bounce = 1, friction = 1.0, density = 1.0 , filter = filters.enemyHitboxFilter},
 			eName = "boss"
 		}
@@ -196,7 +260,24 @@ local boss = {
 		carota:addOnMap(game.map)
 		table.insert(lanciatore.proiettili, carota)
 
+		
+		local spriteListener = function(event)
+			local sprite = event.target
+			if(event.phase == "ended" and sprite.sequence == "fire") then
+				sprite:setSequence("idle")
+				sprite:play()
+			end
+		end
+		
+
+		if(lanciatore.sequence == "idle")then
+			lanciatore:addEventListener("sprite",spriteListener)
+		end
+
 		if(target.x and lanciatore.x and target.y and lanciatore.y) then
+			lanciatore:setSequence("fire")
+			lanciatore:play()
+
 			transition.moveTo(carota,{time=3000, x= target.x, y=target.y , onComplete=function()
 				if(carota)then
 					carota.isFixedRotation=true
@@ -225,21 +306,25 @@ local boss = {
 				bodyType="dynamic",
 				filePath = visual.bossLaser,
 				spriteOptions={
-					height = 40,
-					width = 600,
+					height = 80,
+					width =1200,
 					numFrames = 4,
-					sheetContentWidth = 600,
-					sheetContentHeight = 160 
+					sheetContentWidth = 1200,
+					sheetContentHeight = 320 
 				},
 				spriteSequence= {
 					{name = "laser",  frames={4}, time=100, loopCount=0},
 					{name = "fire",  frames = {4,3,2,1,2,1,2,1,2,1,2,3,4}, time=1000, loopCount=1}
 				},
 			 	physicsParams = { density = 1.0 , isSensor=true, filter = filters.enemyHitboxFilter},
-				eName = "enemy"
+				eName = "visual"
 			}
-			local laser = entity.newEntity(laserParameters)
+			
+			local laser =entity.newEntity(laserParameters)
 			laser.alpha=0
+			laser.isBodyActive=false
+			transition.to(laser,{time=0, onComplete= function()	laser.isBodyActive=false end })
+
 
 		local function deleteLaser(event)
 			--Distruggo il laser
@@ -249,12 +334,12 @@ local boss = {
 				display.remove(sprite)
 				sprite=nil
 				if(generatore.name == "manoSx")then
-					posX = game.steve.x -240 
+					posX = game.steve.x -480 
 					posY = game.steve.y
 
 				elseif(generatore.name == "manoDx")then
 					posX = game.steve.x
-					posY = game.steve.y -150
+					posY = game.steve.y -300
 				end
 				--la mano ritorna nella sua posizione e nello stato per inseguire
 				transition.to(generatore,{time= 500, x = posX, y=posY, onComplete= function()
@@ -265,6 +350,7 @@ local boss = {
 		end 
 
 		local function spara()
+			laser.eName="boss"
 			transition.to(laser,{time=10, onComplete=function() 
 					laser.isBodyActive=true
 			end})
@@ -281,12 +367,12 @@ local boss = {
 				if(generatore.name == "manoDx") then
 			--la mano DX si occupa di fare i laser Verticali
 				posizioneX = generatore.x
-				posizioneY = generatore.y + (laser.width/2) +40
+				posizioneY = generatore.y + (laser.width/2) +80
 				transition.to(laser,{time = 20, rotation = 90})
 
 			elseif(generatore.name == "manoSx")then
 			--la mano SX si occupa di fare i laser Orizzontali
-				posizioneX = generatore.x + (laser.width/2)+ 40
+				posizioneX = generatore.x + (laser.width/2)+ 80
 				posizioneY = generatore.y	
 			end
 
@@ -295,7 +381,7 @@ local boss = {
 			generatore.laser=laser
 			laser:addOnMap(game.map)
 
-			transition.to(laser,{time=10, onComplete= function()	laser.isBodyActive=false end })
+			transition.to(laser,{time=0, onComplete= function()	laser.isBodyActive=false end })
 
 			laser.alpha=0
 			laser:setSequence("laser")
@@ -305,6 +391,7 @@ local boss = {
 
 			-- in Tot secondi l'alpha del laser si riempie
 			transition.to(laser,{time=1000, alpha=1, onComplete= function()
+				
 				--Se Steve muore prima che finisca la fase ed il laser è stato creato
 				if(strategy.state=="Terminated")then
 					transition.to(laser,{time=500, alpha=0,onComplete=function()
@@ -313,7 +400,7 @@ local boss = {
 					end})
 				else --Se tutto procede normalmente
 					--Dopo Tot secondi che il laser è arrivato con alpha=1, spara
-					local t1 = timer.performWithDelay(800, spara )
+					local t1 = timer.performWithDelay(1000, spara )
 					table.insert(strategy.timers, t1)
 				end
 			end})			
@@ -361,7 +448,7 @@ local boss = {
 
 				local t =timer.performWithDelay(10,removePhysicBody(oggetto))
 				table.insert(strategy.timers, t)
-				transition.to(oggetto,{time=1500, y=target.y - 150, onComplete= function() funzioni.insegui() end})
+				transition.to(oggetto,{time=1500, y=target.y - 300, onComplete= function() funzioni.insegui() end})
 			end
 		end
 		
