@@ -29,7 +29,7 @@ local combat = {
 local settings = {
 	melee = {
 		sensorOpts = {
-			radius = 40,
+			radius = 80,
 			alpha = 0, --0.6
 			color = {0, 0, 255},
 		},
