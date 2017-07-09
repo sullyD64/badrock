@@ -46,15 +46,20 @@ local visual = {
 	steveGun               = "visual/sprites/equipped_gun.png",
 	gun                    = "visual/sprites/gun.png",
 
-	-- Steve Dark Skin
-	darkSteveAttack        = "visual/sprites/darkSkinAttack.png",
-	darkSteveSheetWalking  = "visual/sprites/darkSkinAnim.png",
+	steveDebugImage        = "visual/sprites/rock_original.png",
+	steveDefaultSprite     = "visual/sprites/steve_default_sprite.png",
+	steveDefaultAttack     = "visual/sprites/steve_default_attack.png",
+	
+	-- Dark Steve Skin
+	steveDarkSprite        = "visual/sprites/steve_dark_sprite.png",
+	steveDarkAttack        = "visual/sprites/steve_dark_attack.png",
+
 	-- Super Steve Skin
-	superSteveAttack        = "visual/sprites/superSkinAttack.png",
-	superSteveSheetWalking  = "visual/sprites/superSkinAnim.png",
+	steveSuperSprite       = "visual/sprites/steve_super_sprite.png",
+	steveSuperAttack       = "visual/sprites/steve_super_attack.png",
 
+	equipped_gun           = "visual/sprites/equipped_gun.png",
 	bullet                 = "visual/sprites/bullet.png",
-
 	platform               = "visual/tilesets/platform.png",
 
 	npcImage               = "visual/sprites/carota.png",
@@ -64,20 +69,15 @@ local visual = {
 	npcBalloonButton2      = "visual/sprites/buttonno.png",
 
 	-- enemyPaper          = "visual/sprites/paper.png",
-	enemySedia             = "visual/sprites/sedia.png",
-	enemyPaperAnim         = "visual/sprites/paperAnimazione.png",
-	enemyRobot             = "visual/sprites/robot.png",
+	enemyChair             = "visual/sprites/enemy_chair.png",
+	enemyPaper             = "visual/sprites/enemy_paper.png",
+	enemyRobot             = "visual/sprites/enemy_robot_old.png",
 
 	itemLife               = "visual/sprites/bonus_life.png",
 	itemGun                = "visual/sprites/pup_gun.png",
 	itemImmunity           = "visual/sprites/bonus_immunity.png",
 	--itemMetheor          = "visual/misc/metheor.png"
 
-	-- bossHand               = "visual/sprites/manoBoss.png",
-	-- bossSpalla             = "visual/sprites/bossSpalla.png",
-	-- bossTesta              = "visual/sprites/testaBoss.png",
-	-- bossCorpo              = "visual/sprites/corpoBoss.png",
-	-- bossLaser              = "visual/sprites/laserSprite.png"
 	bossHand               = "visual/sprites/manoBossAnim.png",
 	bossSpalla             = "visual/sprites/spallaBossSprite.png",
 	bossTesta              = "visual/sprites/testaBossAnim.png",
