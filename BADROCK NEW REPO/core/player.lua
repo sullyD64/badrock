@@ -107,7 +107,7 @@ function player.loadPlayer( currentGame )
 	-- Loads Sprite and animation sequences
 		local sprite = entity.newEntity{
 			graphicType = "animated",
-			filePath = visual.steveSheetWalking, --visual.steveSheetWalking
+			filePath = visual.darkSteveSheetWalking, --visual.steveSheetWalking  --visual.superSteveSheetWalking
 			spriteOptions = settings.mainSheetData,
 			spriteSequence = settings.mainSequenceData,
 			notPhysical = true,
