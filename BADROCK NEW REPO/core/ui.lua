@@ -73,9 +73,10 @@ local buttonData = {
 		pauseBtn = {
 			options = {
 				id = "pauseBtn",
-				defaultFile = visual.pauseBtn,
+				defaultFile = visual.pauseBtnDefault,
+				overFile = visual.pauseBtnOver,
 				width = 50,
-				height = 50,
+				height = 47,
 				x = display.contentWidth -8,
 				y = 18,
 			},
@@ -86,9 +87,10 @@ local buttonData = {
 		resumeBtn = {
 			options = {
 				id = "resumeBtn",
-				defaultFile = visual.resumeBtn,
+				defaultFile = visual.resumeBtnDefault,
+				overFile = visual.resumeBtnOver,
 				width = 50,
-				height = 50,
+				height = 47,
 				x = display.contentWidth - 8,
 				y = 18,
 			},
