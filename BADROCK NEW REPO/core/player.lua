@@ -10,6 +10,7 @@
 -----------------------------------------------------------------------------------------
 local entity  = require ( "lib.entity"  )
 local combat  = require ( "core.combat" )
+local myData = require ("myData")
 
 local player = {}
 local settings = {
@@ -107,7 +108,8 @@ function player.loadPlayer( currentGame )
 	-- Loads Sprite and animation sequences
 		local sprite = entity.newEntity{
 			graphicType = "animated",
-			filePath = visual.steveDarkSprite, --visual.steveDefaultSprite / visual.steveDarkSprite 
+			-- Richiama myData che ha in memoria le sprite giuste per ogni skin e il numero della skin selezionata
+			filePath = myData.settings.skins[myData.settings.selectedSkin].sheet,--visual.steveDarkSprite, --visual.steveDefaultSprite / visual.steveDarkSprite 
 			spriteOptions = settings.mainSheetData,
 			spriteSequence = settings.mainSequenceData,
 			notPhysical = true,

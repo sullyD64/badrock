@@ -16,6 +16,7 @@
 local entity     = require ( "lib.entity"      )
 local collisions = require ( "core.collisions" )
 local controller = require ( "core.controller" )
+local myData = require ("myData")
 
 local combat = {
 	map = {},
@@ -438,7 +439,8 @@ end
 		-- Loads the sprite and animation sequences
 			local sprite = entity.newEntity{
 				graphicType = "animated",
-				filePath = visual.steveDarkAttack, --visual.steveDefaultAttack / visual.steveDarkAttack
+				-- Richiama myData che ha in memoria le sprite giuste per ogni skin e il numero della skin selezionata
+				filePath = myData.settings.skins[myData.settings.selectedSkin].attackSheet,--visual.steveDarkAttack, --visual.steveDefaultAttack / visual.steveDarkAttack
 				spriteOptions = settings.melee.options.spriteOptions,
 				spriteSequence = settings.melee.options.spriteSequence,
 				notPhysical = true,
