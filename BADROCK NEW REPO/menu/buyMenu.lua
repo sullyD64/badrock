@@ -7,13 +7,17 @@ local skinType
 local price
 local skinBtn, transpBtn, backBtn
 local buyBtns, skins
+local goodText, evilText
 
 local buy = {}
     
-    function buy.setToEnableButtons( backButton, skinsButtons, buyButtons  )
+    function buy.setToEnableButtons( backButton, skinsButtons, buyButtons, gText, eText  )
         backBtn = backButton
         skins = skinsButtons
         buyBtns = buyButtons
+        goodText = gText 
+        evilText = eText
+
     end
     
     -- cambia il menu nel caso non si abbiano abbastanza punti (disabilita tasto d'acquisto e mostra testo)
@@ -71,8 +75,10 @@ local buy = {}
     local function onSkinBuy(event)
         if (skinType == "good") then
             myData.settings.goodPoints = myData.settings.goodPoints - price
+            goodText.text = "Good: "..myData.settings.goodPoints
         elseif (skinType == "evil") then
             myData.settings.evilPoints = myData.settings.evilPoints - price
+            evilText.text = "Evil: "..myData.settings.evilPoints
             print ("saldo punti cattivi "..myData.settings.evilPoints)
         end
         myData.settings.skins[buttonId].unlocked = true

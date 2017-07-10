@@ -37,7 +37,7 @@ local skin = {}
 		end
 		if (myData.settings.skins[idSkin].unlocked == false) then
 				buy.setSkin(idSkin, skin.panel.buyButtons[idSkin], skin.panel.skins[idSkin] ) 
-				buy.setToEnableButtons( skin.panel.returnBtn, skin.panel.skins,skin.panel.buyButtons  )
+				buy.setToEnableButtons( skin.panel.returnBtn, skin.panel.skins,skin.panel.buyButtons, skin.pointsPanel.goodPointsText, skin.pointsPanel.evilPointsText  )
 				skin.panel.returnBtn:setEnabled(false)
 					-- for i=1, myData.settings.skinNumber do
 					--     --skin.panel.skins[i]:setEnabled(false)
