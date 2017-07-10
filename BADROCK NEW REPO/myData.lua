@@ -43,5 +43,5 @@ M.settings.skins[3].unlocked = false
 M.settings.skins[3].price = 20
 M.settings.skins[3].type = "evil"
 M.settings.skins[3].sheet = visual.steveDarkSprite
-M.settings.skins[3].attackSheet = visualsteveDarkAttack
+M.settings.skins[3].attackSheet = visual.steveDarkAttack
 return M
