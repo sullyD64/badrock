@@ -59,12 +59,12 @@ local buttons = {}
 		-- Create a cancel button for return to the menu scene.
 		backButton = widget.newButton({
 			width = 40,
-			height = 38,
-			defaultFile = visual.menuButtonDefault,
-			overFile = visual.menuButtonOver,
+			height = 40,
+			defaultFile = visual.backLevelSelectDefault,
+			overFile = visual.backLevelSelectOver,
 			id = "back",
-			label = "B",
-			labelColor = { default={1}, over={128} },
+			--label = "B",
+			--labelColor = { default={1}, over={128} },
 			onEvent = handleCancelButtonEvent
 		})
 		backButton.anchorX = 0
@@ -185,12 +185,12 @@ local buttons = {}
 			local star = {}
 			if myData.settings.levels[i] and myData.settings.levels[i].stars then --and myData.settings.levels[i].stars > 0 then
 					for j = 1, 3 do --myData.settings.levels[i].stars do
-						star[j] = display.newImageRect(visual.levelSelectStar , buttons[i].width/6, buttons[i].width/5.97)--display.newPolygon( 0, 0, starVertices )
+						star[j] = display.newImageRect(visual.levelSelectStar , buttons[i].width/5, buttons[i].width/4.98)--buttons[i].width/6, buttons[i].width/5.97)--display.newPolygon( 0, 0, starVertices )
 						if j>myData.settings.levels[i].stars then
 							star[j].alpha = 0.2
 						end
-						star[j].x = buttons[i].x + (j * buttons[i].width/5) + buttons[i].width/10
-						star[j].y = buttons[i].y + buttons[i].height/3.5
+						star[j].x = buttons[i].x + (j * 40) + 3--buttons[i].width/5) + buttons[i].width/10
+						star[j].y = buttons[i].y + 55--buttons[i].height/3.5
 						levelSelectGroup:insert(star[j])
 					end
 			end
