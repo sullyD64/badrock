@@ -146,6 +146,7 @@ function player.loadPlayer( currentGame )
 		-- Pre-loads the default attack.
 		function player:loadDefaultAttack()
 			self.attack = combat.loadDefaultAttack()
+			self.attacks = {}
 			combat.defaultLoaded = true
 		end
 		player:loadDefaultAttack()

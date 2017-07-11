@@ -310,7 +310,7 @@ end
 		-- The bonus can't be picked up if the player is attacking, as this action MAY
 		-- modify the attack itself wich is a sequence of timed events.
 		if (not steve:isPerformingAttack()) then
-			print("Picked "..bonus.itemName)
+			-- print("Picked "..bonus.itemName)
 			display.remove(bonus)
 			steve:useBonus(bonus.itemName)
 		end
@@ -320,7 +320,7 @@ end
 		-- The powerUp can't be picked up if the player is attacking, as this action modifies
 		-- the attack itself which is a sequence of timed events.
 		if (not steve.hasPowerUp and steve.state ~= "Attacking" and (not steve.isImmune)) then
-			print("Picked "..powerup.itemName)
+			-- print("Picked "..powerup.itemName)
 			display.remove(powerup)
 			steve:equipPowerUp(powerup.itemName)
 		end
