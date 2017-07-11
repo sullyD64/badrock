@@ -114,6 +114,7 @@ local function handleAttackEnd()
 		player.attack.isBodyActive = false
 		player.attack.sprite:pause()
 		player.attack.sprite.isVisible = false
+		display.remove(player.attack.sprite)
 		display.remove(player.attack)
 		player.attack = nil
 		combat.defaultLoaded = false
@@ -187,11 +188,7 @@ end
 							controller.updateAmmo("destroy")
 						end
 						-- Simulates the press of the action button to begin the rampage.
-						transition.to(player, {time=200,
-							onComplete = function()
-								controller.pressActionButton()
-							end
-						})
+						controller.pressActionButton()
 					end
 				})
 
@@ -355,7 +352,8 @@ end
 
 			-- Attack duration is needed here for re-enabling the action button,
 			-- managing the gun animation and triggering handleAttackEnd.
-			player.attack = {}
+		
+			player.attack=player.powerUp.attacks[combat.ammo]
 			player.attack.type = "bullet"
 			player.attackDuration = 100
 
@@ -366,6 +364,7 @@ end
 	-- Loads a powerup which will appear as equipped near the player
 	-- and will modify the ui's action button.
 	function combat.loadPowerUp( name )
+		combat.defaultLoaded = false
 		local powerUp = {}
 
 		-- Updates the UI to visually represent the new action

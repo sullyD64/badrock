@@ -49,7 +49,7 @@ local enemies = {
 					{name = "running", start =4, count=5,    time=600, loopCount=0},
 					{name = "dead",    frames={9},           time=500, loopCount=1}
 				},
-				physicsParams = { bounce = 0, friction = 1.0, density = 0.8 },
+				physicsParams = { bounce = 0, friction = 1.0, density = 2 },
 				eName = "enemy"
 			}
 		},
