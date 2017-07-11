@@ -61,33 +61,43 @@ local skin = {}
 		location = "custom",
 		onComplete = panelTransDone,
 		width = display.contentWidth * 0.95,
-		height = display.contentHeight * 0.50,
+		height =display.contentHeight * 0.70,
 		speed = 220,
 		anchorX = 1.0,
 		anchorY = 0.5,
 		--x = display.screenOriginX, --attivando questo entra da sinistra
 		x =  display.contentWidth * 2,
-		y = display.contentCenterY +5 ,
+		y = display.contentCenterY +35 ,
 		inEasing = easing.linear,
 		outEasing = easing.outCubic
 	}
-	skin.panel.background = display.newRoundedRect( 0, 0, skin.panel.width, skin.panel.height-20, 10 )
-	skin.panel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
+	--skin.panel.backgroundprova = display.newRoundedRect(0,0, skin.panel.width, skin.panel.height, 10)---20)--display.newRoundedRect( 0, 0, skin.panel.width, skin.panel.height-20, 10 )
+	--skin.panel.backgroundprova:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
+	--skin.panel:insert( skin.panel.backgroundprova )
+
+	skin.panel.background = display.newImageRect(visual.bgMenuSkin, skin.panel.width, skin.panel.height-40)---20)--display.newRoundedRect( 0, 0, skin.panel.width, skin.panel.height-20, 10 )
+	skin.panel.background.y= -10
+	--skin.panel.background:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
 	skin.panel:insert( skin.panel.background )
 
-	skin.panel.title = display.newText( "Wardrobe", 0, -70,  utility.font, 15 )
+	skin.panel.title = display.newText( "Wardrobe", 0, -100, utility.font, 20 ) ---70,  utility.font, 15 )
 	skin.panel.title:setFillColor( 1, 1, 1 )
 	skin.panel:insert( skin.panel.title )
+
+	skin.panel.steve = display.newImageRect(visual.steveMenuSkin, 80, 80)
+	skin.panel.steve.x = 210
+	skin.panel.steve.y = 30
+	skin.panel:insert(skin.panel.steve)
 
 	-- Create the button to exit the skin menu
 	skin.panel.returnBtn = widget.newButton {
 		onRelease = onReturnBtnRelease,
-		width = 15,
-		height = 15,
+		width = 30,
+		height = 30,
 		defaultFile = visual.exitOptionMenu,
 		}
-	skin.panel.returnBtn.x= 75
-	skin.panel.returnBtn.y = -70
+	skin.panel.returnBtn.x= 240
+	skin.panel.returnBtn.y = -95
 	skin.panel:insert(skin.panel.returnBtn)
 
 	skin.panel.skinGroup = widget.newScrollView({
@@ -128,8 +138,8 @@ local skin = {}
 			style = "radio",
 			id = tostring(i),
 			onPress = onSkinSelect,
-			width = skin.panel.width/4.50,--display.contentWidth - 350,
-			height = skin.panel.height-60,--display.contentHeight - 200,
+			width = skin.panel.width/4.35,--display.contentWidth - 350,
+			height = skin.panel.height*0.55,---60,--display.contentHeight - 200,
 			--initialSwitchState = 
 		})
 
@@ -165,11 +175,21 @@ local skin = {}
 	skin.panel.skins[myData.settings.selectedSkin]:setState({isOn=true})
 	skin.panel:insert( skin.panel.skinGroup )
 
+	skin.panel.freccia = display.newImageRect(visual.frecciaSkin, 190, 70)
+	--skin.panel.freccia.x 
+	skin.panel.freccia.y = 65
+	skin.panel:insert(skin.panel.freccia)
+
+
+
 	skin.group = display.newGroup()
 	skin.group:insert(skin.panel)
 	skin.group:insert(buy.panel)
 	assert(skin.group[1] == skin.panel) -- bottom
 	assert(skin.group[2] == buy.panel) -- front
+
+
+
 
 	skin.pointsPanel = utility.newPanel{
 		location = "custom",
