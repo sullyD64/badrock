@@ -72,9 +72,9 @@ function npcs.loadNPCs( currentGame )
 				-- onComplete = panelTransDone,
 				speed = 200,
 				x = npc.x - 60,
-				y = npc.y - 40,
-				width = npc.sprite.width * 3,
-				height = npc.sprite.height * 3,
+				y = npc.y - 20,
+				width = npc.sprite.width * 4,
+				height = npc.sprite.height * 4,
 			}
 
 			local background = display.newImageRect( visual.npcBalloonBackground, 279, 197 )

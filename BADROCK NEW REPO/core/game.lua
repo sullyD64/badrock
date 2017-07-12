@@ -331,6 +331,7 @@ physics.setGravity( 0, 80 )
 				-- Default type is the melee attack or other bonuses
 				if (attack.type == "default" and attack.sprite) then
 					attack.x, attack.y = game.steve.x, game.steve.y	
+					attack.inner.x, attack.inner.y = game.steve.x, game.steve.y
 					attack.sprite.x, attack.sprite.y = game.steve.x, game.steve.y
 					attack.sprite.xScale = game.steve.direction
 				end
@@ -480,6 +481,15 @@ physics.setGravity( 0, 80 )
 		item.collision = collisions.itemCollision
 		items.enableItem(item)
 	end
+
+	-- Generates all the unbound items (which are on the map from the beginning)
+	function game.dropUnboundItems()
+		local itemLocations = game.map:getObjectLayer("itemSpawn").objects
+
+		for k, itemObj in pairs(itemLocations) do
+			game.dropItemFrom(itemObj)
+		end
+	end
 ------------------------------------------------------------------------------------
 
 -- GAME INITIALIZATION -------------------------------------------------------------
@@ -554,6 +564,7 @@ physics.setGravity( 0, 80 )
 		game:loadEnemies()
 		game:loadNPCS()
 		game:loadPlayer()
+		game.dropUnboundItems()
 		---------------------------
 
 		-- Logic, controls and UI initialization -----------------
@@ -586,17 +597,6 @@ function game.start()
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 	dbtimer = timer.performWithDelay(200, debug, 0)
-
-	local pippo = {
-		x = game.spawnPoint.x - 100,
-		y = game.spawnPoint.y,
-		drop = "gun"}
-	game.dropItemFrom(pippo)
-	local pluto = {
-		x = game.spawnPoint.x - 200,
-		y = game.spawnPoint.y,
-		drop = "immunity"}
-	game.dropItemFrom(pluto)
 end
 
 function game.pause()

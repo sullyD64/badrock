@@ -29,10 +29,15 @@ local combat = {
 
 local settings = {
 	melee = {
-		sensorOpts = {
+		sensor1Opts = {  -- Outer sensor
 			radius = 80,
 			alpha = 0, --0.6
 			color = {0, 0, 255},
+		},
+		sensor2Opts = {  -- Inner sensor
+			radius = 40,
+			alpha = 0, --0.8
+			color = {255, 0, 0},
 		},
 		options = {
 			spriteOptions = {
@@ -112,6 +117,8 @@ local function handleAttackEnd()
 	if (player.attack and player.attack.type == "default") then 
 		player.attack.isVisible = false
 		player.attack.isBodyActive = false
+		player.attack.inner.isVisible = false
+		player.attack.inner.isBodyActive = false
 		player.attack.sprite:pause()
 		player.attack.sprite.isVisible = false
 		display.remove(player.attack.sprite)
@@ -151,6 +158,10 @@ function combat.cancel()
 
 	player.attack.isVisible = false
 	player.attack.isBodyActive = false
+	if (player.attack.inner) then
+		player.attack.inner.isVisible = false
+		player.attack.inner.isBodyActive = false
+	end
 	if (player.attack.sprite.sequence) then
 		player.attack.sprite:pause()
 	end
@@ -429,9 +440,20 @@ end
 				graphicType = "sensor",
 				parentX = player.x,
 				parentY = player.y,
-				radius = settings.melee.sensorOpts.radius,
-				color = settings.melee.sensorOpts.color,
-				alpha = settings.melee.sensorOpts.alpha,
+				radius = settings.melee.sensor1Opts.radius,
+				color = settings.melee.sensor1Opts.color,
+				alpha = settings.melee.sensor1Opts.alpha,
+				physicsParams = { filter = filters.sensorAFilter },
+				sensorName = "A"
+			}
+		-- Loads an auxiliary sensor Entity useful when the attack is performed at close range.
+			local innerCircle = entity.newEntity{
+				graphicType = "sensor",
+				parentX = player.x,
+				parentY = player.y,
+				radius = settings.melee.sensor2Opts.radius,
+				color = settings.melee.sensor2Opts.color,
+				alpha = settings.melee.sensor2Opts.alpha,
 				physicsParams = { filter = filters.sensorAFilter },
 				sensorName = "A"
 			}
@@ -449,14 +471,20 @@ end
 		atk.type = "default"
 		atk.sprite = sprite
 
+		atk.inner = innerCircle
+		atk.inner.type = "default"
+
 		-- The attack is initially inactive
 		atk.isVisible = false
 		atk.isBodyActive = false
 		atk.sprite.isVisible = false
+		atk.inner.isVisible = false
+		atk.inner.isBodyActive = false
 
 		-- Inserts the attack hitbox and sprite on the game's current map
 		atk:addOnMap( map )
 		atk.sprite:addOnMap( map )
+		atk.inner:addOnMap( map )
 
 		return atk
 	end
@@ -477,15 +505,19 @@ end
 			player.attack = combat.loadDefaultAttack()
 		end
 		player.attack.collision = collisions.attackCollision
+		player.attack.inner.collision = collisions.attackCollision
 
 		-- Collision Handler Activation -------------------------
 		player.attack:addEventListener("collision", player.attack)
+		player.attack.inner:addEventListener( "collision", player.attack.inner )
 		---------------------------------------------------------
 
 		-- Position linking is handled in game -> onUpdate
 		player.attack.isVisible = true
 		player.attack.isBodyActive = true
 		player.attack.sprite.isVisible = true
+		player.attack.inner.isVisible = true
+		player.attack.inner.isBodyActive = true
 
 		if (player.isImmune) then
 			applyImmunityEffect()

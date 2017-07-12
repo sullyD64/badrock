@@ -91,6 +91,7 @@ function util.prepareMap(currentMap)
 			end
 		else
 			tile:addProperty(Property:new("bodyType", "dynamic"))
+			tile:addProperty(Property:new("friction", "0.08"))
 			tile:addProperty(Property:new("categoryBits", filters.dynamicEnvFilter.categoryBits))
 			tile:addProperty(Property:new("maskBits", filters.dynamicEnvFilter.maskBits))
 		end	

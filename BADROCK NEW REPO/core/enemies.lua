@@ -347,7 +347,7 @@ local enemies = {
 		-- Used also when the walker collides with the player
 		walker.collision = function( self, event )
 			if ( event.phase == "began") then
-				if ( self.id == event.other.id or event.other.eName == "steve") then
+				if ( self.id == event.other.id) then
 					local vx,vy = self:getLinearVelocity()
 					self:setLinearVelocity( -vx, -vy )
 					self.xScale = - self.xScale

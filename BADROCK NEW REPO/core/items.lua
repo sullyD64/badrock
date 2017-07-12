@@ -74,7 +74,7 @@ function items.enableItem ( item )
 			physics.addBody( item, "static", {filter = filters.itemFilterOn, isSensor = true} )
 			item:addEventListener("collision", item)
 			item.isPickable = true
-			print("Item "..item.itemName.." is pickable")
+			-- print("Item "..item.itemName.." is pickable")
 		end
 	})
 end
