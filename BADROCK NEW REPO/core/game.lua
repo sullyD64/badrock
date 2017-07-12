@@ -485,10 +485,11 @@ physics.setGravity( 0, 80 )
 	-- Generates all the unbound items (which are on the map from the beginning)
 	function game.dropUnboundItems()
 		local itemSpawn = game.map:getObjectLayer("itemSpawn")
+		local itemLocations
 		if not itemSpawn then 
 			return 
 		else 
-			local itemLocations = itemSpawn.objects
+			itemLocations = itemSpawn.objects
 		end
 
 		for k, itemObj in pairs(itemLocations) do
