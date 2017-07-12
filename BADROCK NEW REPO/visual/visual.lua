@@ -17,13 +17,16 @@ local visual = {
 
 	sliderSheet            = "visual/misc/volumeSlider.png",
 	checkboxSheet          = "visual/misc/checkbox.png",
-	confirmImg			     = "visual/misc/ok.png",
+	confirmImg			   = "visual/misc/ok.png",
 	cancelImg			   = "visual/misc/xGrey.png",
-	retryImg			        = "visual/misc/retry.png",
-	nextLevelImg		     = "visual/misc/nextLevel.png",		
-	backToMenuImg		     = "visual/misc/menuLink.png",
-	blankButtonMenu			   = "visual/misc/blankMenu.png",
+	retryImg			   = "visual/misc/retry.png",
+	nextLevelImg		   = "visual/misc/nextLevel.png",		
+	backToMenuImg		   = "visual/misc/menuLink.png",
+	blankButtonMenu		   = "visual/misc/blankMenu.png",
 	audioSettingsImg	   = "visual/misc/audioSettings.png",
+	bgMenuSkin			   = "visual/misc/bgMenuSkin.png",
+	frecciaSkin			   = "visual/misc/frecciaSkin.png",
+	steveMenuSkin		   = "visual/misc/steveMenuSkin.png",
 
 
 	menuBackground         = "visual/misc/MenuBackground.jpg",
