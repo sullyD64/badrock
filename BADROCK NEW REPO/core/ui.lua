@@ -248,10 +248,10 @@ local buttonData = {
 	ui.ammunitions = {}
 
 	local function createAmmoIconAt( index )
-		local	ammo = display.newImageRect(ui.buttonGroup, visual.bullet, 23,23 )
+		local	ammo = display.newImageRect(ui.buttonGroup, visual.bullet, 23,10 )
 		ammo.rotation = -90
 		ammo.anchorX, ammo.anchorY = 1, 1
-		ammo.x = ui.buttons.action.x - ui.buttons.action.contentWidth - (ammo.contentWidth * 0.7 * (index - 1))
+		ammo.x = ui.buttons.action.x - ui.buttons.action.contentWidth - (ammo.contentWidth  * (index - 1))
 		ammo.y = ui.buttons.action.y - ui.buttons.action.contentHeight/2 -  ammo.contentHeight / 2
 		ammo.isVisible = true
 		table.insert(ui.ammunitions, ammo)
