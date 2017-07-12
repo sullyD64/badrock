@@ -484,7 +484,12 @@ physics.setGravity( 0, 80 )
 
 	-- Generates all the unbound items (which are on the map from the beginning)
 	function game.dropUnboundItems()
-		local itemLocations = game.map:getObjectLayer("itemSpawn").objects
+		local itemSpawn = game.map:getObjectLayer("itemSpawn")
+		if not itemSpawn then 
+			return 
+		else 
+			local itemLocations = itemSpawn.objects
+		end
 
 		for k, itemObj in pairs(itemLocations) do
 			game.dropItemFrom(itemObj)
@@ -619,11 +624,11 @@ function game.pause()
 	end
 
 	if (game.chaserList) then
-		for k, chaser in pairs(game.chaserList) do chaser:pause() end
-	end
-	if (game.walkerList) then
-		-- [uncomment when walkers will have animated sprites]
-		-- for k, walker in pairs(game.walkerList) do walker:pause() end
+		for k, chaser in pairs(game.chaserList) do 
+			if (chaser.sequence) then
+				chaser:pause()
+			end
+		end
 	end
 
 	if(game.bossFight and game.bossFight.state ~= "Paused" and bossStrategy.activeStrategy ~= 0) then
@@ -652,9 +657,9 @@ function game.resume()
 
 	if (game.chaserList) then
 		for k, chaser in pairs(game.chaserList) do
-		-- if(chaser and chaser.sequence ) then
-			chaser:play()
-		-- end
+			if(chaser.sequence) then
+				chaser:play()
+			end
 		end
 	end
 
