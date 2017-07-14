@@ -10,6 +10,7 @@
 -----------------------------------------------------------------------------------------
 
 local widget = require ("widget")
+local sfx = require ("audio.sfx")
 
 
 local utility = {}
@@ -62,6 +63,12 @@ utility.font = "Berlin Sans FB Regular.ttf"--"ITCKRIST.TTF"--"Micolas.ttf"
 -- -----------------------------------------------------------------------------------
 -- Creazione dei pannelli a scorrimento
 -- -----------------------------------------------------------------------------------
+	function utility.pressButton()
+		audio.stop(9)
+		sfx.playSound( sfx.buttonSound, { channel = 9 } )
+	end
+
+
 
 	function utility.newPanel( options )
 	local customOptions = options or {}

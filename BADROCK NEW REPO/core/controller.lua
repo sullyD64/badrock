@@ -16,6 +16,7 @@ local ui         = require ( "core.ui"         )
 local pauseMenu  = require ( "menu.pauseMenu"  )
 local gameResult = require ( "menu.gameResult" )
 local sfxMenu    = require ( "menu.sfxMenu"    )
+local utility = require("menu.utilityMenu")
 
 local controller = {
 	controlsEnabled,
@@ -233,6 +234,7 @@ local sState = {}
 
 		if (controller.pauseEnabled) then
 			if (event.phase == "began") then
+				utility.pressButton()
 				display.currentStage:setFocus( target, event.id )
 				if (event.target.id == "pauseBtn") then
 					game.state = gState.PAUSED

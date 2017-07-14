@@ -22,12 +22,18 @@ local buttons = {}
 
 	-- Button handler to cancel the level selection and return to the menu
 	local function handleCancelButtonEvent( event )
+		if ("began" == event.phase ) then
+			utility.pressButton()
+		end
 		if ( "ended" == event.phase ) then
 			composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
 		end
 	end
 
 	local function handleSkinsButtonEvent( event )
+		if ("began" == event.phase ) then
+			utility.pressButton()
+		end
 		if ( "ended" == event.phase ) then
 			skin.setToEnableButtons(skinButton, backButton, buttons)
 			skinButton:setEnabled(false)
@@ -46,6 +52,9 @@ local buttons = {}
 
 	-- Button handler to go to the selected level
 	local function handleLevelSelect( event )
+		if ("began" == event.phase ) then
+			utility.pressButton()
+		end
 		if ( "ended" == event.phase ) then
 			myData.settings.currentLevel = event.target.id
 			composer.removeScene( "levels.level" .. tostring(event.target.id), false )

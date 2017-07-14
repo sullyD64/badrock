@@ -23,15 +23,19 @@ local playBtn, optionBtn
 
 -- Menu Buttons ----------------------------------------------------------------------
 
-	local function onPlayBtnRelease()
+	local function onPlayBtnRelease(event)
 		--go to levelSelect.lua scene
+		if event.phase == "began" then
+		utility.pressButton()
+		end
+		if event.phase == "ended" then
 		genMenu.panel:hide({
 			speed = 250,
 			transition = easing.outElastic
 		})
 		composer.removeScene( "menu.levelSelect" )
 		composer.gotoScene( "menu.levelSelect", "fade", 280 )
-
+	end
 		return true
 	end
 
@@ -73,7 +77,9 @@ local playBtn, optionBtn
 				font = utility.font,
 				fontSize = 20,
 				labelColor = { default={1}, over={128} },
-				onRelease = onPlayBtnRelease    
+				onEvent = onPlayBtnRelease
+				--onPress = onPlayBtnPress,
+				--onRelease = onPlayBtnRelease    
 			}
 			playBtn.anchorX = 0.5
 			playBtn.anchorY = 0.5

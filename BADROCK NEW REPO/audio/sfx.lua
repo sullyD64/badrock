@@ -18,12 +18,13 @@ local sfx = {
   npcEvilSound  = audio.loadSound( "audio/npc_evil.wav"   ),
   levelEndSound = audio.loadSound( "audio/level_ended.wav"),
   gameOverSound = audio.loadSound( "audio/game_over.wav"  ),
+  buttonSound = audio.loadSound( "audio/buttonPress.wav"  ),
 }
 
 -- inizializzare i volumi e i canali dei diversi suoni
 sfx.init = function()
 	-- riserva 5 canali audio
-   audio.reserveChannels(8)
+   audio.reserveChannels(9)
    --sfx.masterVolume = audio.getVolume()  --print( "volume "..masterVolume )
    audio.setVolume( 0.40, { channel = 1 } )  --background music
    audio.setVolume( 0.66, { channel = 2 } )  --jump sound
@@ -33,6 +34,7 @@ sfx.init = function()
    audio.setVolume( 0.8,  { channel = 6 } )  --boom sounds
    audio.setVolume( 2.80, { channel = 7 } )  --louder sounds
    audio.setVolume( 0,    { channel = 8 } )  --powerup music
+   audio.setVolume( 1,  { channel = 9 } )  -- button sounds
 end
 
 sfx.playSound = function( handle, options )
@@ -61,6 +63,7 @@ sfx.pauseSound = function()
     audio.setVolume( 0, { channel=5 } )
     audio.setVolume( 0, { channel=6 } )
     audio.setVolume( 0, { channel=7 } )
+    audio.setVolume( 0, { channel=9 } )
 end
 
 
@@ -71,6 +74,7 @@ sfx.setVolumeSound = function(level)
     audio.setVolume( level, { channel=5 } )
     audio.setVolume( level, { channel=6 } )
     audio.setVolume( level, { channel=7 } )
+    audio.setVolume( level, { channel=9 } )
 end
 
 sfx.toggleAlternativeBgm = function( flag )
