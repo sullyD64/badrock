@@ -2,6 +2,7 @@ local widget    = require ( "widget"           )
 -- local myData    = require ( "defaultData"           )
 local utility   = require ( "menu.utilityMenu" )
 local buy       = require ( "menu.buyMenu"     )
+local sfx      = require ( "audio.sfx"        )
 
 local skinBtn
 local backBtn
@@ -31,6 +32,8 @@ local skin = {}
 		idSkin=tonumber(event.target.id)
 		if (event.target.isOn) then
 			if (myData.settings.skins[idSkin].unlocked == true) then
+				audio.stop(9)
+				sfx.playSound( sfx.clickSound, { channel = 9 } )
 				myData.settings.selectedSkin = idSkin   
 				-- SERVICE -------
 				service.saveData()

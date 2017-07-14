@@ -19,12 +19,13 @@ local sfx = {
   levelEndSound = audio.loadSound( "audio/level_ended.mp3"),
   gameOverSound = audio.loadSound( "audio/game_over.mp3"  ),
   buttonSound = audio.loadSound( "audio/buttonPress.mp3"  ),
+  clickSound = audio.loadSound("audio/click.mp3")
 }
 
 -- inizializzare i volumi e i canali dei diversi suoni
 sfx.init = function()
 	-- riserva 5 canali audio
-   audio.reserveChannels(9)
+   audio.reserveChannels(10)
    --sfx.masterVolume = audio.getVolume()  --print( "volume "..masterVolume )
    audio.setVolume( myData.settings.volumeBgm/100, { channel = 1 } )  --background music
    audio.setVolume( myData.settings.volumeSfx/100*0.66, { channel = 2 } )  --jump sound 100*0.66
@@ -35,6 +36,7 @@ sfx.init = function()
    audio.setVolume( myData.settings.volumeSfx/100, { channel = 7 } )  --louder sounds
    audio.setVolume( 0,    { channel = 8 } )  --powerup music
    audio.setVolume( myData.settings.volumeSfx/100,  { channel = 9 } )  -- button sounds
+   audio.setVolume( myData.settings.volumeSfx/100,  { channel = 10 } )
 end
 
 sfx.playSound = function( handle, options )
@@ -64,6 +66,7 @@ sfx.pauseSound = function()
     audio.setVolume( 0, { channel=6 } )
     audio.setVolume( 0, { channel=7 } )
     audio.setVolume( 0, { channel=9 } )
+    audio.setVolume( 0, { channel=10 } )
 end
 
 
@@ -75,6 +78,7 @@ sfx.setVolumeSound = function(level)
     audio.setVolume( level*0.8, { channel=6 } )
     audio.setVolume( level, { channel=7 } )
     audio.setVolume( level, { channel=9 } )
+    audio.setVolume( level, { channel=10 } )
 end
 
 sfx.toggleAlternativeBgm = function( flag )
