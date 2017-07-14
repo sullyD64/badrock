@@ -9,15 +9,17 @@ local widget    = require ( "widget"           )
 local utility   = require ( "menu.utilityMenu" )
 local sfxMenu   = require ( "menu.sfxMenu"     )
 local aboutMenu = require ( "menu.aboutMenu"   )
+local resetMenu = require ( "menu.resetMenu"   )
+local sfx = require ("audio.sfx")
 
-local optBtn
-local playBtn
+local optBtn, playBtn
+local bgm = sfx.bgMenuMusic
 
 local opt = {}
 
 -- Options menu ------------------------------------------------------------------
 	--prende i bottoni dal main menu per poi riabilitarli alla chiusura del menu
-	function opt.setToEnableButtons(optButton, playButton)
+	function opt.passVariables(optButton, playButton)
 		optBtn = optButton
 		playBtn = playButton
 	end
@@ -31,18 +33,33 @@ local opt = {}
 
 	local function onAboutBtnRelease()  
 		--transition.fadeOut( opt.panel, { time=100 } )
+		aboutMenu.passVariables(opt.panel.soundMenuBtn, opt.panel.resetBtn)
+		opt.panel.soundMenuBtn:setEnabled(false)
+		opt.panel.resetBtn:setEnabled(false)
 		aboutMenu.panel:show({
 		y = display.actualContentHeight-30,
 		time =250})
 		return true
 	end
 
-		local function onSoundMenuBtnRelease()  
-	--transition.fadeOut( opt.panel, { time=100 } )
-	sfxMenu.panel:show({
-		y = display.actualContentHeight-30,
-		time =250})
-	return true
+	local function onSoundMenuBtnRelease()  
+	    --transition.fadeOut( opt.panel, { time=100 } )
+		sfxMenu.passVariablesMainMenu(opt.panel.aboutBtn, opt.panel.resetBtn, bgm)
+		opt.panel.aboutBtn:setEnabled(false)
+		opt.panel.resetBtn:setEnabled(false)
+		sfxMenu.panel:show({
+			y = display.actualContentHeight-30,
+			time =250})
+		return true
+	end
+
+	local function onResetBtnRelease()
+		resetMenu.passVariables(opt.panel.soundMenuBtn, opt.panel.aboutBtn)
+		resetMenu.panel:show({
+			y = display.actualContentHeight-30,
+			time =250})
+		opt.panel.soundMenuBtn:setEnabled(false)
+		opt.panel.aboutBtn:setEnabled(false)
 	end
 
 	-- Create the options panel (shown when the clockwork is pressed/released)
@@ -92,34 +109,52 @@ local opt = {}
 			label = "About",
 			fontSize = 14,
 			onRelease = onAboutBtnRelease,
-			width = 65,
-			height = 42,
+			width = 55,--65,
+			height = 35,--42,
 			defaultFile = visual.blankButtonMenu,
 			font = utility.font,
 			emboss = false,
-			labelColor = { default={1}, },--over={1} },
+			labelColor = { default={1} },--over={1} },
 		}
-		opt.panel.aboutBtn.x= 3---50
+		opt.panel.aboutBtn.x= -23--3
 		opt.panel.aboutBtn.y = -30--opt.panel.contentCenterY
 		opt.panel:insert(opt.panel.aboutBtn)
 
 		-- Create the about button
 		opt.panel.soundMenuBtn = widget.newButton {
-			width = 45,
-			height = 42,
+			width = 37,--45,
+			height = 35,--42,
 			onRelease = onSoundMenuBtnRelease,		
 			defaultFile = visual.audioSettingsImg,	
 			}
-		opt.panel.soundMenuBtn.x= -63---10
+		opt.panel.soundMenuBtn.x= -72---63
 		opt.panel.soundMenuBtn.y = -30--opt.panel.contentCenterY
 		opt.panel:insert(opt.panel.soundMenuBtn)
+
+		-- Create the button to reset the saves
+		opt.panel.resetBtn = widget.newButton {
+			label = "Delete saves",
+			fontSize = 13,
+			onRelease = onResetBtnRelease,
+			width = 90,--15,
+			height = 35,--15,
+			defaultFile = visual.blankButtonMenu,
+			--overFile = "buttonOver.png",
+			font = utility.font,
+			labelColor = { default={1} },
+			}
+		opt.panel.resetBtn.x= 52
+		opt.panel.resetBtn.y = -30---75
+		opt.panel:insert(opt.panel.resetBtn)
 -- -------------------------------------------------------------------------------
 opt.group = display.newGroup()
 opt.group:insert(opt.panel)
 opt.group:insert(aboutMenu.panel)
 opt.group:insert(sfxMenu.panel)
+opt.group:insert(resetMenu.panel)
 assert(opt.group[1] == opt.panel) -- do1 is on the bottom
 assert(opt.group[2] == aboutMenu.panel) -- do2 is on the top (front)
 assert(opt.group[3] == sfxMenu.panel)
+assert(opt.group[4] == resetMenu.panel)
 -- -----------------------------------------------------------------------------------
 return opt

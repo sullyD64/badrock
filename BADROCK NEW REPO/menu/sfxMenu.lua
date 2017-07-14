@@ -5,14 +5,38 @@
 -----------------------------------------------------------------------------------------
 
 local widget  = require ( "widget"           )
-local myData  = require ( "myData"           )
+--local myData  = require ( "myData"           )
 local utility = require ( "menu.utilityMenu" )
-
+local aboutBtn, resetBtn, retryBtn, menuBtn
+local bgm
 local opt = {}
 
+function opt.passVariablesMainMenu(abtBtn, rstBtn, bgmM)
+	aboutBtn = abtBtn
+	resetBtn = rstBtn
+	bgm = bgmM
+end
+
+function opt.passVariablesPauseMenu(rtyBtn, mnBtn, bgmP)
+	retryBtn = rtyBtn
+	menuBtn = mnBtn
+	bgm = bgmP
+end
+
+
 local function onOptReturnMenuBtnRelease()
-	--transition.fadeIn( menuPanel, { time=100 } )  --RISOLVERE@@@@@@@@
+	-- SERVICE -------
+    service.saveData()
+    ------------------
+	
 	opt.panel:hide()
+	if aboutBtn then
+		aboutBtn:setEnabled(true)
+		resetBtn:setEnabled(true)
+	elseif retryBtn then
+		retryBtn:setEnabled(true) 
+		menuBtn:setEnabled(true)
+	end
 	return true
 end
 
@@ -22,21 +46,28 @@ local function bgVolumeListener( event )
 
 	if (sfx.altBgmIsPlaying) then
 		audio.setVolume( event.value/100, { channel=8 } )
+		myData.settings.volumeBgm = event.value
 	else
 		audio.setVolume( event.value/100, { channel=1 } )
+		myData.settings.volumeBgm = event.value
 	end
+
 end
 
 -- Effects Volume slider listener
 local function fxVolumeListener( event )
 	print( "Slider at " .. event.value .. "%" )
 	sfx.setVolumeSound(event.value/100)
+	myData.settings.volumeSfx = event.value
 end
 
 -- Handle press events for the mute background music checkbox
 local function onBgMuteSwitchPress( event )
 	local switch = event.target
 	print( "Switch with ID '"..switch.id.."' is on: "..tostring(switch.isOn) )
+	if myData.settings.musicOn == false then
+		audio.play(bgm, {channel = 1 , loops=-1})
+	end
 	if (switch.isOn) then 
 		myData.settings.musicOn=false
 		audio.pause({channel =1})
@@ -49,13 +80,15 @@ local function onBgMuteSwitchPress( event )
 		  audio.resume({channel =1})
 		  audio.resume({channel =8})
 	end
-	
+
+
 end
 
 -- Handle press events for the mute effects checkbox
 local function onFxMuteSwitchPress( event )
 	local switch = event.target
 	print( "Switch with ID '"..switch.id.."' is on: "..tostring(switch.isOn) )
+
 	if (switch.isOn) then 
 		myData.settings.soundOn=false
 		sfx.pauseSound()
@@ -108,7 +141,7 @@ opt.panel:insert( opt.panel.title )
 			--left= 50,
 			orientation = "horizontal",
 			width = 130,
-			value = 40,  -- Start slider at 40%
+			value = myData.settings.volumeBgm,  -- Start slider at 40%
 			listener = bgVolumeListener
 		}
 		opt.panel.bgVolume.x= -85
@@ -131,7 +164,7 @@ opt.panel:insert( opt.panel.title )
 			--left= 50,
 			orientation = "horizontal",
 			width = 130,
-			value = 40,  -- Start slider at 40%
+			value = myData.settings.volumeSfx,  -- Start slider at 40%
 			listener = fxVolumeListener
 		}
 		opt.panel.fxVolume.x= -85
@@ -145,7 +178,9 @@ opt.panel:insert( opt.panel.title )
 	opt.panel.fxVolumeText = display.newText( "Sound Effects", -20, -12,  utility.font, 15 )
 	opt.panel.fxVolumeText:setFillColor( 0, 0, 0 )
 	opt.panel:insert(opt.panel.fxVolumeText)
+	local switchState
 
+	
 	-- Create the background mute checkbox
 	opt.panel.bgMuteBtn = widget.newSwitch
 		{   sheet = utility.checkboxSheet,
@@ -160,6 +195,7 @@ opt.panel:insert( opt.panel.title )
 			width = 15,
 			initialSwitchState = not myData.settings.musicOn
 		}
+		--opt.panel.bgMuteBtn:setState({isOn= not myData.settings.musicOn})
 		opt.panel.bgMuteBtn.x= 60
 		opt.panel.bgMuteBtn.y = -30
 		opt.panel:insert(opt.panel.bgMuteBtn)
@@ -178,6 +214,7 @@ opt.panel:insert( opt.panel.title )
 			width = 15,
 			initialSwitchState = not myData.settings.soundOn
 		}
+		--opt.panel.fxMuteBtn:setState({isOn= not myData.settings.soundOn})
 		opt.panel.fxMuteBtn.x= 60
 		opt.panel.fxMuteBtn.y = 5
 		opt.panel:insert(opt.panel.fxMuteBtn)

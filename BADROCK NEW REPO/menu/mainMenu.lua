@@ -41,7 +41,7 @@ local playBtn, optionBtn
 
 	local function onOptionBtnRelease()
 		-- open options panel
-		genMenu.setToEnableButtons(optionBtn, playBtn)
+		genMenu.passVariables(optionBtn, playBtn)
 		optionBtn:setEnabled(false)
 		playBtn:setEnabled(false)
 		genMenu.panel:show({

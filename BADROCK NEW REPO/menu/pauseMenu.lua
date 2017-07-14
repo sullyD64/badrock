@@ -7,6 +7,7 @@
 local widget   = require ( "widget"           )
 local sfxMenu  = require ( "menu.sfxMenu"     )
 local utility  = require ( "menu.utilityMenu" )
+local sfx = require ("audio.sfx")
 -- local myData   = require ( "myData" )
 
 local pause = {}
@@ -18,6 +19,7 @@ local pause = {}
 -- game's state (see onMenuBtnRelease)
 local game = {}
 local stateList = {}
+local bgm = sfx.bgLvlMusic
 
 function pause.setGame( currentGame, gameStates)
 	game = currentGame
@@ -30,6 +32,7 @@ end
 -- PAUSE MENU ---------------------------------------------------------------------
 	local function onSoundMenuBtnRelease()  
 		--transition.fadeOut( pause.panel, { time=100 } )
+		sfxMenu.passVariablesPauseMenu(pause.panel.retryBtn, pause.panel.menuBtn, bgm)
 		sfxMenu.panel:show({
 			 y = display.actualContentHeight - 30,--y = display.screenOriginY+225,
 			 time =250})

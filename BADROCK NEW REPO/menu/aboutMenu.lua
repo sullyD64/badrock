@@ -5,16 +5,26 @@
 -----------------------------------------------------------------------------------------
 
 local widget  = require ( "widget"           )
-local myData  = require ( "myData"           )
+--local myData  = require ( "myData"           )
 local utility = require ( "menu.utilityMenu" )
 
+local soundBtn, resetBtn
 
 local abt = {}
 
 -- About Menu ------------------------------------------------------------------------
+	
+	function abt.passVariables(sndBtn, rstBtn)
+		soundBtn = sndBtn
+		resetBtn = rstBtn
+	end
+
+
 	local function onAboutReturnBtnRelease()
 		--transition.fadeIn( menuPanel, { time=100 } )
 		abt.panel:hide()
+		soundBtn:setEnabled(true)
+		resetBtn:setEnabled(true)
 		return true
 	end
 

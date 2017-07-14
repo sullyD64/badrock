@@ -32,6 +32,9 @@ local skin = {}
 		if (event.target.isOn) then
 			if (myData.settings.skins[idSkin].unlocked == true) then
 				myData.settings.selectedSkin = idSkin   
+				-- SERVICE -------
+				service.saveData()
+				------------------
 				print ("Selezionata skin "..myData.settings.selectedSkin)      
 			end 
 		end

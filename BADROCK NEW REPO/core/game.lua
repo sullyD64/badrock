@@ -439,6 +439,10 @@ physics.setGravity( 0, 80 )
 		myData.settings.evilPoints = myData.settings.evilPoints + game.evilPoints 
 
 		myData.settings.currentLevel = myData.settings.currentLevel + 1
+
+		-- SERVICE -------
+        service.saveData()
+        ------------------
 	end
 
 	-- Calculates the maximum score obtainable in the current level.

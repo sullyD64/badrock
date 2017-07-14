@@ -15,12 +15,12 @@ util           = require ( "lib.util"      )
 service        = require ( "lib.service"   )
 sfx            = require ( "audio.sfx"     )
 
-sfx.init()
-
 -- DATA ---------
 myData = service.loadData()
 -- service.resetData()
 -----------------
+
+sfx.init()
 
 -- Enable the multitouch 
 system.activate( "multitouch" )
