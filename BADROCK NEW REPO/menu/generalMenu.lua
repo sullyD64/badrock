@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------------------------
 
 local widget    = require ( "widget"           )
-local myData    = require ( "myData"           )
+-- local myData    = require ( "myData"           )
 local utility   = require ( "menu.utilityMenu" )
 local sfxMenu   = require ( "menu.sfxMenu"     )
 local aboutMenu = require ( "menu.aboutMenu"   )

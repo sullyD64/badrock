@@ -1,5 +1,5 @@
 local widget    = require ( "widget"           )
-local myData    = require ( "myData"           )
+-- local myData    = require ( "myData"           )
 local utility   = require ( "menu.utilityMenu" )
 
 local buttonId = 0
@@ -84,6 +84,11 @@ local buy = {}
         myData.settings.skins[buttonId].unlocked = true
         print ("Ho sbloccato la skin "..buttonId.."?")
         print (myData.settings.skins[buttonId].unlocked)
+
+        -- SERVICE -------
+        service.saveData()
+        ------------------
+
         transpBtn:removeSelf()
         backBtn:setEnabled(true)
         skinBtn.alpha = 1

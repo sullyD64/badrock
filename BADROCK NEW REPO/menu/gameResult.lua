@@ -5,7 +5,7 @@
 
 local widget   = require ( "widget"           )
 local utility  = require ( "menu.utilityMenu" )
-local myData  = require ( "myData" )
+-- local myData  = require ( "defaultData" )
 
 local result = {}
 
