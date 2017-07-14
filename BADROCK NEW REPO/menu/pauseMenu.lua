@@ -7,7 +7,7 @@
 local widget   = require ( "widget"           )
 local sfxMenu  = require ( "menu.sfxMenu"     )
 local utility  = require ( "menu.utilityMenu" )
-local myData   = require ( "myData" )
+-- local myData   = require ( "myData" )
 
 local pause = {}
 -- pause.psbutton = nil

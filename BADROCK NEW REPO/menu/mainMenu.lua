@@ -2,7 +2,7 @@
 --
 -- menu.lua
 --
--- Cose da fare:
+-- Cose da fare:ss
 -- se premo da qualche parte che non è il panel menu, non funziona oppure esce dal menu 
 -- (scegliere tra le due)
 -- quando si torna dalla partita al menu, la musica di fondo rimane quella della partita, 
@@ -14,7 +14,7 @@ local widget   = require ( "widget"           )
 local utility  = require ( "menu.utilityMenu" )
 local genMenu  = require ( "menu.generalMenu" )
 local sfx      = require ( "audio.sfx"        )
---local myData = require( "myData" ) 
+-- local myData = require( "myData" ) 
 
 local scene = composer.newScene()
 
@@ -91,7 +91,6 @@ local playBtn, optionBtn
 	function scene:create( event )
 		local sceneGroup = self.view
 		-- backgroundMusic = audio.loadStream( "audio/Undertale - Bonetrousle.mp3" )     -- AUDIO (ovviamente cambiare il brano)     
-
 		-- Load the background
 		local background = display.newImageRect (visual.menuBackground, display.actualContentWidth, display.actualContentHeight )
 		background.anchorX = 0

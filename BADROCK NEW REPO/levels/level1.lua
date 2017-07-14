@@ -4,7 +4,7 @@
 --
 -----------------------------------------------------------------------------------------
 local composer = require ( "composer"  )
-local myData   = require ( "myData"    )
+-- local myData   = require ( "myData"    )
 local sfx      = require ( "audio.sfx" )
 local game     = require ( "core.game" )
 lime           = require ( "lime.lime" )
@@ -33,8 +33,8 @@ function scene:create( event )
 	end
 
 	-- map = lime.loadMap("bossTest_HD.tmx")
-	-- map = lime.loadMap("mapTest_HD.tmx")
-	map = lime.loadMap("level1_DEF_ORIGINAL.tmx")
+	map = lime.loadMap("mapTest_HD.tmx")
+	-- map = lime.loadMap("level1_DEF_ORIGINAL.tmx")
 	visual = lime.createVisual(map)
 	sceneGroup:insert( visual )
 

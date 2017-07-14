@@ -1,5 +1,5 @@
 local widget    = require ( "widget"           )
-local myData    = require ( "myData"           )
+-- local myData    = require ( "defaultData"           )
 local utility   = require ( "menu.utilityMenu" )
 local buy       = require ( "menu.buyMenu"     )
 

@@ -10,7 +10,7 @@
 -----------------------------------------------------------------------------------------
 
 local composer     = require ( "composer"          )
-local myData       = require ( "myData"            )
+-- local myData       = require ( "myData"            )
 local physics      = require ( "physics"           )
 local player       = require ( "core.player"       )
 local combat       = require ( "core.combat"       )

@@ -10,7 +10,7 @@
 -----------------------------------------------------------------------------------------
 local entity  = require ( "lib.entity"  )
 local combat  = require ( "core.combat" )
-local myData = require ("myData")
+-- local myData = require ("myData")
 
 local player = {}
 local settings = {

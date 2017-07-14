@@ -1,4 +1,4 @@
-local myData = require( "myData" )
+-- local myData = require( "myData" )
 --create the main Sound Effects (sfx) table.
 local sfx = { 
   bgMenuMusic  = audio.loadStream( "audio/overside8bit.wav" ),
