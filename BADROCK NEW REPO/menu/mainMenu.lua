@@ -143,8 +143,9 @@ local playBtn, optionBtn
 		local phase = event.phase
 		--audio.play(backgroundMusic, {channel = 1 , loops=-1})
 		if ( phase == "will" ) then
+			if not audio.isChannelActive( 1 ) then
 			sfx.playMusic(sfx.bgMenuMusic, {channel = 1 , loops=-1} )--sfx.playSound( sfx.bgMenuMusic, {channel = 1 , loops=-1} )
-
+			end
 		elseif ( phase == "did" ) then
 
 		end
