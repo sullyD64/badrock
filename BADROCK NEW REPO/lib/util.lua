@@ -151,8 +151,9 @@ function util.destroyWalls(currentMap)
 				end
 			})
 		end
-	end
+	
 	walls:hide()
+	end
 end
 
 -- Creates an object's sensors used to delimit the object's moving area.

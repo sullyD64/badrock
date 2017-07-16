@@ -249,7 +249,7 @@ local boss = {
 			filePath = visual.bossProjectile,
 			width = 40,
 			height = 60,
-		 	physicsParams = { bounce = 1, friction = 1.0, density = 1.0 , filter = filters.enemyHitboxFilter},
+		 	physicsParams = { bounce = 1, friction = 1.0, density = 1.0 , filter = filters.enemyHitboxFilter, gravityScale = 0},
 			eName = "boss"
 		}
 		carota.lives = 1
@@ -322,8 +322,7 @@ local boss = {
 			
 			local laser =entity.newEntity(laserParameters)
 			laser.alpha=0
-			laser.isBodyActive=false
-			transition.to(laser,{time=0, onComplete= function()	laser.isBodyActive=false end })
+			transition.to(laser, {time=0, onComplete=function() laser.gravityScale=0 end})
 
 
 		local function deleteLaser(event)
@@ -332,6 +331,10 @@ local boss = {
 			if(event.phase == "ended") then
 				generatore.state="waiting"
 				display.remove(sprite)
+				if(sprite.laser2)then
+					display.remove(sprite.laser2)
+				end
+				sprite.laser2=nil
 				sprite=nil
 				if(generatore.name == "manoSx")then
 					posX = game.steve.x -480 
@@ -350,15 +353,23 @@ local boss = {
 		end 
 
 		local function spara()
-			laser.eName="boss"
-			transition.to(laser,{time=10, onComplete=function() 
-					laser.isBodyActive=true
-			end})
+			laserParameters.eName="boss"
 
-				laser:setSequence("fire")
-				laser:play()
-				--appena finisce la sequenza di fire
-				laser:addEventListener("sprite",deleteLaser)
+			laser.laser2=entity.newEntity(laserParameters)
+			laser.laser2.x = laser.x
+			laser.laser2.y = laser.y
+			transition.to(laser.laser2, {time=0, onComplete=function() laser.laser2.gravityScale=0 end})
+			if(generatore.name == "manoDx") then
+			--la mano DX si occupa di fare i laser Verticali
+				transition.to(laser.laser2,{time = 0, rotation = 90})
+			end
+			laser.laser2:setSequence("laser")
+			laser.laser2:play()
+
+			laser:setSequence("fire")
+			laser:play()
+			--appena finisce la sequenza di fire
+			laser:addEventListener("sprite",deleteLaser)
 		end
 
 		-- Resta in Tot tempo ad iseguire Steve, poi si ferma a creare il laser
@@ -380,10 +391,6 @@ local boss = {
 			laser.fixedY = posizioneY
 			generatore.laser=laser
 			laser:addOnMap(game.map)
-
-			transition.to(laser,{time=0, onComplete= function()	laser.isBodyActive=false end })
-
-			laser.alpha=0
 			laser:setSequence("laser")
 			laser:play()
 			
@@ -428,7 +435,7 @@ local boss = {
 				table.insert(strategy.timers, t)
 			
 				transition.to(oggetto,{time=500, x=targetX, y=target.y})
-				local t1 = timer.performWithDelay(3000,funzioni.alzati)
+				local t1 = timer.performWithDelay(2000,funzioni.alzati)
 				table.insert(strategy.timers, t1)
 			end
 		end

@@ -74,6 +74,15 @@ local strategyBoss1 = {}
 			self.bossEntity.testa = testa
 			self.bossEntity.spawn = self.spawn
 
+			-- avoid boss parts to fall down when the fight is paused
+			transition.to(self.bossEntity,{time = 0, onComplete= function()
+				self.bossEntity.spallaDx.gravityScale = 0
+				self.bossEntity.spallaSx.gravityScale = 0
+				self.bossEntity.corpo.gravityScale = 0
+				self.bossEntity.testa.gravityScale = 0
+			end})
+
+
 			--inizializazione di componenti aggiuntive di ogni pezzo
 			self.bossEntity.spallaDx.state = "normal"
 			self.bossEntity.spallaSx.state = "normal"
@@ -263,6 +272,8 @@ local strategyBoss1 = {}
 			self.bossEntity.corpo:setSequence("destroy")
 			self.bossEntity.corpo:play()
 
+			transition.to(self.bossEntity.manoSx, {time=1000, x= self.spawn.x, y= self.spawn.y, onComplete=function() self.bossEntity.manoSx.alpha=0 end})
+			transition.to(self.bossEntity.manoDx, {time=1000, x= self.spawn.x, y= self.spawn.y, onComplete=function() self.bossEntity.manoDx.alpha=0 end})
 			--pause all timers of this strategy
 			if(self.timers)then
 				for i,t in pairs(self.timers)do
@@ -301,6 +312,10 @@ local strategyBoss1 = {}
 				 		if(part.laser)then
 				 			transition.cancel(part.laser)
 				 			display.remove(part.laser)
+				 			if(part.laser.laser2)then
+				 				transition.cancel(part.laser.laser2)
+				 				display.remove(part.laser.laser2)
+				 			end
 				 		end
 					end
 					transition.cancel(part)
@@ -439,7 +454,7 @@ local strategyBoss1 = {}
 
 				if(self.phase == 1) then
 					if(bossEntity.manoDx.lives==2 and bossEntity.manoDx.state == "bouncing")then
-						bossEntity.manoDx:setFillColor( 255,0 ,0)
+						bossEntity.manoDx:setFillColor(50,50,0)
 						local t=timer.performWithDelay(250, function()	bossEntity.manoDx:setFillColor(1) end)
 						table.insert(self.timers , t)
 
@@ -448,7 +463,7 @@ local strategyBoss1 = {}
 						boss.alzaSchiaccia(bossEntity.manoDx , game.steve, self)
 					end
 					if(bossEntity.manoSx.lives==2 and bossEntity.manoSx.state == "bouncing")then
-						bossEntity.manoSx:setFillColor( 255,0 ,0)
+						bossEntity.manoSx:setFillColor(50,50,0)
 						local t= timer.performWithDelay(250, function()	bossEntity.manoSx:setFillColor(1) end)
 						table.insert(self.timers , t)
 
@@ -489,8 +504,11 @@ local strategyBoss1 = {}
 
 					if(bossEntity.spallaDx.lives==1 and bossEntity.spallaDx.state == "normal") then
 						bossEntity.spallaDx:setFillColor( 255,0 ,0)
+						transition.to(bossEntity.spallaDx,{time=0, onComplete=function() bossEntity.spallaDx.isBodyActive = false end})
 						local t= timer.performWithDelay(250, function()	bossEntity.spallaDx:setFillColor(1) end)
+						local t1= timer.performWithDelay(4000, function()	transition.to(bossEntity.spallaDx,{time=0, onComplete=function() bossEntity.spallaDx.isBodyActive = true end}) end)
 						table.insert(self.timers , t)
+						table.insert(self.timers , t1)
 
 						bossEntity.spallaDx.state = "rage"
 						bossEntity.spallaDx.isTargettable=false
@@ -504,9 +522,12 @@ local strategyBoss1 = {}
 
 					if(bossEntity.spallaSx.lives==1 and bossEntity.spallaSx.state == "normal") then
 						bossEntity.spallaSx:setFillColor( 255,0 ,0)
+						transition.to(bossEntity.spallaSx,{time=0, onComplete=function() bossEntity.spallaSx.isBodyActive= false end})
 						local t= timer.performWithDelay(250, function()	bossEntity.spallaSx:setFillColor(1) end)
+						local t1= timer.performWithDelay(4000, function()	transition.to(bossEntity.spallaSx,{time=0, onComplete=function() bossEntity.spallaSx.isBodyActive = true end}) end)
 						table.insert(self.timers , t)
-						
+						table.insert(self.timers , t1)
+
 						bossEntity.spallaSx.state = "rage"
 						bossEntity.spallaSx.isTargettable=false
 						timer.performWithDelay(2000,function() bossEntity.spallaSx.isTargettable=true	end)
@@ -521,6 +542,7 @@ local strategyBoss1 = {}
 						for i,t in pairs(bossEntity.spallaSx.timer)do
 							timer.cancel(t)
 						end
+						transition.to(bossEntity.spallaSx, {time=0, onComplete=function() bossEntity.spallaSx.gravityScale = 1 end})
 						for i,c in pairs(bossEntity.spallaSx.proiettili)do
 
 							if(c) then
@@ -535,6 +557,8 @@ local strategyBoss1 = {}
 						for i,t in pairs(bossEntity.spallaDx.timer)do
 							timer.cancel(t)
 						end
+
+						transition.to(bossEntity.spallaDx, {time=0, onComplete=function() bossEntity.spallaDx.gravityScale = 1 end})
 						for i,c in pairs(bossEntity.spallaDx.proiettili)do
 							if(c) then
 								transition.cancel(c)
