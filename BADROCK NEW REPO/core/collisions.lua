@@ -196,7 +196,9 @@ end
 				player.isOnMovingPlatform = false
 			end
 		end
-
+		if(environment.isCheck) then
+			game.spawnPoint=environment
+		end
 		if(environment.type == "event") then
 			environment.owner.listener(event)
 		end
