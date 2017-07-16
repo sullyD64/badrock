@@ -51,7 +51,7 @@ local visual = {
 	--resumeBtn              = "visual/ui/RESUME2.png",
 	--resumeBtn_over         = "visual/ui/RESUME3.png",
 	lifeIcon               = "visual/ui/life.png",
-
+	bossLifeIcon           = "visual/ui/blife.png",
 	steveSheetWalking      = "visual/sprites/steveAnim.png",
 	steveImage             = "visual/sprites/rock_original.png",
 	steveAttack            = "visual/sprites/attackSprite.png",

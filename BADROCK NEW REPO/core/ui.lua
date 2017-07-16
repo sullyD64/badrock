@@ -196,6 +196,7 @@ local buttonData = {
 -- [This section will be likely modified in the future, we will decide next meet 
 -- if it's worth keeping an icon for every life or a simpler single-icon counter].
 	ui.lifeIcons = {}
+	
 
 	local function createLifeIconAt( index )
 		local	lifeIcon = display.newImageRect(ui.buttonGroup, visual.lifeIcon, 30, 30 )
@@ -240,6 +241,50 @@ local buttonData = {
 	function ui.destroyLifeIcons()
 		for i in pairs (ui.lifeIcons) do
 			display.remove(ui.lifeIcons[i])
+		end
+	end
+
+	--bossLives
+	ui.bossLife = {}
+	
+	local function createBossLifeAt( index )
+		local	bossLife = display.newImageRect(ui.buttonGroup, visual.bossLifeIcon, 30, 30 )
+		bossLife.anchorX, bossLife.anchorY = 0, 0
+		bossLife.x = 10 + (bossLife.contentWidth * (index - 1))
+		bossLife.y = -15 + bossLife.contentHeight / 2
+		bossLife.isVisible = true
+		table.insert(ui.bossLife,bossLife)
+	end
+
+	-- Creates the bossLife array initialized to the current game's max lives allowed.
+	function ui.createBossLife( maxLivesNumber )
+		for i = 1, maxLivesNumber do
+			createBossLifeAt( i )
+		end
+	end
+
+	-- Updates the bossLife array, either if a life is added or removed
+	function ui.updateBossLife( currentLivesNumber )
+		for i, v in pairs(ui.bossLife) do
+			if (i > currentLivesNumber) then
+				display.remove(v)
+				ui.bossLife[i] = nil
+				print ("Boss lost one life. Total lives: "..#ui.bossLife)
+			end
+		end
+		
+	end
+
+	-- Empties the bossLife array
+	function ui.emptyBossLife()
+		for i in pairs (ui.bossLife) do
+			ui.bossLife[i] = nil
+		end
+	end
+
+	function ui.destroyBossLife()
+		for i in pairs (ui.bossLife) do
+			display.remove(ui.bossLife[i])
 		end
 	end
 ---------------------------------------------------------------------------------
