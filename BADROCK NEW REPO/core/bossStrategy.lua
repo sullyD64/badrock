@@ -5,20 +5,20 @@
 -----------------------------------------------------------------------------------------
 local boss= require("core.boss")
 local ui= require("core.ui")
-
 local game = {}
 local steve = {}
 local gState = {}
 local sState = {}
-local maxlives=0
+local maxlives = 12
 
-local bossStrategy = {
+bossStrategy = {
 	-- activeStrategy se == 0 -->non c'è nessuna fight, altrimenti indica il numero della Boss Strategy attiva  
 	activeStrategy = 0
 	
 }
-function getMaxLives()
-	return maxlives
+function bossStrategy.maxL()
+local ml= maxlives
+return ml
 end
 ---------- STRATEGIA BOSS 1 --------------------------------------------------------------------------------------------------------------------
 local strategyBoss1 = {}
@@ -61,13 +61,14 @@ local strategyBoss1 = {}
 			local testa = boss.loadBoss("testa")
 			local manoDx = boss.loadBoss("manoDx")
 			local manoSx = boss.loadBoss("manoSx")
-
-			maxlives= maxlives+ corpo.lives
-			maxlives= maxlives+ spallaDx.lives
-			maxlives= maxlives+ spallaSx.lives
-			maxlives= maxlives+ testa.lives
-			maxlives= maxlives+ manoSx.lives
-			maxlives= maxlives+ manoDx.lives -1
+			if(not (maxlives>=12)) then
+				maxlives= maxlives+ corpo.lives
+				maxlives= maxlives+ spallaDx.lives
+				maxlives= maxlives+ spallaSx.lives
+				maxlives= maxlives+ testa.lives
+				maxlives= maxlives+ manoSx.lives
+				maxlives= maxlives+ manoDx.lives -1
+			end
 			corpo:toBack()
 
 			-- sposta le mani nella posizione iniziale
@@ -174,7 +175,8 @@ local strategyBoss1 = {}
 		------ PHASE 2 --------------------------------------------------------------------------------------------------------------------
 		function strategyB1:phase2()
 			self.phase=2
-
+			--colpire le spalle può creare più di una collisione
+			bossStrategy.wide=true
 		 	print("PHASE = 2")
 
 		 	if(self.bossEntity.spallaDx.state == "normal") then
@@ -219,6 +221,7 @@ local strategyBoss1 = {}
 		------ PHASE 3 --------------------------------------------------------------------------------------------------------------------
 		function strategyB1:phase3()
 			self.phase=3
+
 		 	print("PHASE = 3")
 
 		 	--La testa del boss diventa finalmente colpibile
@@ -306,7 +309,9 @@ local strategyBoss1 = {}
 		function strategyB1:terminateFight()
 		
 			self.state = "Terminated"
-			maxlives=0
+			maxlives=12
+			ui.emptyBossLife()
+
 			--IL DELAY DEVE ESSERE CIRCA UGUALE AL TEMPO DI RESPAWN DI STEVE
 
 			timer.performWithDelay(1000, function()
@@ -660,6 +665,9 @@ function bossStrategy.loadBoss( trigger )
 			--J
 			started=true
 			trigger.walls = util.createWalls(game.map)
+			--controllo che la strategia sia appena iniziata (juststarted) per aggiornare le vite al max in collisions
+			bossStrategy.js=true
+			bossStrategy.wide=false
 		end
 	end
 

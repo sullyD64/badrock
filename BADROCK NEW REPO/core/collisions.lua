@@ -9,7 +9,7 @@
 -- These methods can access and modify the Game's current state, aswell as the Player's
 -- current state, position on the map, sprite sequence and other properties.
 -----------------------------------------------------------------------------------------
---local bossStrategy= require ("core.bossStrategy")
+local bs= require ("core.bossStrategy")
 local ui= require ("core.ui")
 local collisions = {
 	-- Used by npcDetectByCollision
@@ -21,7 +21,7 @@ local game = {}
 local steve = {}
 local gState = {}		-- Game state is only modified in collision with end_level
 local sState = {}		-- Steve state is modified in dangerCollision
-local maxlives= 12
+local maxlives= bs.maxL()
 -- This function is accessed from -game.loadGame-.
 function collisions.setGame( currentGame, gameStateList, playerStateList )
 	game = currentGame
@@ -96,7 +96,21 @@ end
 		elseif( (other.eName == "boss") and other.isTargettable == true ) then
 			local boss = other
 			boss.lives = boss.lives-1
-			maxlives= maxlives-1
+
+			--bossl= bs.currentL()
+			--print(bossl)
+			print(bs.js)
+			--se bossStrategy è appenaIniziata allora le vite sono massime
+			if(bs.js) then maxlives=bs.maxL() bs.js=false end
+			print(bs.phase)
+			if(bs.wide) then
+			timer.performWithDelay(500, function() 
+				maxlives= maxlives-1 
+				end )
+			else
+			maxlives= maxlives-1 
+			end
+			print(maxlives)
 			ui.updateBossLife(maxlives)
 			if (boss.lives == 0) then
 				transition.cancel(boss)
