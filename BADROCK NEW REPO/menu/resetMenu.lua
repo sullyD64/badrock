@@ -29,7 +29,7 @@ local reset = {}
 
 	local function onConfirmReset()
 		service.resetData()
-		service.loadData()
+		myData = service.loadData()
 		reset.panel:hide()
 		soundBtn:setEnabled(true)
 		aboutBtn:setEnabled(true)

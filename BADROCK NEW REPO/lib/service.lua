@@ -23,12 +23,13 @@ function service.loadData()
 		print("userData.json contains:")
 		util.print_r(data)
 		------------------------------------------
+	else data = defaultData
 	end
 
 	-- Inizializza il file con il contenuto di defaultData se questo non esiste
-	if (data == nil) then
-		data = defaultData
-	end
+	-- if (data == nil) then
+	-- 	data = defaultData
+	-- end
 
 	return data
 end
