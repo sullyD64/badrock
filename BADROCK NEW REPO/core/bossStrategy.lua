@@ -4,17 +4,22 @@
 --
 -----------------------------------------------------------------------------------------
 local boss= require("core.boss")
+local ui= require("core.ui")
 
 local game = {}
 local steve = {}
 local gState = {}
 local sState = {}
+local maxlives=0
 
 local bossStrategy = {
 	-- activeStrategy se == 0 -->non c'è nessuna fight, altrimenti indica il numero della Boss Strategy attiva  
 	activeStrategy = 0
+	
 }
-
+function getMaxLives()
+	return maxlives
+end
 ---------- STRATEGIA BOSS 1 --------------------------------------------------------------------------------------------------------------------
 local strategyBoss1 = {}
 
@@ -57,6 +62,12 @@ local strategyBoss1 = {}
 			local manoDx = boss.loadBoss("manoDx")
 			local manoSx = boss.loadBoss("manoSx")
 
+			maxlives= maxlives+ corpo.lives
+			maxlives= maxlives+ spallaDx.lives
+			maxlives= maxlives+ spallaSx.lives
+			maxlives= maxlives+ testa.lives
+			maxlives= maxlives+ manoSx.lives
+			maxlives= maxlives+ manoDx.lives -1
 			corpo:toBack()
 
 			-- sposta le mani nella posizione iniziale
@@ -99,6 +110,8 @@ local strategyBoss1 = {}
 			self.bossEntity.testa:play()
 			
 			print(" STA PER INIZIARE LA BOSS FIGHT")
+			ui.createBossLife(maxlives)
+			print(maxlives)
 			--phase1
 			local t = timer.performWithDelay(3000,self:phase1())
 			table.insert(self.timers,t)
@@ -282,6 +295,7 @@ local strategyBoss1 = {}
 		function strategyB1:terminateFight()
 		
 			self.state = "Terminated"
+			maxlives=0
 			--IL DELAY DEVE ESSERE CIRCA UGUALE AL TEMPO DI RESPAWN DI STEVE
 
 			timer.performWithDelay(1000, function()
@@ -619,6 +633,8 @@ function bossStrategy.loadBoss( trigger )
 		if (bossStrategy.activeStrategy == 0 and strategy.win == false) then
 			strategy:startFight()
 			-- Closes the area of the fight
+			--J
+			started=true
 			trigger.walls = util.createWalls(game.map)
 		end
 	end

@@ -17,6 +17,7 @@ local pauseMenu  = require ( "menu.pauseMenu"  )
 local gameResult = require ( "menu.gameResult" )
 local sfxMenu    = require ( "menu.sfxMenu"    )
 local utility = require("menu.utilityMenu")
+local bossStrategy= require("core.bossStrategy")
 
 local controller = {
 	controlsEnabled,
