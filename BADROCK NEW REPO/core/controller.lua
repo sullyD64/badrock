@@ -315,6 +315,9 @@ local sState = {}
 	-- Restores the player at the current spawn point in the current game 
 	-- (called from onDeath if lives are > 0).
 	local function handleRespawn()
+		local restoreEnemies = function (elist)
+
+		end
 		local respawnPlayer = function()
 			local spawn = game.spawnPoint
 			steve.x, steve.y = spawn.x, spawn.y
@@ -357,6 +360,7 @@ local sState = {}
 		transition.to(steve, { time = 1000, 
 			onComplete = function()
 				respawnPlayer()
+				restoreEnemies(elist)
 			end
 		})
 	end

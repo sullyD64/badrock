@@ -104,7 +104,26 @@ physics.setGravity( 0, 80 )
 --|                                                                                                | 
 --\________________________________________________________________________________________________/
 
+--filtra una lista list restituendo una list l di elementi che contengono c1 nel nome: i nemici che devono respawnare saranno identificati in questo modo
+--nemico.checkpoint
+function filter(checkpoint)
+	local l={}
+	local list= game.map:getObjectLayer("enemySpawn").objects
+		if(list) then 
+			for i,v in ipairs(list) do
+				--if(c1 and c2 and ((v.x>c1.x and (math.abs(v.y-c1.y)<50 and math.abs(v.y-c1.y)>0)) or (v.x<c2.x and (math.abs(v.y-c2.y)<50
+				--	and math.abs(v.y-c2.y)>0)))) then
+				if(string.match(v.name,checkpoint.name)) then
 
+					table.insert(l,v)
+					print("inserito")
+				--else table.insert(l,"nothing")
+				end
+			end
+		--else print("mmmh")
+		end
+	return l
+end
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- This loop is executed only if the game's state is RUNNING
 	local function gameRunningLoop()
@@ -210,7 +229,20 @@ physics.setGravity( 0, 80 )
 					end
 			end
 		end
-		
+		-- --WORK IN PROGRESS
+		local currentMap = game.map
+		local enemyList = currentMap:getObjectLayer("enemySpawn").objects
+	
+		local cplist = currentMap:getObjectLayer("checkpoints").objects
+		print(cplist[1].name)
+		print(cplist[2].name)
+		--local s= currentGame.spawnPoint
+		--print(#enemyList)
+		--local ebetweencheck= filter(enemylist,s,currentGame.spawnPoint)
+		local ebetweencheck= filter(cplist[1])
+		for i,v in ipairs(ebetweencheck) do print(ebetweencheck[i]) end
+		--if(#ebetweencheck==0) then print("nullo") end
+		-- --END WORK IN PROGRESS
 		-- Entity animation: handles the chasers' behavior
 		if (game.enemiesLoaded == true and game.lives ~= 0) then
 			-- Iterates the chaser list
@@ -535,6 +567,8 @@ physics.setGravity( 0, 80 )
 		end
 	end
 
+
+	
 	-- See enemies.lua
 	function game:loadEnemies() 
 		self.enemies, self.chaserList, self.walkerList = enemies.loadEnemies( self )
@@ -545,9 +579,12 @@ physics.setGravity( 0, 80 )
 			game.enemiesLoaded = true
 		end
 
+		
+
 		-- Assigns the home to each chaser
 		enemies.assignChaserHomes(self.enemies, self.chaserList)
-	end
+		end
+		
 
 	-- See bossStrategy.lua
 	function game:loadBoss( trigger )

@@ -381,12 +381,18 @@ function enemies.assignChaserHomes( enemies, chasers )
 	end
 end
 
+
+
+	
 -- Loads the enemies's images (and sprites) and initializes their attributes.
 -- Visually instantiates the enemies in the current game's map.
 -- @return enemyList, walkerList, chaserList
 function enemies.loadEnemies( currentGame ) 
 	local currentMap = currentGame.map
 	local enemyList = currentMap:getObjectLayer("enemySpawn").objects
+	
+	
+
 	if not (enemyList) then return end
 
 	local chaserList = {}
