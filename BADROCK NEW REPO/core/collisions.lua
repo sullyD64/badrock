@@ -68,6 +68,15 @@ end
 			-- Enemy has no lives left: handle death
 			if ( enemy.lives == 0 ) then 
 				game.addScore(enemy.score)
+				print(enemy.score)
+				if(enemy.score==150) then enemy.type= "robot" else enemy.type="paper" end
+				print(enemy.enemySprite)
+				print(enemyHit.name)
+				print(enemy.type)
+
+				--aggiungo il nemico ucciso alla lista dei nemici che devono respawnare
+				table.insert(game.listaNemiciRestore,enemy)
+
 				-- Forces the enemy to drop his item
 				if (enemyHit.drop) then	game.dropItemFrom(enemyHit) end
 				
@@ -103,8 +112,9 @@ end
 			--se bossStrategy è appenaIniziata allora le vite sono massime
 			if(bs.js) then maxlives=bs.maxL() bs.js=false end
 			print(bs.phase)
+			--bs.wide significa che la bossStrategy è nella fase in cui vengono targettate le spalle e si può avere collisione continua
 			if(bs.wide) then
-			timer.performWithDelay(500, function() 
+			timer.performWithDelay(500, function() print("isloop?sembra di no, però ne stampa più di 4")
 				maxlives= maxlives-1 
 				end )
 			else
@@ -196,6 +206,7 @@ end
 		return true
 	end
 
+	
 	-- Collision between the player and safe environment Tiles
 	local function environmentCollision( player, event )
 		local environment = event.other
@@ -211,7 +222,14 @@ end
 			end
 		end
 		if(environment.isCheck) then
+			oldSpawnPoint=game.spawnPoint
 			game.spawnPoint=environment
+
+			--svuoto la lista dei nemici da ripristinare se tocco un checkpoint diverso dall'ultimo raggiunto
+			if(not(oldSpawnPoint==game.spawnPoint)) then game.listaNemiciRestore={} end
+			--game.spawnPoint.name=environment.name
+			--print(game.spawnPoint.name)
+			--print(game.spawnPoint.tName)
 		end
 		if(environment.type == "event") then
 			environment.owner.listener(event)

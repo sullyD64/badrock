@@ -387,13 +387,13 @@ end
 -- Loads the enemies's images (and sprites) and initializes their attributes.
 -- Visually instantiates the enemies in the current game's map.
 -- @return enemyList, walkerList, chaserList
-function enemies.loadEnemies( currentGame ) 
+function enemies.loadEnemies( currentGame,lista) 
 	local currentMap = currentGame.map
-	local enemyList = currentMap:getObjectLayer("enemySpawn").objects
+	--local enemyList = currentMap:getObjectLayer("enemySpawn").objects
 	
 	
 
-	if not (enemyList) then return end
+	if not (lista) then return end
 
 	local chaserList = {}
 	local walkerList = {}
@@ -497,7 +497,7 @@ function enemies.loadEnemies( currentGame )
 		return enemySprite
 	end
 
-	for k, enemy in ipairs(enemyList) do
+	for k, enemy in ipairs(lista) do
 		enemy.enemySprite = loadEnemyEntity(enemy)
 		---------------------------------------------------------------
 		-- Temporary: assuming the species DOES NOT determine the 
@@ -513,7 +513,7 @@ function enemies.loadEnemies( currentGame )
 		---------------------------------------------------------------	
 	end
 
-	return enemyList, chaserList, walkerList
+	return lista, chaserList, walkerList
 end
 
 return enemies

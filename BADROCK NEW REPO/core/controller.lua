@@ -18,7 +18,7 @@ local gameResult = require ( "menu.gameResult" )
 local sfxMenu    = require ( "menu.sfxMenu"    )
 local utility = require("menu.utilityMenu")
 local bossStrategy= require("core.bossStrategy")
-
+local enemies= require("core.enemies")
 local controller = {
 	controlsEnabled,
 	pauseEnabled,
@@ -315,9 +315,9 @@ local sState = {}
 	-- Restores the player at the current spawn point in the current game 
 	-- (called from onDeath if lives are > 0).
 	local function handleRespawn()
-		local restoreEnemies = function (elist)
+		--local restoreEnemies = function (elist)
 
-		end
+		--end
 		local respawnPlayer = function()
 			local spawn = game.spawnPoint
 			steve.x, steve.y = spawn.x, spawn.y
@@ -360,7 +360,8 @@ local sState = {}
 		transition.to(steve, { time = 1000, 
 			onComplete = function()
 				respawnPlayer()
-				restoreEnemies(elist)
+				--restoreEnemies(game.listaNemiciRestore)
+				enemies.loadEnemies(game,game.listaNemiciRestore)
 			end
 		})
 	end
@@ -401,8 +402,10 @@ local sState = {}
 			sfx.playSound( sfx.gameOverSound, { channel = 7 } )
 			-------------------------------------------------
 			controller.onGameOver("Failed")
+		--lo score rimane 0 anche se non entra nel for perché listaNemiciRestore è stata svuotata
 		elseif ( game.lives > 0 ) then
-			game.score = 0
+			for k,v in pairs(game.listaNemiciRestore) do print("morto") game.score= game.score - v.score end
+			--game.score = 0
 			handleRespawn()
 		end
 	end

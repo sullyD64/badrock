@@ -22,7 +22,8 @@ local collisions   = require ( "core.collisions"   )
 local bossStrategy = require ( "core.bossStrategy" )
 
 local game = {}
-
+game.listaNemiciRestore={}
+--table.insert(listaNemiciRestore,"ciao")
 physics.start()
 physics.setGravity( 0, 80 )
 
@@ -108,6 +109,7 @@ physics.setGravity( 0, 80 )
 --nemico.checkpoint
 function filter(checkpoint)
 	local l={}
+	--game.spawnPoint.name=checkpoint.name
 	local list= game.map:getObjectLayer("enemySpawn").objects
 		if(list) then 
 			for i,v in ipairs(list) do
@@ -116,7 +118,7 @@ function filter(checkpoint)
 				if(string.match(v.name,checkpoint.name)) then
 
 					table.insert(l,v)
-					print("inserito")
+					--print("inserito")
 				--else table.insert(l,"nothing")
 				end
 			end
@@ -124,6 +126,8 @@ function filter(checkpoint)
 		end
 	return l
 end
+
+
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- This loop is executed only if the game's state is RUNNING
 	local function gameRunningLoop()
@@ -230,18 +234,23 @@ end
 			end
 		end
 		-- --WORK IN PROGRESS
-		local currentMap = game.map
-		local enemyList = currentMap:getObjectLayer("enemySpawn").objects
+		-- local currentMap = game.map
+		-- local enemyList = currentMap:getObjectLayer("enemySpawn").objects
 	
-		local cplist = currentMap:getObjectLayer("checkpoints").objects
-		print(cplist[1].name)
-		print(cplist[2].name)
-		--local s= currentGame.spawnPoint
-		--print(#enemyList)
-		--local ebetweencheck= filter(enemylist,s,currentGame.spawnPoint)
-		local ebetweencheck= filter(cplist[1])
-		for i,v in ipairs(ebetweencheck) do print(ebetweencheck[i]) end
+		-- local cplist = currentMap:getObjectLayer("checkpoints").objects
+		-- --print(cplist[1].name)
+		-- --print(cplist[2].name)
+		-- --local s= currentGame.spawnPoint
+		-- --print(#enemyList)
+		-- --local ebetweencheck= filter(enemylist,s,currentGame.spawnPoint)
+		-- local ebetweencheck= filter(cplist[1])
+		-- for i,v in ipairs(ebetweencheck) do print(ebetweencheck[i]) end
 		--if(#ebetweencheck==0) then print("nullo") end
+		for i,v in pairs(game.listaNemiciRestore) do
+					--print(#filter(game.spawnPoint))
+					print(v, v.type)
+					--print(v) print(v.type)
+		end
 		-- --END WORK IN PROGRESS
 		-- Entity animation: handles the chasers' behavior
 		if (game.enemiesLoaded == true and game.lives ~= 0) then
@@ -571,7 +580,7 @@ end
 	
 	-- See enemies.lua
 	function game:loadEnemies() 
-		self.enemies, self.chaserList, self.walkerList = enemies.loadEnemies( self )
+		self.enemies, self.chaserList, self.walkerList = enemies.loadEnemies( self,game.map:getObjectLayer("enemySpawn").objects )
 		if (#(self.enemies) == 0) then 
 			game.enemiesLoaded = false
 			return
