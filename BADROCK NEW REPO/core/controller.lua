@@ -360,8 +360,12 @@ local sState = {}
 		transition.to(steve, { time = 1000, 
 			onComplete = function()
 				respawnPlayer()
+				ui.buttons.score:setLabel("Score: "..game.score)
 				--restoreEnemies(game.listaNemiciRestore)
+				print(#game.listaNemiciRestore .. " enemy to restore")
 				enemies.loadEnemies(game,game.listaNemiciRestore)
+		--		print(game.listaNemiciRestore[1].eName)
+				--enemies.loadEnemies(game,game.map:getObjectLayer("enemySpawn").objects)
 			end
 		})
 	end
@@ -404,8 +408,10 @@ local sState = {}
 			controller.onGameOver("Failed")
 		--lo score rimane 0 anche se non entra nel for perché listaNemiciRestore è stata svuotata
 		elseif ( game.lives > 0 ) then
-			for k,v in pairs(game.listaNemiciRestore) do print("morto") game.score= game.score - v.score end
+			for k,v in pairs(game.listaNemiciRestore) do if(game.score-v.score<=0) then game.score= 0 break else game.score=game.score-v.score end end
+			--display.newText(game.score, display.contentWidth -80,18)
 			--game.score = 0
+			--ui.buttons.score:setLabel("Score: "..game.score)
 			handleRespawn()
 		end
 	end

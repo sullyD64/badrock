@@ -248,7 +248,7 @@ end
 		--if(#ebetweencheck==0) then print("nullo") end
 		for i,v in pairs(game.listaNemiciRestore) do
 					--print(#filter(game.spawnPoint))
-					print(v, v.type)
+					--print(v, v.type)
 					--print(v) print(v.type)
 		end
 		-- --END WORK IN PROGRESS

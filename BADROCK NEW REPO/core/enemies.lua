@@ -499,6 +499,7 @@ function enemies.loadEnemies( currentGame,lista)
 
 	for k, enemy in ipairs(lista) do
 		enemy.enemySprite = loadEnemyEntity(enemy)
+		print("loop "..k)
 		---------------------------------------------------------------
 		-- Temporary: assuming the species DOES NOT determine the 
 		--	behavior, this is specified in the enemy object in the map,

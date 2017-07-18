@@ -68,20 +68,22 @@ end
 			-- Enemy has no lives left: handle death
 			if ( enemy.lives == 0 ) then 
 				game.addScore(enemy.score)
-				print(enemy.score)
-				if(enemy.score==150) then enemy.type= "robot" else enemy.type="paper" end
-				print(enemy.enemySprite)
-				print(enemyHit.name)
-				print(enemy.type)
-
+				temp=enemy
+				print(temp.score)
+				if(temp.score==150) then temp.type= "robot" else temp.type="paper" end
+				--print(enemy.enemySprite)
+				--print(enemyHit.name)
+				--print(enemy.type)
+				
+				print("il nemico morto è " ..temp.eName)
 				--aggiungo il nemico ucciso alla lista dei nemici che devono respawnare
 				table.insert(game.listaNemiciRestore,enemy)
 
 				-- Forces the enemy to drop his item
 				if (enemyHit.drop) then	game.dropItemFrom(enemyHit) end
 				
-				enemy:onDeathAnimation()
-				enemy:destroy()
+				temp:onDeathAnimation()
+				temp:destroy()
 
 			-- Enemy is still alive: handle hit
 			else 									
