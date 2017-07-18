@@ -343,7 +343,7 @@ local buttonData = {
 		for i in pairs (ui.bossHealthBar) do
 			ui.bossHealthBar[i] = nil
 		end
-		ui.bossHealthBarGroup.maxLivesNum = nil
+		if(ui.bossHealtBarGroup) then ui.bossHealthBarGroup.maxLivesNum = nil end
 		ui.bossHealthBarGroup = nil
 	end
 
