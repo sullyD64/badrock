@@ -9,8 +9,7 @@
 -- These methods can access and modify the Game's current state, aswell as the Player's
 -- current state, position on the map, sprite sequence and other properties.
 -----------------------------------------------------------------------------------------
-local bs= require ("core.bossStrategy")
-local ui= require ("core.ui")
+
 local collisions = {
 	-- Used by npcDetectByCollision
 	contactEnabled = true,
@@ -21,7 +20,7 @@ local game = {}
 local steve = {}
 local gState = {}		-- Game state is only modified in collision with end_level
 local sState = {}		-- Steve state is modified in dangerCollision
-local maxlives= bs.maxL()
+
 -- This function is accessed from -game.loadGame-.
 function collisions.setGame( currentGame, gameStateList, playerStateList )
 	game = currentGame
@@ -39,7 +38,7 @@ end
 
 		-- Target is an enemy, targettable AND not invincible
 		if( other.eName == "enemy" and other.isTargettable == true ) then 
-			-- audio ----------------------------------------
+			-- audio --------------------------------------------
 			if (steve.isImmune) then
 				audio.stop(3)
 				sfx.playSound( sfx.boom2Sound, { channel = 3 } )
@@ -47,7 +46,7 @@ end
 				audio.stop(3)
 				sfx.playSound( sfx.enemyDefSound, { channel = 3 } )
 			end
-			-------------------------------------------------
+			-----------------------------------------------------
 
 			local enemy = other
 			-- Locally stores some of the enemies attributes
@@ -104,64 +103,48 @@ end
 				self:destroy()
 			end
 
+		-- Target is a boss part, targettable
 		elseif( (other.eName == "boss") and other.isTargettable == true ) then
-			local boss = other
-			boss.lives = boss.lives-1
+			local bossPart = other
 
-			--bossl= bs.currentL()
-			--print(bossl)
-			print(bs.js)
-			--se bossStrategy è appenaIniziata allora le vite sono massime
-			if(bs.js) then maxlives=bs.maxL() bs.js=false end
-			print(bs.phase)
-			--bs.wide significa che la bossStrategy è nella fase in cui vengono targettate le spalle e si può avere collisione continua
-			if(bs.wide) then
-			timer.performWithDelay(500, function() print("isloop?sembra di no, però ne stampa più di 4")
-				maxlives= maxlives-1 
-				end )
+			-- audio --------------------------------------------
+			if (bossPart.isProjectile) then
+				audio.stop(2)
+				sfx.playSound( sfx.boom1Sound, { channel = 2 } )
 			else
-			maxlives= maxlives-1 
+				audio.stop(3)
+				sfx.playSound( sfx.enemyDefSound, { channel = 3 } )
 			end
-			print(maxlives)
-			ui.updateBossLife(maxlives)
-			if (boss.lives == 0) then
-				transition.cancel(boss)
+			-----------------------------------------------------
 
-				if (boss.isProjectile) then
-					display.remove(boss)
+			bossPart.lives = bossPart.lives - 1
+
+			-- Destructible projectiles which belong the boss don't count in 
+			-- decrementing the boss' total life
+			if (not bossPart.isProjectile) then	
+				game.bossFight:decrementTotalLives()
+			end
+
+			-- bossPart has no lives left: handle death
+			if (bossPart.lives == 0) then
+				transition.cancel(bossPart)
+				if (bossPart.isProjectile) then
+					display.remove(bossPart)
 				else
-				 -- Animation: knocks the boss AWAY and off the map----
-					boss.isSensor = true
-					boss.eName = "deadBossPart"
-					boss.yScale = -1
-					if (boss.sequence) then
-						boss:setSequence("dead")
-						boss:play()
-					end
-					timer.performWithDelay(1000, boss:applyLinearImpulse( 0.05, -50, boss.x, boss.y ))
-					transition.to(boss, {time = 5000,  -- removes it when he's off the map 
-						onComplete = function()
-							display.remove(boss)
-						end
-					})
-				end	
-
-			else --Se ha almeno una vita
-				if(boss.name=="testa")then
-					boss:setSequence("damage")
-					boss:play()
-					transition.to(boss,{time=1500, onComplete=function()
-						boss:setSequence("idle")
-						boss:play()
-					end})
+					bossPart:onDeathAnimation()
 				end
 
-				boss.alpha = 0.5 
-				boss.isTargettable = false
-				timer.performWithDelay(500, 
+			-- bossPart is still alive: handle hit
+			else
+				bossPart:onHitAnimation()
+
+				-- Makes the bossPart temporairly untargettable and reverts it short after
+				bossPart.alpha = 0.5 
+				bossPart.isTargettable = false
+				timer.performWithDelay(1000, 
 					function()
-						boss.alpha = 1
-						boss.isTargettable = true
+						bossPart.alpha = 1
+						bossPart.isTargettable = true
 					end
 				)
 			end
@@ -363,70 +346,6 @@ end
 			steve:equipPowerUp(powerup.itemName)
 		end
 	end
-
-	-- local function metheorsRainCollision( metheorsItem, event )
-		-- 	if ( event.phase == "began" ) then
-		-- 		display.remove(metheorsItem)
-		-- 		--da Implementare
-		-- 		local numberMetheors = 6
-		-- 		local metheors = {}
-
-		-- 		local function createMetheor()
-		-- 			local metheor = entity.newEntity{
-		-- 			graphicType = "static",
-		-- 				filePath = visual.itemMetheor,
-		-- 				width = 40,
-		-- 				height = 40,
-		-- 				bodyType = "dynamic",
-		-- 				physicsParams = { isSensor = true , friction = 10.0, density = 0.3, },
-		-- 				eName = "item"
-		-- 			}
-
-		-- 			local directionX = math.random(-2, 2)
-		-- 			local directionY = math.random(-1, 1)
-		-- 			local c = display.contentCenterX
-		-- 			local spawnX = math.random( c - display.contentWidth , c + display.contentWidth)
-		-- 			metheor.x , metheor.y = spawnX, display.contentHeight
-		-- 			metheor:addOnMap(game.map)
-
-		-- 			transition.to(metheor,{time =0, onComplete= function()
-		-- 				metheor:applyLinearImpulse(directionX, directionY, metheor.x -5 , metheor.y +7)
-		-- 			end})
-
-		-- 			local funct = function()
-		-- 				display.remove(metheor)
-		-- 			end
-		-- 			timer.performWithDelay(6000, funct)
-
-		-- 			return metheor
-		-- 		end
-
-		-- 		local function effect()
-		-- 			local m = createMetheor()
-		-- 			table.insert(metheors, m)
-		-- 		end
-
-		-- 		local function executeWithDelay()
-		-- 			local difference = math.random(1000, 2000)
-		-- 			timer.performWithDelay(difference, effect)
-		-- 		end
-
-		-- 		for i=0, numberMetheors do
-		-- 			executeWithDelay()
-		-- 		end
-
-		-- 	elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-		-- 	end
-		-- end
-
-	-- local function summonCollision( summonItem, event )
-		-- 	if ( event.phase == "began" ) then
-		-- 		display.remove(summonItem)
-		-- 		--da Implementare
-				
-		-- 	elseif(event.phase == "cancelled" or event.phase == "ended" ) then
-		-- 	end
-		-- end
 
 	function collisions.itemCollision( self, event )
 		local o = event.other

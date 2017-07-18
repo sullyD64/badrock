@@ -3,23 +3,20 @@
 -- Used to store the boss event phases for every boss
 --
 -----------------------------------------------------------------------------------------
-local boss= require("core.boss")
-local ui= require("core.ui")
+local boss       = require ( "core.boss"       )
+local controller = require ( "core.controller" )
+
 local game = {}
 local steve = {}
 local gState = {}
 local sState = {}
-local maxlives = 12
 
 bossStrategy = {
 	-- activeStrategy se == 0 -->non c'è nessuna fight, altrimenti indica il numero della Boss Strategy attiva  
 	activeStrategy = 0
 	
 }
-function bossStrategy.maxL()
-local ml= maxlives
-return ml
-end
+
 ---------- STRATEGIA BOSS 1 --------------------------------------------------------------------------------------------------------------------
 local strategyBoss1 = {}
 
@@ -31,7 +28,7 @@ local strategyBoss1 = {}
 		strategyB1.BossNumber= 1
  		strategyB1.bossEntity = {}
  		strategyB1.phase = 0
-		strategyB1.state = ""
+		strategyB1.state = "Loaded"
 		strategyB1.timers={}          --campo opzionale per altre strategy
 		strategyB1.fireRateSx = 5000  --campo opzionale per altre strategy
 		strategyB1.fireRateDx = 5000  --campo opzionale per altre strategy
@@ -39,44 +36,51 @@ local strategyBoss1 = {}
 		strategyB1.spawn = game.map:getObjectLayer("bossSpawn"):getObject("bossSpawn")
 		strategyB1.spawnOriginalPosition= {x=strategyB1.spawn.x , y= strategyB1.spawn.y}
 		strategyB1.win = false
-		
-
 	
 		-- funzione obbligatoriamente presente in ogni strategy
 		function strategyB1:startFight()
 			self:phase0()
 		end
+
+		-- Health bar management --------------------------------------------
+			function strategyB1:initializeHealthBar()
+				self.totalLives = boss.getMaxLives(self.bossEntity)
+				controller.updateBossHealthBar("initialize", self.totalLives)
+			end
+
+			function strategyB1:destroyHealthBar()
+				self.totalLives = 0
+				controller.updateBossHealthBar("destroy")
+			end
+
+			function strategyB1:decrementTotalLives()
+				self.totalLives = self.totalLives - 1
+				controller.updateBossHealthBar("update", self.totalLives)
+			end
+		---------------------------------------------------------------------
 		
 		------ PHASE 0 --------------------------------------------------------------------------------------------------------------------
 		function strategyB1:phase0()
-		
 			bossStrategy.activeStrategy = 1
 			self.isActive = true
-			self.state = "generating"
-			self.phase=0
-			
+			self.state = "Generating"
+			self.phase = 0
+
 			local corpo = boss.loadBoss("corpo")
 			local spallaDx = boss.loadBoss("spallaDx")
 			local spallaSx = boss.loadBoss ("spallaSx")	
 			local testa = boss.loadBoss("testa")
 			local manoDx = boss.loadBoss("manoDx")
 			local manoSx = boss.loadBoss("manoSx")
-			if(not (maxlives>=12)) then
-				maxlives= maxlives+ corpo.lives
-				maxlives= maxlives+ spallaDx.lives
-				maxlives= maxlives+ spallaSx.lives
-				maxlives= maxlives+ testa.lives
-				maxlives= maxlives+ manoSx.lives
-				maxlives= maxlives+ manoDx.lives -1
-			end
+
 			corpo:toBack()
 
 			-- sposta le mani nella posizione iniziale
 			manoSx.x = self.spawn.x -100
 			manoDx.x = self.spawn.x +100
 			--xScale degli oggetti identici
-			manoDx.xScale=-1
-			spallaSx.xScale=-1
+			manoDx.xScale = -1
+			spallaSx.xScale = -1
 			
 			self.bossEntity.manoDx = manoDx
 			self.bossEntity.manoSx = manoSx
@@ -84,18 +88,22 @@ local strategyBoss1 = {}
 			self.bossEntity.spallaSx = spallaSx
 			self.bossEntity.corpo = corpo
 			self.bossEntity.testa = testa
-			self.bossEntity.spawn = self.spawn
+
+			--------------------------
+			self:initializeHealthBar()
+			--------------------------
 
 			-- avoid boss parts to fall down when the fight is paused
-			transition.to(self.bossEntity,{time = 0, onComplete= function()
-				self.bossEntity.spallaDx.gravityScale = 0
-				self.bossEntity.spallaSx.gravityScale = 0
-				self.bossEntity.corpo.gravityScale = 0
-				self.bossEntity.testa.gravityScale = 0
-			end})
+			transition.to(self.bossEntity, {time = 0, 
+				onComplete= function()
+					self.bossEntity.spallaDx.gravityScale = 0
+					self.bossEntity.spallaSx.gravityScale = 0
+					self.bossEntity.corpo.gravityScale = 0
+					self.bossEntity.testa.gravityScale = 0
+				end
+			})
 
-
-			--inizializazione di componenti aggiuntive di ogni pezzo
+			-- inizializazione di componenti aggiuntive di ogni pezzo
 			self.bossEntity.spallaDx.state = "normal"
 			self.bossEntity.spallaSx.state = "normal"
 			self.bossEntity.spallaDx.proiettili = {}
@@ -105,7 +113,7 @@ local strategyBoss1 = {}
 			self.bossEntity.manoDx.laser = nil
 			self.bossEntity.manoSx.laser = nil
 			
-			--play all the sprites
+			-- play all the sprites
 			self.bossEntity.manoDx:setSequence("idle")
 			self.bossEntity.manoDx:play()
 			self.bossEntity.manoSx:setSequence("idle")
@@ -120,63 +128,62 @@ local strategyBoss1 = {}
 			self.bossEntity.testa:play()
 			
 			print(" STA PER INIZIARE LA BOSS FIGHT")
-			ui.createBossLife(maxlives)
-			print(maxlives)
+
 			--phase1
-			local t = timer.performWithDelay(3000,self:phase1())
+			local t = timer.performWithDelay(3000,
+				function()
+					self:phase1()
+					self.state = "Running"
+				end
+			)
 			table.insert(self.timers,t)
 		end
 
-
-
 		------ PHASE 1 --------------------------------------------------------------------------------------------------------------------
 		function strategyB1:phase1()
+			-- self.state = "Running" -- [See above]
+			self.phase=1
+			print("PHASE = 1")
+			
+			self.bossEntity.manoDx.state = "bouncing"
+			self.bossEntity.manoSx.state = "bouncing"
 
-				self.state = "Running"
-				self.phase=1
-				print("PHASE = 1")
-				
-				self.bossEntity.manoDx.state = "bouncing"
-				self.bossEntity.manoSx.state = "bouncing"
+			-- Alcune parti non possono essere toccate durante alcune fasi--------
+			self.bossEntity.spallaDx.isTargettable =false
+			self.bossEntity.spallaSx.isTargettable =false
+			self.bossEntity.testa.isTargettable =false
 
-				-- Alcune parti non possono essere toccate durante alcune fasi--------
-				self.bossEntity.spallaDx.isTargettable =false
-				self.bossEntity.spallaSx.isTargettable =false
-				self.bossEntity.testa.isTargettable =false
+			--DA RIMUOVERE, SOLO PER SEMPLIFICARE I TEST
+			--self.bossEntity.manoDx.state = "alzaSchiaccia"
+			--self.bossEntity.manoSx.state = "alzaSchiaccia"
 
-				--DA RIMUOVERE, SOLO PER SEMPLIFICARE I TEST
-				--self.bossEntity.manoDx.state = "alzaSchiaccia"
-				--self.bossEntity.manoSx.state = "alzaSchiaccia"
+			--Sposta il corpo del boss con tutto il resto verso l'alto
+			transition.to(self.spawn, {time=4000, y= self.spawn.y - 220})
 
-				--Sposta il corpo del boss con tutto il resto verso l'alto
-				transition.to(self.spawn, {time=4000, y= self.spawn.y - 220})
-
-				-- Funzione che fa muovere le mani ogni tot secondi----------
-				local t1
-				local muoviMani = function()
-					if(self.phase==1 and self.state == "Running") then
-						local d1 = math.random(-200,200)
-						local d2 = math.random(-200,200)
-						if(self.bossEntity.manoDx and self.bossEntity.manoDx.lives > 1)then 
-							self.bossEntity.manoDx:applyLinearImpulse(d1,-100,self.bossEntity.manoDx.x,self.bossEntity.manoDx.y) 
-						end
-						if(self.bossEntity.manoSx and self.bossEntity.manoSx.lives > 1)then
-							self.bossEntity.manoSx:applyLinearImpulse(d2,-100,self.bossEntity.manoSx.x,self.bossEntity.manoSx.y)
-						end
-					else
-						timer.cancel(t1)
+			-- Funzione che fa muovere le mani ogni tot secondi----------
+			local t1
+			local muoviMani = function()
+				if(self.phase==1 and self.state == "Running") then
+					local d1 = math.random(-200,200)
+					local d2 = math.random(-200,200)
+					if(self.bossEntity.manoDx and self.bossEntity.manoDx.lives > 1)then 
+						self.bossEntity.manoDx:applyLinearImpulse(d1,-100,self.bossEntity.manoDx.x,self.bossEntity.manoDx.y) 
 					end
+					if(self.bossEntity.manoSx and self.bossEntity.manoSx.lives > 1)then
+						self.bossEntity.manoSx:applyLinearImpulse(d2,-100,self.bossEntity.manoSx.x,self.bossEntity.manoSx.y)
+					end
+				else
+					timer.cancel(t1)
 				end
-				t1 = timer.performWithDelay(5000, muoviMani, -1)
-				table.insert(self.timers,t1)
+			end
+			t1 = timer.performWithDelay(5000, muoviMani, -1)
+			table.insert(self.timers,t1)
 		end
 
 
 		------ PHASE 2 --------------------------------------------------------------------------------------------------------------------
 		function strategyB1:phase2()
 			self.phase=2
-			--colpire le spalle può creare più di una collisione
-			bossStrategy.wide=true
 		 	print("PHASE = 2")
 
 		 	if(self.bossEntity.spallaDx.state == "normal") then
@@ -285,6 +292,10 @@ local strategyBoss1 = {}
 			self.state = "Completed"
 			self.win = true
 
+			-----------------------
+			self:destroyHealthBar()
+			-----------------------
+
 			self.bossEntity.corpo:setSequence("destroy")
 			self.bossEntity.corpo:play()
 
@@ -299,18 +310,21 @@ local strategyBoss1 = {}
 				end
 			end
 
-			timer.performWithDelay(5000,function() --dopo circa 5 sec
-				self:terminateFight()
-			end )
+			timer.performWithDelay(5000,
+				function() --dopo circa 5 sec
+					self:terminateFight()
+				end 
+			)
 		end
 
 
 		-- TERMINATE BOSS FIGHT --------------------------(called if we: die|return to menu|after victory)----
 		function strategyB1:terminateFight()
-		
 			self.state = "Terminated"
-			maxlives=12
-			ui.emptyBossLife()
+
+			-----------------------
+			self:destroyHealthBar()
+			-----------------------
 
 			--IL DELAY DEVE ESSERE CIRCA UGUALE AL TEMPO DI RESPAWN DI STEVE
 
@@ -657,17 +671,11 @@ function bossStrategy.loadBoss( trigger )
 	trigger:addProperty(Property:new("maskBits", filters.envFilter.maskBits))
 				
 	trigger.listener = function(event)
-
 		--Triggers the Boss Fight
 		if (bossStrategy.activeStrategy == 0 and strategy.win == false) then
 			strategy:startFight()
 			-- Closes the area of the fight
-			--J
-			started=true
 			trigger.walls = util.createWalls(game.map)
-			--controllo che la strategia sia appena iniziata (juststarted) per aggiornare le vite al max in collisions
-			bossStrategy.js=true
-			bossStrategy.wide=false
 		end
 	end
 

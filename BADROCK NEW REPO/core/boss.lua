@@ -11,10 +11,10 @@ local gState = {}
 local sState = {}
 
 local boss = {
+	descriptions = {
 
- descriptions = {
-		
-		{	type = "manoDx",
+		{	
+			type = "manoDx",
 			lives = 3,--3
 			score  = 0,
 			options = {
@@ -133,7 +133,8 @@ local boss = {
 			 	physicsParams = { },
 				eName = "boss"
 			}
-		},{	
+		},
+		{	
 			type ="corpo",
 			bodyType="dynamic",
 			lives = 1,
@@ -158,9 +159,7 @@ local boss = {
 				eName = "visual"
 			}
 		},
-		
-	}
-		
+	}		
 }
 
 	function boss.setGame ( currentGame, gameStateList, playerStateList )
@@ -172,10 +171,8 @@ local boss = {
 		sState = playerStateList
 	end
 
-
 	--crea il boss
 	function boss.loadBoss(bossName)
-
 		local desc={options={physicsParams={}}}
 		for i, v in pairs(boss.descriptions) do
 			if (v.type == bossName) then
@@ -202,28 +199,52 @@ local boss = {
 		bossSprite:addOnMap( game.map )
 		bossSprite.name = desc.type
 		bossSprite.score = desc.score
+
+		-- De facto, this is only applied to the head (for Boss 1)
+		function bossSprite:onHitAnimation()
+			if(self.name=="testa")then
+				self:setSequence("damage")
+				self:play()
+				transition.to(self,{time=1500, 
+					onComplete = function()
+						self:setSequence("idle")
+						self:play()
+					end
+				})
+			end
+		end
+		
+		-- Animation: knocks the bossPart AWAY and off the map
+		-- De facto, this is only applied to the shoulder-cannons (for Boss 1)
+		function bossSprite:onDeathAnimation()
+			self.isSensor = true
+			self.eName = "deadBossPart"
+			self.yScale = -1
+			if (self.sequence) then
+				self:setSequence("dead")
+				self:play()
+			end
+			timer.performWithDelay(1000, self:applyLinearImpulse( 0.05, -5, self.x, self.y ))
+			transition.to(self, {time = 5000,  -- removes it when he's off the map 
+				onComplete = function()
+					display.remove(self)
+				end
+			})
+		end	
+
 		return bossSprite
 	end
 
-	--il boss ha n vite
-	-- function gestisciVita(n)
-	-- 	local lifeBar = {}
-	-- 	local lives = n
-	-- 	local x=10
-
-	-- 	for i=1,n do
-	-- 		lifeBar[i] = display.newImage("nomeImmagine.png")
-	-- 		lifeBar[i].x = x+10
-	-- 		lifeBar[i].y = 30
-	-- 		lifeBar[i].isVisible = true
-	-- 	end
-
-	-- 	--aggiorna
-	-- 	if lives>0 then
-	-- 	    lifeBar[lives].isVisible = false
-	-- 	    lives = lives - 1
-	-- 	end
-	-- end
+	-- Given a list of Entities (the boss' parts), returns the sum of their lives
+	function boss.getMaxLives(bossParts)
+		local maxLives = 0
+		for k, part in pairs(bossParts) do
+			maxLives = maxLives + part.lives
+		end
+		-- The result is decremented by three, because the body and the hands 
+		-- need at least one life to stay on screen
+		return maxLives - 3
+	end
 
 
 	--inizia un breve dialogo con il nemico, testo da mettere in un array per poterne scorrere gli elementi

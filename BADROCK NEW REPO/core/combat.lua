@@ -119,6 +119,12 @@ local function handleAttackEnd()
 		player.attack.isBodyActive = false
 		player.attack.inner.isVisible = false
 		player.attack.inner.isBodyActive = false
+
+		if (player.attack.bodyType and player.attack.inner.bodyType) then
+			physics.removeBody( player.attack )
+			physics.removeBody( player.attack.inner )
+		end
+
 		player.attack.sprite:pause()
 		player.attack.sprite.isVisible = false
 		display.remove(player.attack.sprite)
@@ -477,9 +483,9 @@ end
 		-- The attack is initially inactive
 		atk.isVisible = false
 		atk.isBodyActive = false
-		atk.sprite.isVisible = false
 		atk.inner.isVisible = false
 		atk.inner.isBodyActive = false
+		atk.sprite.isVisible = false
 
 		-- Inserts the attack hitbox and sprite on the game's current map
 		atk:addOnMap( map )

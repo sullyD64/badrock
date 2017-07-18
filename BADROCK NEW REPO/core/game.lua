@@ -233,6 +233,7 @@ end
 					end
 			end
 		end
+
 		-- --WORK IN PROGRESS
 		-- local currentMap = game.map
 		-- local enemyList = currentMap:getObjectLayer("enemySpawn").objects
@@ -246,12 +247,15 @@ end
 		-- local ebetweencheck= filter(cplist[1])
 		-- for i,v in ipairs(ebetweencheck) do print(ebetweencheck[i]) end
 		--if(#ebetweencheck==0) then print("nullo") end
+
+
 		for i,v in pairs(game.listaNemiciRestore) do
 					--print(#filter(game.spawnPoint))
 					--print(v, v.type)
 					--print(v) print(v.type)
 		end
 		-- --END WORK IN PROGRESS
+
 		-- Entity animation: handles the chasers' behavior
 		if (game.enemiesLoaded == true and game.lives ~= 0) then
 			-- Iterates the chaser list
@@ -328,16 +332,19 @@ end
 				end
 			end	
 		end
+
 		-- Handles the runtime events associated with the boss fight
 		-- (if the current level has a boss).
-		if(game.bossFight and bossStrategy.activeStrategy ~= 0) then
-			-- Gestione Boss Strategy in caso di interruzione del fight
-			if((game.steve.state == playerStateList.DEAD and game.lives > 1) and game.bossFight.state ~= "Terminated") then 	
-				game.bossFight:terminateFight() 				
+		if(game.bossFight) then
+			if (bossStrategy.activeStrategy ~= 0) then
+				-- Gestione Boss Strategy in caso di interruzione del fight
+				if((game.steve.state == playerStateList.DEAD and game.lives > 1) and game.bossFight.state ~= "Terminated") then 	
+					game.bossFight:terminateFight()		
+				end
+				-----------------------------------
+				game.bossFight:executeRuntimeLoop()
+				-----------------------------------
 			end
-			-----------------------------------
-			game.bossFight:executeRuntimeLoop()
-			-----------------------------------
 		end		
 
 		-- Listener for the "player has died" event.
@@ -631,6 +638,8 @@ end
 		-----------------------------------------------------------
 
 		game:loadBoss(util.getBossTrigger(game.map))
+
+		-- collisions.setBossFight(game.bossFight)
 
 		physics.start()
 		physics.pause()

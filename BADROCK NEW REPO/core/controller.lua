@@ -12,13 +12,13 @@
 -- some methods to visually manipulate the UI, like visualizing the score or other 
 -- 'system' responses for the uses.
 -----------------------------------------------------------------------------------------
-local ui         = require ( "core.ui"         )
-local pauseMenu  = require ( "menu.pauseMenu"  )
-local gameResult = require ( "menu.gameResult" )
-local sfxMenu    = require ( "menu.sfxMenu"    )
-local utility = require("menu.utilityMenu")
-local bossStrategy= require("core.bossStrategy")
-local enemies= require("core.enemies")
+local ui         = require ( "core.ui"          )
+local pauseMenu  = require ( "menu.pauseMenu"   )
+local gameResult = require ( "menu.gameResult"  )
+local sfxMenu    = require ( "menu.sfxMenu"     )
+local utility    = require ( "menu.utilityMenu" )
+local enemies    = require ( "core.enemies"     )
+
 local controller = {
 	controlsEnabled,
 	pauseEnabled,
@@ -581,7 +581,7 @@ local sState = {}
 		ui.buttons.action:dispatchEvent( event )
 	end
 
-	-- Manages the the UI Ammo Icons
+	-- Manages the UI Ammo Icons
 	function controller.updateAmmo( flag, ammoNumber )
 		if (flag == "initialize") then
 			ui.createAmmoIcons(ammoNumber)
@@ -591,6 +591,18 @@ local sState = {}
 			ui.destroyAmmoIcons()
 			ui.emptyAmmoIcons()
 			controller.restoreActionButton()
+		end
+	end
+
+	-- Manages the UI Boss' Health Bar
+	function controller.updateBossHealthBar( flag, bossLivesNumber )
+		if (flag == "initialize") then
+			ui.createBossHealthBar(bossLivesNumber)
+		elseif (flag == "update") then
+			ui.updateBossHealthBar(bossLivesNumber)
+		elseif (flag == "destroy") then
+			ui.destroyBossHealthBar()
+			ui.emptyBossHealthBar()
 		end
 	end
 ------------------------------------------------------------------------------------
