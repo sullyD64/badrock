@@ -364,6 +364,7 @@ local sState = {}
 				--restoreEnemies(game.listaNemiciRestore)
 				print(#game.listaNemiciRestore .. " enemy to restore")
 				enemies.loadEnemies(game,game.listaNemiciRestore)
+				game.listaNemiciRestore={}
 		--		print(game.listaNemiciRestore[1].eName)
 				--enemies.loadEnemies(game,game.map:getObjectLayer("enemySpawn").objects)
 			end
