@@ -191,8 +191,8 @@ opt.panel:insert( opt.panel.title )
 			style = "checkbox",
 			id = "Checkbox",
 			onPress = onBgMuteSwitchPress,
-			height = 15,
-			width = 15,
+			height = 20,--15,
+			width = 20,--15,
 			initialSwitchState = not myData.settings.musicOn
 		}
 		--opt.panel.bgMuteBtn:setState({isOn= not myData.settings.musicOn})
@@ -210,8 +210,8 @@ opt.panel:insert( opt.panel.title )
 			style = "checkbox",
 			id = "Checkbox",
 			onPress = onFxMuteSwitchPress,
-			height = 15,
-			width = 15,
+			height = 20, --15,
+			width = 20, --15,
 			initialSwitchState = not myData.settings.soundOn
 		}
 		--opt.panel.fxMuteBtn:setState({isOn= not myData.settings.soundOn})

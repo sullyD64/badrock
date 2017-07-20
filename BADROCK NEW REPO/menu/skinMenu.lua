@@ -67,7 +67,7 @@ local skin = {}
 		location = "custom",
 		onComplete = panelTransDone,
 		width = display.contentWidth * 0.95,
-		height =display.contentHeight * 0.70,
+		height = display.contentHeight * 0.70,
 		speed = 220,
 		anchorX = 1.0,
 		anchorY = 0.5,
@@ -90,10 +90,10 @@ local skin = {}
 	skin.panel.title:setFillColor( 1, 1, 1 )
 	skin.panel:insert( skin.panel.title )
 
-	skin.panel.steve = display.newImageRect(visual.steveMenuSkin, 80, 80)
-	skin.panel.steve.x = 210
-	skin.panel.steve.y = 30
-	skin.panel:insert(skin.panel.steve)
+	-- skin.panel.steve = display.newImageRect(visual.steveMenuSkin, 80, 80)
+	-- --skin.panel.steve.x = diplay. --210
+	-- skin.panel.steve.y = 30
+	-- skin.panel:insert(skin.panel.steve)
 
 	-- Create the button to exit the skin menu
 	skin.panel.returnBtn = widget.newButton {
@@ -102,7 +102,9 @@ local skin = {}
 		height = 30,
 		defaultFile = visual.exitOptionMenu,
 		}
-	skin.panel.returnBtn.x= 240
+	skin.panel.returnBtn.x= 
+	print ("HERE "..skin.panel.returnBtn.x)
+	skin.panel.returnBtn.x = 250
 	skin.panel.returnBtn.y = -95
 	skin.panel:insert(skin.panel.returnBtn)
 
@@ -144,8 +146,8 @@ local skin = {}
 			style = "radio",
 			id = tostring(i),
 			onPress = onSkinSelect,
-			width = skin.panel.width/4.35,--display.contentWidth - 350,
-			height = skin.panel.height*0.55,---60,--display.contentHeight - 200,
+			width = 125,--skin.panel.width/4.35,--display.contentWidth - 350,
+			height = 120,--skin.panel.height*0.55,---60,--display.contentHeight - 200,
 			--initialSwitchState = 
 		})
 
@@ -174,7 +176,7 @@ local skin = {}
 			skin.panel.skinGroup:insert( skin.panel.buyButtons[i] )
 		end
 		
-		xOffset = xOffset + skin.panel.skins[i].width*1.2--+20
+		xOffset = xOffset + skin.panel.skins[i].width*1.1--+20
 	end
 
 
