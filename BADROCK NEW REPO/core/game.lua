@@ -667,7 +667,7 @@ end
 function game.pause()
 	physics.pause()
 	controller:pause()
-
+	for k,v in pairs(game.enemies) do temp= v.enemySprite if(temp.sequence) then temp:pause() print(v.type) end end
 	if (game.steve.attack and game.steve.attack.sprite) then
 		game.steve.attack.sprite:pause()
 	end
@@ -683,13 +683,13 @@ function game.pause()
 		end
 	end
 
-	if (game.chaserList) then
-		for k, chaser in pairs(game.chaserList) do 
-			if (chaser.sequence) then
-				chaser:pause()
-			end
-		end
-	end
+	-- if (game.chaserList) then
+	-- 	for k, chaser in pairs(game.chaserList) do 
+	-- 		if (chaser.sequence) then
+	-- 			chaser:pause()
+	-- 		end
+	-- 	end
+	-- end
 
 	if(game.bossFight and game.bossFight.state ~= "Paused" and bossStrategy.activeStrategy ~= 0) then
 		game.bossFight:pauseFight()
@@ -699,7 +699,7 @@ end
 function game.resume()
 	physics.start()
 	controller:start()
-
+	for k,v in pairs(game.enemies) do temp= v.enemySprite if(temp.sequence) then temp:play() print(v.type) end end
 	if (game.steve.attack and game.steve.attack.sprite) then
 		game.steve.attack.sprite:play()
 	end
@@ -715,21 +715,21 @@ function game.resume()
 		end
 	end
 
-	if (game.chaserList) then
-		for k, chaser in pairs(game.chaserList) do
-			if(chaser.sequence) then
-				chaser:play()
-			end
-		end
-	end
+	-- if (game.chaserList) then
+	-- 	for k, chaser in pairs(game.chaserList) do
+	-- 		if(chaser.sequence) then
+	-- 			chaser:play()
+	-- 		end
+	-- 	end
+	-- end
 
-	if (game.walkerList) then
-		-- for k, walker in pairs(game.walkerList) do
-			-- if(walker and walker.sequence ) then
-				-- walker:play()
-			-- end	
-		-- end
-	end
+	-- if (game.walkerList) then
+	-- 	-- for k, walker in pairs(game.walkerList) do
+	-- 		-- if(walker and walker.sequence ) then
+	-- 			-- walker:play()
+	-- 		-- end	
+	-- 	-- end
+	-- end
 
 	if(game.bossFight and game.bossFight.state ~= "Running" and bossStrategy.activeStrategy ~= 0)then
 		game.bossFight:resumeFight()
