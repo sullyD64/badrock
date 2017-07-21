@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.1" orientation="orthogonal" renderorder="right-down" width="100" height="28" tilewidth="64" tileheight="64" nextobjectid="82">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="100" height="28" tilewidth="64" tileheight="64" nextobjectid="83">
  <properties>
   <property name="ParallaxEnabled" value="true"/>
  </properties>
@@ -857,6 +857,7 @@
     <property name="travelDistance" value="250"/>
    </properties>
   </object>
+  <object id="82" name="phoenix" type="phoenix" x="728" y="1386"/>
  </objectgroup>
  <objectgroup name="itemSpawn">
   <object id="76" name="immunity" x="801.333" y="261.333">

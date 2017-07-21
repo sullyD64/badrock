@@ -82,6 +82,7 @@ local visual = {
 	enemyChair             = "visual/sprites/enemy_chair.png",
 	enemyPaper             = "visual/sprites/enemy_paper.png",
 	enemyRobot             = "visual/sprites/enemy_robot.png",
+	enemyPhoenix           = "visual/sprites/enemy_phoenix.png",
 
 	itemLife               = "visual/sprites/bonus_life.png",
 	itemGun                = "visual/sprites/pup_gun.png",
