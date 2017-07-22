@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------------------------
 
 local visual = {
-	
+
 	panel                  = "visual/misc/panel.png",
 	exitOptionMenu         = "visual/misc/xRed.png",
 	optionButtonDefault    = "visual/misc/settings.png",
@@ -17,16 +17,27 @@ local visual = {
 
 	sliderSheet            = "visual/misc/volumeSlider.png",
 	checkboxSheet          = "visual/misc/checkbox.png",
-	confirmImg			     = "visual/misc/ok.png",
-	cancelImg			     = "visual/misc/xGrey.png",
-	retryImg			        = "visual/misc/retry.png",
-	nextLevelImg		     = "visual/misc/nextLevel.png",		
-	backToMenuImg		     = "visual/misc/menuLink.png",
-	blankButtonMenu		  = "visual/misc/blankMenu.png",
-	audioSettingsImg	     = "visual/misc/audioSettings.png",
-	bgMenuSkin			     = "visual/misc/bgMenuSkin.png",
-	frecciaSkin			     = "visual/misc/frecciaSkin.png",
-	steveMenuSkin		     = "visual/misc/steveMenuSkin.png",
+
+	confirmImg             = "visual/misc/ok.png",
+	cancelImg              = "visual/misc/xGrey.png",
+	retryImg               = "visual/misc/retry.png",
+	nextLevelImg           = "visual/misc/nextLevel.png",
+	backToMenuImg          = "visual/misc/menuLink.png",
+	blankButtonMenu        = "visual/misc/blankMenu.png",
+	audioSettingsImg       = "visual/misc/audioSettings.png",
+	bgMenuSkin             = "visual/misc/bgMenuSkin.png",
+	bgMenuBuy              = "visual/misc/bgMenuBuy.png",
+	frecciaSkin            = "visual/misc/frecciaSkin.png",
+	steveMenuSkin          = "visual/misc/steveMenuSkin.png",
+	transparent            = "visual/misc/transparent.png",
+
+	tutorialArrowMove      = "visual/misc/arrowMove.png",
+	tutorialArrowAttack    = "visual/misc/arrowAttack.png",
+	tutorialArrowLife      = "visual/misc/arrowLife.png",
+	tutorialArrowPause     = "visual/misc/arrowPause.png",
+	tutorialBlack          = "visual/misc/tutorialBlack.png",
+	tutorialRed            = "visual/misc/tutorialRed3.png",
+
 
 	menuBackground         = "visual/misc/MenuBackground.jpg",
 	titleLogo              = "visual/misc/LogoShadow.png",
@@ -44,9 +55,9 @@ local visual = {
 	actionBtn_gun          = "visual/ui/actbtn_gun.png",
 	actionBtn_gun_over     = "visual/ui/actbtn_gun_over.png",
 	pauseBtnDefault        = "visual/ui/pauseDefault.png",
-	pauseBtnOver		     = "visual/ui/pauseOver.png",
-	resumeBtnDefault	     = "visual/ui/resumeDefault.png",
-	resumeBtnOver 		     = "visual/ui/resumeOver.png",
+	pauseBtnOver           = "visual/ui/pauseOver.png",
+	resumeBtnDefault       = "visual/ui/resumeDefault.png",
+	resumeBtnOver          = "visual/ui/resumeOver.png",
 
 	lifeIcon               = "visual/ui/life.png",
 	bossLifeIcon           = "visual/ui/blife.png",
@@ -82,6 +93,7 @@ local visual = {
 	enemyChair             = "visual/sprites/enemy_chair.png",
 	enemyPaper             = "visual/sprites/enemy_paper.png",
 	enemyRobot             = "visual/sprites/enemy_robot.png",
+	enemyPhoenix           = "visual/sprites/enemy_phoenix.png",
 
 	itemLife               = "visual/sprites/bonus_life.png",
 	itemGun                = "visual/sprites/pup_gun.png",
@@ -94,7 +106,6 @@ local visual = {
 	bossTesta              = "visual/sprites/testaBossAnim.png",
 	bossCorpo              = "visual/sprites/corpoBossAnim.png",
 	bossLaser              = "visual/sprites/laserSprite.png"
-
 }
 
 return visual

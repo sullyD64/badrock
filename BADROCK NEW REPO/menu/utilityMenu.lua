@@ -51,11 +51,11 @@ utility.font = "Berlin Sans FB Regular.ttf"--"ITCKRIST.TTF"--"Micolas.ttf"
 
 	-- checkbox sheet
 	local checkboxOptions = {
-			width = 20,
-			height = 21,
+			width = 36,
+			height = 36,
 			numFrames = 2,
-			sheetContentWidth = 42,
-			sheetContentHeight = 21
+			sheetContentWidth = 73,
+			sheetContentHeight = 36
 		}
 	utility.checkboxSheet = graphics.newImageSheet( visual.checkboxSheet, checkboxOptions )
 

@@ -1,5 +1,6 @@
 local defaults = {}
 defaults.maxLevels = 5
+defaults.firstStart = false
 defaults.settings = {}
 defaults.settings.currentLevel = 1
 defaults.settings.unlockedLevels = 1
@@ -23,7 +24,7 @@ defaults.settings.levels[4].score = 0
 defaults.settings.levels[5] = {}
 defaults.settings.levels[5].stars = 0
 defaults.settings.levels[5].score = 0
-defaults.settings.goodPoints=5
+defaults.settings.goodPoints=0
 defaults.settings.evilPoints=20
 defaults.settings.skinNumber= 3
 defaults.settings.selectedSkin=1

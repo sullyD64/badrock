@@ -48,9 +48,9 @@ physics.setGravity( 0, 80 )
 	}
 	
 --===========================================-- 
---__________________________________________________________________________________________________ 	
---|                                                                                                | 
---|                                                                                                | 
+--__________________________________________________________________________________________________
+--|                                                                                                |
+--|                                                                                                |
 			-- The only purpose of this is for text debugging on the console.
 			local function debug(event)
 				-- print("Game is " .. game.state)
@@ -100,8 +100,8 @@ physics.setGravity( 0, 80 )
 				-- print("-----------------------------") -- android debugging
 				-- print("")                              -- normal debugging
 			end
---|                                                                                                | 
---|                                                                                                | 
+--|                                                                                                |
+--|                                                                                                |
 --\________________________________________________________________________________________________/
 
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
@@ -293,7 +293,8 @@ physics.setGravity( 0, 80 )
 		if(game.bossFight) then
 			if (bossStrategy.activeStrategy ~= 0) then
 				-- Gestione Boss Strategy in caso di interruzione del fight
-				if((game.steve.state == playerStateList.DEAD and game.lives > 1) and game.bossFight.state ~= "Terminated") then 	
+				if((game.steve.state == playerStateList.DEAD and game.lives > 1) 
+					and game.bossFight.state ~= "Terminated") then 	
 					game.bossFight:terminateFight()		
 				end
 				-----------------------------------
@@ -546,7 +547,7 @@ physics.setGravity( 0, 80 )
 			self.loadedWalkers = util.subtable(self.loadedEnemies, "behavior", "walker")
 			util.toKeyMap(self.loadedWalkers, "name")
 
-			self.loadedChasers = {}		
+			self.loadedChasers = {}
 			self.loadedChasers = util.subtable(self.loadedEnemies, "behavior", "chaser")
 			util.toKeyMap(self.loadedChasers, "name")
 
@@ -665,7 +666,7 @@ physics.setGravity( 0, 80 )
 
 		-- Entity initialization --
 		-- The following 4 tables track the state of all the entities on the map.
-		game.loadedEnemies = {}   
+		game.loadedEnemies = {}
 		game.loadedNPCs  = {}
 		game.loadedItems = {}
 		game.loadedDrops = {}
@@ -688,7 +689,7 @@ physics.setGravity( 0, 80 )
 		game.goodPoints = 0
 		game.evilPoints = 0
 		game.stars = 0
-		game.lives = game.MAX_LIVES - 1 
+		game.lives = game.MAX_LIVES - 1
 		game.levelHasBeenCompleted = false
 		game.maxPoints = game.getMaxScore()
 		-----------------------------------
@@ -749,6 +750,14 @@ function game.pause()
 		end
 	end
 
+	if (game.loadedEnemies) then
+		for k, enemy in pairs(game.loadedEnemies) do
+			if (enemy.entity and enemy.entity.sequence) then
+				enemy.entity:pause()
+			end
+		end
+	end
+
 	if(game.bossFight and game.bossFight.state ~= "Paused" and bossStrategy.activeStrategy ~= 0) then
 		game.bossFight:pauseFight()
 	end
@@ -779,6 +788,14 @@ function game.resume()
 
 	if (game.loadedWalkers) then
 		-- [[Might be useful]]
+	end
+
+	if (game.loadedEnemies) then
+		for k, enemy in pairs(game.loadedEnemies) do
+			if (enemy.entity and enemy.entity.sequence) then
+				enemy.entity:play()
+			end
+		end
 	end
 
 	if(game.bossFight and game.bossFight.state ~= "Running" and bossStrategy.activeStrategy ~= 0) then

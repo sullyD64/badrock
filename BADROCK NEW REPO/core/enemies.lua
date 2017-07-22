@@ -91,6 +91,30 @@ local enemies = {
 				eName = "enemy",
 			},
 		},
+		-- 4 Phoenix
+		{	
+			species = "phoenix",
+			lives = 1,
+			score = 200,
+			options = {
+				graphicType = "animated",
+				filePath = visual.enemyPhoenix,
+				spriteOptions = {
+					width = 300,
+					height = 160,
+					numFrames = 5,
+					sheetContentWidth = 300,
+					sheetContentHeight = 800,
+				},
+				spriteSequence = {
+					{name = "idle", start=1 ,count=4, time=500, loopCount=0},
+					{name = "dead",    frames={5},   time=300, loopCount=1},
+				},
+				bodyType = "static",
+				physicsParams = { bounce = 0, friction = 1.0, density = 0.5, gravityScale = 0 },
+				eName = "enemy",
+			},
+		},
 	}
 }
 
