@@ -13,6 +13,7 @@ local skin = require ("menu.skinMenu")
 local scene    = composer.newScene()
 local backButton
 local skinButton
+local activeMenu = false
 
 local buttons = {}
 
@@ -35,18 +36,28 @@ local buttons = {}
 			utility.pressButton()
 		end
 		if ( "ended" == event.phase ) then
-			skin.setToEnableButtons(skinButton, backButton, buttons)
-			skinButton:setEnabled(false)
-			backButton:setEnabled(false)
-			for i=1, myData.maxLevels do
-				buttons[i]:setEnabled(false)
+			if (activeMenu) then
+				skin.panel:hide()
+				skin.pointsPanel:hide()
+				backButton:setEnabled(true)
+				for i=1, myData.maxLevels do
+					buttons[i]:setEnabled(true)
+				end
+				activeMenu = false
+			else 
+				skin.setToEnableButtons(skinButton, backButton, buttons)
+				backButton:setEnabled(false)
+				for i=1, myData.maxLevels do
+					buttons[i]:setEnabled(false)
+				end
+				skin.panel:show({
+				x = display.contentWidth-12,
+				})
+				skin.pointsPanel:show({
+				x = display.contentWidth - 150,
+				})
+				activeMenu = true
 			end
-			skin.panel:show({
-			x = display.contentWidth-12,
-			})
-			skin.pointsPanel:show({
-			x = display.contentWidth - 150,
-			})
 		end
 	end
 

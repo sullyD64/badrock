@@ -4,7 +4,7 @@
 --
 -----------------------------------------------------------------------------------------
 local composer = require ( "composer"  )
--- local myData   = require ( "myData"    )
+local tutorial = require ( "tutorial"  )
 local sfx      = require ( "audio.sfx" )
 local game     = require ( "core.game" )
 lime           = require ( "lime.lime" )
@@ -17,6 +17,11 @@ local scene = composer.newScene()
 -- -----------------------------------------------------------------------------------
 
 local map, visual, physical
+
+local function startTutorial()
+			game.state = "Paused"
+			tutorial.start()
+end
 
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
@@ -44,6 +49,10 @@ function scene:create( event )
 	-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
 	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
 	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0") )
+	if myData.firstStart then
+		tutorial.create(game)
+	end
+
 end
 
 -- show()
@@ -57,8 +66,12 @@ function scene:show( event )
 		-- (needed for syncing the two when we want to swap them)
 		sfx.playMusic(sfx.bgLvlMusicUP, {channel = 8, loops=-1})
 	elseif (phase == "did") then
-		game.start()	
+		game.start()
+		if myData.firstStart then
+			timer.performWithDelay(400, startTutorial)
+		end
 	end
+
 end
 
 -- hide()

@@ -1,5 +1,4 @@
 local widget    = require ( "widget"           )
--- local myData    = require ( "defaultData"           )
 local utility   = require ( "menu.utilityMenu" )
 local buy       = require ( "menu.buyMenu"     )
 local sfx      = require ( "audio.sfx"        )
@@ -55,6 +54,7 @@ local skin = {}
 					--        skin.panel.buyButtons[i]:setEnabled(false)
 					--     end
 					-- end
+				buy.transpBlock.alpha = 1
 				buy.panel:show({
 				y = display.contentCenterY})
 				print ("Aperto pannello per skin "..idSkin)
@@ -65,7 +65,7 @@ local skin = {}
 
 	skin.panel = utility.newPanel{
 		location = "custom",
-		onComplete = panelTransDone,
+		--onComplete = panelTransDone,
 		width = display.contentWidth * 0.95,
 		height = display.contentHeight * 0.70,
 		speed = 220,
@@ -165,7 +165,7 @@ local skin = {}
 				onRelease = onSkinSelect,
 				width = skin.panel.skins[i].width,
 				height = skin.panel.skins[i].height,
-				defaultFile = "visual/misc/transparent.png",            
+				defaultFile = visual.transparent,            
 			})  
 
 			skin.panel.skins[i].alpha = 0.5
@@ -192,9 +192,12 @@ local skin = {}
 
 	skin.group = display.newGroup()
 	skin.group:insert(skin.panel)
+	skin.group:insert(buy.transpBlock)
 	skin.group:insert(buy.panel)
+
 	assert(skin.group[1] == skin.panel) -- bottom
-	assert(skin.group[2] == buy.panel) -- front
+	assert(skin.group[2] == buy.transpBlock)
+	assert(skin.group[3] == buy.panel) -- front
 
 
 

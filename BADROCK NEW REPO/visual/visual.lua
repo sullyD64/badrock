@@ -28,6 +28,14 @@ local visual = {
 	bgMenuBuy			   = "visual/misc/bgMenuBuy.png",
 	frecciaSkin		       = "visual/misc/frecciaSkin.png",
 	steveMenuSkin		   = "visual/misc/steveMenuSkin.png",
+	transparent			   = "visual/misc/transparent.png",
+
+	tutorialArrowMove	   = "visual/misc/arrowMove.png",
+	tutorialArrowAttack    = "visual/misc/arrowAttack.png",
+	tutorialArrowLife	   = "visual/misc/arrowLife.png",
+	tutorialArrowPause    = "visual/misc/arrowPause.png",
+	tutorialBlack		   = "visual/misc/tutorialBlack.png",
+	tutorialRed			   = "visual/misc/tutorialRed3.png",
 
 	menuBackground         = "visual/misc/MenuBackground.jpg",
 	titleLogo              = "visual/misc/LogoShadow.png",

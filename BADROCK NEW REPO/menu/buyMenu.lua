@@ -66,6 +66,7 @@ local buy = {}
         --         buyBtns[i]:setEnabled(true)
         --     end
         -- end
+        buy.transpBlock.alpha = 0
         buy.panel:hide()
         return true
     end
@@ -93,20 +94,34 @@ local buy = {}
         transpBtn:removeSelf()
         backBtn:setEnabled(true)
         skinBtn.alpha = 1
+        buy.transpBlock.alpha = 0
         buy.panel:hide()
         return true
     end
 
+   --buy.transpBlock = display.newImageRect (visual.tutorialBlack, display.contentWidth, display.contentHeight) --visual.transparent
+
+   
+
+
+    buy.transpBlock = widget.newButton {
+        width = display.contentWidth,
+        height = display.contentHeight,
+        defaultFile = visual.transparent,
+        }
+    buy.transpBlock.alpha = 0
+
+
+
     -- 
     buy.panel = utility.newPanel{
         location = "custom",
-        onComplete = panelTransDone,
+        --onComplete = panelTransDone,
         speed = 200,
         x = display.contentCenterX,
         y = display.contentCenterY-500,
         width = 175,--display.contentWidth * 0.30,
         height = 190,--display.contentHeight * 0.45,
-        -- speed = 220,
         -- anchorX = 1.0,
         -- anchorY = 0.5,
          inEasing = easing.linear,
