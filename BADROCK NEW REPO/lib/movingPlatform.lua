@@ -3,7 +3,6 @@
 -- movingPlatform.lua
 --
 -----------------------------------------------------------------------------------------
-local physics = require ( "physics" )
 
 local platforms = {}
 

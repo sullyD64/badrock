@@ -2,7 +2,6 @@
 -- BOSS is a class used to store any Boss actions and methods, can create a boss with specified actions and variables
 
 -----------------------------------------------------------------------------------------
-local filters= require ("lib.filters")
 local entity = require ("lib.entity")
 
 local game = {}

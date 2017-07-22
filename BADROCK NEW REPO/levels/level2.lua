@@ -5,14 +5,13 @@
 -----------------------------------------------------------------------------------------
 
 local composer = require ( "composer"  )
-local myData   = require ( "myData"    )
+-- local myData   = require ( "myData"    )
 local sfx      = require ( "audio.sfx" )
 local game     = require ( "core.game" )
 lime           = require ( "lime.lime" )
 lime.enableScreenCulling()
 
 local scene = composer.newScene()
-
 
 -- -----------------------------------------------------------------------------------
 -- SCENE-ACCESSIBLE CODE

@@ -17,7 +17,6 @@ local stateList = {}
 --local finalText = display.newText ("", 0, -50, native.systemFontBold, 34)
 --local finalScore = display.newText( "", 0, -70, "Micolas.ttf", 15 )
 local stars = {}
-local level = myData.settings.currentLevel
 
 function result.setStars(game, outcome)
 	if (outcome == "Completed") then
@@ -113,6 +112,7 @@ end
 		audio.stop(1)
 
 		-- cambiare il game state per andare di nuovo al livello
+		local level = myData.settings.currentLevel
 		game.nextScene = "level"..level
 		game.state = stateList.ENDED
 		return true

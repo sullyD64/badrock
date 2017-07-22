@@ -219,12 +219,12 @@ local buttonData = {
 			if (i > currentLivesNumber) then
 				display.remove(v)
 				ui.lifeIcons[i] = nil
-				print ("Steve lost one life. Total lives: "..#ui.lifeIcons)
+				print ("Player lost one life. Total lives: "..#ui.lifeIcons)
 			end
 		end
 		if (currentLivesNumber - #ui.lifeIcons == 1) then
 			createLifeIconAt(currentLivesNumber)
-			print ("Steve gained one life. Current lives: "..#ui.lifeIcons)
+			print ("Player gained one life. Current lives: "..#ui.lifeIcons)
 		end
 	end
 
@@ -343,7 +343,9 @@ local buttonData = {
 		for i in pairs (ui.bossHealthBar) do
 			ui.bossHealthBar[i] = nil
 		end
-		if(ui.bossHealtBarGroup) then ui.bossHealthBarGroup.maxLivesNum = nil end
+		if (ui.bossHealtBarGroup) then
+			ui.bossHealthBarGroup.maxLivesNum = nil 
+		end
 		ui.bossHealthBarGroup = nil
 	end
 

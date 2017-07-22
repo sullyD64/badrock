@@ -550,12 +550,17 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup name="playerSpawn">
-  <object id="25" name="spawn0" x="263.273" y="1085.42"/>
+ <objectgroup name="checkPoints">
+  <object id="25" name="check0" x="263.273" y="1085.42">
+   <properties>
+    <property name="checkID" value="0"/>
+    <property name="isStart" value=""/>
+   </properties>
+  </object>
  </objectgroup>
+ <objectgroup name="itemSpawn"/>
  <objectgroup name="npcSpawn"/>
  <objectgroup name="enemySpawn"/>
- <objectgroup name="walkerRoutes"/>
  <objectgroup name="cadutaVuoto"/>
  <objectgroup name="movingPlatforms"/>
  <objectgroup name="bossSpawn">

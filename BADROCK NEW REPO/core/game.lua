@@ -10,7 +10,6 @@
 -----------------------------------------------------------------------------------------
 
 local composer     = require ( "composer"          )
--- local myData       = require ( "myData"            )
 local physics      = require ( "physics"           )
 local player       = require ( "core.player"       )
 local combat       = require ( "core.combat"       )
@@ -19,11 +18,11 @@ local npcs         = require ( "core.npcs"         )
 local items        = require ( "core.items"        )
 local controller   = require ( "core.controller"   )
 local collisions   = require ( "core.collisions"   )
+local checkPoints  = require ( "core.checkPoints"  )
 local bossStrategy = require ( "core.bossStrategy" )
 
 local game = {}
-game.listaNemiciRestore={}
---table.insert(listaNemiciRestore,"ciao")
+
 physics.start()
 physics.setGravity( 0, 80 )
 
@@ -78,7 +77,7 @@ physics.setGravity( 0, 80 )
 				-- print(controller.endGameOccurring)
 
 				-- local nextCh
-				-- for i, chaser in pairs (game.chaserList) do
+				-- for i, chaser in pairs (game.loadedChasers) do
 				-- 	if(chaser) then
 						-- if (chaser.targetName) then
 						-- 	print(chaser.species.." ["..i.."] (target:"..chaser.targetName
@@ -88,45 +87,22 @@ physics.setGravity( 0, 80 )
 						-- 		"] (target: none) (sequence:"..chaser.sequence..")")
 						-- end
 				-- 	end
-				-- 	nextCh = next(game.chaserList)
+				-- 	nextCh = next(game.loadedChasers)
 				-- end
 				-- if nextCh == nil then print("there are no chasers alive") end
 
-				-- for i, walker in pairs (game.walkerList) do
+				-- for i, walker in pairs (game.walkers) do
 				-- 	if (walker) then
 				-- 		print(walker.species.."["..i.."] xScale: "..walker.xScale)
 				-- 	end
 				-- end
 
 				-- print("-----------------------------") -- android debugging
-				-- print("") -- normal debugging
+				-- print("")                              -- normal debugging
 			end
 --|                                                                                                | 
 --|                                                                                                | 
 --\________________________________________________________________________________________________/
-
---filtra una lista list restituendo una list l di elementi che contengono c1 nel nome: i nemici che devono respawnare saranno identificati in questo modo
---nemico.checkpoint
-function filter(checkpoint)
-	local l={}
-	--game.spawnPoint.name=checkpoint.name
-	local list= game.map:getObjectLayer("enemySpawn").objects
-		if(list) then 
-			for i,v in ipairs(list) do
-				--if(c1 and c2 and ((v.x>c1.x and (math.abs(v.y-c1.y)<50 and math.abs(v.y-c1.y)>0)) or (v.x<c2.x and (math.abs(v.y-c2.y)<50
-				--	and math.abs(v.y-c2.y)>0)))) then
-				if(string.match(v.name,checkpoint.name)) then
-
-					table.insert(l,v)
-					--print("inserito")
-				--else table.insert(l,"nothing")
-				end
-			end
-		--else print("mmmh")
-		end
-	return l
-end
-
 
 -- RUNTIME FUNCTIONS ---------------------------------------------------------------
 	-- This loop is executed only if the game's state is RUNNING
@@ -234,37 +210,16 @@ end
 			end
 		end
 
-		-- --WORK IN PROGRESS
-		-- local currentMap = game.map
-		-- local enemyList = currentMap:getObjectLayer("enemySpawn").objects
-	
-		-- local cplist = currentMap:getObjectLayer("checkpoints").objects
-		-- --print(cplist[1].name)
-		-- --print(cplist[2].name)
-		-- --local s= currentGame.spawnPoint
-		-- --print(#enemyList)
-		-- --local ebetweencheck= filter(enemylist,s,currentGame.spawnPoint)
-		-- local ebetweencheck= filter(cplist[1])
-		-- for i,v in ipairs(ebetweencheck) do print(ebetweencheck[i]) end
-		--if(#ebetweencheck==0) then print("nullo") end
-
-
-		for i,v in pairs(game.listaNemiciRestore) do
-					--print(#filter(game.spawnPoint))
-					--print(v, v.type)
-					--print(v) print(v.type)
-		end
-		-- --END WORK IN PROGRESS
-
 		-- Entity animation: handles the chasers' behavior
 		if (game.enemiesLoaded == true and game.lives ~= 0) then
 			-- Iterates the chaser list
-			for i, chaser in pairs(game.chaserList) do
+			for i, obj in pairs(game.loadedChasers) do
+				local chaser = obj.entity
 				-- Chasing is disabled when the player dies. It is then re-enabled only when
 				-- the respawn is complete AND the chaser has successfully returned to his 
 				-- spawn point. In this phase, even if the player comes in short range with the
 				-- chaser, it won't turn back to the player because it isn't targeting him.
-				if (chaser.lives > 0) then
+				if (chaser and chaser.lives > 0) then
 					if not(controller.deathBeingHandled) then
 						if( chaser and chaser.x ) then
 							local xDelta = math.abs(game.steve.x-chaser.x)
@@ -424,12 +379,11 @@ end
 		elseif (state == gameStateList.ENDED) then
 			game.stop()
 			if(game.bossFight and bossStrategy.activeStrategy ~= 0)then
-				print("GAME TERMINATO Da GAME ENDED")
+				print("GAME TERMINATO DA GAME ENDED")
 				game.bossFight:terminateFight()
 			end
 		elseif (state == gameStateList.COMPLETED) then
 			if(controller.endGameOccurring ~= true) then
-				game.maxPoints = game.getMaxScore()
 				controller.endGameOccurring = true
 				game.levelHasBeenCompleted = true
 				game.updateMyData()
@@ -439,7 +393,6 @@ end
 			if(controller.endGameOccurring ~= true) then
 				controller.endGameOccurring = true
 				controller.onGameOver("Terminated")
-
 				-- Prevents overriding the nextScene if replay level has been requested.
 				if (not game.nextScene) then
 					game.nextScene = "mainMenu"
@@ -467,12 +420,9 @@ end
 		end
 
 		local perc = game.score/game.maxPoints*100
-		if (perc == 100 ) then 
-			game.stars = 3
-		elseif (perc >= 65) then
-			game.stars = 2
-		elseif (perc >= 35 ) then
-			game.stars = 1
+		if     (perc == 100 ) then game.stars = 3
+		elseif (perc >= 65  ) then game.stars = 2
+		elseif (perc >= 35  ) then	game.stars = 1
 		end
 
 		if (game.stars > myData.settings.levels[level].stars) then
@@ -489,22 +439,30 @@ end
 		myData.settings.currentLevel = myData.settings.currentLevel + 1
 
 		-- SERVICE -------
-        service.saveData()
-        ------------------
+		service.saveData()
+		------------------
 	end
 
 	-- Calculates the maximum score obtainable in the current level.
 	function game.getMaxScore()
 		local score = 0
-		for k, enemy in pairs(game.enemies) do
-			score = score + enemy.enemySprite.score
+		-- Since this function is called from loadGame, game.loadedEnemies
+		-- will contain all the enemies in the map.
+		for k, enemy in pairs(game.loadedEnemies) do
+			score = score + enemy.entity.score
 		end
-		score = score + #game.npcs * 1000
-
+		for k, npc in pairs(game.loadedNPCs) do
+			score = score + npc.entity.score
+		end
 		return score
 	end
 
-	-- Adds points to the current game's score (points are fixed for now).
+	-- Adds points to the current game's special points, depending on the type ("good" or "evil")
+	function game.addSpecialPoints(points, type)
+		controller.addSpecialPoints(points, type)
+	end
+
+	-- Adds points to the current game's score.
 	function game.addScore(points)
 		-- [the purpose of this function being in Game is because 
 		-- collisions should not comunicate directly with controller.
@@ -513,11 +471,6 @@ end
 		controller.addScore(points)
 	end
 
-	-- Adds points to the current game's special points, depending on the type ("good" or "evil")
-	function game.addSpecialPoints(points, type)
-		controller.addSpecialPoints(points, type)
-	end
-	
 	-- Adds -one- life to the current game's lives.
 	function game.addOneLife()
 		-- [same reasons as above]
@@ -526,38 +479,171 @@ end
 
 	-- Displays the item contained in the attribute -drop- of an enemy.
 	function game.dropItemFrom( enemy )
-		local item = items.createItem(enemy.drop)
-		item:addOnMap(game.map)
-		item.x = enemy.x
-		item.y = enemy.y
-		item.collision = collisions.itemCollision
-		items.enableItem(item)
+		items.dropItemFrom(game, enemy)
 	end
 
-	-- Generates all the unbound items (which are on the map from the beginning)
-	function game.dropUnboundItems()
-		local itemSpawn = game.map:getObjectLayer("itemSpawn")
-		local itemLocations
-		if not itemSpawn then 
-			return 
-		else 
-			itemLocations = itemSpawn.objects
+------------------------------------------------------------------------------------
+
+-- ENTITY AND CHECKPOINT MANAGEMENT ------------------------------------------------
+	-- Called when a checkpoint with the "isLast" attribute is set.
+	-- All the entities are removed to free screen memory.
+	local function unloadEntities()	
+		local destroyEntities = function (loadedEntities)
+			for k, obj in pairs(loadedEntities) do
+				if (obj.entity) then
+					display.remove(obj.entity)
+					obj.entity:destroy()
+				end
+			end
+			loadedEntities = {}
+		end
+		destroyEntities(game.loadedEnemies)
+		destroyEntities(game.loadedNPCs)
+		destroyEntities(game.loadedItems)
+		game.itemsGen = {}
+		game.npcsGen = {}
+		game.enemiesGen = {}
+	end
+
+	-- Setting a checkpoint triggers the following actions:
+	-- 1) The spawnpoint is updated to the checkpoint position
+	-- 2) The current generators table is populated with the generators of the new section.
+	function game.setCheckPoint( checkPoint )
+		game.spawnPoint = checkPoint
+		print("Player will spawn at checkPoint #"..checkPoint.checkID)
+		if (not checkPoint.isStart) then
+			-- Advances by one section and stores that section's generators in currentGenerators.
+			-- (old entries are garbage collected)
+			game.section = game.section + 1
+			game.currentGenerators = util.subtable(game.allGenerators, "sectionID", game.section)
+
+			if (not checkPoint.isLast) then
+				-- Updates the three main generator tables.
+				-- (old entries are garbage collected)
+				game.itemsGen = util.subtable(game.currentGenerators, "layerName", "itemSpawn")
+				game.npcsGen = util.subtable(game.currentGenerators, "layerName", "npcSpawn")
+				game.enemiesGen = util.subtable(game.currentGenerators, "layerName", "enemySpawn") 
+				util.toKeyMap(game.itemsGen, "name")
+				util.toKeyMap(game.npcsGen, "name")
+				util.toKeyMap(game.enemiesGen, "name")
+			else
+				unloadEntities()
+				game:reloadEntities()
+			end
 		end
 
-		for k, itemObj in pairs(itemLocations) do
-			game.dropItemFrom(itemObj)
+		-- util.print(game.loadedEnemies, "ENEMIES", "entity")
+		-- util.print(game.loadedNPCs, "NPCS", "entity")
+		-- util.print(game.loadedItems, "ITEMS", "entity")
+	end
+
+	-- Enemies, NPCs and Items --------------------------------------------------------
+		function game:loadEnemies() -- See enemies.lua
+			util.copy(enemies.loadEnemies(self), self.loadedEnemies)
+			util.toKeyMap(self.loadedEnemies, "name")
+
+			self.loadedWalkers = {}
+			self.loadedWalkers = util.subtable(self.loadedEnemies, "behavior", "walker")
+			util.toKeyMap(self.loadedWalkers, "name")
+
+			self.loadedChasers = {}		
+			self.loadedChasers = util.subtable(self.loadedEnemies, "behavior", "chaser")
+			util.toKeyMap(self.loadedChasers, "name")
+
+			if (util.sizeof(self.loadedEnemies) == 0) then 
+				game.enemiesLoaded = false
+				print("No enemies were loaded")
+				return
+			else game.enemiesLoaded = true
+			end
 		end
+
+		function game:loadNPCs() -- See npcs.lua
+			util.copy(npcs.loadNPCs(self), self.loadedNPCs)
+			util.toKeyMap(self.loadedNPCs, "name")
+
+			if (util.sizeof(self.loadedNPCs) == 0) then 
+				game.npcsLoaded = false 
+				print("No NPCs were loaded")
+				return
+			else game.npcsLoaded = true
+			end
+		end
+
+		function game:loadItems() -- see items.lua
+			-- Items contains all the items which aren't held by enemies.
+			util.copy(items.loadItems(self), self.loadedItems)
+			util.toKeyMap(self.loadedItems, "name")
+
+			-- Empties all the items that have been dropped by enemies
+			self.loadedDrops = items.removeDrops(self)
+
+			if (util.sizeof(self.loadedItems) == 0) then 
+				print("No items were loaded")
+				return
+			end
+		end
+	-----------------------------------------------------------------------------------
+
+	-- Initializes the generator tables.
+	function game:loadGenerators()
+		-- Looks up the current map for a given objectLayer and extracts
+		-- its objects in a table which is converted to a keymap.
+		-- [Those objects must be entity generators].
+		local function loadGenerator(layerName)
+			if (not self.map:getObjectLayer(layerName)) then
+				error ("Object layer "..layerName.." is missing")
+			end
+			local gen = self.map:getObjectLayer(layerName).objects
+			for k, obj in pairs(gen) do
+				obj:addProperty(Property:new("layerName", layerName))
+			end
+			util.toKeyMap(gen, "name")
+			-- util.print(gen, layerName)
+			return gen
+		end
+
+		-- Initializes the three main generator tables.
+		self.enemiesGen = loadGenerator("enemySpawn")
+		self.npcsGen = loadGenerator("npcSpawn")
+		self.itemsGen = loadGenerator("itemSpawn")
+
+		-- Stores all the generators in one single, immutable table.
+		local allGens = {}
+		util.copy(self.enemiesGen, allGens)
+		util.copy(self.npcsGen,    allGens)
+		util.copy(self.itemsGen,   allGens)
+		util.toKeyMap(allGens, "name")
+
+		-- Stores only the generators associated to the first checkpoint
+		local currentGens = util.subtable(allGens, "sectionID", self.section)
+		util.toKeyMap(currentGens, "name")
+
+		self.allGenerators = allGens
+		self.currentGenerators = currentGens
+	end
+
+	function game:loadCheckPoints() -- See checkPoints.lua
+		self.checkPoints = checkPoints.loadCheckPoints( self )
+	end
+
+	function game:reloadEntities()
+		game:loadItems()
+		game:loadNPCs()
+		game:loadEnemies()
+
+		-- util.print(game.loadedEnemies, "ENEMIES", "entity")
+		-- util.print(game.loadedNPCs, "NPCS", "entity")
+		-- util.print(game.loadedItems, "ITEMS", "entity")
 	end
 ------------------------------------------------------------------------------------
 
 -- GAME INITIALIZATION -------------------------------------------------------------
-	-- See player.lua
-	function game:loadPlayer()
+	function game:loadPlayer() -- See player.lua
 		self.steve = player.loadPlayer( self )
-		-- From now on, game.steve.sprite and game.steve.sensorD are accessible
+		-- Side-effect: game.steve.sprite and game.steve.sensorD are loaded
 		self.steve.sprite:setSequence("idle")
 		self.steve.sprite:play()
-
 		self.steve.direction = 1
 		self.steve.collision = collisions.playerCollision
 		self.steve:addEventListener( "collision", self.steve )
@@ -567,79 +653,56 @@ end
 		self.map:setFocus( self.steve, -185, -100 )
 	end
 
-	-- See npcs.lua
-	function game:loadNPCS() 
-		self.npcs = npcs.loadNPCs( self )
-		if (#(self.npcs) == 0) then 
-			game.npcsLoaded = false
-			return
-		else 
-			game.npcsLoaded = true
-		end
-
-		for i in pairs(self.npcs) do
-			self.npcs[i].sensorN.collision = collisions.npcDetectByCollision
-			self.npcs[i].sensorN:addEventListener( "collision", self.npcs[i].sensorN )
-		end
-	end
-
-
-	
-	-- See enemies.lua
-	function game:loadEnemies() 
-		self.enemies, self.chaserList, self.walkerList = enemies.loadEnemies( self,game.map:getObjectLayer("enemySpawn").objects )
-		if (#(self.enemies) == 0) then 
-			game.enemiesLoaded = false
-			return
-		else 
-			game.enemiesLoaded = true
-		end
-
-		
-
-		-- Assigns the home to each chaser
-		enemies.assignChaserHomes(self.enemies, self.chaserList)
-		end
-		
-
-	-- See bossStrategy.lua
-	function game:loadBoss( trigger )
+	function game:loadBoss( trigger ) -- see bossStrategy.lua
 		if (not trigger) then return end
 		self.bossFight = bossStrategy.loadBoss(trigger)
 	end
 
-	-- MAIN ENTRY POINT FOR INITIALIZATION (called from the current level).
+	-- MAIN ENTRY POINT (called from the current level).
 	function game.loadGame( map, spawn )
 		-- Locally stores the current level map and spawn coordinates
 		game.map = map
-		game.spawnPoint = spawn
 
-		-- Instance parameters ----
+		-- Entity initialization --
+		-- The following 4 tables track the state of all the entities on the map.
+		game.loadedEnemies = {}   
+		game.loadedNPCs  = {}
+		game.loadedItems = {}
+		game.loadedDrops = {}
+		game:loadGenerators()
+		game:loadEnemies()
+		game:loadNPCs()
+		game:loadItems()
+		---------------------------
+
+		-- Checkpoints -------
+		game:loadCheckPoints()
+		----------------------
+
+		game.setCheckPoint( spawn )
+		game:loadPlayer()
+
+		-- Instance parameters ------------
+		game.section = 0
 		game.score = 0
 		game.goodPoints = 0
 		game.evilPoints = 0
 		game.stars = 0
 		game.lives = game.MAX_LIVES - 1 
 		game.levelHasBeenCompleted = false
-		---------------------------
-		
-		-- Entity initialization --
-		game:loadEnemies()
-		game:loadNPCS()
-		game:loadPlayer()
-		game.dropUnboundItems()
-		---------------------------
+		game.maxPoints = game.getMaxScore()
+		-----------------------------------
 
-		-- Logic, controls and UI initialization -----------------
+		-- Logic, controls and UI initialization ------------------
 		collisions.setGame( game, gameStateList, playerStateList  )
 		controller.setGame( game, gameStateList, playerStateList  )
 		bossStrategy.setGame(game, gameStateList, playerStateList )
 		controller.prepareUI()
 		-----------------------------------------------------------
 
+		-- Boss ------------------------------------
 		game:loadBoss(util.getBossTrigger(game.map))
-
-		-- collisions.setBossFight(game.bossFight)
+		--------------------------------------------
 
 		physics.start()
 		physics.pause()
@@ -647,7 +710,6 @@ end
 ------------------------------------------------------------------------------------
 
 -- Removes every Entity on the map when -game.stop- is triggered
-	-- [[ lavori in corso: introdurre lista di entità in game ]]
 function game:removeAllEntities()
 	self.map:getTileLayer("entities"):destroy()
 	self.map:getTileLayer("MAP_BUTTONS"):destroy()
@@ -677,17 +739,13 @@ function game.pause()
 
 	if (combat.timers) then
 		for k, combatTimer in pairs(combat.timers) do
-		 	if (not combatTimer._expired) then
-				timer.pause(combatTimer)
-			end
+		 	if (not combatTimer._expired) then timer.pause(combatTimer)	end
 		end
 	end
 
-	if (game.chaserList) then
-		for k, chaser in pairs(game.chaserList) do 
-			if (chaser.sequence) then
-				chaser:pause()
-			end
+	if (game.loadedChasers) then
+		for k, chaser in pairs(game.loadedChasers) do 
+			if (chaser.sequence) then chaser:pause() end
 		end
 	end
 
@@ -709,29 +767,21 @@ function game.resume()
 
 	if (combat.timers) then
 		for k, combatTimer in pairs(combat.timers) do
-			if (not combatTimer._expired) then
-				timer.resume(combatTimer)
-			end
+			if (not combatTimer._expired) then timer.resume(combatTimer) end
 		end
 	end
 
-	if (game.chaserList) then
-		for k, chaser in pairs(game.chaserList) do
-			if(chaser.sequence) then
-				chaser:play()
-			end
+	if (game.loadedChasers) then
+		for k, chaser in pairs(game.loadedChasers) do
+			if(chaser.sequence) then chaser:play() end
 		end
 	end
 
-	if (game.walkerList) then
-		-- for k, walker in pairs(game.walkerList) do
-			-- if(walker and walker.sequence ) then
-				-- walker:play()
-			-- end	
-		-- end
+	if (game.loadedWalkers) then
+		-- [[Might be useful]]
 	end
 
-	if(game.bossFight and game.bossFight.state ~= "Running" and bossStrategy.activeStrategy ~= 0)then
+	if(game.bossFight and game.bossFight.state ~= "Running" and bossStrategy.activeStrategy ~= 0) then
 		game.bossFight:resumeFight()
 	end
 end
@@ -754,12 +804,11 @@ function game.stop()
 	controller.deathBeingHandled = nil
 	controller.endGameOccurring = nil
 
-
 	if (game.nextScene == "mainMenu") then
 		composer.removeScene( "menu.mainMenu" )
 		composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
-		-- Checks if nextScene has a substring containing "level", then
-		-- go to the next scene.
+	-- Checks if nextScene has a substring containing "level", then
+	-- goes to the next scene.
 	elseif (string.find( game.nextScene, "level" )) then 
 		composer.removeScene( "levels."..game.nextScene )
 		composer.gotoScene( "levels."..game.nextScene , { effect="fade", time=280 } )

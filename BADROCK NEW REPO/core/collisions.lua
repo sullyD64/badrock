@@ -9,7 +9,7 @@
 -- These methods can access and modify the Game's current state, aswell as the Player's
 -- current state, position on the map, sprite sequence and other properties.
 -----------------------------------------------------------------------------------------
-local entity  = require ( "lib.entity"  )
+
 local collisions = {
 	-- Used by npcDetectByCollision
 	contactEnabled = true,
@@ -67,26 +67,6 @@ end
 			-- Enemy has no lives left: handle death
 			if ( enemy.lives == 0 ) then 
 				game.addScore(enemy.score)
-				--temp è il nuovo nemico che verrà rigenerato, le proprietà di enemy vengono copiate in temp
-				temp={}
-				temp.eName="enemy"
-				print(enemy.score)
-				--print("la velocità è "..enemy.speed)
-				--print(enemy.isChaser)
-				temp.speed=enemy.speed
-				temp.x,temp.y=enemy.x,enemy.y
-				temp.drop=enemy.drop
-				temp.xScale=-1
-				temp.travelDistance=enemy.travelDistance
-				--print("la distanza è " ..enemy.travelDistance)
-				if(enemy.score==150) then temp.type= "robot" temp.score=150 else temp.type="paper" temp.score=250 end
-				--print(enemy.enemySprite)
-				--print(enemyHit.name)
-				--print(enemy.type)
-				
-				--print("il nemico morto è " ..temp.eName)
-				--aggiungo il nemico ucciso alla lista dei nemici che devono respawnare
-				table.insert(game.listaNemiciRestore,temp)
 
 				-- Forces the enemy to drop his item
 				if (enemyHit.drop) then	game.dropItemFrom(enemyHit) end
@@ -201,54 +181,57 @@ end
 		return true
 	end
 
---l'idea di questa funzione era creare un effetto quando steve raggiungeva un checkpoint: ho usato il metodo che genera i frammenti alla morte di steve,
--- ma l'idea è creare delle stelle o dei fuochi d'artificio molto semplici, basta cambiare il filePath e mettere un'immagine adatta
-	-- local function generateStars(currentGame, pointX, pointY)
-	-- 	local fragments = {}
-	-- 	local fragmentGroup = display.newGroup()
-	-- 	local numStars = 5
-	-- 	local cp
-	-- 	for i = 1, numStars, 1 do
-	-- 		local dim = math.random (4, 20)
-	-- 		local directionX = math.random(-5, 5)
-	-- 		local directionY = math.random(-50, -30)
-	-- 		local frag = entity.newEntity{
-	-- 			filePath = visual.lifeIcon,
-	-- 			width = dim,
-	-- 			height = dim,
-	-- 			physicsParams = {density = 1, friction = 1, bounce = 0.5, filter = filters.parcticleFilter},
-	-- 			eName = "particle"
-	-- 		}	
-	-- 		frag.x , frag.y = pointX, pointY-30
-	-- 		frag:addOnMap(currentGame.map)
-	-- 		fragmentGroup:insert(frag)
+	-- l'idea di questa funzione era creare un effetto quando steve raggiungeva 
+	-- un checkpoint: ho usato il metodo che genera i frammenti alla morte di steve,
+	-- ma l'idea è creare delle stelle o dei fuochi d'artificio molto semplici, basta 
+	-- cambiare il filePath e mettere un'immagine adatta
+		-- local function generateStars(currentGame, pointX, pointY)
+		-- 	local fragments = {}
+		-- 	local fragmentGroup = display.newGroup()
+		-- 	local numStars = 5
+		-- 	local cp
+		-- 	for i = 1, numStars, 1 do
+		-- 		local dim = math.random (4, 20)
+		-- 		local directionX = math.random(-5, 5)
+		-- 		local directionY = math.random(-50, -30)
+		-- 		local frag = entity.newEntity{
+		-- 			filePath = visual.lifeIcon,
+		-- 			width = dim,
+		-- 			height = dim,
+		-- 			physicsParams = {density = 1, friction = 1, bounce = 0.5, filter = filters.parcticleFilter},
+		-- 			eName = "particle"
+		-- 		}	
+		-- 		frag.x , frag.y = pointX, pointY-30
+		-- 		frag:addOnMap(currentGame.map)
+		-- 		fragmentGroup:insert(frag)
 
-	-- 		-- Transition here is needed because we need to wait newEntity to finish
-	-- 		-- its transition to the entities' physical bodies.
-	-- 		transition.to(frag, {time = 0,
-	-- 			onComplete = function()
-	-- 				frag:applyLinearImpulse(directionX, directionY, frag.x , frag.y)
-	-- 				cp=display.newText("checkpoint",50,10)
-					
-	-- 				end
-	-- 			})
-	-- 		table.insert(fragments, frag)
-	-- 	end
+		-- 		-- Transition here is needed because we need to wait newEntity to finish
+		-- 		-- its transition to the entities' physical bodies.
+		-- 		transition.to(frag, {time = 0,
+		-- 			onComplete = function()
+		-- 				frag:applyLinearImpulse(directionX, directionY, frag.x , frag.y)
+		-- 				cp=display.newText("checkpoint",50,10)
+						
+		-- 				end
+		-- 			})
+		-- 		table.insert(fragments, frag)
+		-- 	end
 
-	-- 	currentGame.map:getTileLayer("entities"):addObject(fragmentGroup)
+		-- 	currentGame.map:getTileLayer("entities"):addObject(fragmentGroup)
 
-	-- 	-- Removes physics to the rock fragments after a brief delay.
-	-- 	transition.to(fragmentGroup, {alpha = 0, time = 3000, transition = easing.inExpo, 
-	-- 		onComplete = function()
-	-- 			for i=1, #fragments, 1 do
-	-- 				fragments[i].isBodyActive = false
-	-- 				fragments[i].alpha = 0
-	-- 				if(gameStateList ~= ENDED) then fragments[i]:removeSelf() display.remove(cp) cp.isVisible= false end
-	-- 			end
-	-- 			if (gameStateList ~= ENDED) then display.remove( fragmentGroup ) end
-	-- 		end
-	-- 	})
-	-- end
+		-- 	-- Removes physics to the rock fragments after a brief delay.
+		-- 	transition.to(fragmentGroup, {alpha = 0, time = 3000, transition = easing.inExpo, 
+		-- 		onComplete = function()
+		-- 			for i=1, #fragments, 1 do
+		-- 				fragments[i].isBodyActive = false
+		-- 				fragments[i].alpha = 0
+		-- 				if(gameStateList ~= ENDED) then fragments[i]:removeSelf() display.remove(cp) cp.isVisible= false end
+		-- 			end
+		-- 			if (gameStateList ~= ENDED) then display.remove( fragmentGroup ) end
+		-- 		end
+		-- 	})
+		-- end
+
 	-- Collision between the player and safe environment Tiles
 	local function environmentCollision( player, event )
 		local environment = event.other
@@ -263,17 +246,7 @@ end
 				player.isOnMovingPlatform = false
 			end
 		end
-		if(environment.isCheck) then
-			oldSpawnPoint=game.spawnPoint
-			game.spawnPoint=environment
-			
-			--svuoto la lista dei nemici da ripristinare se tocco un checkpoint diverso dall'ultimo raggiunto
-			if(not(oldSpawnPoint==game.spawnPoint)) then game.listaNemiciRestore={} --generateStars(game,game.spawnPoint.x,game.spawnPoint.y) 
-			end
-			--game.spawnPoint.name=environment.name
-			--print(game.spawnPoint.name)
-			--print(game.spawnPoint.tName)
-		end
+
 		if(environment.type == "event") then
 			environment.owner.listener(event)
 		end
@@ -337,7 +310,6 @@ end
 	-- collision is a "contact" or a "release" between the two circles.
 	function collisions.npcDetectByCollision( sensorN, event )
 		if (event.other.eName == "sensor" and event.other.sensorName == "D") then
-
 			if (collisions.contactEnabled) then 
 				collName = "contact"
 				flag = "show"
@@ -355,12 +327,8 @@ end
 				collisions.contactEnabled = true
 			end
 
-			for i, v in ipairs(game.npcs) do
-				-- Selects the npc associated to the sensorN and calls the toggle function
-				if (v.sensorN == sensorN) then
-					v.balloon:toggle(flag)
-				end
-			end
+			-- Selects the npc associated to the sensorN and calls the toggle function
+			game.loadedNPCs[sensorN.oName].balloon:toggle(flag)
 		end
 	end
 ------------------------------------------------------------------------------------
@@ -416,7 +384,7 @@ end
 			elseif (self.type == "powerup") then
 				powerupCollision(self, event)
 			end
-			item = nil -- Distruzione dell'item
+			self:destroy()
 		end
 	end
 ------------------------------------------------------------------------------------

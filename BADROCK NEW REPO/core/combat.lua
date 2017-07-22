@@ -16,7 +16,6 @@
 local entity     = require ( "lib.entity"      )
 local collisions = require ( "core.collisions" )
 local controller = require ( "core.controller" )
--- local myData = require ("myData")
 
 local combat = {
 	map = {},

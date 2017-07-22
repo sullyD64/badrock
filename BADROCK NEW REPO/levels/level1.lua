@@ -4,7 +4,6 @@
 --
 -----------------------------------------------------------------------------------------
 local composer = require ( "composer"  )
--- local myData   = require ( "myData"    )
 local sfx      = require ( "audio.sfx" )
 local game     = require ( "core.game" )
 lime           = require ( "lime.lime" )
@@ -34,16 +33,30 @@ function scene:create( event )
 
 	-- map = lime.loadMap("bossTest_HD.tmx")
 	-- map = lime.loadMap("mapTest_HD.tmx")
-	 map = lime.loadMap("level1_DEF_ORIGINAL.tmx")
+	map = lime.loadMap("level1_DEF.tmx")
+	print(os.clock() .. " \t| loaded map" )
 	visual = lime.createVisual(map)
+	print(os.clock() .. " \t| loaded visual")
 	sceneGroup:insert( visual )
 
 	util.prepareMap(map)
 	physical = lime.buildPhysical(map)
+	print(os.clock() .. " \t| built physical")
 
 	-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
 	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
-	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0") )
+	-- checkPoints contenente ALMENO un oggetto "check0" (primo checkPoint)
+	game.loadGame( map, map:getObjectLayer("checkPoints"):getObject("check0"))
+	-- game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0") )
+
+	--------------------------------------------------------------------------------
+	-- Commento: in fase di produzione (skippo il mainMenu) può capitare che, se
+	-- completiamo il livello e lo rigiochiamo, il currentLevel sarà aggiornato al 
+	-- livello 2. Quando andrò a fare retry da livello 1, il gioco proverà a caricare
+	-- level2 invece che ricaricare level1.
+	-- Qui sotto forzo myData a level1, andrà tolto prima del deploy dell'app.
+	-- if (myData.settings.currentLevel ~= 1) then myData.settings.currentLevel = 1 end
+	--------------------------------------------------------------------------------
 end
 
 -- show()

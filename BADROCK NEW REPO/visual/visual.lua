@@ -28,7 +28,6 @@ local visual = {
 	frecciaSkin			     = "visual/misc/frecciaSkin.png",
 	steveMenuSkin		     = "visual/misc/steveMenuSkin.png",
 
-
 	menuBackground         = "visual/misc/MenuBackground.jpg",
 	titleLogo              = "visual/misc/LogoShadow.png",
 	menuSteveImage         = "visual/misc/MenuSteve.png",
@@ -56,6 +55,7 @@ local visual = {
 	steveAttack            = "visual/sprites/attackSprite.png",
 	steveGun               = "visual/sprites/equipped_gun.png",
 	gun                    = "visual/sprites/gun.png",
+	checkPointImage        = "visual/sprites/checkPROVA.png",
 
 	steveDebugImage        = "visual/sprites/rock_original.png",
 	steveDefaultSprite     = "visual/sprites/steve_default_sprite.png",

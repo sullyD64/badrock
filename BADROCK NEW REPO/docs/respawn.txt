@@ -1,0 +1,31 @@
+Analisi sui cambiamenti del respawn con l'introduzione dei checkpoints
+----------------------------------------------------------------------
+
+Durante il gioco possiamo compiere diverse azioni, alcune delle quali provocano dei CAMBIAMENTI nella mappa rispetto alla sua situazione originale. Per ora, tutti questi cambiamenti persistono nel ciclo di vita di una partita e rinascere non porta alcuna conseguenza al gioco se non che venga azzerato lo score attuale. 
+Elenchiamo i cambiamenti che possiamo apportare giocando:
+> Distruggiamo delle rocce
+> Raccogliamo degli oggetti (parlo di quelli scollegati dai nemici)
+> Sconfiggiamo nemici
+> Interagiamo con gli NPC
+
+Quali tra questi cambiamenti vogliamo RIPRISTINARE con il respawn?
+++ Sicuramente non ci interessa delle rocce: non essendo entity diventa difficile gestire una ricreazione.
+++ Sicuramente vogliamo che gli oggetti vengano riposizionati, così come che rinascano i nemici. 
+Per quanto riguarda gli NPC, due sono le opzioni: 
+	- Una volta interagito con un NPC, lasciamo che i punti speciali vengano mantenuti in memoria per tutta la durata della partita (è la situazione attuale): in questo caso non voglio che l'NPC rinasca, così da impedire lo stacking di punti sfruttando un solo NPC;
+	- Quando si muore, azzeriamo i punti speciali ottenuti dall'interazione con l'NPC e facciamo invece in modo che rinasca, così da poter riprendere i punti ottenuti fino a quel momento. Questo permette di essere coerenti con ciò che abbiamo deciso riguardo l'azzeramento dello score: i checkpoint ti aiutano a finire il livello ma non memorizzano i punti che hai accumulato, e se vuoi fare tre stelle non devi mai morire. Infine, azzerando sia i punti normali che i punti speciali ottenuti da un npc mantiene questi due valori allineati (non posso finire un livello con 1 stella e con 50 punti speciali).
+
+Per cambiamento da ripristinare intendiamo quindi respawnare entity sulla mappa; sappiamo che una entity viene spawnata a partire da un oggetto sulla mappa (che chiamiamo Generatore), e che all'inizio tutti gli oggetti Generatori devono spawnare una entity ciascuno.
+
+Rendendo parametrici i tre metodi che ci servono (enemies.loadEnemies, npc.loadNPCs e game.dropUnboundItems) rispetto a delle liste di generatori selettive, possiamo modellare non solo il respawn selettivo ma anche le prestazioni di questo processo.
+
+La mia proposta è di appendere tre liste a game:
+- AllEntityGenerators/AllGenerators: table di tutti gli oggetti Generator, che conterrà quindi gli oggetti degli ObjectLayer "enemySpawn", "npcSpawn", "itemSpawn"
+- CurrentCheckPointGenerators: table di tutti gli oggetti Generator che hanno l'attributo sectionID con valore identico al checkID del checkpoint
+- ActiveGenerators: table di tutti gli oggetti Generator le cui Entity associate sono attive [per attivo si intende che le sprite animate sono in play, altri movimenti e logiche sono attive]. In questa lista si possono aggiungere anche le piattaforme di cui si vuole attivare il movimento.
+
+La prima lista è caricata su loadGame sulla base dei tre objectLayer che recuperiamo dalla mappa. Rimane immutata per tutta la partita.
+
+La seconda lista è un sottoinsieme della prima, inizialmente conterrà solo le entity con sectionID == 0 (lo spawnPoint); quando viene superato il primo checkpoint, verrà reinizializzata con le entity con sectionID == 1, e così via. [[[Con questo metodo non si rende necessario l'uso di buffer dove inserire i nemici da riportare in vita perchè usiamo una lista generalizzata che ci permette di respawnare anche oggetti e NPC.]]] 
+
+La terza lista è anch'essa un sottoinsieme della prima ma non viene reinizializzata, bensì ampliata ad ogni checkpoint superato: inizialmente contiene solo le entity con sectionID == 0, poi quelle con sectionID == 0 e quelle con sectionID == 1, e così via. Questo perchè non voglio che, superato un checkpoint, le entity della sezione precedente si congelino.
