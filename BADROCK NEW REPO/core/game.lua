@@ -770,7 +770,7 @@ function game.pause()
 	physics.pause()
 	controller:pause()
 
-	if (game.steve.attack and game.steve.attack.sprite) then
+	if (game.steve.attack and game.steve.attack.sprite and not(game.steve.hasPowerUp)) then
 		game.steve.attack.sprite:pause()
 	end
 	if (game.steve.powerUp and game.steve.powerUp.sprite) then
@@ -800,7 +800,7 @@ function game.resume()
 	physics.start()
 	controller:start()
 
-	if (game.steve.attack and game.steve.attack.sprite) then
+	if (game.steve.attack and game.steve.attack.sprite and not(game.steve.hasPowerUp)) then
 		game.steve.attack.sprite:play()
 	end
 	if (game.steve.powerUp and game.steve.powerUp.sprite) then
