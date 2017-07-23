@@ -201,7 +201,7 @@ local buttonData = {
 		local	lifeIcon = display.newImageRect(ui.buttonGroup, visual.lifeIcon, 30, 30 )
 		lifeIcon.anchorX, lifeIcon.anchorY = 0, 0
 		lifeIcon.x = 10 + (lifeIcon.contentWidth * (index - 1))
-		lifeIcon.y = 10 + lifeIcon.contentHeight / 2
+		lifeIcon.y = 15 + lifeIcon.contentHeight / 2
 		lifeIcon.isVisible = true
 		table.insert(ui.lifeIcons,lifeIcon)
 	end
@@ -297,12 +297,14 @@ local buttonData = {
 
 -- BOSS HEALTH BAR --------------------------------------------------------------
 	ui.bossHealthBar = {}
+	ui.face={}
 	
 	local function createBossLifeBarAt( index )
-		local	bossLifeBar = display.newImageRect(ui.buttonGroup, visual.bossLifeIcon, 30, 30 )
-		bossLifeBar.anchorX, bossLifeBar.anchorY = 0, 0
-		bossLifeBar.x = 10 + (bossLifeBar.contentWidth * (index - 1))
-		bossLifeBar.y = -15 + bossLifeBar.contentHeight / 2
+		local	bossLifeBar = display.newImageRect(ui.buttonGroup, visual.bossLifeIcon, display.contentWidth/21, 30 )
+		print(display.contentWidth)
+		bossLifeBar.anchorX, bossLifeBar.anchorY = 1, 1
+		bossLifeBar.x = 0.34* display.contentWidth+(bossLifeBar.contentWidth * (index - 1))
+		bossLifeBar.y = 0.92* display.contentHeight
 		
 		table.insert(ui.bossHealthBar,bossLifeBar)
 		ui.bossHealthBarGroup:insert(bossLifeBar)
@@ -311,6 +313,11 @@ local buttonData = {
 	-- Creates the boss' Health Bar initialized to the current boss' max lives.
 	function ui.createBossHealthBar( maxLivesNumber )
 		ui.bossHealthBarGroup = display.newGroup()
+		local face = display.newImageRect(ui.buttonGroup, "visual/sprites/testaBoss.png", 40, 40 )
+		face.anchorX, face.anchorY = 1, 1
+		face.x = 0.84* display.contentWidth
+		face.y = 0.89* display.contentHeight
+		table.insert(ui.face,face)
 		for i = 1, maxLivesNumber do
 			createBossLifeBarAt( i )
 		end
@@ -350,6 +357,7 @@ local buttonData = {
 	end
 
 	function ui.destroyBossHealthBar()
+		display.remove(ui.face)
 		for i in pairs (ui.bossHealthBar) do
 			display.remove(ui.bossHealthBar[i])
 		end
