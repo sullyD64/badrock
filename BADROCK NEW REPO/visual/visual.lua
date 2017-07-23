@@ -38,7 +38,6 @@ local visual = {
 	tutorialBlack          = "visual/misc/tutorialBlack.png",
 	tutorialRed            = "visual/misc/tutorialRed3.png",
 
-
 	menuBackground         = "visual/misc/MenuBackground.jpg",
 	titleLogo              = "visual/misc/LogoShadow.png",
 	menuSteveImage         = "visual/misc/MenuSteve.png",
@@ -66,7 +65,7 @@ local visual = {
 	steveAttack            = "visual/sprites/attackSprite.png",
 	steveGun               = "visual/sprites/equipped_gun.png",
 	gun                    = "visual/sprites/gun.png",
-	checkPointImage        = "visual/sprites/checkPROVA.png",
+	checkPointImage        = "visual/ui/blife.png",
 
 	steveDebugImage        = "visual/sprites/rock_original.png",
 	steveDefaultSprite     = "visual/sprites/steve_default_sprite.png",

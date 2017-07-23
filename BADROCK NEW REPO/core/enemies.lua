@@ -234,7 +234,8 @@ function enemies.loadEnemies( currentGame )
 					end
 					wkr = nil
 				end
-			currentGame.loadedEnemies[self.oName].entity = nil	
+			currentGame.loadedEnemies[self.oName].entity = nil
+			currentGame.loadedEnemies[self.oName].active = false	
 		end
 
 		return eSprite
