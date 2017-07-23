@@ -299,10 +299,10 @@ local buttonData = {
 	ui.bossHealthBar = {}
 	
 	local function createBossLifeBarAt( index )
-		local	bossLifeBar = display.newImageRect(ui.buttonGroup, visual.bossLifeIcon, display.contentWidth/21, 30 )
-		bossLifeBar.anchorX, bossLifeBar.anchorY = 1, 1
-		bossLifeBar.x = 0.34 * display.contentWidth + (bossLifeBar.contentWidth * (index - 1))
-		bossLifeBar.y = 0.92 * display.contentHeight
+		local	bossLifeBar = display.newImageRect(ui.buttonGroup, visual.bossLifeIcon, display.contentWidth/27, 30 )
+		bossLifeBar.anchorX, bossLifeBar.anchorY = buttonData.livesText.aX, buttonData.livesText.aY
+		bossLifeBar.x = 20 + buttonData.livesText.options.x/4 + (bossLifeBar.contentWidth * (index - 1))
+		bossLifeBar.y = -30 + buttonData.livesText.options.y
 		
 		table.insert(ui.bossHealthBar,bossLifeBar)
 		ui.bossHealthBarGroup:insert(bossLifeBar)
@@ -313,9 +313,9 @@ local buttonData = {
 		ui.bossHealthBarGroup = display.newGroup()
 
 		local face = display.newImageRect(ui.buttonGroup, visual.bossHeadIcon, 40, 40 )
-		face.anchorX, face.anchorY = 1, 1
-		face.x = 0.84 * display.contentWidth
-		face.y = 0.89 * display.contentHeight
+		face.anchorX, face.anchorY = buttonData.pauseBtn.aX,buttonData.pauseBtn.aY
+		face.x = 0.25*buttonData.pauseBtn.options.x
+		face.y = buttonData.pauseBtn.options.y
 
 		ui.bossHealthBar.face = face
 
