@@ -29,6 +29,7 @@ function checkPoints.loadCheckPoints( currentGame )
 		local checkPointCollision = function( self, event )
 			if (event.other.eName == "steve") then
 				-- audio ----------------------------------------
+				audio.stop(7)
 				sfx.playSound( sfx.levelEndSound, { channel = 7 } )
 				-------------------------------------------------
 				display.remove(self)

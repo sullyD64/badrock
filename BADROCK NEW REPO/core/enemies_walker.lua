@@ -27,16 +27,22 @@ local behavior = {}
 		end
 		walker:addEventListener( "collision", walker )
 
-		transition.to(walker, {time = 500,
+		transition.to(walker, {time = 1000,
 			onComplete = function()
 				walker.bodyType = "kinematic"
-				walker:setLinearVelocity( -walker.speed, 0 )
-				walker:setSequence("walking")
-				walker:play()
 			end
 		})
 
 		return walker
+	end
+
+	function behavior.activateWalkerBehavior( enemyObj )
+		local walker = enemyObj.entity
+		transition.to(walker, {time = 1000,
+			onComplete = function()
+				walker:setLinearVelocity( -walker.speed, 0 )
+			end
+		})
 	end
 	---------------------------------------------------------------------------------
 

@@ -14,7 +14,7 @@ function platforms.loadPlatforms( currentMap )
 	if not (platformList) then return end
 
 	-- Creates the platform body
-	local createBody = function(obj)
+	local createEntity = function(obj)
 		local body = display.newImageRect(visual.platform, obj.points[5], obj.points[6])
 		body.x, body.y = obj.x, obj.y
 		physics.addBody( body, "kinematic", { friction = 1, filter = filters.envFilter })
@@ -34,22 +34,26 @@ function platforms.loadPlatforms( currentMap )
 		end
 		body:addEventListener( "collision", body )
 
+		-- Starts moving the platform. It can be paused when physics is paused.
+		function body:activate()
+			if (obj.direction == "horizontal") then
+				self:setLinearVelocity( obj.speed, 0 )
+			elseif (obj.direction == "vertical") then
+				self:setLinearVelocity( 0, obj.speed )
+			else
+				error("Incorrect direction specified for the platform")
+			end
+		end
+
 		map:getTileLayer("entities"):addObject(body)
 		return body
 	end
 
 	-- Iterates the list of platforms declared on the map
 	for k, platformObj in pairs(platformList) do
-
-		platformObj.body = createBody(platformObj)
+		platformObj.entity = createEntity(platformObj)
 		platformObj.sensors = util.createObjectSensors(map, platformObj)
-		
-		-- Starts moving the platform. It can be paused when physics is paused.
-		if (platformObj.direction == "horizontal") then
-			platformObj.body:setLinearVelocity( platformObj.speed, 0 )
-		elseif (platformObj.direction == "vertical") then
-			platformObj.body:setLinearVelocity( 0, platformObj.speed )
-		end
+		platformObj.entity.oName = platformObj.name
 	end
 end
 

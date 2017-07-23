@@ -214,7 +214,10 @@ physics.setGravity( 0, 80 )
 		if (game.enemiesLoaded == true and game.lives ~= 0) then
 			-- Iterates the chaser list
 			for i, obj in pairs(game.loadedChasers) do
-				local chaser = obj.entity
+				local chaser
+				if (obj.active) then
+					chaser = obj.entity
+				end
 				-- Chasing is disabled when the player dies. It is then re-enabled only when
 				-- the respawn is complete AND the chaser has successfully returned to his 
 				-- spawn point. In this phase, even if the player comes in short range with the
@@ -482,63 +485,10 @@ physics.setGravity( 0, 80 )
 	function game.dropItemFrom( enemy )
 		items.dropItemFrom(game, enemy)
 	end
-
 ------------------------------------------------------------------------------------
 
 -- ENTITY AND CHECKPOINT MANAGEMENT ------------------------------------------------
-	-- Called when a checkpoint with the "isLast" attribute is set.
-	-- All the entities are removed to free screen memory.
-	local function unloadEntities()	
-		local destroyEntities = function (loadedEntities)
-			for k, obj in pairs(loadedEntities) do
-				if (obj.entity) then
-					display.remove(obj.entity)
-					obj.entity:destroy()
-				end
-			end
-			loadedEntities = {}
-		end
-		destroyEntities(game.loadedEnemies)
-		destroyEntities(game.loadedNPCs)
-		destroyEntities(game.loadedItems)
-		game.itemsGen = {}
-		game.npcsGen = {}
-		game.enemiesGen = {}
-	end
-
-	-- Setting a checkpoint triggers the following actions:
-	-- 1) The spawnpoint is updated to the checkpoint position
-	-- 2) The current generators table is populated with the generators of the new section.
-	function game.setCheckPoint( checkPoint )
-		game.spawnPoint = checkPoint
-		print("Player will spawn at checkPoint #"..checkPoint.checkID)
-		if (not checkPoint.isStart) then
-			-- Advances by one section and stores that section's generators in currentGenerators.
-			-- (old entries are garbage collected)
-			game.section = game.section + 1
-			game.currentGenerators = util.subtable(game.allGenerators, "sectionID", game.section)
-
-			if (not checkPoint.isLast) then
-				-- Updates the three main generator tables.
-				-- (old entries are garbage collected)
-				game.itemsGen = util.subtable(game.currentGenerators, "layerName", "itemSpawn")
-				game.npcsGen = util.subtable(game.currentGenerators, "layerName", "npcSpawn")
-				game.enemiesGen = util.subtable(game.currentGenerators, "layerName", "enemySpawn") 
-				util.toKeyMap(game.itemsGen, "name")
-				util.toKeyMap(game.npcsGen, "name")
-				util.toKeyMap(game.enemiesGen, "name")
-			else
-				unloadEntities()
-				game:reloadEntities()
-			end
-		end
-
-		-- util.print(game.loadedEnemies, "ENEMIES", "entity")
-		-- util.print(game.loadedNPCs, "NPCS", "entity")
-		-- util.print(game.loadedItems, "ITEMS", "entity")
-	end
-
-	-- Enemies, NPCs and Items --------------------------------------------------------
+	-- Enemies, NPCs and Items ------------------------------------------------------
 		function game:loadEnemies() -- See enemies.lua
 			util.copy(enemies.loadEnemies(self), self.loadedEnemies)
 			util.toKeyMap(self.loadedEnemies, "name")
@@ -584,7 +534,66 @@ physics.setGravity( 0, 80 )
 				return
 			end
 		end
-	-----------------------------------------------------------------------------------
+	---------------------------------------------------------------------------------
+	
+	-- Called when a checkpoint with the "isLast" attribute is set.
+	-- All the entities are removed to free screen memory.
+	local function unloadEntities()	
+		local destroyEntities = function (loadedEntities)
+			for k, obj in pairs(loadedEntities) do
+				if (obj.entity) then
+					display.remove(obj.entity)
+					obj.entity:destroy()
+				end
+			end
+			loadedEntities = {}
+		end
+		destroyEntities(game.loadedEnemies)
+		destroyEntities(game.loadedNPCs)
+		destroyEntities(game.loadedItems)
+		game.itemsGen = {}
+		game.npcsGen = {}
+		game.enemiesGen = {}
+	end
+
+	-- Setting a checkpoint triggers the following actions:
+	-- 1) The spawnpoint is updated to the checkpoint position
+	-- 2) The current generators table is populated with the generators of the new section.
+	function game.setCheckPoint( checkPoint )
+		game.spawnPoint = checkPoint
+		print("Player will spawn at checkPoint #"..checkPoint.checkID)
+		if (not checkPoint.isStart) then
+			-- Advances by one section and stores that section's generators in currentGenerators.
+			-- (old entries are garbage collected)
+			game.section = game.section + 1
+			game.currentGenerators = util.subtable(game.allGenerators, "sectionID", game.section)
+
+			local nextActiveGens = util.subtable(game.allActivableGenerators, "sectionID", game.section)
+			-- util.print(game.activeGenerators, "BEFORE", "sectionID")
+			util.copy(nextActiveGens, game.activeGenerators)
+			-- util.print(game.activeGenerators, "AFTER", "sectionID")
+
+			game:activateEntities()
+
+			if (not checkPoint.isLast) then
+				-- Updates the three main generator tables.
+				-- (old entries are garbage collected)
+				game.itemsGen = util.subtable(game.currentGenerators, "layerName", "itemSpawn")
+				game.npcsGen = util.subtable(game.currentGenerators, "layerName", "npcSpawn")
+				game.enemiesGen = util.subtable(game.currentGenerators, "layerName", "enemySpawn") 
+				util.toKeyMap(game.itemsGen, "name")
+				util.toKeyMap(game.npcsGen, "name")
+				util.toKeyMap(game.enemiesGen, "name")
+			else
+				unloadEntities()
+				game:reloadEntities()
+			end
+		end
+		-- util.print(game.loadedEnemies, "ENEMIES", "entity")
+		-- util.print(game.loadedNPCs, "NPCS", "entity")
+		-- util.print(game.loadedItems, "ITEMS", "entity")
+	end
+
 
 	-- Initializes the generator tables.
 	function game:loadGenerators()
@@ -609,6 +618,9 @@ physics.setGravity( 0, 80 )
 		self.npcsGen = loadGenerator("npcSpawn")
 		self.itemsGen = loadGenerator("itemSpawn")
 
+		-- Initializes the platform generator table (for activation)
+		self.platformsGen = loadGenerator("movingPlatforms")
+
 		-- Stores all the generators in one single, immutable table.
 		local allGens = {}
 		util.copy(self.enemiesGen, allGens)
@@ -620,22 +632,49 @@ physics.setGravity( 0, 80 )
 		local currentGens = util.subtable(allGens, "sectionID", self.section)
 		util.toKeyMap(currentGens, "name")
 
+		-- Stores all the "activable" generators in one single, immutable table.
+		-- Activable means that the animation and additional behavior associated to the 
+		-- generator's entity can be enabled conditionally.
+		local allActivableGens = {}
+		util.copy(self.platformsGen, allActivableGens)
+		util.copy(self.enemiesGen,   allActivableGens)
+		util.toKeyMap(allActivableGens, "name")
+
+		-- Stores only the activable generators associated to the first checkpoint
+		local activeGens = util.subtable(allActivableGens, "sectionID", self.section)
+		util.toKeyMap(activeGens, "name")
+
 		self.allGenerators = allGens
 		self.currentGenerators = currentGens
+		self.allActivableGenerators = allActivableGens
+		self.activeGenerators = activeGens
 	end
 
 	function game:loadCheckPoints() -- See checkPoints.lua
 		self.checkPoints = checkPoints.loadCheckPoints( self )
 	end
 
+	-- Called at respawn.
 	function game:reloadEntities()
 		game:loadItems()
 		game:loadNPCs()
 		game:loadEnemies()
+		game:activateEntities()
 
 		-- util.print(game.loadedEnemies, "ENEMIES", "entity")
 		-- util.print(game.loadedNPCs, "NPCS", "entity")
 		-- util.print(game.loadedItems, "ITEMS", "entity")
+	end
+
+	-- Activates the entities for the objects which aren't yet activated.
+	function game:activateEntities()
+		-- util.print(game.activeGenerators, "game.activeGenerators", "entity")
+		for k, obj in pairs(game.activeGenerators) do
+			if (obj.entity and obj.active ~= true) then
+				obj.entity:activate()
+				obj.active = true
+			end
+		end
 	end
 ------------------------------------------------------------------------------------
 
@@ -664,6 +703,13 @@ physics.setGravity( 0, 80 )
 		-- Locally stores the current level map and spawn coordinates
 		game.map = map
 
+		-- Checkpoints ------------
+		game.section = 0
+		game:loadCheckPoints()
+		game.setCheckPoint( spawn )
+		game:loadPlayer()
+		---------------------------
+
 		-- Entity initialization --
 		-- The following 4 tables track the state of all the entities on the map.
 		game.loadedEnemies = {}
@@ -674,17 +720,9 @@ physics.setGravity( 0, 80 )
 		game:loadEnemies()
 		game:loadNPCs()
 		game:loadItems()
-		---------------------------
-
-		-- Checkpoints -------
-		game:loadCheckPoints()
-		----------------------
-
-		game.setCheckPoint( spawn )
-		game:loadPlayer()
+		--------------------------
 
 		-- Instance parameters ------------
-		game.section = 0
 		game.score = 0
 		game.goodPoints = 0
 		game.evilPoints = 0
@@ -721,6 +759,7 @@ end
 function game.start()
 	physics.start()
 	controller:start()
+	game:activateEntities()
 	Runtime:addEventListener("enterFrame", moveCamera)
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
@@ -744,15 +783,9 @@ function game.pause()
 		end
 	end
 
-	if (game.loadedChasers) then
-		for k, chaser in pairs(game.loadedChasers) do 
-			if (chaser.sequence) then chaser:pause() end
-		end
-	end
-
 	if (game.loadedEnemies) then
 		for k, enemy in pairs(game.loadedEnemies) do
-			if (enemy.entity and enemy.entity.sequence) then
+			if (enemy.entity and enemy.active) then
 				enemy.entity:pause()
 			end
 		end
@@ -780,19 +813,9 @@ function game.resume()
 		end
 	end
 
-	if (game.loadedChasers) then
-		for k, chaser in pairs(game.loadedChasers) do
-			if(chaser.sequence) then chaser:play() end
-		end
-	end
-
-	if (game.loadedWalkers) then
-		-- [[Might be useful]]
-	end
-
 	if (game.loadedEnemies) then
 		for k, enemy in pairs(game.loadedEnemies) do
-			if (enemy.entity and enemy.entity.sequence) then
+			if (enemy.entity and enemy.active) then
 				enemy.entity:play()
 			end
 		end

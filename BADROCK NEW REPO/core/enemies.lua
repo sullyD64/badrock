@@ -127,6 +127,14 @@ local function loadBehavior( enemyObj, behavior, currentGame )
 	end
 end
 
+local function activateBehavior( enemyObj )
+	if (enemyObj.behavior == "chaser") then
+		--
+	elseif (enemyObj.behavior == "walker") then
+		walkers.activateWalkerBehavior( enemyObj )
+	end
+end
+
 -- Loads the enemies's images (and sprites) and initializes their attributes.
 -- Visually instantiates the enemies in the current game's map.
 -- @return enemyList, walkerList, chaserList
@@ -167,9 +175,15 @@ function enemies.loadEnemies( currentGame )
 			enemyObj.behavior = desc.behavior
 		end
 
-		if(desc.options.graphicType == "animated") then
-			eSprite:setSequence("idle")
-			eSprite:play()
+		function eSprite:activate()
+			if (desc.options.graphicType == "animated") then
+				eSprite:setSequence("idle")
+				eSprite:play()
+
+				if (desc.behavior) then
+					activateBehavior(enemyObj)
+				end
+			end
 		end
 
 		-- Animation: Knocks the enemy AWAY given a x position

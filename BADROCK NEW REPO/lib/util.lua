@@ -46,7 +46,7 @@ util = {}
 		print(" > Table "..tostring(name).." [size:"..util.sizeof(t).."]")
 		for k,v in pairs(t) do
 			if (a and v[a]) then
-				print ("    "..k,v,a..": yes") --tostring(v[a])
+				print ("    "..k,v,a..":yes "..tostring(v[a])) --tostring(v[a])
 			else
 				print ("    "..k,v)
 			end
@@ -78,6 +78,15 @@ util = {}
 		for k, v in pairs(t1) do
 			table.insert(t2, v)
 		end
+	end
+
+	-- Adds all the elements of a table into a new table
+	function util.copyNew( t )
+		local tCopy = {}
+		for k, v in pairs(t) do
+			table.insert(tCopy, v)
+		end
+		return tCopy
 	end
 
 	-- Given a table, creates a subset of entries having an attribute whose value

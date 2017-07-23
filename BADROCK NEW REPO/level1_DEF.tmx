@@ -924,7 +924,6 @@
   </object>
   <object id="43" name="paper2" type="paper" x="144" y="682">
    <properties>
-    <property name="drop" value="life"/>
     <property name="sectionID" value="1"/>
    </properties>
   </object>
@@ -949,7 +948,7 @@
     <property name="travelDistance" value="250"/>
    </properties>
   </object>
-  <object id="41" name="robot2" type="robot" x="1996.61" y="944.121">
+  <object id="41" name="robot2" type="robot" x="2008.61" y="912.121">
    <properties>
     <property name="drop" value="gun"/>
     <property name="id" value="4"/>
@@ -1057,37 +1056,41 @@
   </object>
  </objectgroup>
  <objectgroup name="movingPlatforms">
-  <object id="61" name="9-x" x="3568" y="1498">
+  <object id="61" name="5-x" x="3568" y="1498">
    <properties>
     <property name="direction" value="horizontal"/>
-    <property name="id" value="9"/>
+    <property name="id" value="05"/>
+    <property name="sectionID" value="2"/>
     <property name="speed" value="160"/>
     <property name="travelDistance" value="200"/>
    </properties>
    <polyline points="0,0 121.455,0 121.455,60.6667 0,60.6667 0,0"/>
   </object>
-  <object id="59" name="7-y" x="3272.12" y="316.242">
+  <object id="59" name="4-y" x="3272.12" y="316.242">
    <properties>
     <property name="direction" value="vertical"/>
-    <property name="id" value="7"/>
+    <property name="id" value="04"/>
+    <property name="sectionID" value="2"/>
     <property name="speed" value="150"/>
     <property name="travelDistance" value="280"/>
    </properties>
    <polyline points="0,0 241.455,0 241.455,60.6667 0,60.6667 0,0"/>
   </object>
-  <object id="45" name="5-x" x="694" y="728">
+  <object id="45" name="3-x" x="694" y="728">
    <properties>
     <property name="direction" value="horizontal"/>
-    <property name="id" value="5"/>
+    <property name="id" value="03"/>
+    <property name="sectionID" value="1"/>
     <property name="speed" value="100"/>
     <property name="travelDistance" value="300"/>
    </properties>
    <polyline points="0,0 118.788,0 118.788,68.6667 0,68.6667 0,0"/>
   </object>
-  <object id="20" name="3-y" x="2339.42" y="1327.97">
+  <object id="20" name="2-y" x="2339.42" y="1327.97">
    <properties>
     <property name="direction" value="vertical"/>
-    <property name="id" value="3"/>
+    <property name="id" value="02"/>
+    <property name="sectionID" value="1"/>
     <property name="speed" value="150"/>
     <property name="travelDistance" value="680"/>
    </properties>
@@ -1096,7 +1099,8 @@
   <object id="39" name="1-x" x="1697.33" y="1392.85">
    <properties>
     <property name="direction" value="horizontal"/>
-    <property name="id" value="1"/>
+    <property name="id" value="01"/>
+    <property name="sectionID" value="0"/>
     <property name="speed" value="100"/>
     <property name="travelDistance" value="400"/>
    </properties>

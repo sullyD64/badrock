@@ -87,6 +87,7 @@ function npcs.loadNPCs( currentGame )
 						-- Good/bad action conditional behavior --
 						if (target.id == "npcButton1") then
 							-- audio ----------------------------------------
+							audio.stop(7)
 							sfx.playSound( sfx.npcGoodSound, { channel = 7 } )
 							-------------------------------------------------
 							choice = "good"
@@ -94,6 +95,7 @@ function npcs.loadNPCs( currentGame )
 							npcObj.entity:play()
 						elseif (target.id == "npcButton2") then
 							-- audio ----------------------------------------
+							audio.stop(7)
 							sfx.playSound( sfx.npcEvilSound, { channel = 7 } )
 							-------------------------------------------------
 							choice = "evil"
