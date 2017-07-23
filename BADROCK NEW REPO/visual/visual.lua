@@ -60,6 +60,8 @@ local visual = {
 
 	lifeIcon               = "visual/ui/life.png",
 	bossLifeIcon           = "visual/ui/blife.png",
+	bossHeadIcon           = "visual/sprites/testaBoss.png",
+
 	steveSheetWalking      = "visual/sprites/steveAnim.png",
 	steveImage             = "visual/sprites/rock_original.png",
 	steveAttack            = "visual/sprites/attackSprite.png",
