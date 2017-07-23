@@ -356,7 +356,7 @@ util = {}
 					for i=1, #fragments, 1 do
 						fragments[i].isBodyActive = false
 						fragments[i].alpha = 0
-						if(currentGame.state ~= "Ended") then fragments[i]:removeSelf() end
+						--if(currentGame.state ~= "Ended") then fragments[i]:removeSelf() end
 					end
 					if(currentGame.state ~= "Ended") then display.remove( fragmentGroup ) end
 				end
