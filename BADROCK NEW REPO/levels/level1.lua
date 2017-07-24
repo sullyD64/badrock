@@ -44,9 +44,9 @@ function scene:create( event )
 	loadingText:setTextColor( 255, 255, 255 ) 
 	sceneGroup:insert(loadingText)
 
-	mapName = "bossTest_HD.tmx" 
+	-- mapName = "bossTest_HD.tmx" 
 	-- mapName = "mapTest_HD.tmx" 
-	-- mapName = "level1_DEF.tmx" 
+	mapName = "level1_DEF.tmx" 
 end
 
 -- show()
