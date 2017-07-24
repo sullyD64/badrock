@@ -16,8 +16,6 @@
 -- Sensors are also entities
 -----------------------------------------------------------------------------------------
 
-local physics = require ( "physics")
-
 local entity = {}
 
 -- Create a new entity. Some options must always be specified, like the image/sheet file path,

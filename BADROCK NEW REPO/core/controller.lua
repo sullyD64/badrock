@@ -315,9 +315,6 @@ local sState = {}
 	-- Restores the player at the current spawn point in the current game 
 	-- (called from onDeath if lives are > 0).
 	local function handleRespawn()
-		--local restoreEnemies = function (elist)
-
-		--end
 		local respawnPlayer = function()
 			local spawn = game.spawnPoint
 			steve.x, steve.y = spawn.x, spawn.y
@@ -360,13 +357,7 @@ local sState = {}
 		transition.to(steve, { time = 1000, 
 			onComplete = function()
 				respawnPlayer()
-				ui.buttons.score:setLabel("Score: "..game.score)
-				--restoreEnemies(game.listaNemiciRestore)
-				print(#game.listaNemiciRestore .. " enemy to restore")
-				enemies.loadEnemies(game,game.listaNemiciRestore)
-				game.listaNemiciRestore={}
-		--		print(game.listaNemiciRestore[1].eName)
-				--enemies.loadEnemies(game,game.map:getObjectLayer("enemySpawn").objects)
+				game:reloadEntities()
 			end
 		})
 	end
@@ -378,7 +369,7 @@ local sState = {}
 		-- from launching it again until the handling is completed.
 		controller.deathBeingHandled = true
 		-- audio ----------------------------------------
-		sfx.playSound( sfx.dangerSound, { channel = 5 } )
+		sfx.playSound( sfx.dangerSound, { channel = 6 } )
 		-- animation ------------------------------------
 		steve.deathAnimation(game, steve.x , steve.y)
 		-------------------------------------------------
@@ -407,12 +398,11 @@ local sState = {}
 			sfx.playSound( sfx.gameOverSound, { channel = 7 } )
 			-------------------------------------------------
 			controller.onGameOver("Failed")
-		--lo score rimane 0 anche se non entra nel for perché listaNemiciRestore è stata svuotata
+
 		elseif ( game.lives > 0 ) then
-			for k,v in pairs(game.listaNemiciRestore) do if(game.score-v.score<=0) then game.score= 0 break else game.score=game.score-v.score end end
-			--display.newText(game.score, display.contentWidth -80,18)
-			--game.score = 0
-			--ui.buttons.score:setLabel("Score: "..game.score)
+			game.score = 0
+			game.goodPoints = 0
+			game.evilPoints = 0
 			handleRespawn()
 		end
 	end

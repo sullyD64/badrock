@@ -7,8 +7,7 @@ local composer = require ( "composer"  )
 local tutorial = require ( "tutorial"  )
 local sfx      = require ( "audio.sfx" )
 local game     = require ( "core.game" )
-lime           = require ( "lime.lime" )
-lime.disableScreenCulling()
+local loader   = require ( "lib.mapLoader" )
 
 local scene = composer.newScene()
 
@@ -16,11 +15,11 @@ local scene = composer.newScene()
 -- SCENE-ACCESSIBLE CODE
 -- -----------------------------------------------------------------------------------
 
-local map, visual, physical
+local mapName, map
 
 local function startTutorial()
-			game.state = "Paused"
-			tutorial.start()
+	game.state = "Paused"
+	tutorial.start()
 end
 
 -- -----------------------------------------------------------------------------------
@@ -37,22 +36,17 @@ function scene:create( event )
 		audio.pause(1)
 	end
 
-	-- map = lime.loadMap("bossTest_HD.tmx")
-	-- map = lime.loadMap("mapTest_HD.tmx")
-	 map = lime.loadMap("level1_DEF_ORIGINAL.tmx")
-	visual = lime.createVisual(map)
-	sceneGroup:insert( visual )
+	local blackScreen = display.newRect(display.contentCenterX, display.contentCenterY, 500, 500)
+	blackScreen:setFillColor( 0, 0, 0 ) 
+	sceneGroup:insert(blackScreen)
 
-	util.prepareMap(map)
-	physical = lime.buildPhysical(map)
+	local loadingText = display.newText( "LOADING...", display.contentCenterX, display.contentCenterY, native.systemFont, 24 )
+	loadingText:setTextColor( 255, 255, 255 ) 
+	sceneGroup:insert(loadingText)
 
-	-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
-	-- playerSpawn contenente un oggetto "spawn0" (primo checkpoint)
-	game.loadGame( map, map:getObjectLayer("playerSpawn"):getObject("spawn0") )
-	if myData.firstStart then
-		tutorial.create(game)
-	end
-
+	-- mapName = "bossTest_HD.tmx" 
+	-- mapName = "mapTest_HD.tmx" 
+	mapName = "level1_DEF.tmx" 
 end
 
 -- show()
@@ -66,10 +60,30 @@ function scene:show( event )
 		-- (needed for syncing the two when we want to swap them)
 		sfx.playMusic(sfx.bgLvlMusicUP, {channel = 8, loops=-1})
 	elseif (phase == "did") then
-		game.start()
-		if myData.firstStart then
-			timer.performWithDelay(400, startTutorial)
-		end
+		timer.performWithDelay(250, 
+			function()
+				map = loader.loadMap(mapName, sceneGroup)
+				-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
+				-- checkPoints contenente ALMENO un oggetto "check0" (primo checkPoint)
+				game.loadGame( map, map:getObjectLayer("checkPoints"):getObject("check0"))
+
+				--------------------------------------------------------------------------------
+				-- Commento: in fase di produzione (skippo il mainMenu) può capitare che, se
+				-- completiamo il livello e lo rigiochiamo, il currentLevel sarà aggiornato al 
+				-- livello 2. Quando andrò a fare retry da livello 1, il gioco proverà a caricare
+				-- level2 invece che ricaricare level1.
+				-- Qui sotto forzo myData a level1, andrà tolto prima del deploy dell'app.
+				-- if (myData.settings.currentLevel ~= 1) then myData.settings.currentLevel = 1 end
+				--------------------------------------------------------------------------------
+
+				game.start()
+
+				if (myData.firstStart) then
+					tutorial.create(game)
+					timer.performWithDelay(400, startTutorial)
+				end
+			end
+		)
 	end
 
 end
@@ -78,11 +92,10 @@ end
 function scene:hide( event )
 	local sceneGroup = self.view
 	local phase = event.phase
-	
 	if (phase == "will") then
 		audio.fadeOut(1,10)
 	elseif (phase == "did") then
-	end		
+	end
 end
 
 -- destroy()

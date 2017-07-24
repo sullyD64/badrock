@@ -47,20 +47,108 @@ local settings = {
 -- @return npcList (a table of NPCS)
 function npcs.loadNPCs( currentGame ) 
 	local currentMap = currentGame.map
-	local npcList = currentMap:getObjectLayer("npcSpawn"):getObjects("npc")
-	if not (npcList) then return end
+	local npcList = currentGame.npcsGen
 
 	-- Loads the main animated Entity.
-		local loadNPCEntity = function( npc )
-			local sprite = entity.newEntity(settings.options)
-			sprite.x, sprite.y = npc.x, npc.y
-			sprite:addOnMap( currentMap )
-			return sprite
+		local loadEntity = function( npcObj )
+			local nSprite = entity.newEntity(settings.options)
+			nSprite.score = 1000
+			nSprite.x, nSprite.y = npcObj.x, npcObj.y
+			nSprite:addOnMap( currentMap )
+
+				-- Destroys the visual attributes of an npc
+				function nSprite:destroy()
+					local oName = self.oName
+					local npcObj = currentGame.loadedNPCs[oName]
+					display.remove(npcObj.self)
+					display.remove(npcObj.balloon)
+					display.remove(npcObj.sensorN)
+					currentGame.loadedNPCs[oName].entity = nil
+					currentGame.loadedNPCs[oName].balloon = nil
+					currentGame.loadedNPCs[oName].sensorN = nil
+				end
+
+			return nSprite
 		end
 
 	-- Loads the speech balloon, the text and the buttons.
-		local loadBalloon = function( npc )
-			-- Panel status check for debug
+		local loadBalloon = function( npcObj )
+			-- Handler ---------------------------------------------------------------
+			local onBalloonButtonEvent = function(event)
+				local target = event.target
+				local choice
+
+				if (event.phase == "began") then
+					-- Status check prevents from pressing the button when pause menu is overlaying.
+					if (currentGame.state == "Running" and target.active) then
+						display.currentStage:setFocus( target, event.id )
+						target.active = false
+
+						-- Good/bad action conditional behavior --
+						if (target.id == "npcButton1") then
+							-- audio ----------------------------------------
+							audio.stop(7)
+							sfx.playSound( sfx.npcGoodSound, { channel = 7 } )
+							-------------------------------------------------
+							choice = "good"
+							npcObj.entity:setSequence("happy")
+							npcObj.entity:play()
+						elseif (target.id == "npcButton2") then
+							-- audio ----------------------------------------
+							audio.stop(7)
+							sfx.playSound( sfx.npcEvilSound, { channel = 7 } )
+							-------------------------------------------------
+							choice = "evil"
+
+							npcObj.entity:setSequence("sad")
+							npcObj.entity:play()
+						end
+						-------------------------------------------
+						currentGame.addScore(npcObj.entity.score)
+						currentGame.addSpecialPoints(5, choice)
+						-------------------------------------------
+
+						-- Removes the associated npc entity, sensorN and balloon from the current game
+						npcObj.balloon:hide()
+						display.remove(npcObj.sensorN)
+
+						-- Resets the switch on the npcDetect
+						if (collisions.releaseEnabled) then
+							collisions.releaseEnabled = false
+						end
+
+						-- Animation: npc flies up in the sky
+						if (choice == "good") then
+							transition.to(npcObj.entity, { time = 1000, 
+								y = npcObj.y - 1000, alpha = 0, transition = easing.inQuart,
+								onComplete = function()
+									npcObj.entity:destroy()
+								end
+							})
+						-- Animation: npc falls off the map
+						elseif (choice == "evil") then
+							transition.to(npcObj.entity, { time = 0,
+								onComplete = function()
+									physics.addBody( npcObj.entity, "dynamic", {isSensor = true, density = 0.1} )
+									npcObj.entity:applyLinearImpulse( 0, -40, npcObj.entity.x, npcObj.entity.y )
+									npcObj.entity:applyTorque( - 2000 )
+								end
+							})
+							transition.to(npcObj.entity, { time = 1000, 
+								onComplete = function()
+									npcObj.entity:destroy()
+								end
+							})
+						end
+					end
+				elseif (event.phase == "ended" or "cancelled" == event.phase) then
+					display.currentStage:setFocus( target, nil )
+				end
+
+				return true
+			end
+			--------------------------------------------------------------------------
+			-- balloon status check for debug
 				-- local panelTransDone = function( target )
 				-- 	if ( target.completeState ) then
 				-- 		print( "Panel state is: "..target.completeState )
@@ -71,10 +159,10 @@ function npcs.loadNPCs( currentGame )
 				location = "static",
 				-- onComplete = panelTransDone,
 				speed = 200,
-				x = npc.x - 60,
-				y = npc.y - 20,
-				width = npc.sprite.width * 4,
-				height = npc.sprite.height * 4,
+				x = npcObj.x - 60,
+				y = npcObj.y - 20,
+				width = npcObj.entity.width * 4,
+				height = npcObj.entity.height * 4,
 			}
 
 			local background = display.newImageRect( visual.npcBalloonBackground, 279, 197 )
@@ -89,91 +177,6 @@ function npcs.loadNPCs( currentGame )
 			text.x = background.x - 10
 			text.y = background.y - background.height + 70
 			balloon:insert(text)
-
-			--------------------------------------------------------------------------
-			local onBalloonButtonEvent = function(event)
-				local target = event.target
-				local choice
-
-				-- Status check prevents from pressing the button when pause menu is overlaying.
-				if (currentGame.state == "Running" and target.active) then
-					if (event.phase == "began") then
-						display.currentStage:setFocus( target, event.id )
-						target.active = false
-
-						-- Good/bad action conditional behavior --
-						if (target.id == "npcButton1") then
-							-- audio ----------------------------------------
-							sfx.playSound( sfx.npcGoodSound, { channel = 6 } )
-							-------------------------------------------------
-							choice = "good"
-							npc.sprite:setSequence("happy")
-							npc.sprite:play()
-						elseif (target.id == "npcButton2") then
-							-- audio ----------------------------------------
-							sfx.playSound( sfx.npcEvilSound, { channel = 6 } )
-							-------------------------------------------------
-							choice = "evil"
-
-							npc.sprite:setSequence("sad")
-							npc.sprite:play()
-						end
-						-------------------------------------------
-						currentGame.addScore(1000)
-						currentGame.addSpecialPoints(5, choice)
-						-------------------------------------------
-
-						-- Removes the associated npc from the current game
-						for i, npc in pairs(currentGame.npcs) do
-							if (npc.balloon.button1 == target or npc.balloon.button2 == target) then
-								npc.balloon:hide()
-								display.remove(npc.sensorN)
-
-								-- Resets the switch on the npcDetect
-								if (collisions.releaseEnabled) then
-									collisions.releaseEnabled = false
-								end
-
-								-- Animation: npc flies up in the sky
-								if (choice == "good") then
-									transition.to(npc.sprite, { time = 1000, 
-										y = npc.y - 1000, alpha = 0, transition = easing.inQuart,
-										onComplete = function()
-											display.remove(npc.sprite)
-											display.remove(npc.balloon)
-											npc:destroy()
-											table.remove(currentGame.npcs, i)		
-											npc = nil
-										end
-									})
-								-- Animation: npc falls off the map
-								elseif (choice == "evil") then
-									transition.to(npc.sprite, { time = 0,
-										onComplete = function()
-											physics.addBody( npc.sprite, "dynamic", {isSensor = true, density = 0.1} )
-											npc.sprite:applyLinearImpulse( 0, -40, npc.sprite.x, npc.sprite.y )
-											npc.sprite:applyTorque( - 2000 )
-										end
-									})
-									transition.to(npc.sprite, { time = 1000, 
-										onComplete = function()
-											display.remove(npc.sprite)
-											display.remove(npc.balloon)
-											npc:destroy()
-											table.remove(currentGame.npcs, i)		
-											npc = nil
-										end
-									})
-								end
-							end
-						end
-					elseif (event.phase == "ended" or "cancelled" == event.phase) then
-						display.currentStage:setFocus( target, nil )
-					end
-				end
-				return true
-			end
-			--------------------------------------------------------------------------
 
 			local button1 = widget.newButton{
 				id = "npcButton1",
@@ -203,12 +206,11 @@ function npcs.loadNPCs( currentGame )
 			balloon.button2 = button2
 			balloon:insert(button1)
 			balloon:insert(button2)
-			balloon.x, balloon.y = npc.x, npc.y -20
+			balloon.x, balloon.y = npcObj.x, npcObj.y -20
 			balloon.alpha = 0
 			balloon:hide()
 
 			-- Handles the showing/hiding event for one npc's balloon.
-			-- Params: a NPC from the NPCs list and a flag string.
 			-- The flag is calculated by the type of collision detected.
 			function balloon:toggle ( flag )
 				if (flag == "show") then
@@ -224,11 +226,11 @@ function npcs.loadNPCs( currentGame )
 		end
 
 	-- Loads the sensor for -npcDetectByCollision-.
-		local loadSensor = function(npc)
+		local loadSensor = function(npcObj)
 			local sensorN = entity.newEntity{
 				graphicType = "sensor",
-				parentX = npc.x,
-				parentY = npc.y,
+				parentX = npcObj.x,
+				parentY = npcObj.y,
 				radius = settings.sensorOpts.radius,
 				color = settings.sensorOpts.color,
 				alpha = settings.sensorOpts.alpha,
@@ -241,16 +243,25 @@ function npcs.loadNPCs( currentGame )
 					sensorN.gravityScale = 0
 				end
 			})
-
+			sensorN.collision = collisions.npcDetectByCollision
+			sensorN:addEventListener( "collision", sensorN )
 			sensorN:addOnMap(currentMap)
 
 			return sensorN
 		end
 
-	for k, npc in pairs(npcList) do
-			npc.sprite = loadNPCEntity(npc)
-			npc.balloon = loadBalloon(npc)
-			npc.sensorN = loadSensor(npc)
+	-- Iterates the objects in ncpList and loads the visual attributes of all objects
+	for k, obj in pairs(npcList) do
+		-- To avoid creating a duplicate entity for the object
+		-- if one already exists and is on the map, it is destroyed
+		if (not obj.entity) then
+			obj.entity = loadEntity(obj)
+			obj.balloon = loadBalloon(obj)
+			obj.sensorN = loadSensor(obj)
+			obj.entity.oName = obj.name
+			-- obj.balloon.oName = obj.name  	--not used
+			obj.sensorN.oName = obj.name
+		end
 	end
 
 	return npcList

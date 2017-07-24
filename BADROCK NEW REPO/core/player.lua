@@ -16,7 +16,7 @@ local player = {}
 local settings = {
 
 	mainSensorOpts = {
-		radius = 100,
+		radius = 50,
 		alpha = 0, --0.5
 		color = {20, 50, 200},
 	},

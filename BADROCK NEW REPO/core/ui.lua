@@ -219,12 +219,12 @@ local buttonData = {
 			if (i > currentLivesNumber) then
 				display.remove(v)
 				ui.lifeIcons[i] = nil
-				print ("Steve lost one life. Total lives: "..#ui.lifeIcons)
+				print ("Player lost one life. Total lives: "..#ui.lifeIcons)
 			end
 		end
 		if (currentLivesNumber - #ui.lifeIcons == 1) then
 			createLifeIconAt(currentLivesNumber)
-			print ("Steve gained one life. Current lives: "..#ui.lifeIcons)
+			print ("Player gained one life. Current lives: "..#ui.lifeIcons)
 		end
 	end
 
@@ -299,10 +299,10 @@ local buttonData = {
 	ui.bossHealthBar = {}
 	
 	local function createBossLifeBarAt( index )
-		local	bossLifeBar = display.newImageRect(ui.buttonGroup, visual.bossLifeIcon, 30, 30 )
-		bossLifeBar.anchorX, bossLifeBar.anchorY = 0, 0
-		bossLifeBar.x = 10 + (bossLifeBar.contentWidth * (index - 1))
-		bossLifeBar.y = -15 + bossLifeBar.contentHeight / 2
+		local	bossLifeBar = display.newImageRect(ui.buttonGroup, visual.bossLifeIcon, display.contentWidth/40, 30 )
+		bossLifeBar.anchorX, bossLifeBar.anchorY = buttonData.livesText.aX, buttonData.livesText.aY
+		bossLifeBar.x = 60 + buttonData.livesText.options.x/4 + (bossLifeBar.contentWidth * (index - 1))
+		bossLifeBar.y = -30 + buttonData.livesText.options.y
 		
 		table.insert(ui.bossHealthBar,bossLifeBar)
 		ui.bossHealthBarGroup:insert(bossLifeBar)
@@ -311,6 +311,14 @@ local buttonData = {
 	-- Creates the boss' Health Bar initialized to the current boss' max lives.
 	function ui.createBossHealthBar( maxLivesNumber )
 		ui.bossHealthBarGroup = display.newGroup()
+
+		local face = display.newImageRect(ui.buttonGroup, visual.bossHeadIcon, 40, 40 )
+		face.anchorX, face.anchorY = buttonData.pauseBtn.aX,buttonData.pauseBtn.aY
+		face.x = 0.35*buttonData.pauseBtn.options.x
+		face.y = buttonData.pauseBtn.options.y
+
+		ui.bossHealthBar.face = face
+
 		for i = 1, maxLivesNumber do
 			createBossLifeBarAt( i )
 		end
@@ -321,7 +329,7 @@ local buttonData = {
 
 	-- Updates the boss' Health Bar
 	function ui.updateBossHealthBar( currentLivesNumber )
-		for i, v in pairs(ui.bossHealthBar) do
+		for i, v in ipairs(ui.bossHealthBar) do
 			if (i > currentLivesNumber) then
 				display.remove(v)
 				ui.bossHealthBar[i] = nil
@@ -340,15 +348,18 @@ local buttonData = {
 
 	-- Empties the boss' Health Bar
 	function ui.emptyBossHealthBar()
-		for i in pairs (ui.bossHealthBar) do
+		for i in ipairs (ui.bossHealthBar) do
 			ui.bossHealthBar[i] = nil
 		end
-		if(ui.bossHealtBarGroup) then ui.bossHealthBarGroup.maxLivesNum = nil end
+		if (ui.bossHealtBarGroup) then
+			ui.bossHealthBarGroup.maxLivesNum = nil 
+		end
 		ui.bossHealthBarGroup = nil
 	end
 
 	function ui.destroyBossHealthBar()
-		for i in pairs (ui.bossHealthBar) do
+		display.remove(ui.bossHealthBar.face)
+		for i in ipairs (ui.bossHealthBar) do
 			display.remove(ui.bossHealthBar[i])
 		end
 		display.remove(ui.bossHealthBarGroup)
