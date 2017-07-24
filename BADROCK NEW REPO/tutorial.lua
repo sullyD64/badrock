@@ -1,3 +1,10 @@
+-----------------------------------------------------------------------------------------------------------------
+-- Tutorial.lua
+-- Il tutorial crea gli oggetti di cui necessita quando viene invocato il metodo create() (insieme alla creazione 
+-- del livello), dopodiché a scena già iniziata si può dare inizio al tutorial tramite start(), si susseguiranno 
+-- le istruzioni a schermo, ogni istruzione è collegata a una funzione che invocherà la funzione dell'istruzione
+-- successiva, una volta termianto il suo compito 
+-----------------------------------------------------------------------------------------------------------------
 
 local utility = require ("menu.utilitymenu")
 local ui = require ("core.ui")
@@ -5,7 +12,7 @@ local ui = require ("core.ui")
 local tutorial = {}
 local game
 
-function tutorial.create(gm)
+function tutorial.create(currentGame)
 	tutorial.black = display.newImageRect ( visual.tutorialBlack, display.contentWidth, display.contentHeight)
 	tutorial.black.anchorX = 0
 	tutorial.black.anchorY = 0
@@ -18,6 +25,7 @@ function tutorial.create(gm)
 
 	tutorial.textJump = display.newText( "", 0, 0, utility.font, 20 )
 	tutorial.textJump.alpha = 0
+	--tutorial.textJump:setFillColor( 0.85, 0.85, 0.85 )
 	tutorial.text = display.newText( "", 0, 0, utility.font, 20 )
 	tutorial.text.alpha = 0
 
@@ -29,7 +37,7 @@ function tutorial.create(gm)
 	tutorial.arrowLife.alpha = 0
 	tutorial.arrowPause = display.newImageRect ( visual.tutorialArrowPause, 90, 65)
 	tutorial.arrowPause.alpha = 0
-	game = gm
+	game = currentGame
 end
 
 local function gameResume()
@@ -42,7 +50,13 @@ local function gameResume()
 	tutorial.arrowAttack:removeSelf()
 	tutorial.arrowLife:removeSelf()
 	tutorial.arrowPause:removeSelf()
-	-- myData.firstStart = false
+	
+	-- myData viene modificato e salvato per non far partire il tutorial dal prossimo avvio
+	myData.firstStart = false
+	-- SERVICE -------
+	service.saveData()
+	------------------
+
 	game.state = "Resumed"
 end
 
@@ -96,7 +110,7 @@ local function score()
 end
 
 
-local function jump2 ()
+local function jump2()
 	tutorial.textJump.text = "Hold to jump higher!"
 	transition.to( tutorial.textJump, { time=500, alpha=1 , delay = 500} )
 	transition.dissolve( tutorial.red, tutorial.black, 500, 2250 )
@@ -140,13 +154,11 @@ end
 
 function tutorial.start()
 transition.fadeIn (tutorial.black,  { time=500 })
-ui.loadUI()
-ui.createLifeIcons(3)--game.lives)
+ui.buttonGroup:toFront()
 move()
+--letStart()
 end
 
 -- --tutorial.text.text = "This is Steve, you control him"
-
-
 
 return tutorial

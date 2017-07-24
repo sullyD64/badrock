@@ -1,6 +1,6 @@
 local defaults = {}
 defaults.maxLevels = 5
-defaults.firstStart = false
+defaults.firstStart = true
 defaults.settings = {}
 defaults.settings.currentLevel = 1
 defaults.settings.unlockedLevels = 1
