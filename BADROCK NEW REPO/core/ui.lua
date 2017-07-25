@@ -312,7 +312,7 @@ local buttonData = {
 	function ui.createBossHealthBar( maxLivesNumber )
 		ui.bossHealthBarGroup = display.newGroup()
 
-		local face = display.newImageRect( visual.bossHeadIcon, 40, 40 )
+		local face = display.newImageRect( visual.bossHeadIcon, 34, 40 )
 		face.anchorX, face.anchorY = buttonData.pauseBtn.aX,buttonData.pauseBtn.aY
 		face.x = 0.35*buttonData.pauseBtn.options.x
 		face.y = buttonData.pauseBtn.options.y
