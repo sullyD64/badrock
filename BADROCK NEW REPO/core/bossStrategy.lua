@@ -158,7 +158,7 @@ local strategyBoss1 = {}
 			--self.bossEntity.manoSx.state = "alzaSchiaccia"
 
 			--Sposta il corpo del boss con tutto il resto verso l'alto
-			transition.to(self.spawn, {time=4000, y= self.spawn.y - 220})
+			transition.to(self.spawn, {time=4000, y= self.spawnOriginalPosition.y - 220})
 
 			-- Funzione che fa muovere le mani ogni tot secondi----------
 			local t1
@@ -195,7 +195,7 @@ local strategyBoss1 = {}
 
 			--Sposta il corpo del boss con tutto il resto verso il basso
 			if(self.bossEntity.spallaSx.state == "normal" and self.bossEntity.spallaDx.state == "normal") then
-				transition.to(self.spawn, {time=4000, y= self.spawn.y + 70})
+				transition.to(self.spawn, {time=4000, y= self.spawnOriginalPosition.y -150})
 			end
 
 		 	local function sparaSx()
@@ -234,7 +234,7 @@ local strategyBoss1 = {}
 		 	--La testa del boss diventa finalmente colpibile
 		 	transition.to(self.bossEntity.testa,{time = 5000, onComplete=function() self.bossEntity.testa.isTargettable=true end })
 		 	--Sposta il corpo del boss con tutto il resto verso l'alto
-			transition.to(self.spawn, {time=4000, y= self.spawn.y - 200})
+			transition.to(self.spawn, {time=4000, y= self.spawnOriginalPosition.y - 220})
 		 	-- da togliere--
 		 	--transition.to(self.bossEntity.manoSx, {time=20, onComplete=function() self.bossEntity.manoSx.isBodyActive=false end})
 		 	--transition.to(self.bossEntity.manoDx, {time=20, onComplete=function() self.bossEntity.manoDx.isBodyActive=false end})
@@ -265,7 +265,7 @@ local strategyBoss1 = {}
 				timer.pause(t1)
 				timer.pause(t2) 
 				--Sposta il corpo del boss con tutto il resto verso il basso
-				transition.to(self.spawn, {time=4000, y= self.spawn.y + 200})
+				transition.to(self.spawn, {time=4000, y= self.spawnOriginalPosition.y})
 				--Rende le mani rosse
 				self.bossEntity.manoDx:setFillColor( 255,0 ,0)
 				self.bossEntity.manoSx:setFillColor( 255,0 ,0)
@@ -280,7 +280,7 @@ local strategyBoss1 = {}
 					timer.resume(t2)
 
 					--Sposta il corpo del boss con tutto il resto verso l'alto
-					transition.to(self.spawn, {time=4000, y= self.spawn.y - 200})
+					transition.to(self.spawn, {time=4000, y= self.spawnOriginalPosition.y - 220})
 				end)
 				table.insert(self.timers,t4)
 			end , -1)

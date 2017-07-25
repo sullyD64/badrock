@@ -303,7 +303,7 @@ local buttonData = {
 		bossLifeBar.anchorX, bossLifeBar.anchorY = buttonData.livesText.aX, buttonData.livesText.aY
 		bossLifeBar.x = 60 + buttonData.livesText.options.x/4 + (bossLifeBar.contentWidth * (index - 1))
 		bossLifeBar.y = -30 + buttonData.livesText.options.y
-		
+
 		table.insert(ui.bossHealthBar,bossLifeBar)
 		ui.bossHealthBarGroup:insert(bossLifeBar)
 	end
@@ -312,7 +312,7 @@ local buttonData = {
 	function ui.createBossHealthBar( maxLivesNumber )
 		ui.bossHealthBarGroup = display.newGroup()
 
-		local face = display.newImageRect(ui.buttonGroup, visual.bossHeadIcon, 40, 40 )
+		local face = display.newImageRect( visual.bossHeadIcon, 40, 40 )
 		face.anchorX, face.anchorY = buttonData.pauseBtn.aX,buttonData.pauseBtn.aY
 		face.x = 0.35*buttonData.pauseBtn.options.x
 		face.y = buttonData.pauseBtn.options.y
@@ -322,6 +322,8 @@ local buttonData = {
 		for i = 1, maxLivesNumber do
 			createBossLifeBarAt( i )
 		end
+
+
 		ui.bossHealthBarGroup.alpha = 0
 		ui.bossHealthBarGroup.maxLivesNum = maxLivesNumber
 		transition.to( ui.bossHealthBarGroup, { time = 2000, alpha = 1})
