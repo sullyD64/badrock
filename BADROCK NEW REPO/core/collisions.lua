@@ -347,7 +347,7 @@ end
 			else
 				print("max lives!")
 				---------------------------------
-				-- game.maxLivesReached() --toDo
+				game.maxLivesReached(life) 
 				---------------------------------
 			end
 		end
