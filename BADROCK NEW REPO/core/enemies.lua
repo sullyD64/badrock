@@ -199,6 +199,7 @@ function enemies.loadEnemies( currentGame )
 				transition.to (self, {time = 0, 
 					onComplete = function()
 						self.bodyType = "dynamic" 
+						self.gravityScale = 1
 						self:removeEventListener( "collision", self )
 					end
 				})

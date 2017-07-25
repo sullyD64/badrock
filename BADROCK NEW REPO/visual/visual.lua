@@ -106,7 +106,10 @@ local visual = {
 	bossSpalla             = "visual/sprites/spallaBossSprite.png",
 	bossTesta              = "visual/sprites/testaBossAnim.png",
 	bossCorpo              = "visual/sprites/corpoBossAnim.png",
-	bossLaser              = "visual/sprites/laserSprite.png"
+	bossLaser              = "visual/sprites/laserSprite.png",
+
+	--loading screen
+	loading                = "visual/misc/loading.png",
 }
 
 return visual
