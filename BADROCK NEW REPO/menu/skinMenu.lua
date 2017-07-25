@@ -14,17 +14,6 @@ local skin = {}
 		btns = buttons
 	end
 
-	local function onReturnBtnRelease()  
-		skin.panel:hide()
-		skin.pointsPanel:hide()
-		skinBtn:setEnabled(true)
-		backBtn:setEnabled(true)
-		for i=1, myData.maxLevels do
-			btns[i]:setEnabled(true)
-		end
-		return true
-	end
-
 	-- Risponde al tocco di una delle skin, la seleziona se è sbloccata,
 	-- richiama la finestra di acquisto se non è sbloccata
 	local function onSkinSelect(event)
@@ -42,18 +31,7 @@ local skin = {}
 		end
 		if (myData.settings.skins[idSkin].unlocked == false) then
 				buy.setSkin(idSkin, skin.panel.buyButtons[idSkin], skin.panel.skins[idSkin] ) 
-				buy.setToEnableButtons( skin.panel.returnBtn, skin.panel.skins,skin.panel.buyButtons, skin.pointsPanel.goodPointsText, skin.pointsPanel.evilPointsText  )
-				skin.panel.returnBtn:setEnabled(false)
-					-- for i=1, myData.settings.skinNumber do
-					--     --skin.panel.skins[i]:setEnabled(false)
-					--     if myData.settings.skins[i].unlocked == false then
-					--        print (i)
-					--        print ("controllo")
-					--        print(myData.settings.skins[i].unlocked)
-					--        print (skin.panel.buyButtons[i].id)
-					--        skin.panel.buyButtons[i]:setEnabled(false)
-					--     end
-					-- end
+				buy.setToEnableButtons( skin.panel.skins,skin.panel.buyButtons, skin.pointsPanel.goodPointsText, skin.pointsPanel.evilPointsText  )
 				buy.transpBlock.alpha = 1
 				buy.panel:show({
 				y = display.contentCenterY})
@@ -89,22 +67,6 @@ local skin = {}
 	skin.panel.title = display.newText( "Wardrobe", 0, -100, utility.font, 20 ) ---70,  utility.font, 15 )
 	skin.panel.title:setFillColor( 1, 1, 1 )
 	skin.panel:insert( skin.panel.title )
-
-	-- skin.panel.steve = display.newImageRect(visual.steveMenuSkin, 80, 80)
-	-- --skin.panel.steve.x = diplay. --210
-	-- skin.panel.steve.y = 30
-	-- skin.panel:insert(skin.panel.steve)
-
-	-- Create the button to exit the skin menu
-	skin.panel.returnBtn = widget.newButton {
-		onRelease = onReturnBtnRelease,
-		width = 30,
-		height = 30,
-		defaultFile = visual.exitOptionMenu,
-		}
-	skin.panel.returnBtn.x = 250
-	skin.panel.returnBtn.y = -95
-	skin.panel:insert(skin.panel.returnBtn)
 
 	skin.panel.skinGroup = widget.newScrollView({
 		width = skin.panel.width-50,

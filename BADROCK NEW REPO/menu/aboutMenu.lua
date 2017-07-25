@@ -52,9 +52,13 @@ local abt = {}
 	abt.panel.title:setFillColor( 1, 1, 1 )
 	abt.panel:insert( abt.panel.title )
 
-	abt.panel.title = display.newText( "Creato da:", 0, -40, utility.font, 15 ) --che scriviamo qui?
-	abt.panel.title:setFillColor( 1, 1, 1 )
-	abt.panel:insert( abt.panel.title )
+	abt.panel.text = display.newText( "BadRock - created by: \nClaudia De Santis, Elena Madon,\nLorenzo Guidaldi, Fabio Cherubini,\nGiacomo Bonanni\nfor the Mobile Computing course,\nheld by Franco Milicchio (AA 2016-17)", 0, -40, utility.font, 11 ) --che scriviamo qui?
+	abt.panel.text:setFillColor( 1, 1, 1 )
+	abt.panel.text.anchorX = 0
+	abt.panel.text.anchorY = 0
+	abt.panel.text.x = -85
+	abt.panel.text.y = -55
+	abt.panel:insert( abt.panel.text )
 
 	-- Create the button to exit the about menu
 	abt.panel.aboutReturnBtn = widget.newButton {

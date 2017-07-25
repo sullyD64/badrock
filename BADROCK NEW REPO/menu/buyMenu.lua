@@ -11,8 +11,7 @@ local goodText, evilText
 
 local buy = {}
     
-    function buy.setToEnableButtons( backButton, skinsButtons, buyButtons, gText, eText  )
-        backBtn = backButton
+    function buy.setToEnableButtons( skinsButtons, buyButtons, gText, eText  )
         skins = skinsButtons
         buyBtns = buyButtons
         goodText = gText 
@@ -59,13 +58,6 @@ local buy = {}
 
     -- torna al menu delle skin
     local function onReturnBtnRelease()  
-        backBtn:setEnabled(true)
-        -- for i=1, myData.settings.skinNumber do
-        --     --skins[i]:setEnabled(true)
-        --     if myData.settings.skins[i].unlocked == false then
-        --         buyBtns[i]:setEnabled(true)
-        --     end
-        -- end
         buy.transpBlock.alpha = 0
         buy.panel:hide()
         return true
@@ -92,7 +84,6 @@ local buy = {}
         ------------------
 
         transpBtn:removeSelf()
-        backBtn:setEnabled(true)
         skinBtn.alpha = 1
         buy.transpBlock.alpha = 0
         buy.panel:hide()

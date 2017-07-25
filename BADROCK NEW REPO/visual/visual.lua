@@ -31,10 +31,7 @@ local visual = {
 	steveMenuSkin          = "visual/misc/steveMenuSkin.png",
 	transparent            = "visual/misc/transparent.png",
 
-	tutorialArrowMove      = "visual/misc/arrowMove.png",
-	tutorialArrowAttack    = "visual/misc/arrowAttack.png",
-	tutorialArrowLife      = "visual/misc/arrowLife.png",
-	tutorialArrowPause     = "visual/misc/arrowPause.png",
+	tutorialArrow 		   = "visual/misc/arrow.png",
 	tutorialBlack          = "visual/misc/tutorialBlack.png",
 	tutorialRed            = "visual/misc/tutorialRed3.png",
 

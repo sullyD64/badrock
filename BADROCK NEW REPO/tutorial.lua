@@ -30,14 +30,8 @@ function tutorial.create(currentGame)
 	tutorial.text = display.newText( "", 0, 0, utility.font, 20 )
 	tutorial.text.alpha = 0
 
-	tutorial.arrowMove = display.newImageRect ( visual.tutorialArrowMove, 90, 65)
-	tutorial.arrowMove.alpha = 0
-	tutorial.arrowAttack = display.newImageRect ( visual.tutorialArrowAttack, 90, 65)
-	tutorial.arrowAttack.alpha = 0
-	tutorial.arrowLife = display.newImageRect ( visual.tutorialArrowLife, 90, 65)
-	tutorial.arrowLife.alpha = 0
-	tutorial.arrowPause = display.newImageRect ( visual.tutorialArrowPause, 90, 65)
-	tutorial.arrowPause.alpha = 0
+	tutorial.arrow = display.newImageRect ( visual.tutorialArrow, 90, 65)
+	tutorial.arrow.alpha = 0
 	game = currentGame
 end
 
@@ -47,10 +41,7 @@ local function gameResume()
 	tutorial.red:removeSelf()
 	tutorial.text:removeSelf()
 	tutorial.textJump:removeSelf()
-	tutorial.arrowMove:removeSelf()
-	tutorial.arrowAttack:removeSelf()
-	tutorial.arrowLife:removeSelf()
-	tutorial.arrowPause:removeSelf()
+	tutorial.arrow:removeSelf()
 	controller.pauseEnabled = true
 	-- myData viene modificato e salvato per non far partire il tutorial dal prossimo avvio
 	myData.firstStart = false
@@ -72,42 +63,48 @@ local function letStart()
 end
 
 local function pause()
-	tutorial.arrowPause.x = display.contentWidth - 110
-	tutorial.arrowPause.y = display.screenOriginY + 60
-	tutorial.arrowPause:toFront()
+	tutorial.arrow.x = display.contentWidth - 110
+	tutorial.arrow.y = display.screenOriginY + 60
+	tutorial.arrow.xScale = -1
+	tutorial.arrow.yScale = -1
+	tutorial.arrow:toFront()
 	tutorial.text.text = "Pause the game whenever you want!"
 	tutorial.text.x = display.contentWidth - 180
 	tutorial.text.y = display.screenOriginY + 110
 	transition.to( tutorial.text, { time=500, alpha=1 , delay = 800} )
-	transition.to( tutorial.arrowPause, { time=500, alpha=1 , delay = 800} )
+	transition.to( tutorial.arrow, { time=500, alpha=1 , delay = 800} )
 	transition.to( tutorial.text, { time=500, alpha=0 , delay = 2450,  onComplete = letStart} )
-	transition.to( tutorial.arrowPause, { time=500, alpha=0 , delay = 2450 } )
+	transition.to( tutorial.arrow, { time=500, alpha=0 , delay = 2450 } )
 end
 
 
 local function life()
-	tutorial.arrowLife.x = display.screenOriginX + 155--130
-	tutorial.arrowLife.y = display.screenOriginY + 50
+	tutorial.arrow.x = display.screenOriginX + 155--130
+	tutorial.arrow.y = display.screenOriginY + 50
+	tutorial.arrow.yScale = -1
+	tutorial.arrow.xScale = 1
 	tutorial.text.text = "When your lives drop to \n      zero is game over"
 	tutorial.text.x = display.screenOriginX + 195--170
 	tutorial.text.y = display.screenOriginY + 115
 	transition.to( tutorial.text, { time=500, alpha=1 , delay = 800} )
-	transition.to( tutorial.arrowLife, { time=500, alpha=1 , delay = 800} )
+	transition.to( tutorial.arrow, { time=500, alpha=1 , delay = 800} )
 	transition.to( tutorial.text, { time=500, alpha=0 , delay = 2550,  onComplete = pause } )
-	transition.to( tutorial.arrowLife, { time=500, alpha=0 , delay = 2550 } )
+	transition.to( tutorial.arrow, { time=500, alpha=0 , delay = 2550 } )
 end
 
 
 local function score()
-	tutorial.arrowPause.x = display.contentWidth - 240
-	tutorial.arrowPause.y = display.screenOriginY + 50
+	tutorial.arrow.x = display.contentWidth - 240
+	tutorial.arrow.y = display.screenOriginY + 50
+	tutorial.arrow.xScale = -1
+	tutorial.arrow.yScale = -1
 	tutorial.text.text = "             This is your score,\n do your best by killing enemies \n      and interacting with npcs!"
 	tutorial.text.x = display.contentWidth - 280 
 	tutorial.text.y = display.screenOriginY + 115
 	transition.to( tutorial.text, { time=500, alpha=1 , delay = 700} )
-	transition.to( tutorial.arrowPause, { time=500, alpha=1 , delay = 700} )
+	transition.to( tutorial.arrow, { time=500, alpha=1 , delay = 700} )
 	transition.to( tutorial.text, { time=500, alpha=0 , delay = 3200,  onComplete = life } )
-	transition.to( tutorial.arrowPause, { time=500, alpha=0 , delay = 3200 } )
+	transition.to( tutorial.arrow, { time=500, alpha=0 , delay = 3200 } )
 end
 
 
@@ -129,27 +126,28 @@ local function jump()
 end
 
 local function attack()
-	tutorial.arrowAttack.x = display.contentWidth -130
-	tutorial.arrowAttack.y = display.contentHeight - 60
+	tutorial.arrow.x = display.contentWidth -130
+	tutorial.arrow.y = display.contentHeight - 60
+	tutorial.arrow.xScale = -1
 	tutorial.text.text = "Press to attack"
 	tutorial.text.x = display.contentWidth -150
 	tutorial.text.y = display.contentHeight - 110
 	transition.to( tutorial.text, { time=500, alpha=1 , delay = 800} )
-	transition.to( tutorial.arrowAttack, { time=500, alpha=1 , delay = 800} )
+	transition.to( tutorial.arrow, { time=500, alpha=1 , delay = 800} )
 	transition.to( tutorial.text, { time=500, alpha=0 , delay = 2250, onComplete = jump } )
-	transition.to( tutorial.arrowAttack, { time=500, alpha=0 , delay = 2250 } )
+	transition.to( tutorial.arrow, { time=500, alpha=0 , delay = 2250 } )
 end
 
 local function move()
-	tutorial.arrowMove.x = display.screenOriginX + 190
-	tutorial.arrowMove.y = display.contentHeight - 80
+	tutorial.arrow.x = display.screenOriginX + 190
+	tutorial.arrow.y = display.contentHeight - 80
 	tutorial.text.text = "Use the arrows to move"
 	tutorial.text.x = display.screenOriginX + 220--250
 	tutorial.text.y = display.contentHeight - 130--170
 	transition.to( tutorial.text, { time=500, alpha=1 , delay = 800 } )
-	transition.to( tutorial.arrowMove, { time=500, alpha=1 , delay = 800 } )
+	transition.to( tutorial.arrow, { time=500, alpha=1 , delay = 800 } )
 	transition.to( tutorial.text, { time=500, alpha=0 , delay = 2250,  onComplete = attack } )
-	transition.to( tutorial.arrowMove, { time=500, alpha=0 , delay = 2250 } )
+	transition.to( tutorial.arrow, { time=500, alpha=0 , delay = 2250 } )
 end
 
 
