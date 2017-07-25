@@ -30,6 +30,8 @@ local behavior = {}
 		transition.to(walker, {time = 1000,
 			onComplete = function()
 				walker.bodyType = "kinematic"
+				walker:setLinearVelocity( 0, 0 )
+				walker.gravityScale = 0
 			end
 		})
 
