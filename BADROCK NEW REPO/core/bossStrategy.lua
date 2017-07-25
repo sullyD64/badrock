@@ -66,66 +66,174 @@ local strategyBoss1 = {}
 			self.state = "Generating"
 			self.phase = 0
 
-			local corpo = boss.loadBoss("corpo")
-			local spallaDx = boss.loadBoss("spallaDx")
-			local spallaSx = boss.loadBoss ("spallaSx")	
-			local testa = boss.loadBoss("testa")
-			local manoDx = boss.loadBoss("manoDx")
-			local manoSx = boss.loadBoss("manoSx")
-
-			corpo:toBack()
-
-			-- sposta le mani nella posizione iniziale
-			manoSx.x = self.spawn.x -100
-			manoDx.x = self.spawn.x +100
-			--xScale degli oggetti identici
-			manoDx.xScale = -1
-			spallaSx.xScale = -1
-			
-			self.bossEntity.manoDx = manoDx
-			self.bossEntity.manoSx = manoSx
-			self.bossEntity.spallaDx = spallaDx
-			self.bossEntity.spallaSx = spallaSx
-			self.bossEntity.corpo = corpo
-			self.bossEntity.testa = testa
-
-			--------------------------
-			self:initializeHealthBar()
-			--------------------------
-
-			-- avoid boss parts to fall down when the fight is paused
-			transition.to(self.bossEntity, {time = 0, 
-				onComplete= function()
-					self.bossEntity.spallaDx.gravityScale = 0
-					self.bossEntity.spallaSx.gravityScale = 0
+			-- Caricamento Corpo Boss
+			local t1= timer.performWithDelay(100, function()
+				print("Inizio Caricamento Boss")
+				local corpo = boss.loadBoss("corpo")
+				corpo:toBack()
+				self.bossEntity.corpo = corpo
+				self.bossEntity.corpo:setSequence("idle")
+				self.bossEntity.corpo:play()
+				transition.to(self.bossEntity.corpo, {time = 0,onComplete= function()
 					self.bossEntity.corpo.gravityScale = 0
-					self.bossEntity.testa.gravityScale = 0
-				end
-			})
+				end	})
+				print("-- CORPO caricato")
 
-			-- inizializazione di componenti aggiuntive di ogni pezzo
-			self.bossEntity.spallaDx.state = "normal"
-			self.bossEntity.spallaSx.state = "normal"
-			self.bossEntity.spallaDx.proiettili = {}
-			self.bossEntity.spallaSx.proiettili = {}
-			self.bossEntity.spallaDx.timer = {}
-			self.bossEntity.spallaSx.timer = {}
-			self.bossEntity.manoDx.laser = nil
-			self.bossEntity.manoSx.laser = nil
+				-- Caricamento Spalle Boss
+				local t2= timer.performWithDelay(50, function()
+					
+					local spallaDx = boss.loadBoss("spallaDx")
+					self.bossEntity.spallaDx = spallaDx
+					self.bossEntity.spallaDx.state = "normal"
+					self.bossEntity.spallaDx.proiettili = {}
+					self.bossEntity.spallaDx.timer = {}
+					self.bossEntity.spallaDx:setSequence("idle")
+					self.bossEntity.spallaDx:play()
+					transition.to(self.bossEntity.spallaDx, {time = 0,onComplete= function()
+							self.bossEntity.spallaDx.gravityScale = 0
+					end	})
+					print("-Spalla Dx Caricata")
+
+					local t2b= timer.performWithDelay(50, function()
+					
+						local spallaSx = boss.loadBoss ("spallaSx")	
+						--xScale degli oggetti identici
+						spallaSx.xScale = -1
+						self.bossEntity.spallaSx = spallaSx
+						self.bossEntity.spallaSx.state = "normal"
+						self.bossEntity.spallaSx.proiettili = {}
+						self.bossEntity.spallaSx.timer = {}
+						self.bossEntity.spallaSx:setSequence("idle")
+						self.bossEntity.spallaSx:play()
+						transition.to(self.bossEntity.spallaSx, {time = 0,onComplete= function()
+							self.bossEntity.spallaSx.gravityScale = 0
+						end	})
+						print("-- SPALLE caricate ")
+
+						-- Caricamento Testa Boss
+						local t3= timer.performWithDelay(50, function()
+								
+							local testa = boss.loadBoss("testa")
+							self.bossEntity.testa = testa
+							self.bossEntity.testa:setSequence("idle")
+							self.bossEntity.testa:play()
+							transition.to(self.bossEntity.testa, {time = 0,onComplete= function()
+								self.bossEntity.testa.gravityScale = 0
+							end	})
+							
+							-- Caricamento ManoSx Boss	
+							local t4= timer.performWithDelay(50, function()
+
+								local manoSx = boss.loadBoss("manoSx")
+								-- sposta le mani nella posizione iniziale
+								manoSx.x = self.spawn.x -100
+								self.bossEntity.manoSx = manoSx
+								self.bossEntity.manoSx.laser = nil
+								self.bossEntity.manoSx:setSequence("idle")
+								self.bossEntity.manoSx:play()
+								print("-Mano Sx Caricata")
+
+								-- Caricamento ManoDx Boss e LifeBar
+								local t4b= timer.performWithDelay(50, function()
+									
+									local manoDx = boss.loadBoss("manoDx")
+									-- sposta le mani nella posizione iniziale
+									manoDx.x = self.spawn.x +100
+									--xScale degli oggetti identici
+									manoDx.xScale = -1
+									self.bossEntity.manoDx = manoDx
+									self.bossEntity.manoDx.laser = nil
+									self.bossEntity.manoDx:setSequence("idle")
+									self.bossEntity.manoDx:play()
+
+									--------------------------
+									self:initializeHealthBar()
+									--------------------------
+
+									print("-- MANI caricate --FINE caricamento Boss")
+
+								end)
+								table.insert(self.timers,t4b)
+							end)
+							table.insert(self.timers,t4)
+						end)
+						table.insert(self.timers,t3)
+					end)
+					table.insert(self.timers,t2b)
+				end)
+				table.insert(self.timers,t2)
+			end)
+			table.insert(self.timers,t1)
+
+				
+
+
+		-- SEZIONE DA TOGLIERE IN  SEGUITO -----------------------------------
+				-- local corpo = boss.loadBoss("corpo")
+				-- local spallaDx = boss.loadBoss("spallaDx")
+				-- local spallaSx = boss.loadBoss ("spallaSx")	
+				-- local testa = boss.loadBoss("testa")
+				-- local manoDx = boss.loadBoss("manoDx")
+				-- local manoSx = boss.loadBoss("manoSx")
+
+				-- corpo:toBack()
+
+				-- -- sposta le mani nella posizione iniziale
+				-- manoSx.x = self.spawn.x -100
+				-- manoDx.x = self.spawn.x +100
+				-- --xScale degli oggetti identici
+				-- manoDx.xScale = -1
+				-- spallaSx.xScale = -1
+				
+				-- self.bossEntity.manoDx = manoDx
+				-- self.bossEntity.manoSx = manoSx
+				-- self.bossEntity.spallaDx = spallaDx
+				-- self.bossEntity.spallaSx = spallaSx
+				-- self.bossEntity.corpo = corpo
+				-- self.bossEntity.testa = testa
+
+				-- ------------------------
+				-- self:initializeHealthBar()
+				-- ------------------------
+
+				-- --avoid boss parts to fall down when the fight is paused
+				-- transition.to(self.bossEntity, {time = 0, 
+				-- 	onComplete= function()
+				-- 		self.bossEntity.spallaDx.gravityScale = 0
+				-- 		self.bossEntity.spallaSx.gravityScale = 0
+				-- 		self.bossEntity.corpo.gravityScale = 0
+				-- 		self.bossEntity.testa.gravityScale = 0
+				-- 	end
+				-- })
+
+				-- -- inizializazione di componenti aggiuntive di ogni pezzo
+				-- self.bossEntity.spallaDx.state = "normal"
+				-- self.bossEntity.spallaSx.state = "normal"
+				-- self.bossEntity.spallaDx.proiettili = {}
+				-- self.bossEntity.spallaSx.proiettili = {}
+				-- self.bossEntity.spallaDx.timer = {}
+				-- self.bossEntity.spallaSx.timer = {}
+				-- self.bossEntity.manoDx.laser = nil
+				-- self.bossEntity.manoSx.laser = nil
+				
+				-- -- play all the sprites
+				-- self.bossEntity.manoDx:setSequence("idle")
+				-- self.bossEntity.manoDx:play()
+				-- self.bossEntity.manoSx:setSequence("idle")
+				-- self.bossEntity.manoSx:play()
+				-- self.bossEntity.spallaDx:setSequence("idle")
+				-- self.bossEntity.spallaDx:play()
+				-- self.bossEntity.spallaSx:setSequence("idle")
+				-- self.bossEntity.spallaSx:play()
+				-- self.bossEntity.corpo:setSequence("idle")
+				-- self.bossEntity.corpo:play()
+				-- self.bossEntity.testa:setSequence("idle")
+				-- self.bossEntity.testa:play()
+		-- SEZIONE DA TOGLIERE IN SEGUITO --------------------------------------		
+
+
 			
-			-- play all the sprites
-			self.bossEntity.manoDx:setSequence("idle")
-			self.bossEntity.manoDx:play()
-			self.bossEntity.manoSx:setSequence("idle")
-			self.bossEntity.manoSx:play()
-			self.bossEntity.spallaDx:setSequence("idle")
-			self.bossEntity.spallaDx:play()
-			self.bossEntity.spallaSx:setSequence("idle")
-			self.bossEntity.spallaSx:play()
-			self.bossEntity.corpo:setSequence("idle")
-			self.bossEntity.corpo:play()
-			self.bossEntity.testa:setSequence("idle")
-			self.bossEntity.testa:play()
+
 			
 			print(" STA PER INIZIARE LA BOSS FIGHT")
 
@@ -325,6 +433,11 @@ local strategyBoss1 = {}
 			-----------------------
 			self:destroyHealthBar()
 			-----------------------
+
+			-- audio ----------------------------------------
+			audio.stop(1)
+			sfx.playMusic( sfx.bgLvlMusic, { channel = 1 } )
+			-------------------------------------------------
 
 			--IL DELAY DEVE ESSERE CIRCA UGUALE AL TEMPO DI RESPAWN DI STEVE
 
@@ -673,6 +786,10 @@ function bossStrategy.loadBoss( trigger )
 	trigger.listener = function(event)
 		--Triggers the Boss Fight
 		if (bossStrategy.activeStrategy == 0 and strategy.win == false) then
+			-- audio ----------------------------------------
+			audio.stop(1)
+			sfx.playMusic( sfx.bgBossMusic, { channel = 1 } )
+			-------------------------------------------------
 			strategy:startFight()
 			-- Closes the area of the fight
 			trigger.walls = util.createWalls(game.map)

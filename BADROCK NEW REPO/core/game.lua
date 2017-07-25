@@ -481,6 +481,10 @@ physics.setGravity( 0, 80 )
 		controller.addOneLife()
 	end
 
+	--Called if we try to take a LifeItem when we are already with Max Lives
+	function game.maxLivesReached(life)
+		controller.maxLivesReached(life)
+	end
 	-- Displays the item contained in the attribute -drop- of an enemy.
 	function game.dropItemFrom( enemy )
 		items.dropItemFrom(game, enemy)
@@ -548,10 +552,19 @@ physics.setGravity( 0, 80 )
 			end
 			loadedEntities = {}
 		end
+
+		local lastItems = util.subtable(game.loadedItems, "sectionID", game.section )
+		util.toKeyMap(lastItems, "name")
+
+		for k in pairs(lastItems) do
+			game.loadedItems[k] = nil
+		end
+		
 		destroyEntities(game.loadedEnemies)
 		destroyEntities(game.loadedNPCs)
 		destroyEntities(game.loadedItems)
-		game.itemsGen = {}
+
+		game.itemsGen = lastItems
 		game.npcsGen = {}
 		game.enemiesGen = {}
 	end

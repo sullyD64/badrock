@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.1" orientation="orthogonal" renderorder="right-down" width="26" height="14" tilewidth="64" tileheight="64" nextobjectid="47">
+<map version="1.0" tiledversion="1.0.1" orientation="orthogonal" renderorder="right-down" width="26" height="14" tilewidth="64" tileheight="64" nextobjectid="48">
  <properties>
   <property name="ParallaxEnabled" value="true"/>
  </properties>
@@ -477,7 +477,7 @@
     <property name="isStart" value=""/>
    </properties>
   </object>
-  <object id="39" name="check1" x="328" y="662">
+  <object id="39" name="check1" x="926" y="654">
    <properties>
     <property name="checkID" value="1"/>
    </properties>
@@ -511,7 +511,7 @@
     <property name="travelDistance" value="250"/>
    </properties>
   </object>
-  <object id="43" name="enemy2" type="robot" x="460" y="648">
+  <object id="43" name="enemy2" type="robot" x="1066" y="646">
    <properties>
     <property name="drop" value="life"/>
     <property name="id" value="2"/>
@@ -540,10 +540,16 @@
     <property name="sectionID" value="0"/>
    </properties>
   </object>
-  <object id="41" name="gun1" x="828" y="638">
+  <object id="41" name="gun1" x="362" y="656">
    <properties>
     <property name="drop" value="gun"/>
-    <property name="sectionID" value="1"/>
+    <property name="sectionID" value="0"/>
+   </properties>
+  </object>
+  <object id="47" name="gun2" x="492" y="650">
+   <properties>
+    <property name="drop" value="gun"/>
+    <property name="sectionID" value="0"/>
    </properties>
   </object>
  </objectgroup>

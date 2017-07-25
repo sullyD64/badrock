@@ -189,6 +189,24 @@ local buttonData = {
 			aX = 0.5,
 			aY = 0.5,
 		},
+		--12
+		maxLivesText = {
+			options = {
+				id = "maxLivesText",
+				textOnly = true,
+				label = "",
+				font = utility.font,
+				fontSize = 20,
+				labelColor = {
+					default = { 0,210,255 },
+					over = { 0,210,255 },
+				},
+				x = 55,
+				y = 63,
+			},
+			aX = 0.5,
+			aY = 0.5,
+		},
 }
 
 
@@ -312,7 +330,7 @@ local buttonData = {
 	function ui.createBossHealthBar( maxLivesNumber )
 		ui.bossHealthBarGroup = display.newGroup()
 
-		local face = display.newImageRect( visual.bossHeadIcon, 40, 40 )
+		local face = display.newImageRect( visual.bossHeadIcon, 34, 40 )
 		face.anchorX, face.anchorY = buttonData.pauseBtn.aX,buttonData.pauseBtn.aY
 		face.x = 0.35*buttonData.pauseBtn.options.x
 		face.y = buttonData.pauseBtn.options.y
@@ -418,6 +436,10 @@ local function createButtons()
 		specialUpText.anchorX, specialUpText.anchorY = buttonData.specialUpText.aX, buttonData.specialUpText.aY
 		--buttonGroup:insert( specialUpText )
 
+	local maxLivesText    = widget.newButton ( buttonData.maxLivesText.options    )
+		maxLivesText.anchorX, maxLivesText.anchorY = buttonData.maxLivesText.aX, buttonData.maxLivesText.aY
+		buttonGroup:insert( maxLivesText )
+
 	local buttons = {
 		jump = jumpScreen,
 		dleft = dpadLeft,
@@ -430,7 +452,8 @@ local function createButtons()
 		scoreUp = scoreUpText,
 		lives = livesText,
 		lifeUp = lifeUpText,
-		specialUp = specialUpText
+		specialUp = specialUpText,
+		maxLives = maxLivesText
 	}
 
 	buttonGroup:toFront()

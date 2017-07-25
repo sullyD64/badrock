@@ -429,10 +429,10 @@ local sState = {}
 
 	-- Adds a life to the lives and visually updates the lifeIcons array
 	function controller.addOneLife()
+		local textTimer = 500
 		if(game.lives < game.MAX_LIVES ) then
 			game.lives = game.lives + 1
 			ui.updateLifeIcons(game.lives)
-			local textTimer = 500
 			local lifeUp = ui.buttons.lifeUp
 
 			if (lifeUp.isVisible == false) then
@@ -442,7 +442,35 @@ local sState = {}
 
 		-- Visually animates the lifeUp text element
 		timer.performWithDelay(textTimer, ui.textFade(lifeUp, 750))
+		-- If we have a already the maximum lives possible
 		end
+	end
+
+	--Called if we try to take a LifeItem when we are already with Max Lives
+	function controller.maxLivesReached(life)
+			-- Text Handled ------
+			local textTimer = 1500
+			local maxLives = ui.buttons.maxLives
+			if (maxLives.isVisible == false) then
+				maxLives:setLabel("max Lives")
+				maxLives.isVisible = true 
+			end
+			
+			timer.performWithDelay(textTimer,function() ui.textFade(maxLives, 750) end)
+			-- Visually animates the maxLives text element -----
+
+			-- Little animation for the life Item
+			transition.to(life,{ time=50, y=life.y-5, rotation = 30, transition=easing.outBounce, onComplete=function()
+				transition.to(life,{ time=50, y=life.y-2, rotation = -30, transition=easing.outBounce, onComplete=function()
+					transition.to(life,{ time=50, y=life.y-2, rotation = 30, transition=easing.outBounce, onComplete=function()
+						transition.to(life,{ time=50, y=life.y-2, rotation = -30, transition=easing.outBounce, onComplete=function()
+							transition.to(life,{time=0, y= life.y+11, rotation = 0})
+						end })
+					end })
+				end })
+			end })
+			
+
 	end
 
 	-- Adds special points to the current game and displays the points obtained
@@ -527,6 +555,7 @@ local sState = {}
 		ui.buttons.scoreUp.isVisible = false
 		ui.buttons.lifeUp.isVisible = false
 		ui.buttons.specialUp.isVisible = false
+		ui.buttons.maxLives.isVisible = false
 		-------------------------------
 		pauseMenu.setGame(game, gState)
 		-------------------------------
@@ -537,6 +566,7 @@ local sState = {}
 		if (ui.buttons and ui.buttonGroup) then
 			ui.buttons.scoreUp:setLabel("")
 			ui.buttons.lifeUp:setLabel("")
+			ui.buttons.maxLives:setLabel("")
 			ui.buttons = nil
 			ui.emptyLifeIcons()
 			ui.destroyLifeIcons()

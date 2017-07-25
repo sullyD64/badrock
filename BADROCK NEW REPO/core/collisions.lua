@@ -347,7 +347,7 @@ end
 			else
 				print("max lives!")
 				---------------------------------
-				-- game.maxLivesReached() --toDo
+				game.maxLivesReached(life) 
 				---------------------------------
 			end
 		end
@@ -366,10 +366,14 @@ end
 	local function powerupCollision( powerup, event )
 		-- The powerUp can't be picked up if the player is attacking, as this action modifies
 		-- the attack itself which is a sequence of timed events.
-		if (not steve.hasPowerUp and steve.state ~= "Attacking" and (not steve.isImmune)) then
+		if (steve.state ~= "Attacking" and (not steve.isImmune)) then
 			-- print("Picked "..powerup.itemName)
 			display.remove(powerup)
-			steve:equipPowerUp(powerup.itemName)
+			if (not steve.hasPowerUp) then 
+				steve:equipPowerUp(powerup.itemName)
+			elseif (steve.hasPowerUp and steve.equipped == powerup.itemName) then
+				steve:refreshPowerUp(powerup.itemName)
+			end
 		end
 	end
 

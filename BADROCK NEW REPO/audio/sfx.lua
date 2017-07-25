@@ -4,6 +4,7 @@ local sfx = {
   bgMenuMusic  = audio.loadStream( "audio/overside8bit.mp3" ),
   bgLvlMusic   = audio.loadStream( "audio/Level1BGM/Highways_standard.mp3" ),
   bgLvlMusicUP = audio.loadStream( "audio/Level1BGM/Highways_G_faster.mp3" ),
+  bgBossMusic  = audio.loadStream( "audio/Level1BGM/Highways_shuffle_fastest.mp3"),
   jumpSound     = audio.loadSound( "audio/jump.mp3"       ),
   coinSound     = audio.loadSound( "audio/coin.mp3"       ),
   lifeupSound   = audio.loadSound( "audio/lifeup.mp3"     ),
