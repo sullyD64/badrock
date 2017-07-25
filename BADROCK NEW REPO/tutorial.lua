@@ -8,6 +8,7 @@
 
 local utility = require ("menu.utilitymenu")
 local ui = require ("core.ui")
+local controller = require ("core.controller")
 
 local tutorial = {}
 local game
@@ -50,7 +51,7 @@ local function gameResume()
 	tutorial.arrowAttack:removeSelf()
 	tutorial.arrowLife:removeSelf()
 	tutorial.arrowPause:removeSelf()
-	
+	controller.pauseEnabled = true
 	-- myData viene modificato e salvato per non far partire il tutorial dal prossimo avvio
 	myData.firstStart = false
 	-- SERVICE -------
@@ -155,6 +156,7 @@ end
 function tutorial.start()
 transition.fadeIn (tutorial.black,  { time=500 })
 ui.buttonGroup:toFront()
+controller.pauseEnabled = false
 move()
 --letStart()
 end
