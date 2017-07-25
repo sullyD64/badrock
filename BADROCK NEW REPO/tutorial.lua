@@ -6,7 +6,7 @@
 -- successiva, una volta termianto il suo compito 
 -----------------------------------------------------------------------------------------------------------------
 
-local utility = require ("menu.utilitymenu")
+local utility = require ("menu.utilityMenu")
 local ui = require ("core.ui")
 local controller = require ("core.controller")
 

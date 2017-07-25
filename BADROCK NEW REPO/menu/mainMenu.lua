@@ -169,6 +169,7 @@ local playBtn, optionBtn
 		playBtn:removeSelf()    -- widgets must be manually removed
 		playBtn = nil
 		optionBtn:removeSelf()
+		optionBtn = nil
 
 		-----------------------------------------------------------------------------
 		-- The reason to prefer the latter here is because, while having the the same

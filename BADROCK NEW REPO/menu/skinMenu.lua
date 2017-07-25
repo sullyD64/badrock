@@ -7,7 +7,7 @@ local skinBtn
 local backBtn
 local btns
 local skin = {}
-	
+
 	function skin.setToEnableButtons(skinButton, backButton, buttons)
 		skinBtn = skinButton
 		backBtn = backButton
@@ -228,6 +228,5 @@ local skin = {}
 	skin.pointsPanel.evilPointsText = display.newText( "Evil: "..myData.settings.evilPoints, -18, -5,  utility.font, 15 )
 	skin.pointsPanel.evilPointsText:setFillColor( 0.8,0,0 )
 	skin.pointsPanel:insert(skin.pointsPanel.evilPointsText)
-
-
+	
 return skin

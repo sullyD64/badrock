@@ -250,7 +250,12 @@ local buttons = {}
 	end
 
 	function scene:destroy( event )
-		local sceneGroup = self.view   
+		local sceneGroup = self.view
+		for i = 1, myData.maxLevels do
+			buttons[i]:removeSelf()
+			buttons[i] = nil
+		end
+
 	end
 
 -- -----------------------------------------------------------------------------------
