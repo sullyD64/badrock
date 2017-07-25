@@ -481,6 +481,10 @@ physics.setGravity( 0, 80 )
 		controller.addOneLife()
 	end
 
+	--Called if we try to take a LifeItem when we are already with Max Lives
+	function game.maxLivesReached(life)
+		controller.maxLivesReached(life)
+	end
 	-- Displays the item contained in the attribute -drop- of an enemy.
 	function game.dropItemFrom( enemy )
 		items.dropItemFrom(game, enemy)

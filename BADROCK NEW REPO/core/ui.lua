@@ -189,6 +189,24 @@ local buttonData = {
 			aX = 0.5,
 			aY = 0.5,
 		},
+		--12
+		maxLivesText = {
+			options = {
+				id = "maxLivesText",
+				textOnly = true,
+				label = "",
+				font = utility.font,
+				fontSize = 20,
+				labelColor = {
+					default = { 0,210,255 },
+					over = { 0,210,255 },
+				},
+				x = 55,
+				y = 63,
+			},
+			aX = 0.5,
+			aY = 0.5,
+		},
 }
 
 
@@ -418,6 +436,10 @@ local function createButtons()
 		specialUpText.anchorX, specialUpText.anchorY = buttonData.specialUpText.aX, buttonData.specialUpText.aY
 		--buttonGroup:insert( specialUpText )
 
+	local maxLivesText    = widget.newButton ( buttonData.maxLivesText.options    )
+		maxLivesText.anchorX, maxLivesText.anchorY = buttonData.maxLivesText.aX, buttonData.maxLivesText.aY
+		buttonGroup:insert( maxLivesText )
+
 	local buttons = {
 		jump = jumpScreen,
 		dleft = dpadLeft,
@@ -430,7 +452,8 @@ local function createButtons()
 		scoreUp = scoreUpText,
 		lives = livesText,
 		lifeUp = lifeUpText,
-		specialUp = specialUpText
+		specialUp = specialUpText,
+		maxLives = maxLivesText
 	}
 
 	buttonGroup:toFront()
