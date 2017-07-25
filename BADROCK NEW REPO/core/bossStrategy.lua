@@ -434,6 +434,11 @@ local strategyBoss1 = {}
 			self:destroyHealthBar()
 			-----------------------
 
+			-- audio ----------------------------------------
+			audio.stop(1)
+			sfx.playMusic( sfx.bgLvlMusic, { channel = 1 } )
+			-------------------------------------------------
+
 			--IL DELAY DEVE ESSERE CIRCA UGUALE AL TEMPO DI RESPAWN DI STEVE
 
 			timer.performWithDelay(1000, function()
@@ -781,6 +786,10 @@ function bossStrategy.loadBoss( trigger )
 	trigger.listener = function(event)
 		--Triggers the Boss Fight
 		if (bossStrategy.activeStrategy == 0 and strategy.win == false) then
+			-- audio ----------------------------------------
+			audio.stop(1)
+			sfx.playMusic( sfx.bgBossMusic, { channel = 1 } )
+			-------------------------------------------------
 			strategy:startFight()
 			-- Closes the area of the fight
 			trigger.walls = util.createWalls(game.map)

@@ -552,10 +552,19 @@ physics.setGravity( 0, 80 )
 			end
 			loadedEntities = {}
 		end
+
+		local lastItems = util.subtable(game.loadedItems, "sectionID", game.section )
+		util.toKeyMap(lastItems, "name")
+
+		for k in pairs(lastItems) do
+			game.loadedItems[k] = nil
+		end
+		
 		destroyEntities(game.loadedEnemies)
 		destroyEntities(game.loadedNPCs)
 		destroyEntities(game.loadedItems)
-		game.itemsGen = {}
+
+		game.itemsGen = lastItems
 		game.npcsGen = {}
 		game.enemiesGen = {}
 	end
