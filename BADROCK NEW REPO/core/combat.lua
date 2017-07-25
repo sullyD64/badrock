@@ -348,6 +348,7 @@ end
 			-- Ammo and Bullets------------
 			combat.ammo = settings.gun.ammo
 			gun.attacks = loadBullets(gun)
+			controller.updateAmmo("initialize", combat.ammo)
 			-------------------------------
 			return gun
 		end
@@ -389,7 +390,6 @@ end
 		-- Case switch depending on the item's name
 		if ( name == "gun" ) then
 			powerUp = loadGun()
-			controller.updateAmmo("initialize", combat.ammo)
 		else
 			error("Invalid powerup name")
 		end

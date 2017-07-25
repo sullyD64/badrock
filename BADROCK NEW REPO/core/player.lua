@@ -176,6 +176,19 @@ function player.loadPlayer( currentGame )
 			self.attacks = self.powerUp.attacks
 		end
 
+		function player:refreshPowerUp( itemName )
+			transition.to(self, {time = 0, 
+				onComplete = function()
+					self:losePowerUp()
+				end
+			})
+			transition.to(self, {time = 500, 
+				onComplete = function()
+					self:equipPowerUp(itemName)
+				end
+			})
+		end
+
 		function player:losePowerUp()
 			combat.losePowerUp()
 			self.equipped = nil
