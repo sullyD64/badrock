@@ -111,7 +111,7 @@ local enemies = {
 					{name = "dead",    frames={5},   time=300, loopCount=1},
 				},
 				bodyType = "static",
-				physicsParams = { bounce = 0, friction = 1.0, density = 0.5, gravityScale = 0 },
+				physicsParams = { bounce = 0, friction = 1.0, density = 0.5, gravityScale = 0, shape ={-150,-80,  150,-80,  80,80, -80,80} },
 				eName = "enemy",
 			},
 		},
