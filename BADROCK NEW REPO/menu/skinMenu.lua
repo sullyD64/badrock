@@ -102,8 +102,6 @@ local skin = {}
 		height = 30,
 		defaultFile = visual.exitOptionMenu,
 		}
-	skin.panel.returnBtn.x= 
-	print ("HERE "..skin.panel.returnBtn.x)
 	skin.panel.returnBtn.x = 250
 	skin.panel.returnBtn.y = -95
 	skin.panel:insert(skin.panel.returnBtn)
