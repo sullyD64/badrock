@@ -8,7 +8,7 @@ local utility  = require ( "menu.utilityMenu" )
 -- local myData  = require ( "defaultData" )
 
 local result = {}
-
+local level 
 ------------------------------------------------
 -- This is required for triggering a change in game's state
 
@@ -27,7 +27,6 @@ function result.setStars(game, outcome)
 				result.panel.star[j].alpha = 0.3
 			end		
 		end
-		print(game.stars)
 	elseif (outcome == "Failed") then
 		for j = 1, 3 do
 			result.panel.star[j].alpha = 0
@@ -40,6 +39,7 @@ end
 function result.setGame( currentGame, gameStates, outcome )
 	game = currentGame
 	stateList = gameStates
+	level = myData.settings.currentLevel
 
 	if (outcome == "Completed") then
 		result.panel.menuBtn.x= -47
@@ -51,15 +51,21 @@ function result.setGame( currentGame, gameStates, outcome )
 		result.panel.nextLevelBtn.x= 53
 		result.panel.nextLevelBtn.y = 5
 
-
 		-- decide che testo viene mostrato a schermo
 		result.panel.finalText.text = "You win!"
 		result.panel.finalText:setFillColor( 0, 0.7, 0)--0.75, 0.8, 1 )
 
 		--abilita o disabilita il tasto per passare al livello successivo
 		-- meglio se outcome è completed o mydata.score già esiste?
-		result.panel.nextLevelBtn.alpha = 1,
-		result.panel.nextLevelBtn:setEnabled( true )
+		-- la if serve per disabilitre il tasto "next level" se si raggiunge il massimo di livelli esistenti
+		-- quando il numero di livelli esistenti è uguale a maxLevels sostituire "3" con "myData.maxLevels"
+		if (tonumber(level)>=3) then
+			result.panel.nextLevelBtn.alpha = 0.3,
+			result.panel.nextLevelBtn:setEnabled( false )
+		else
+			result.panel.nextLevelBtn.alpha = 1,
+			result.panel.nextLevelBtn:setEnabled( true )
+		end
 
 		result.panel.score.text = "Score: "..game.score --myData.settings.levels[game.currentLevel].score
 		
@@ -112,7 +118,7 @@ end
 		audio.stop(1)
 
 		-- cambiare il game state per andare di nuovo al livello
-		local level = myData.settings.currentLevel
+		--local level = myData.settings.currentLevel
 		game.nextScene = "level"..level
 		game.state = stateList.ENDED
 		return true
@@ -127,10 +133,9 @@ end
 		audio.fadeOut(1,100)
 		audio.stop(1)
 		-- cambiare il game state per andare al prossimo livello
-		game.nextScene = "level"..(tonumber(myData.settings.currentLevel)+1)
-		if(game.nextScene=="level4") then game.nextScene = "mainMenu" end
+		game.nextScene = "level"..tonumber(level)+1
+		myData.settings.currentLevel = level+1
 		game.state = stateList.ENDED
-
 		return true
 	end
 
