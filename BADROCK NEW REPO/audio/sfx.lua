@@ -94,12 +94,4 @@ sfx.toggleAlternativeBgm = function( flag )
   end
 end
 
--- sfx.pauseMusic = function(channel)
--- 	if ( myData.settings.musicOn == true ) then
---       -- ^ Le opzioni ci dicono di non riprodurre suoni
---       return false
---    end
---    audio.pause(channel)
--- end
-
 return sfx

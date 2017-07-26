@@ -799,7 +799,7 @@ function bossStrategy.loadBoss( trigger )
 		if (bossStrategy.activeStrategy == 0 and strategy.win == false) then
 			-- audio ----------------------------------------
 			audio.stop(1)
-			sfx.playMusic( sfx.bgBossMusic, { channel = 1 } )
+			sfx.playMusic( sfx.bgBossMusic, { channel = 1, loops=-1 } )
 			-------------------------------------------------
 			strategy:startFight()
 			-- Closes the area of the fight
