@@ -150,7 +150,7 @@ util = {}
 ------------------------------------------------------------------------------------
 
 -- MAP UTILITIES -------------------------------------------------------------------
-	function util.prepareMap(currentMap)
+	function util.prepareMap(currentMap, doNotSetBounds)
 		local map = currentMap
 		if not map then return end
 
@@ -158,13 +158,15 @@ util = {}
 
 		map:setScale(0.6)
 
-		local bounds = {
-			xMin = 0,
-			yMin = 0,
-			xMax = props.tilewidth:getValue() * props.width:getValue() - display.viewableContentWidth + display.contentCenterX * 1.25,
-			yMax = props.tileheight:getValue() * props.height:getValue() - display.viewableContentHeight + display.contentCenterY * 0.70,
-		}
-		map:setClampingBounds( bounds.xMin, bounds.yMin, bounds.xMax, bounds.yMax )
+		if (not doNotSetBounds) then
+			local bounds = {
+				xMin = 0,
+				yMin = 0,
+				xMax = props.tilewidth:getValue() * props.width:getValue() - display.viewableContentWidth + display.contentCenterX * 1.25,
+				yMax = props.tileheight:getValue() * props.height:getValue() - display.viewableContentHeight + display.contentCenterY * 0.70,
+			}
+			map:setClampingBounds( bounds.xMin, bounds.yMin, bounds.xMax, bounds.yMax )
+		end
 
 		local walls = map:getTileLayer("blockingWalls")
 		if (walls) then 

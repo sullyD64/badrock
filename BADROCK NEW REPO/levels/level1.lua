@@ -63,7 +63,6 @@ function scene:show( event )
 	elseif (phase == "did") then
 		timer.performWithDelay(250, 
 			function()
-				loadingText:toFront()
 				map = loader.loadMap(mapName, sceneGroup)
 				-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
 				-- checkPoints contenente ALMENO un oggetto "check0" (primo checkPoint)

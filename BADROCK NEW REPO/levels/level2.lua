@@ -40,7 +40,7 @@ function scene:create( event )
 	sceneGroup:insert(loadingText)
 
 	-- mapName = "bossTest_HD.tmx" 
-	 mapName = "mapTest_HD.tmx" 
+	 mapName = "level2.tmx" 
 	--mapName = "level1_DEF.tmx" 
 end
 
@@ -58,7 +58,7 @@ function scene:show( event )
 		timer.performWithDelay(250, 
 			function()
 				loadingText:toFront()
-				map = loader.loadMap(mapName, sceneGroup)
+				map = loader.loadMap(mapName, sceneGroup, "doNotSetBounds")
 				-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
 				-- checkPoints contenente ALMENO un oggetto "check0" (primo checkPoint)
 				game.loadGame( map, map:getObjectLayer("checkPoints"):getObject("check0"))
