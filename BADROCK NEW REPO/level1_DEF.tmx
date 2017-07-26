@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.1" orientation="orthogonal" renderorder="right-down" width="100" height="28" tilewidth="64" tileheight="64" nextobjectid="97">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="100" height="28" tilewidth="64" tileheight="64" nextobjectid="97">
  <properties>
   <property name="ParallaxEnabled" value="true"/>
  </properties>
@@ -935,7 +935,7 @@
     <property name="sectionID" value="1"/>
    </properties>
   </object>
-  <object id="58" name="robot4" type="robot" x="3222" y="482">
+  <object id="58" name="robot4" type="robot" x="3224" y="502">
    <properties>
     <property name="id" value="8"/>
     <property name="sectionID" value="2"/>
@@ -943,7 +943,7 @@
     <property name="travelDistance" value="320"/>
    </properties>
   </object>
-  <object id="46" name="robot3" type="robot" x="1001.33" y="234">
+  <object id="46" name="robot3" type="robot" x="1000.33" y="252">
    <properties>
     <property name="id" value="6"/>
     <property name="sectionID" value="2"/>
@@ -951,7 +951,7 @@
     <property name="travelDistance" value="250"/>
    </properties>
   </object>
-  <object id="41" name="robot2" type="robot" x="2008.61" y="912.121">
+  <object id="41" name="robot2" type="robot" x="2007.61" y="947.121">
    <properties>
     <property name="drop" value="gun"/>
     <property name="id" value="4"/>
