@@ -5,27 +5,27 @@ local sfx = {
   bgLvlMusic   = audio.loadStream( "audio/Level1BGM/Highways_standard.mp3" ),
   bgLvlMusicUP = audio.loadStream( "audio/Level1BGM/Highways_G_faster.mp3" ),
   bgBossMusic  = audio.loadStream( "audio/Level1BGM/Highways_shuffle_fastest.mp3"),
-  jumpSound     = audio.loadSound( "audio/jump.mp3"       ),
-  coinSound     = audio.loadSound( "audio/coin.mp3"       ),
-  lifeupSound   = audio.loadSound( "audio/lifeup.mp3"     ),
-  gunSound      = audio.loadSound( "audio/gun.mp3"        ),
-  boom1Sound    = audio.loadSound( "audio/boom_small.mp3" ),
-  boom2Sound    = audio.loadSound( "audio/boom_big.mp3"   ),
-  noAmmoSound   = audio.loadSound( "audio/noAmmo.mp3"     ),
-  attackSound   = audio.loadSound( "audio/attack.mp3"     ),
-  dangerSound   = audio.loadSound( "audio/danger3.mp3"    ),
-  enemyDefSound = audio.loadSound( "audio/danger.mp3"     ),--enemyDef.wav"   ),
-  npcGoodSound  = audio.loadSound( "audio/npc_good.mp3"   ),
-  npcEvilSound  = audio.loadSound( "audio/npc_evil.mp3"   ),
-  levelEndSound = audio.loadSound( "audio/level_ended.mp3"),
-  gameOverSound = audio.loadSound( "audio/game_over.mp3"  ),
-  buttonSound = audio.loadSound( "audio/buttonPress.mp3"  ),
+  jumpSound     = audio.loadSound( "audio/jump.wav"       ),
+  coinSound     = audio.loadSound( "audio/coin.wav"       ),
+  lifeupSound   = audio.loadSound( "audio/lifeup.wav"     ),
+  gunSound      = audio.loadSound( "audio/gun.wav"        ),
+  boom1Sound    = audio.loadSound( "audio/boom_small.wav" ),
+  boom2Sound    = audio.loadSound( "audio/boom_big.wav"   ),
+  noAmmoSound   = audio.loadSound( "audio/noAmmo.wav"     ),
+  attackSound   = audio.loadSound( "audio/attack.wav"     ),
+  dangerSound   = audio.loadSound( "audio/danger3.wav"    ),
+  enemyDefSound = audio.loadSound( "audio/danger.wav"     ),--enemyDef.wav"   ),
+  npcGoodSound  = audio.loadSound( "audio/npc_good.wav"   ),
+  npcEvilSound  = audio.loadSound( "audio/npc_evil.wav"   ),
+  levelEndSound = audio.loadSound( "audio/level_ended.wav"),
+  gameOverSound = audio.loadSound( "audio/game_over.wav"  ),
+  buttonSound = audio.loadSound( "audio/buttonPress.wav"  ),
   clickSound = audio.loadSound("audio/click.mp3")
 }
 
 -- inizializzare i volumi e i canali dei diversi suoni
 sfx.init = function()
-	-- riserva 5 canali audio
+	-- riserva 10 canali audio
    audio.reserveChannels(10)
    --sfx.masterVolume = audio.getVolume()  --print( "volume "..masterVolume )
    audio.setVolume( myData.settings.volumeBgm/100, { channel = 1 } )  --background music

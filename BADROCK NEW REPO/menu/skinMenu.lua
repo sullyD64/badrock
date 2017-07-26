@@ -3,16 +3,8 @@ local utility   = require ( "menu.utilityMenu" )
 local buy       = require ( "menu.buyMenu"     )
 local sfx      = require ( "audio.sfx"        )
 
-local skinBtn
-local backBtn
-local btns
 local skin = {}
 
-	function skin.setToEnableButtons(skinButton, backButton, buttons)
-		skinBtn = skinButton
-		backBtn = backButton
-		btns = buttons
-	end
 
 	-- Risponde al tocco di una delle skin, la seleziona se è sbloccata,
 	-- richiama la finestra di acquisto se non è sbloccata
@@ -55,9 +47,6 @@ local skin = {}
 		inEasing = easing.linear,
 		outEasing = easing.outCubic
 	}
-	--skin.panel.backgroundprova = display.newRoundedRect(0,0, skin.panel.width, skin.panel.height, 10)---20)--display.newRoundedRect( 0, 0, skin.panel.width, skin.panel.height-20, 10 )
-	--skin.panel.backgroundprova:setFillColor( 0.5, 0.28, 0.6)--0, 0.25, 0.5 )
-	--skin.panel:insert( skin.panel.backgroundprova )
 
 	skin.panel.background = display.newImageRect(visual.bgMenuSkin, skin.panel.width, skin.panel.height-40)---20)--display.newRoundedRect( 0, 0, skin.panel.width, skin.panel.height-20, 10 )
 	skin.panel.background.y= -10
@@ -144,7 +133,6 @@ local skin = {}
 	skin.panel:insert( skin.panel.skinGroup )
 
 	skin.panel.freccia = display.newImageRect(visual.frecciaSkin, 190, 70)
-	--skin.panel.freccia.x 
 	skin.panel.freccia.y = 65
 	skin.panel:insert(skin.panel.freccia)
 

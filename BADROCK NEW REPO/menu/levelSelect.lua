@@ -27,7 +27,17 @@ local buttons = {}
 			utility.pressButton()
 		end
 		if ( "ended" == event.phase ) then
-			composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
+			if (activeMenu) then
+				skin.panel:hide()
+				skin.pointsPanel:hide()
+				backButton:setEnabled(true)
+				for i=1, myData.maxLevels do
+					buttons[i]:setEnabled(true)
+				end
+				activeMenu = false
+			else 
+				composer.gotoScene( "menu.mainMenu", { effect="fade", time=280 } )
+			end
 		end
 	end
 
@@ -45,8 +55,6 @@ local buttons = {}
 				end
 				activeMenu = false
 			else 
-				skin.setToEnableButtons(skinButton, backButton, buttons)
-				backButton:setEnabled(false)
 				for i=1, myData.maxLevels do
 					buttons[i]:setEnabled(false)
 				end

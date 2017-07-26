@@ -445,7 +445,7 @@ local strategyBoss1 = {}
 
 			-- audio ----------------------------------------
 			audio.stop(1)
-			sfx.playMusic( sfx.bgLvlMusic, { channel = 1 } )
+			sfx.playMusic( sfx.bgLvlMusic, {channel = 1 , loops=-1} )
 			-------------------------------------------------
 
 			--IL DELAY DEVE ESSERE CIRCA UGUALE AL TEMPO DI RESPAWN DI STEVE
@@ -807,7 +807,7 @@ function bossStrategy.loadBoss( trigger )
 		if (bossStrategy.activeStrategy == 0 and strategy.win == false) then
 			-- audio ----------------------------------------
 			audio.stop(1)
-			sfx.playMusic( sfx.bgBossMusic, { channel = 1, loops=-1 } )
+			sfx.playMusic( sfx.bgBossMusic, {channel = 1 , loops=-1} )
 			-------------------------------------------------
 			strategy:startFight()
 			-- Closes the area of the fight
