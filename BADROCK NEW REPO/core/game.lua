@@ -776,8 +776,6 @@ function game.start()
 	Runtime:addEventListener("collision", collisions.onCollision)
 	Runtime:addEventListener("enterFrame", onUpdate)
 	dbtimer = timer.performWithDelay(200, debug, 0)
-	game.state=gameStateList.RUNNING
-	controller.pauseBeingHandled=false
 end
 
 function game.pause()

@@ -650,6 +650,8 @@ function controller:start()
 	controller.SSVEnabled = true
 	controller.SSVLaunched = false
 	controller.noMovementDetected = false
+	--per permettere la pausa quando viene ricaricato il livello
+	controller.pauseBeingHandled=false
 end
 
 function controller:pause()
