@@ -52,7 +52,7 @@ function npcs.loadNPCs( currentGame )
 	-- Loads the main animated Entity.
 		local loadEntity = function( npcObj )
 			local nSprite = entity.newEntity(settings.options)
-			nSprite.score = 1000
+			nSprite.score = 400
 			nSprite.x, nSprite.y = npcObj.x, npcObj.y
 			nSprite:addOnMap( currentMap )
 

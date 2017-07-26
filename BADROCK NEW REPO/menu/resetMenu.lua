@@ -30,9 +30,10 @@ local reset = {}
 	local function onConfirmReset()
 		service.resetData()
 		myData = service.loadData()
-		reset.panel:hide()
-		soundBtn:setEnabled(true)
-		aboutBtn:setEnabled(true)
+		native.requestExit()
+		-- reset.panel:hide()
+		-- soundBtn:setEnabled(true)
+		-- aboutBtn:setEnabled(true)
 	end
 
 	-- Create the about panel
@@ -59,9 +60,16 @@ local reset = {}
 	reset.panel.title:setFillColor( 1, 1, 1 )
 	reset.panel:insert( reset.panel.title )
 
-	reset.panel.title = display.newText( "       Are you sure you \n want to cancel your saves?", 0, -37, utility.font, 15 ) --che scriviamo qui?
-	reset.panel.title:setFillColor( 1, 1, 1 )
-	reset.panel:insert( reset.panel.title )
+	reset.panel.text = display.newText( "Are you sure?", 0, -45, utility.font, 15 )
+	reset.panel.text:setFillColor( 1, 1, 1 )
+	reset.panel:insert( reset.panel.text )
+
+	reset.panel.text1 = display.newText( "Game will close and", 0, -32, utility.font, 12 )
+	reset.panel.text1:setFillColor( 1, 1, 1 )
+	reset.panel:insert( reset.panel.text1 )
+	reset.panel.text2 = display.newText( "you'll need to restart", 0, -22, utility.font, 12 )
+	reset.panel.text2:setFillColor( 1, 1, 1 )
+	reset.panel:insert( reset.panel.text2 )
 
 	reset.panel.returnBtn = widget.newButton {
         onRelease = onReturnBtnRelease,

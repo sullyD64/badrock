@@ -5,7 +5,6 @@
 -----------------------------------------------------------------------------------------
 
 local widget  = require ( "widget"           )
---local myData  = require ( "myData"           )
 local utility = require ( "menu.utilityMenu" )
 local aboutBtn, resetBtn, retryBtn, menuBtn
 local bgm
