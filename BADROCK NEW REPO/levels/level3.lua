@@ -16,6 +16,7 @@ local scene = composer.newScene()
 -- -----------------------------------------------------------------------------------
 
 local mapName, map
+local loadingText
 
 local function startTutorial()
 	game.state = "Paused"
@@ -40,13 +41,13 @@ function scene:create( event )
 	blackScreen:setFillColor( 0, 0, 0 ) 
 	sceneGroup:insert(blackScreen)
 
-	local loadingText = display.newText( "LOADING...", display.contentCenterX, display.contentCenterY, native.systemFont, 24 )
-	loadingText:setTextColor( 255, 255, 255 ) 
+	loadingText = display.newImageRect( visual.loading, 279, 58 )
+	loadingText.x, loadingText.y = display.contentCenterX, display.contentCenterY
 	sceneGroup:insert(loadingText)
 
 	 mapName = "bossTest_HD.tmx" 
 	-- mapName = "mapTest_HD.tmx" 
-	--mapName = "level1_DEF - Copia.tmx" 
+	--mapName = "level1_DEF.tmx" 
 end
 
 -- show()
@@ -62,6 +63,7 @@ function scene:show( event )
 	elseif (phase == "did") then
 		timer.performWithDelay(250, 
 			function()
+				loadingText:toFront()
 				map = loader.loadMap(mapName, sceneGroup)
 				-- La mappa caricata deve SEMPRE avere un layer di OGGETTI chiamato
 				-- checkPoints contenente ALMENO un oggetto "check0" (primo checkPoint)
