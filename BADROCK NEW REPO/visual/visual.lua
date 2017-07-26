@@ -104,6 +104,7 @@ local visual = {
 	bossTesta              = "visual/sprites/testaBossAnim.png",
 	bossCorpo              = "visual/sprites/corpoBossAnim.png",
 	bossLaser              = "visual/sprites/laserSprite.png",
+	bossSight              = "visual/sprites/sight.png",
 
 	--loading screen
 	loading                = "visual/misc/loading.png",

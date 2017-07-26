@@ -451,6 +451,10 @@ local boss = {
 		local function schiaccia(targetX)
 			if( oggetto and target and strategy.state == "Running" and oggetto.lives ==2) then
 
+				if(oggetto.sight)then
+					transition.to(oggetto.sight,{time=200, alpha = 0 } )
+				end
+
 				local t = timer.performWithDelay(10,addPhysicBody(oggetto))
 				table.insert(strategy.timers, t)
 			
@@ -462,6 +466,11 @@ local boss = {
 		local function insegui()
 			if( oggetto and target and strategy.state == "Running" and oggetto.lives ==2) then
 
+				if(oggetto.sight)then
+					transition.to(oggetto.sight,{ x = target.x, y=target.y } )
+				end
+
+
 				transition.to(oggetto,{ x = target.x ,onComplete=function()
 					local x = oggetto.x
 					local t = timer.performWithDelay(500,funzioni.schiaccia(x))
@@ -472,6 +481,23 @@ local boss = {
 		end
 		local function alzati()
 			if( oggetto and target  and strategy.state == "Running" and oggetto.lives ==2) then
+
+				if(not oggetto.sight)then
+					local sight = entity.newEntity{
+						bodyType= "static",
+						height = 50,
+						width = 37,
+						filePath = visual.bossSight,
+					 	physicsParams = { density = 1.0 , isSensor=true, gravityScale=0},
+						eName = "visual"
+					}
+					sight.x , sight.y = oggetto.x, target.y
+					oggetto.sight = sight
+					oggetto.sight.alpha=0
+					oggetto.sight:addOnMap(game.map)
+				end
+					transition.to(oggetto.sight, {time=200,y= target.y, alpha=1})
+				
 
 				local t =timer.performWithDelay(10,removePhysicBody(oggetto))
 				table.insert(strategy.timers, t)

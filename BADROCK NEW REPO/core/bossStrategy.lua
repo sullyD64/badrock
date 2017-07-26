@@ -403,12 +403,13 @@ local strategyBoss1 = {}
 			-----------------------
 			self:destroyHealthBar()
 			-----------------------
+			transition.to(self.spawn, {time=2000, y= self.spawnOriginalPosition.y + 50, onComplete= function()  
+				self.bossEntity.corpo:setSequence("destroy")
+				self.bossEntity.corpo:play()
+			end})
 
-			self.bossEntity.corpo:setSequence("destroy")
-			self.bossEntity.corpo:play()
-
-			transition.to(self.bossEntity.manoSx, {time=1000, x= self.spawn.x, y= self.spawn.y, onComplete=function() self.bossEntity.manoSx.alpha=0 end})
-			transition.to(self.bossEntity.manoDx, {time=1000, x= self.spawn.x, y= self.spawn.y, onComplete=function() self.bossEntity.manoDx.alpha=0 end})
+			transition.to(self.bossEntity.manoSx, {time=2000, x= self.spawn.x, y= self.spawn.y, onComplete=function() self.bossEntity.manoSx.alpha=0 end})
+			transition.to(self.bossEntity.manoDx, {time=2000, x= self.spawn.x, y= self.spawn.y, onComplete=function() self.bossEntity.manoDx.alpha=0 end})
 			--pause all timers of this strategy
 			if(self.timers)then
 				for i,t in pairs(self.timers)do
@@ -441,7 +442,7 @@ local strategyBoss1 = {}
 
 			--IL DELAY DEVE ESSERE CIRCA UGUALE AL TEMPO DI RESPAWN DI STEVE
 
-			timer.performWithDelay(1000, function()
+			timer.performWithDelay(1100, function()
 				self.isActive=false
 				bossStrategy.activeStrategy=0
 
@@ -462,6 +463,10 @@ local strategyBoss1 = {}
 				 				transition.cancel(part.laser.laser2)
 				 				display.remove(part.laser.laser2)
 				 			end
+				 		end
+				 		if(part.sight)then
+				 			transition.cancel(part.sight)
+				 			display.remove(part.sight)
 				 		end
 					end
 					transition.cancel(part)
@@ -506,6 +511,9 @@ local strategyBoss1 = {}
 			 		if(part.laser)then
 			 			transition.pause(part.laser)
 			 		end
+			 		if(part.sight)then
+			 			transition.pause(part.sight)
+			 		end
 				end
 			 end	
 
@@ -546,6 +554,9 @@ local strategyBoss1 = {}
 				elseif(part.name=="manoSx" or part.name=="manoDx") then
 					if(part.laser)then
 						transition.resume(part.laser)
+					end
+					if(part.sight)then
+						transition.resume(part.sight)
 					end
 				end
 			end	
