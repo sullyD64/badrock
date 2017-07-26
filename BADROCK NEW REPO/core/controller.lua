@@ -199,7 +199,7 @@ local sState = {}
 				steve:performAttack()
 
 				local isAttackValid = true 	-- flag is used to call cancelAttack only once
-				local attackValidityCheck = function()
+				controller.attackValidityCheck = function()
 					if (isAttackValid) then
 						-- print("sto controllando...")
 						if (steve.state == sState.DEAD) or controller.deathBeingHandled then
@@ -209,13 +209,13 @@ local sState = {}
 						end
 					end
 				end
-				Runtime:addEventListener("enterFrame", attackValidityCheck)
+				Runtime:addEventListener("enterFrame", controller.attackValidityCheck)
 
 				timer.performWithDelay(steve.attackDuration,
 					function()
 						button.active = true
 						button.alpha = 1
-						Runtime:removeEventListener("enterFrame", attackValidityCheck)
+						Runtime:removeEventListener("enterFrame", controller.attackValidityCheck)
 						isAttackValid = false
 						-- print("fine controllo")
 					end
@@ -280,6 +280,7 @@ local sState = {}
 		controller.pauseEnabled = false
 
 		if (steve.attack) then
+			Runtime:removeEventListener("enterFrame", controller.attackValidityCheck)
 			steve:cancelAttack()
 		end
 		---------------------------------------
