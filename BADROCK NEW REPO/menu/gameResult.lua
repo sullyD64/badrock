@@ -128,8 +128,8 @@ end
 		audio.stop(1)
 		-- cambiare il game state per andare al prossimo livello
 		print("livello: "..myData.settings.currentLevel)
-		if(myData.settings.currentLevel==4) then game.nextScene = "mainMenu" 
-		else game.nextScene = "level"..tonumber(myData.settings.currentLevel) end
+		if(myData.settings.currentLevel==3) then game.nextScene = "mainMenu" 
+		else game.nextScene = "level"..tonumber(myData.settings.currentLevel)+1 end
 		game.state = stateList.ENDED
 
 		return true

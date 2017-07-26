@@ -440,7 +440,6 @@ physics.setGravity( 0, 80 )
 		myData.settings.goodPoints = myData.settings.goodPoints + game.goodPoints
 		myData.settings.evilPoints = myData.settings.evilPoints + game.evilPoints 
 
-		myData.settings.currentLevel = myData.settings.currentLevel + 1
 
 		-- SERVICE -------
 		service.saveData()
