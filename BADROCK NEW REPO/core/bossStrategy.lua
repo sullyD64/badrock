@@ -31,8 +31,9 @@ local strategyBoss1 = {}
 		strategyB1.state = "Loaded"
 		strategyB1.timers={}          --campo opzionale per altre strategy
 		strategyB1.fireRateSx = 5000  --campo opzionale per altre strategy
-		strategyB1.fireRateDx = 5000  --campo opzionale per altre strategy
-		strategyB1.maxFireRate = 800
+		strategyB1.fireRateDx = 5000 
+		strategyB1.minFireRate = 5000 --campo opzionale per altre strategy
+		strategyB1.maxFireRate = 1200
 		strategyB1.spawn = game.map:getObjectLayer("bossSpawn"):getObject("bossSpawn")
 		strategyB1.spawnOriginalPosition= {x=strategyB1.spawn.x , y= strategyB1.spawn.y}
 		strategyB1.win = false
@@ -119,6 +120,7 @@ local strategyBoss1 = {}
 							self.bossEntity.testa:play()
 							transition.to(self.bossEntity.testa, {time = 0,onComplete= function()
 								self.bossEntity.testa.gravityScale = 0
+								self.bossEntity.testa.isBodyActive = false
 							end	})
 							
 							-- Caricamento ManoSx Boss	
@@ -294,11 +296,14 @@ local strategyBoss1 = {}
 			self.phase=2
 		 	print("PHASE = 2")
 
+
 		 	if(self.bossEntity.spallaDx.state == "normal") then
 		 		self.bossEntity.spallaDx.isTargettable =true
+		 		self.fireRateDx = self.minFireRate
 		 	end
 		 	if(self.bossEntity.spallaSx.state == "normal") then
 				self.bossEntity.spallaSx.isTargettable =true
+				self.fireRateSx = self.minFireRate
 			end
 
 			--Sposta il corpo del boss con tutto il resto verso il basso
@@ -340,7 +345,10 @@ local strategyBoss1 = {}
 		 	print("PHASE = 3")
 
 		 	--La testa del boss diventa finalmente colpibile
-		 	transition.to(self.bossEntity.testa,{time = 5000, onComplete=function() self.bossEntity.testa.isTargettable=true end })
+		 	transition.to(self.bossEntity.testa,{time = 5000, onComplete=function()
+		 	 self.bossEntity.testa.isTargettable=true
+		 	 self.bossEntity.testa.isBodyActive = true
+		 	  end })
 		 	--Sposta il corpo del boss con tutto il resto verso l'alto
 			transition.to(self.spawn, {time=4000, y= self.spawnOriginalPosition.y - 220})
 		 	-- da togliere--
