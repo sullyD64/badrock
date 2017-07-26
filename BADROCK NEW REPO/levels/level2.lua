@@ -4,7 +4,6 @@
 --
 -----------------------------------------------------------------------------------------
 local composer = require ( "composer"  )
-local tutorial = require ( "tutorial"  )
 local sfx      = require ( "audio.sfx" )
 local game     = require ( "core.game" )
 local loader   = require ( "lib.mapLoader" )
@@ -17,11 +16,6 @@ local scene = composer.newScene()
 
 local mapName, map
 local loadingText
-
-local function startTutorial()
-	game.state = "Paused"
-	tutorial.start()
-end
 
 -- -----------------------------------------------------------------------------------
 -- SCENE EVENT FUNCTIONS
@@ -80,10 +74,6 @@ function scene:show( event )
 
 				game.start()
 
-				if (myData.firstStart) then
-					tutorial.create(game)
-					timer.performWithDelay(400, startTutorial)
-				end
 			end
 		)
 	end
